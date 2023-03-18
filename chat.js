@@ -1,4 +1,5 @@
 require('dotenv').config();
+const ee = require('./ee');
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
 let ws = null;
@@ -32,12 +33,15 @@ const reduceMessage = (data) => {
 	} catch (e) {}
 	if (json?.result?.channel === WS_CHANNEL) {
 		const from = json.result?.data?.data?.data?.author?.nick;
-		const message = json.result.data.data.data.data
+		const text = json.result.data.data.data.data
 			.filter((item) => item.type === 'text')
 			.filter((item) => item.content)
 			.map((item) => JSON.parse(item.content)[0])
 			.join('\n');
-			console.log(`${from}: "${message}"`);
+			ee.emit('ws:message', {
+				from,
+				text,
+			});
 	}
 }
 
@@ -73,4 +77,6 @@ const init = () => {
 	.then(connect);
 }
 
-init();
+module.exports = {
+	init,
+}

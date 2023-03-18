@@ -1,8 +1,8 @@
 const { createCanvas, Image } = require('canvas');
 const fs = require('fs');
 
-const WIDTH = 300;
-const HEIGHT = 300;
+const WIDTH = 854;
+const HEIGHT = 480;
 
 const canvas = createCanvas(WIDTH, HEIGHT);
 const ctx = canvas.getContext('2d');
