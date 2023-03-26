@@ -14,8 +14,6 @@
   "dependencies": {
     "canvas": "^2.11.0",
     "dotenv": "^16.0.3",
-    "effector": "^22.7.0",
-    "effector-react": "^22.5.1",
     "emittery": "^1.0.1",
     "node-fetch": "^2.6.9",
     "node-sass": "^8.0.0",

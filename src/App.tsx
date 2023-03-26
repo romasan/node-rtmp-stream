@@ -9,7 +9,7 @@ import { Palette } from './components/Palette';
 import { sendMessage } from './ws';
 
 export const App: React.FC = () => {
-	const [showed, toggle] = useState(false);
+	const [showed, toggle] = useState(true);
 
 	const handleCanvasClick = (x: number, y: number) => {
 		// toggle(true);
@@ -34,11 +34,13 @@ export const App: React.FC = () => {
 			<Palette />
 			{showed && (
 				<Modal onClose={() => toggle(false)}>
-					Чтобы присоединиться к PIXEL BATTLE<br />
-					напиши свой ник на VK Play<br />
-					<input type="text" /><br />
-					и в чат стрима отправь команду !join<br />
-					<button onClick={handleOpenChatClick}>ОТКРЫТЬ ЧАТ</button>
+					<div className={s.joinModalContent}>
+						<div>Чтобы присоединиться к PIXEL BATTLE</div>
+						<div>напиши свой ник на VK Play</div>
+						<div><input type="text" className={s.input} /></div>
+						<div>и в чат стрима отправь команду <span className={s.command}>!join</span></div>
+						<button onClick={handleOpenChatClick} className={s.button}>ОТКРЫТЬ ЧАТ</button>
+					</div>
 				</Modal>
 			)}
 		</div>

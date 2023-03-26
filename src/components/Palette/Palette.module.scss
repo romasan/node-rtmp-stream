@@ -1,8 +1,8 @@
 .root {
-	width: 400px;
-	height: 100px;
+	display: flex;
+	gap: 10px;
 	position: absolute;
-	padding: 15px;
+	padding: 10px;
 	color: black;
 	background: #aaa8d9;
 	border-style: solid;
@@ -11,4 +11,49 @@
 	border-left-color: #b6b5eb;
 	border-right-color: #2d2d3a;
 	border-bottom-color: #2d2d3a;
+	border-radius: 5px;
+	cursor: grab;
+}
+
+.draggable {
+	width: 25px;
+	height: 69px;
+	display: inline-block;
+	background-image: linear-gradient(0deg, white 0%, white 25%, black 25.1%, black 50%, transparent 50.1%, transparent 100%);
+	background-size: 4px 4px;
+}
+
+.currentColor {
+	background: #c2c1fa;
+	width: 69px;
+	height: 69px;
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #b6b5eb;
+	border-bottom-color: #b6b5eb;
+	border-top-color: #2d2d3a;
+	border-left-color: #2d2d3a;
+	box-sizing: border-box;
+}
+
+.colors {
+	display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, 1fr);
+	grid-auto-flow: column;
+	gap: 5px;
+}
+
+.color {
+	width: 30px;
+	height: 30px;
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #b6b5eb;
+	border-bottom-color: #b6b5eb;
+	border-top-color: #2d2d3a;
+	border-left-color: #2d2d3a;
+	box-sizing: border-box;
+	cursor: pointer;
 }

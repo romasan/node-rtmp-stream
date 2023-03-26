@@ -11,8 +11,6 @@
 }
 
 .window {
-	width: 500px;
-	height: 400px;
 	position: relative;
 	padding: 15px;
 	color: black;
@@ -23,6 +21,7 @@
 	border-left-color: #b6b5eb;
 	border-right-color: #2d2d3a;
 	border-bottom-color: #2d2d3a;
+	border-radius: 5px;
 }
 
 .close {
@@ -35,6 +34,9 @@
 	justify-content: center;
 	align-items: center;
 	box-sizing: border-box;
+	padding: 0 1px 3px 0;
+	border-radius: 5px;
+	font-size: 23px;
 	cursor: pointer;
 
 	&:hover {
@@ -44,5 +46,6 @@
 		border-bottom-color: #b6b5eb;
 		border-top-color: #2d2d3a;
 		border-left-color: #2d2d3a;
+		color: #ff0000;
 	}
 }

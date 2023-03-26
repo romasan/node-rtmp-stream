@@ -1,6 +1,7 @@
 # basic
 
 - [ ] auth
+- [ ] cooldown
 
 # server
 
@@ -9,4 +10,3 @@
 # web
 - [x] drawing
 - [ ] zooming
-- [ ] cooldown
