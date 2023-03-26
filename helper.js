@@ -1,12 +1,47 @@
 const { createCanvas, Image } = require('canvas');
 const fs = require('fs');
 
-const WIDTH = 854;
-const HEIGHT = 480;
+const WIDTH = 426;//854;
+const HEIGHT = 240;//480;
 
-const canvas = createCanvas(WIDTH, HEIGHT);
-const ctx = canvas.getContext('2d');
-ctx.fillStyle = '#ffffff';
-ctx.fillRect(0, 0, WIDTH, HEIGHT);
+const COLORS = [
+	'#e2d747',
+	'#a5dd5f',
+	'#56ba37',
+	'#5fcfdb',
+	'#3681c1',
+	'#091de0',
+	'#c276de',
+	'#77197c',
+	'#e4e4e4',
+	'#888888',
+	'#f1aacf',
+	'#d22d1f',
+	'#db9834',
+	'#976c49',
+];
 
-fs.writeFileSync('inout.png', canvas.toBuffer());
+const func = (file) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, WIDTH, HEIGHT);
+	
+	// const inc = 1;
+	// for (let x = 0; x < WIDTH / inc; x++) {
+	//   for (let y = 0; y < HEIGHT / inc; y++) {
+	//     const color = COLORS[Math.floor((Math.random() * COLORS.length))];
+	//     ctx.fillStyle = color;
+	//     ctx.fillRect(x * inc, y * inc, inc, inc);
+	//   }
+	// }
+	
+	fs.writeFileSync(file, canvas.toBuffer());
+}
+
+func('inout.png');
+// func('head2.png');
+// func('head3.png');
+// func('head4.png');
+// func('head5.png');
+// func('head6.png');

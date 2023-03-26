@@ -1,27 +1,11 @@
 require('dotenv').config();
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
+const { COLORS } = require('./const');
+const log = require('./log');
+const ee = require('./ee');
 
 const { IN_OUT_IMAGE } = process.env;
-
-const COLORS = {
-	yellow: '#e2d747',
-	lightgreen: '#a5dd5f',
-	green: '#56ba37',
-	cyan: '#5fcfdb',
-	cyanblue: '#3681c1',
-	blue: '#091de0',
-	lightmagenta: '#c276de',
-	magenta: '$77197c',
-	white: '#ffffff',
-	lightgray: '#e4e4e4',
-	gray: '#888888',
-	black: '#000000',
-	pink: '#f1aacf',
-	red: '#d22d1f',
-	orange: '#db9834',
-	brown: '976c49',
-};
 
 const imgBuf = fs.readFileSync(IN_OUT_IMAGE);
 const image = new Image;
@@ -34,7 +18,6 @@ ctx.drawImage(image, 0, 0);
 const randomColor = (depth) => Math.floor(Math.random() * depth)
 const random = (min, max) => (Math.random() * (max - min)) + min;
 
-
 const drawRandomLine = () => {
 	ctx.beginPath();
 	ctx.strokeStyle = `rgb(${randomColor(255)}, ${randomColor(255)}, ${randomColor(255)})`
@@ -43,12 +26,24 @@ const drawRandomLine = () => {
 	ctx.stroke();
 }
 
-const drawPix = (x, y, color) => {
-	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width) {
+const drawPix = ({x, y, color, nickname}) => {
+	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
 		return;
 	}
-	ctx.fillStyle = COLORS[color];
+
+	const rawColor = COLORS[color];
+
+	ctx.fillStyle = rawColor;
 	ctx.fillRect(x, y, 1, 1);
+	log({x, y, color: rawColor, nickname});
+	ee.emit('spam', {
+		event: 'drawPix',
+		payload: {
+			x,
+			y,
+			color: rawColor,
+		},
+	});
 }
 
 const drawRandomPix = () => {

@@ -1,0 +1,48 @@
+.root {
+	background: rgba(0, 0, 0, .5);
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.window {
+	width: 500px;
+	height: 400px;
+	position: relative;
+	padding: 15px;
+	color: black;
+	background: #aaa8d9;
+	border-style: solid;
+	border-width: 5px;
+	border-top-color: #b6b5eb;
+	border-left-color: #b6b5eb;
+	border-right-color: #2d2d3a;
+	border-bottom-color: #2d2d3a;
+}
+
+.close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	cursor: pointer;
+
+	&:hover {
+		border-style: solid;
+		border-width: 2px;
+		border-right-color: #b6b5eb;
+		border-bottom-color: #b6b5eb;
+		border-top-color: #2d2d3a;
+		border-left-color: #2d2d3a;
+	}
+}
