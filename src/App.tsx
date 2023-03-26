@@ -37,8 +37,8 @@ export const App: React.FC = () => {
 					<div className={s.joinModalContent}>
 						<div>Чтобы присоединиться к PIXEL BATTLE</div>
 						<div>напиши свой ник на VK Play</div>
-						<div><input type="text" className={s.input} /></div>
-						<div>и в чат стрима отправь команду <span className={s.command}>!join</span></div>
+						<div><input type="text" className={s.input} placeholder="nickname" /></div>
+						<div>и отправь в чат стрима <span className={s.command}>!join</span></div>
 						<button onClick={handleOpenChatClick} className={s.button}>ОТКРЫТЬ ЧАТ</button>
 					</div>
 				</Modal>

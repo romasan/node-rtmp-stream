@@ -35,6 +35,9 @@
 	border-radius: 5px;
 	&:focus{
 		outline: none;
+		&::placeholder {
+			color: transparent;
+		}
 	}
 }
 

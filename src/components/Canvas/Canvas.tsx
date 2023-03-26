@@ -40,8 +40,9 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	}, [canvasRef.current]);
 
 	return (
-		<div>
+		<div className={s.root}>
 			<canvas ref={canvasRef} className={s.canvas} onClick={handleCanvasClick}></canvas>
+			<div className={s.coordinates}>[0, 0]</div>
 		</div>
 	);
 }

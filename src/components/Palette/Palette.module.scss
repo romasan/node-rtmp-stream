@@ -12,19 +12,61 @@
 	border-right-color: #2d2d3a;
 	border-bottom-color: #2d2d3a;
 	border-radius: 5px;
-	cursor: grab;
+}
+
+.paletteContent {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.paletteControls {
+	display: flex;
+	gap: 10px;
 }
 
 .draggable {
 	width: 25px;
-	height: 69px;
+	height: 98px;
 	display: inline-block;
-	background-image: linear-gradient(0deg, white 0%, white 25%, black 25.1%, black 50%, transparent 50.1%, transparent 100%);
+	background-image: linear-gradient(0deg, #edeefc 0%, #edeefc 25%, #2d2d3a 25.1%, #2d2d3a 50%, transparent 50.1%, transparent 100%);
 	background-size: 4px 4px;
+	cursor: grab;
 }
 
-.currentColor {
-	background: #c2c1fa;
+.cooldown {
+	height: 20px;
+	box-sizing: border-box;
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #b6b5eb;
+	border-bottom-color: #b6b5eb;
+	border-top-color: #2d2d3a;
+	border-left-color: #2d2d3a;
+	border-radius: 3px;
+}
+
+.progress {
+	background: #88c429;
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #5f891e;
+	border-bottom-color: #5f891e;
+	border-top-color: #9ce22e;
+	border-left-color: #9ce22e;
+	box-sizing: border-box;
+	height: 100%;
+	border-radius: 3px;
+}
+
+.currentColorWrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-image: repeating-conic-gradient(#9493bf 0% 25%, #c2c1fa 0% 50%);
+	background-position: 0 0, 2px 2px;
+	background-size: 4px 4px;
+	background-color: #c2c1fa;
 	width: 69px;
 	height: 69px;
 	border-style: solid;
@@ -34,6 +76,21 @@
 	border-top-color: #2d2d3a;
 	border-left-color: #2d2d3a;
 	box-sizing: border-box;
+	border-radius: 3px;
+}
+
+.currentColor {
+	background: red;
+	width: 40px;
+	height: 40px;
+	border-style: solid;
+	border-width: 2px;
+	border-top-color: #b6b5eb;
+	border-left-color: #b6b5eb;
+	border-bottom-color: #2d2d3a;
+	border-right-color: #2d2d3a;
+	box-sizing: border-box;
+	border-radius: 3px;
 }
 
 .colors {

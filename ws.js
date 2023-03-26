@@ -28,7 +28,9 @@ const webServerHandler = (req, res) => {
 const handleMessage = ({ user, event, payload }) => {
 	if (event === 'pushPix' /* && user.authorized */) {
 		drawPix({
-			...payload,
+			color: payload.color,
+			x: Math.floor(payload.x),
+			y: Math.floor(payload.y),
 			nickname: user.nickname,
 		});
 	}
