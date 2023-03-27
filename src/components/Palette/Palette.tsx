@@ -1,11 +1,13 @@
 import React, { FC } from 'react';
+import { useDraggable } from '../../hooks/useDraggable';
 
 import s from './Palette.module.scss';
 
 export const Palette: FC = () => {
+	const { anchorRef, draggableRef } = useDraggable({ x: 100, y: 100 });
 	return (
-		<div className={s.root} style={{ top: '700px', left: '100px' }}>
-			<div className={s.draggable}></div>
+		<div className={s.root} ref={draggableRef}>
+			<div className={s.draggable} ref={anchorRef}></div>
 			<div className={s.paletteContent}>
 
 				<div className={s.paletteControls}>

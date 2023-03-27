@@ -48,8 +48,6 @@ export const connect = () => {
 	ws.onerror = console.error;
 
 	ws.onopen = () => {
-		console.log('==== ws open');
-
 		// => auth uuid | null
 		// <= ok | uuid
 
@@ -60,7 +58,6 @@ export const connect = () => {
 	ws.onmessage = reduceMessage;
 
 	ws.onclose = () => {
-		console.log('==== ws close');
 		clearInterval(timer);
 		setTimeout(connect, 10 * 1000);
 	}

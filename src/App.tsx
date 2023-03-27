@@ -13,7 +13,6 @@ export const App: React.FC = () => {
 
 	const handleCanvasClick = (x: number, y: number) => {
 		// toggle(true);
-		console.log(`==== handleCanvasClick ${x} ${y}`);
 		sendMessage({
 			event: 'pushPix',
 			payload: {
