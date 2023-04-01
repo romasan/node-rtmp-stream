@@ -7,7 +7,7 @@
     "start": "parcel index.html",
     "prebuild": "rm -rf dist/*.*",
     "build": "parcel build index.html",
-    "serve": "node index.js"
+    "serve": "cd ./server && node index.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const ee = require('./ee');
 const { drawPix, saveCanvas, COLORS } = require('./canvas');
-const chat = require('./chat');
+const chat = require('./vkplay-chat-listener');
 require('./ws');
 
 const { STREAM_ENABLE } = process.env;

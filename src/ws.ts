@@ -2,6 +2,10 @@ import ee from './ee';
 
 let ws: any = null;
 
+export const config: any = {
+	authWindowLocation: '',
+};
+
 const reduceMessage = ({ data }: any) => {
 	if (data === '3') {
 		return;
@@ -20,6 +24,12 @@ const reduceMessage = ({ data }: any) => {
 
 	if (event === 'drawPix') {
 		ee.emit('drawPix', payload);
+	}
+
+	if (event === 'updateConfig') {
+		Object.entries(payload).forEach(([key, value]) => {
+			config[key] = value;
+		})
 	}
 
 	// event => auth
@@ -42,8 +52,11 @@ const ping = () => {
 
 let timer = -1;
 
+const { hostname } = document.location;
+const apiHost = `ws://${hostname === 'localhost' ? '' : 'ws.'}${hostname.replace('www.', '')}:8080`
+
 export const connect = () => {
-	ws = new WebSocket('ws://localhost:8080');
+	ws = new WebSocket(apiHost);
 
 	ws.onerror = console.error;
 

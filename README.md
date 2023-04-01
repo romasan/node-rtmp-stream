@@ -10,3 +10,4 @@
 # web
 - [x] drawing
 - [ ] zooming
+- [ ] mobile layout
