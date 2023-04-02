@@ -2,10 +2,6 @@ import ee from './ee';
 
 let ws: any = null;
 
-export const config: any = {
-	authWindowLocation: '',
-};
-
 const reduceMessage = ({ data }: any) => {
 	if (data === '3') {
 		return;
@@ -22,25 +18,14 @@ const reduceMessage = ({ data }: any) => {
 
 	const { event, payload } = json;
 
-	if (event === 'drawPix') {
-		ee.emit('drawPix', payload);
+	if (event && payload) {
+		ee.emit(`ws:${event}`, payload);
 	}
-
-	if (event === 'updateConfig') {
-		Object.entries(payload).forEach(([key, value]) => {
-			config[key] = value;
-		})
-	}
-
-	// event => auth
-	// w = window.open('https://vkplay.live/pixel_battle/only-chat', '', 'width=500,height=500')
-	// event <= linked
-	// w.close()
 }
 
-export const sendMessage = (data: any) => {
+export const sendMessage = (event: string, payload: any) => {
 	if (ws) {
-		ws.send(JSON.stringify(data))
+		ws.send(JSON.stringify({ event, payload }));
 	}
 };
 

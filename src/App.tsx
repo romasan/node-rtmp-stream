@@ -1,34 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import s from './App.module.scss';
 
 import { Canvas } from './components/Canvas';
+import { Palette } from './components/Palette';
 import { Modal } from './components/Modal';
 
 import { sendMessage } from './ws';
+import ee from './ee';
 
 export const App: React.FC = () => {
 	const [showed, toggle] = useState(true);
+	const [wsStore, setWsStore] = useState<any>({});
+	const [color, setColor] = useState('');
+
+	useEffect(() => {
+		if (!color && wsStore?.environment?.palette) {
+			const firstColor = 'black' in wsStore?.environment?.palette ? 'black' : (Object.keys(wsStore?.environment?.palette) || []).pop();
+			setColor(firstColor as string);
+		}
+	}, [color, wsStore]);
 
 	const handleCanvasClick = (x: number, y: number) => {
-		// toggle(true);
-		sendMessage({
-			event: 'pushPix',
-			payload: {
-				x,
-				y,
-				color: 'red',
-			},
-		});
+		sendMessage('pushPix', { x, y, color });
 	}
 
 	const handleOpenChatClick = () => {
-		window.open('https://vkplay.live/pixel_battle/only-chat', '', 'width=500,height=500');
+		window.open('https://vkplay.live/pixel_battle/only-chat', '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
 	}
+
+	useEffect(() => {
+		ee.on('ws:environment', (payload) => {
+			setWsStore((store = {}) => ({ ...store, environment: payload }));
+		});
+	}, []);
 
 	return (
 		<div className={s.root}>
-			<Canvas onClick={handleCanvasClick} />
+			<Canvas color={wsStore?.environment?.palette[color]} onClick={handleCanvasClick} />
+			{wsStore?.environment?.palette && (
+				<Palette color={color} colors={wsStore?.environment?.palette} setColor={setColor} />
+			)}
 			{showed && (
 				<Modal onClose={() => toggle(false)}>
 					<div className={s.joinModalContent}>

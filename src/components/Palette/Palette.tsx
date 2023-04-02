@@ -3,8 +3,15 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import s from './Palette.module.scss';
 
-export const Palette: FC = () => {
+interface Props {
+	color: string;
+	colors: any;
+	setColor(value: string): void;
+}
+
+export const Palette: FC<Props> = ({ color, colors, setColor }) => {
 	const { anchorRef, draggableRef } = useDraggable({ x: 30, y: window.innerHeight - 160});
+
 	return (
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}></div>
@@ -12,34 +19,16 @@ export const Palette: FC = () => {
 
 				<div className={s.paletteControls}>
 					<div className={s.currentColorWrapper}>
-						<div className={s.currentColor}></div>
+						<div className={s.currentColor} style={{ background: colors[color]}}></div>
 					</div>
 					<div className={s.colors}>
-						{[
-							// '#ff0000', '#00ff00', '#0000ff',
-							// '#ff0000', '#00ff00', '#0000ff',
-							// '#ff0000', '#00ff00', '#0000ff',
-							// '#ff0000', '#00ff00', '#0000ff',
-							// '#ff0000', '#00ff00', '#0000ff',
-							// '#ff0000',
-							'#e2d747',
-							'#a5dd5f',
-							'#56ba37',
-							'#5fcfdb',
-							'#3681c1',
-							'#091de0',
-							'#c276de',
-							'#77197c',
-							'#ffffff',
-							'#e4e4e4',
-							'#888888',
-							'#000000',
-							'#f1aacf',
-							'#d22d1f',
-							'#db9834',
-							'#976c49',
-						].map((color) => (
-							<div key={color} className={s.color} style={{ background: color }}></div>
+						{Object.entries(colors).map(([key, color]) => (
+							<div
+								key={key}
+								className={s.color}
+								style={{ background: color as string }}
+								onClick={() => setColor(key)}
+							/>
 						))}
 					</div>
 				</div>

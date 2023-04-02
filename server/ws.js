@@ -6,11 +6,9 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const { canvas, drawPix } = require('./canvas');
 const ee = require('./lib/ee');
+const { COLORS, CHAT_WINDOW_LOCATION } = require('./const');
 
 const { WS_SERVER_PORT, WS_SECURE } = process.env;
-
-const CHARS = new Array(26).fill().map((_, i) => String.fromCharCode(97 + i) + String.fromCharCode(65 + i)).join('') + new Array(10).fill().map((_, i)=>String(i)).join('');
-const getId = (length = 11) => new Array(length).fill().map(() => CHARS[Math.floor(Math.random()*CHARS.length)]).join('');
 
 let webServer = null;
 
@@ -37,19 +35,21 @@ const handleMessage = ({ user, event, payload }) => {
 }
 
 if (WS_SECURE === 'true') {
-	const privateKey = fs.readFileSync('ssl-cert/privkey.pem', 'utf8');
-	const certificate = fs.readFileSync('ssl-cert/fullchain.pem', 'utf8');
+	const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
+	const certificate = fs.readFileSync('../ssl-cert/fullchain.pem', 'utf8');
 	const credentials = { key: privateKey, cert: certificate };
+
 	webServer = https.createServer(credentials, webServerHandler);
 } else {
 	webServer = http.createServer(webServerHandler);
 }
+
 webServer.listen(WS_SERVER_PORT);
 
 const wss = new WebSocket.Server({ server: webServer });
 
-const send = (ws, data) => {
-	ws.send(JSON.stringify(data))
+const send = (ws, event, payload) => {
+	ws.send(JSON.stringify({ event, payload }))
 };
 
 const spam = (data) => {
@@ -67,7 +67,13 @@ wss.on('connection', ws => {
 	const user = {
 		authorized: false,
 		nickname: null,
+		cooldown: Date.now(),
 	};
+
+	send(ws, 'environment', {
+		palette: COLORS,
+		authLocation: CHAT_WINDOW_LOCATION,
+	});
 
 	ws.on('message', (buf) => {
 		const raw = buf.toString()
