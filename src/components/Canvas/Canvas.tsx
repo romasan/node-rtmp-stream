@@ -2,14 +2,18 @@ import React, { FC, useRef, useState, useMemo, useCallback, useEffect, MouseEven
 
 import ee from '../../ee';
 import { WSHost } from '../../ws';
+import { posIsAbove } from '../../helpers';
 
 import s from './Canvas.module.scss';
 
 interface Props {
 	onClick(x: number, y: number): void;
 }
+
 const globalPadding = 10;
 const showPixelScale = 8;
+const minScale = .5;
+const maxScale = 40;
 
 export const Canvas: FC<Props> = ({ onClick }) => {
 	const firstRender = useRef(true);
@@ -21,22 +25,16 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 
-	const posIsAbove = ([x, y]: [number, number], el: HTMLElement) => {
-		const { left, top, width, height } = el.getBoundingClientRect();
-
-		return x >= left && x <= left + width && y >= top && y <= top + height;
-	}
-
-	const mouseDownCallback = ({ clientX, clientY, target }: any) => {
+	const mouseDownCallback = ({ clientX, clientY }: any) => {
 		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			cur.current = [clientX, clientY, false];
 		}
 	};
 
-	const mouseMoveCallback = ({ clientX, clientY, target }: any) => {
+	const mouseMoveCallback = ({ clientX, clientY }: any) => {
 		if (!cur.current.some((e) => e === -1)) {
-			const moveX = clientX - cur.current[0];
-			const moveY = clientY - cur.current[1];
+			const moveX = (clientX - cur.current[0]) / scale;
+			const moveY = (clientY - cur.current[1]) / scale;
 
 			const [,, moved] = cur.current;
 
@@ -55,7 +53,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 		}
 	};
 
-	const mouseUpCallback = ({ clientX, clientY, target }: any) => {
+	const mouseUpCallback = ({ clientX, clientY }: any) => {
 		const [,, moved] = cur.current;
 
 		if (!moved && scale >= showPixelScale && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
@@ -73,10 +71,8 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	}
 
 	const handleRootWheel = (event: any) => {
-		console.log('==== handleRootWheel', scale, pos.x, pos.y);
-		// change scale at center of screen
-		setScale((scale) => Math.min(Math.max(scale + (event.deltaY < 0 ? .2 : -.2), .5), 30));
-		// setPos()
+
+		setScale((scale) => Math.min(Math.max(scale + (event.deltaY < 0 ? .2 : -.2), minScale), maxScale));
 	};
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
@@ -149,15 +145,19 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 			className={s.root}
 			onWheel={handleRootWheel}
 		>
-			<canvas
-				ref={canvasRef}
-				className={s.canvas}
-				style={{
-					transform: `scale(${scale})`,
-					left: `${pos.x}px`,
-					top: `${pos.y}px`,
-				}}
-			/>
+			<div
+				className={s.workbench}
+				style={{ transform: `scale(${scale})` }}
+			>
+				<canvas
+					ref={canvasRef}
+					className={s.canvas}
+					style={{
+						left: `${pos.x}px`,
+						top: `${pos.y}px`,
+					}}
+				/>
+			</div>
 			<div className={s.coordinates}>
 				[{coord.join(', ')}] x {Number(scale.toFixed(2))}
 			</div>

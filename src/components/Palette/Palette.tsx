@@ -45,7 +45,7 @@ export const Palette: FC = () => {
 				</div>
 
 				<div className={s.cooldown}>
-					<div className={s.progress} style={{ width: '33%'}}></div>
+					<div className={s.progress} style={{ width: '100%'}}></div>
 				</div>
 
 			</div>

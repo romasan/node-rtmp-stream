@@ -1,17 +1,13 @@
+@import "../../styles/mixins";
+
 .root {
+	@include windowLike();
+
 	display: flex;
 	gap: 10px;
 	position: absolute;
 	padding: 10px;
 	color: black;
-	background: #aaa8d9;
-	border-style: solid;
-	border-width: 5px;
-	border-top-color: #b6b5eb;
-	border-left-color: #b6b5eb;
-	border-right-color: #2d2d3a;
-	border-bottom-color: #2d2d3a;
-	border-radius: 5px;
 }
 
 .paletteContent {
