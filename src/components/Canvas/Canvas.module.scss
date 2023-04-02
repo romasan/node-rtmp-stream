@@ -12,7 +12,6 @@
 .canvas {
 	position: absolute;
 	image-rendering: pixelated;
-	cursor: crosshair;
 }
 
 .coordinates {
@@ -25,4 +24,10 @@
 	font-family: 'Courier New', Courier, monospace;
 	font-size: 20px;
 	font-weight: bold;
+}
+
+.pixel {
+	position: absolute;
+	box-sizing: border-box;
+	border: 1px solid #ffffff;
 }

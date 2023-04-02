@@ -8,25 +8,27 @@ import s from './Canvas.module.scss';
 interface Props {
 	onClick(x: number, y: number): void;
 }
+const globalPadding = 10;
+const showPixelScale = 8;
+
 export const Canvas: FC<Props> = ({ onClick }) => {
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
+	const pixelRef = useRef<null | HTMLDivElement>(null);
 	const cur = useRef<[number, number, boolean]>([-1, -1, false]);
 	const [coord, setCoord] = useState<[number, number]>([-1, -1]);
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 
-	// const handleCanvasClick = (event: MouseEvent<HTMLCanvasElement>) => {
-	// 	const { clientX, clientY, currentTarget } = event;
-	// 	const { top, left } = currentTarget.getBoundingClientRect();
-	// 	const x = clientX - left;
-	// 	const y = clientY - top;
-	// 	onClick(x, y);
-	// }
+	const posIsAbove = ([x, y]: [number, number], el: HTMLElement) => {
+		const { left, top, width, height } = el.getBoundingClientRect();
+
+		return x >= left && x <= left + width && y >= top && y <= top + height;
+	}
 
 	const mouseDownCallback = ({ clientX, clientY, target }: any) => {
-		if (canvasRef.current?.contains(target as Node)) {
+		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			cur.current = [clientX, clientY, false];
 		}
 	};
@@ -42,7 +44,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
 
-		if (canvasRef.current?.contains(target as Node)) {
+		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
 			const x = Math.floor((clientX - left) / scale);
 			const y = Math.floor((clientY - top) / scale);
@@ -56,7 +58,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	const mouseUpCallback = ({ clientX, clientY, target }: any) => {
 		const [,, moved] = cur.current;
 
-		if (!moved && canvasRef.current?.contains(target as Node)) {
+		if (!moved && scale >= showPixelScale && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 				const { top, left } = canvasRef.current.getBoundingClientRect();
 				const x = Math.floor((clientX - left) / scale);
 				const y = Math.floor((clientY - top) / scale);
@@ -103,6 +105,20 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 		});
 	}, [canvasRef.current]);
 
+	const getPixelStyle = () => {
+		const { left = 0, top = 0 } = canvasRef.current?.getBoundingClientRect() || {};
+		const [x, y] = coord;
+
+		return {
+			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
+			left: `${-globalPadding + left + x * scale}px`,
+			top: `${-globalPadding + top + y * scale}px`,
+			width: `${scale}px`,
+			height: `${scale}px`,
+			background: 'red',
+		};
+	}
+
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
 			firstRender.current = false;
@@ -125,7 +141,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 			document.removeEventListener('mouseup', mouseUpCallback);
 			document.removeEventListener('drag', dragCallback);
 		}
-	}, [rootRef.current, canvasRef.current, scale]);
+	}, [rootRef.current, canvasRef.current, pixelRef.current, scale]);
 
 	return (
 		<div
@@ -142,7 +158,13 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 					top: `${pos.y}px`,
 				}}
 			/>
-			<div className={s.coordinates}>[{coord.join(', ')}] x {Number(scale.toFixed(2))}</div>
+			<div className={s.coordinates}>
+				[{coord.join(', ')}] x {Number(scale.toFixed(2))}
+			</div>
+			<div
+				className={s.pixel}
+				style={scale ? getPixelStyle() : {}}
+			/>
 		</div>
 	);
 }
