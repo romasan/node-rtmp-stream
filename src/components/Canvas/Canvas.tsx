@@ -144,9 +144,21 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 		setScale((scale) => getInRange(scale * 2, [minScale, maxScale]));
 	}, []);
 
-	const ohandleClickinus = useCallback(() => {
+	const handleClickMinus = useCallback(() => {
 		setScale((scale) => getInRange(scale / 2, [minScale, maxScale]));
 	}, []);
+
+	const handleClickPlace = useCallback(() => {
+		if (rootRef.current && canvasRef.current) {
+			const { width, height } = rootRef.current.getBoundingClientRect();
+			const canvas = canvasRef.current.getBoundingClientRect();
+			setPos({
+				x: width / 2 - canvas.width / scale / 2,
+				y: height / 2 - canvas.height / scale / 2,
+			});
+			setScale(2);
+		}
+	}, [rootRef.current, canvasRef.current, scale]);
 
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
@@ -203,7 +215,8 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 			<Bar
 				onDraw={handleClickDraw}
 				onPlus={handleClickPlus}
-				onMinus={ohandleClickinus}
+				onMinus={handleClickMinus}
+				onPlace={handleClickPlace}
 			/>
 			<Palette />
 		</>

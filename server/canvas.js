@@ -5,7 +5,9 @@ const { COLORS } = require('./const');
 const log = require('./log');
 const ee = require('./lib/ee');
 
-const { IN_OUT_IMAGE } = process.env;
+const { IN_OUT_IMAGE, UPSCALE } = process.env;
+
+const scale = Number(UPSCALE) || 1;
 
 const imgBuf = fs.readFileSync(IN_OUT_IMAGE);
 const image = new Image;
@@ -15,18 +17,25 @@ const canvas = createCanvas(image.width, image.height);
 const ctx = canvas.getContext('2d');
 ctx.drawImage(image, 0, 0);
 
-const randomColor = (depth) => Math.floor(Math.random() * depth)
-const random = (min, max) => (Math.random() * (max - min)) + min;
+let scaledCanvas = null;
+let scaledCTX = null;
 
-const drawRandomLine = () => {
-	ctx.beginPath();
-	ctx.strokeStyle = `rgb(${randomColor(255)}, ${randomColor(255)}, ${randomColor(255)})`
-	ctx.moveTo(random(0, canvas.width), random(0, canvas.height));
-	ctx.lineTo(random(0, canvas.width), random(0, canvas.height));
-	ctx.stroke();
+if (scale > 1) {
+	scaledCanvas = createCanvas(image.width * scale, image.height * scale);
+	scaledCTX = scaledCanvas.getContext('2d');
+	scaledCTX.imageSmoothingEnabled = false;
+	scaledCTX.drawImage(image, 0, 0, image.width * scale, image.height * scale);
 }
 
-const drawPix = ({x, y, color, nickname}) => {
+const getImageBuffer = () => {
+	if (scale > 1 && scaledCanvas) {
+		return scaledCanvas.toBuffer();
+	}
+
+	return canvas.toBuffer();
+}
+
+const drawPix = ({ x, y, color, nickname, uuid}) => {
 	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
 		return;
 	}
@@ -35,6 +44,12 @@ const drawPix = ({x, y, color, nickname}) => {
 
 	ctx.fillStyle = rawColor;
 	ctx.fillRect(x, y, 1, 1);
+
+	if (scale > 1 && scaledCTX) {
+		scaledCTX.fillStyle = rawColor;
+		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
+	}
+
 	log({x, y, color: rawColor, nickname});
 	ee.emit('spam', {
 		event: 'drawPix',
@@ -46,23 +61,6 @@ const drawPix = ({x, y, color, nickname}) => {
 	});
 }
 
-const drawRandomPix = () => {
-	ctx.fillStyle = `rgb(${randomColor(255)}, ${randomColor(255)}, ${randomColor(255)})`
-	ctx.fillRect(random(0, canvas.width), random(0, canvas.height), 1, 1);
-}
-
-let i = 0;
-const drawFrameText = () => {
-	ctx.fillStyle = '#ff0000';
-	ctx.fillRect(5, 5, 500, 60);
-
-	ctx.font = '48px serif';
-	ctx.fillStyle = '#ffffff';
-	const [m, s, ms] = ['getMinutes', 'getSeconds', 'getMilliseconds'].map((key) => String(new Date()[key]()).padStart(2, 0));
-	ctx.fillText(`Frame: ${i} - ${m}:${s}:${ms}`, 10, 50);
-	i++;
-}
-
 const saveCanvas = () => {
 	fs.writeFileSync(IN_OUT_IMAGE, canvas.toBuffer());
 }
@@ -71,8 +69,6 @@ module.exports = {
 	canvas,
 	COLORS,
 	drawPix,
-	drawRandomLine,
-	drawRandomPix,
-	drawFrameText,
 	saveCanvas,
+	getImageBuffer,
 };

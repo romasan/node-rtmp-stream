@@ -6,12 +6,14 @@ interface Props {
 	onDraw(): void;
 	onPlus(): void;
 	onMinus(): void;
+	onPlace(): void;
 }
 
 export const Bar: FC<Props> = ({
 	onDraw,
 	onPlus,
 	onMinus,
+	onPlace,
 }) => {
 	return (
 		<div className={s.root}>
@@ -23,6 +25,9 @@ export const Bar: FC<Props> = ({
 			</button>
 			<button className={s.button} onClick={onMinus}>
 				<svg className={s.icon} version="1.0" xmlns="http://www.w3.org/2000/svg" width="586.667" height="586.667" viewBox="0 0 440 440"><path d="M40 220v60h360V160H40v60zm320 0v20H80v-40h280v20z"/></svg>
+			</button>
+			<button className={s.button} onClick={onPlace}>
+				<svg className={s.icon} version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440"><path d="M40 100v60h40V80h80V40H40v60zM280 60v20h80v80h40V40H280v20zM40 340v60h120v-40H80v-80H40v60zM360 320v40h-80v40h120V280h-40v40z"/></svg>
 			</button>
 		</div>
 	);

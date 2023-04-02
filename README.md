@@ -1,13 +1,16 @@
 # basic
 
-- [ ] auth
+- [ ] auth by chat command
 - [ ] cooldown
+- [ ] githib actions deploy (front only?)
+- [ ] ssl support
 
 # server
 
-- [ ] backup frames/pixels for timelapse
+- [ ] backup frames / pixels for timelapse
 
 # web
 - [x] drawing
-- [ ] zooming
+- [x] zooming
+- [ ] select color
 - [ ] mobile layout
