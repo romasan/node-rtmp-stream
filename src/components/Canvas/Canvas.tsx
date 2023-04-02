@@ -205,7 +205,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 					/>
 				</div>
 				<div className={s.coordinates}>
-					[{coord.join(', ')}] x {Number(scale.toFixed(2))}
+					{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
 				</div>
 				<div
 					className={s.pixel}

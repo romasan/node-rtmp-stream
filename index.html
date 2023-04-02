@@ -1,9 +1,13 @@
 <html>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="icon shortcut" href="./src/favicon.png" type="image/png">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon shortcut" href="./src/favicon.png" type="image/png" />
 		<title>PIXEL BATTLE</title>
 		<style>
+			@font-face {
+				font-family: 'Custom Font';
+				src: url('./src/fonts/CustomFont.ttf') format('truetype');
+			}
 			html {
 				padding: 0;
 				margin: 0;
@@ -11,31 +15,18 @@
 			}
 			body {
 				overflow: hidden;
-				font-family: sans-serif;
+				font-family: 'Custom Font', monospace;
 				margin: 0;
 				padding: 10px;
 				color: #ffffff;
-				background:
-					radial-gradient(
+				background: radial-gradient(
 						farthest-side at top left,
 						#16161a,
 						transparent
 					),
-					radial-gradient(
-						farthest-side at top right,
-						#111111,
-						transparent
-					),
-					radial-gradient(
-						farthest-side at bottom left,
-						#1f1f23,
-						transparent
-					),
-					radial-gradient(
-						farthest-side at bottom right,
-						#262626,
-						transparent
-					),
+					radial-gradient(farthest-side at top right, #111111, transparent),
+					radial-gradient(farthest-side at bottom left, #1f1f23, transparent),
+					radial-gradient(farthest-side at bottom right, #262626, transparent),
 					#000000;
 			}
 			img {
