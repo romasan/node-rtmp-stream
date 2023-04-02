@@ -9,7 +9,7 @@ import { Palette } from './components/Palette';
 import { sendMessage } from './ws';
 
 export const App: React.FC = () => {
-	const [showed, toggle] = useState(true);
+	const [showed, toggle] = useState(false);
 
 	const handleCanvasClick = (x: number, y: number) => {
 		// toggle(true);

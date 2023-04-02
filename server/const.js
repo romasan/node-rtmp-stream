@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+const { VKPLAY_HOST, VKPLAY_USER_NAME } = process.env;
+
 const COLORS = {
 	yellow: '#e2d747',
 	lightgreen: '#a5dd5f',
@@ -17,6 +21,9 @@ const COLORS = {
 	brown: '#976c49',
 };
 
+const CHAT_WINDOW_LOCATION = `${VKPLAY_HOST}/${VKPLAY_USER_NAME}/only-chat`;
+
 module.exports = {
 	COLORS,
+	CHAT_WINDOW_LOCATION,
 };

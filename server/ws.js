@@ -5,7 +5,7 @@ const http = require('http');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const { canvas, drawPix } = require('./canvas');
-const ee = require('./ee');
+const ee = require('./lib/ee');
 
 const { WS_SERVER_PORT, WS_SECURE } = process.env;
 

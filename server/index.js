@@ -1,5 +1,5 @@
 require('dotenv').config();
-const ee = require('./ee');
+const ee = require('./lib/ee');
 const { drawPix, saveCanvas, COLORS } = require('./canvas');
 const chat = require('./vkplay-chat-listener');
 require('./ws');

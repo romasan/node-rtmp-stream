@@ -35,6 +35,23 @@ const func = (file) => {
 	//     ctx.fillRect(x * inc, y * inc, inc, inc);
 	//   }
 	// }
+
+	const squareSize = 40;
+	const rows = Math.ceil(HEIGHT / squareSize);
+	const cols = Math.ceil(WIDTH / squareSize);
+	ctx.strokeStyle = '#0000ff';
+	for (let x = 0; x < cols; x++) {
+		for (let y = 0; y < rows; y++) {
+			if ((x + y) % 2 === 0) {
+				ctx.fillStyle = '#ff00ff';
+				ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			}
+			ctx.fillStyle = '#008000';
+			ctx.fillRect(x * squareSize, y * squareSize, 1, 1);
+			ctx.fillStyle = '#0000ff';
+			ctx.fillText(`${y + 1}:${x + 1}`, x * squareSize + 5, y * squareSize + 15);
+		}
+	}
 	
 	fs.writeFileSync(file, canvas.toBuffer());
 }

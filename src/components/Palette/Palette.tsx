@@ -4,7 +4,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 import s from './Palette.module.scss';
 
 export const Palette: FC = () => {
-	const { anchorRef, draggableRef } = useDraggable({ x: 100, y: 100 });
+	const { anchorRef, draggableRef } = useDraggable({ x: 30, y: window.innerHeight - 160});
 	return (
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}></div>
@@ -39,7 +39,7 @@ export const Palette: FC = () => {
 							'#db9834',
 							'#976c49',
 						].map((color) => (
-							<div className={s.color} style={{ background: color }}></div>
+							<div key={color} className={s.color} style={{ background: color }}></div>
 						))}
 					</div>
 				</div>

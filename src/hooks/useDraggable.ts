@@ -21,8 +21,10 @@ export const useDraggable = ({ x, y }: Props): { anchorRef: React.RefObject<HTML
 		if (cur.current.every((e) => e >= 0)) {
 			const moveX = clientX - cur.current[0];
 			const moveY = clientY - cur.current[1];
+
 			pos.current = { x: pos.current.x + moveX, y: pos.current.y + moveY };
 			cur.current = [clientX, clientY];
+
 			if (draggableRef.current) {
 				draggableRef.current.style.top = `${pos.current.y}px`;
 				draggableRef.current.style.left = `${pos.current.x}px`;
@@ -42,10 +44,12 @@ export const useDraggable = ({ x, y }: Props): { anchorRef: React.RefObject<HTML
 		if (anchorRef.current && draggableRef.current) {
 			draggableRef.current.style.top = `${pos.current.y}px`;
 			draggableRef.current.style.left = `${pos.current.x}px`;
+
 			document.addEventListener('mousedown', mouseDownCallback);
 			document.addEventListener('mousemove', mouseMoveCallback);
 			document.addEventListener('mouseup', mouseUpCallback);
 			document.addEventListener('drag', dragCallback);
+
 			return () => {
 				document.removeEventListener('mousedown', mouseDownCallback);
 				document.removeEventListener('mousemove', mouseMoveCallback);

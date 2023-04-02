@@ -53,10 +53,10 @@ const ping = () => {
 let timer = -1;
 
 const { hostname } = document.location;
-const apiHost = `ws://${hostname === 'localhost' ? '' : 'ws.'}${hostname.replace('www.', '')}:8080`
+export const WSHost = `${hostname === 'localhost' ? '' : 'ws.'}${hostname.replace('www.', '')}:8080`;
 
 export const connect = () => {
-	ws = new WebSocket(apiHost);
+	ws = new WebSocket(`ws://${WSHost}`);
 
 	ws.onerror = console.error;
 

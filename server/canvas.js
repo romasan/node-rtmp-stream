@@ -3,7 +3,7 @@ const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { COLORS } = require('./const');
 const log = require('./log');
-const ee = require('./ee');
+const ee = require('./lib/ee');
 
 const { IN_OUT_IMAGE } = process.env;
 

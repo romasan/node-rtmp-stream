@@ -1,10 +1,10 @@
 require('dotenv').config();
-const ee = require('./ee');
+const ee = require('./lib/ee');
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
 let ws = null;
 
-const { USER_AGENT, API_HOST, USER_NAME, WS_HOST, ORIGIN } = process.env;
+const { USER_AGENT, VKPLAY_API_HOST, VKPLAY_USER_NAME, VKPLAY_WS_HOST, VKPLAY_ORIGIN } = process.env;
 
 let id = 1;
 
@@ -46,9 +46,9 @@ const reduceMessage = (data, channel) => {
 }
 
 const connect = (token, channel) => {
-	ws = new WebSocket(WS_HOST, {
+	ws = new WebSocket(VKPLAY_WS_HOST, {
 		headers: {
-			origin: ORIGIN
+			origin: VKPLAY_ORIGIN
 		}
 	});
 
@@ -69,12 +69,12 @@ const connect = (token, channel) => {
 
 const init = () => {
 	Promise.all([
-		fetch(`${API_HOST}/v1/ws/connect`, {
+		fetch(`${VKPLAY_API_HOST}/v1/ws/connect`, {
 			headers: {
 				'X-From-Id': USER_AGENT
 			}
 		}),
-		fetch(`${API_HOST}/v1/blog/${USER_NAME}/public_video_stream?from=layer`),
+		fetch(`${VKPLAY_API_HOST}/v1/blog/${VKPLAY_USER_NAME}/public_video_stream?from=layer`),
 	]).then((resps) => {
 		Promise.all(resps.map((resp) => resp.json())).then(([{ token }, { wsChatChannel }]) => {
 			connect(token, wsChatChannel);
