@@ -11,4 +11,37 @@ $color-window-border-dark: #2d2d3a;
 	border-right-color: $color-window-border-dark;
 	border-bottom-color: $color-window-border-dark;
 	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+@mixin buttonLike() {
+	background-color: #9e9ecc;
+	border-style: solid;
+	border-width: 2px;
+	border-top-color: $color-window-border-light;
+	border-left-color: $color-window-border-light;
+	border-right-color: $color-window-border-dark;
+	border-bottom-color: $color-window-border-dark;
+	border-radius: 5px;
+	padding: 10px 30px;
+	box-sizing: border-box;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #b5b4ea;
+	}
+
+	&:active {
+		padding: 12px 28px 8px 32px;
+		background-color: #8080a6;
+		border-top-color: $color-window-border-dark;
+		border-left-color: $color-window-border-dark;
+		border-right-color: $color-window-border-light;
+		border-bottom-color: $color-window-border-light;
+	}
+}
+
+@mixin size($size) {
+	width: $size;
+	height: $size;
 }

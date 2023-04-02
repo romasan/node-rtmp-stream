@@ -1,0 +1,28 @@
+@import "../../styles/mixins";
+
+.root {
+	@include windowLike();
+
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	right: 15px;
+	padding: 6px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.button {
+	@include buttonLike();
+
+	padding: 5px;
+
+	&:active {
+		padding: 6px 4px 4px 6px;
+	}
+}
+
+.icon {
+	@include size(20px);
+}

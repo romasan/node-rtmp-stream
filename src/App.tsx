@@ -4,12 +4,11 @@ import s from './App.module.scss';
 
 import { Canvas } from './components/Canvas';
 import { Modal } from './components/Modal';
-import { Palette } from './components/Palette';
 
 import { sendMessage } from './ws';
 
 export const App: React.FC = () => {
-	const [showed, toggle] = useState(false);
+	const [showed, toggle] = useState(true);
 
 	const handleCanvasClick = (x: number, y: number) => {
 		// toggle(true);
@@ -30,7 +29,6 @@ export const App: React.FC = () => {
 	return (
 		<div className={s.root}>
 			<Canvas onClick={handleCanvasClick} />
-			<Palette />
 			{showed && (
 				<Modal onClose={() => toggle(false)}>
 					<div className={s.joinModalContent}>

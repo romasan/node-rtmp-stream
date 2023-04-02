@@ -2,7 +2,10 @@ import React, { FC, useRef, useState, useMemo, useCallback, useEffect, MouseEven
 
 import ee from '../../ee';
 import { WSHost } from '../../ws';
-import { posIsAbove } from '../../helpers';
+import { posIsAbove, getInRange } from '../../helpers';
+
+import { Bar } from '../Bar';
+import { Palette } from '../Palette';
 
 import s from './Canvas.module.scss';
 
@@ -12,6 +15,7 @@ interface Props {
 
 const globalPadding = 10;
 const showPixelScale = 8;
+const scaleStep = .3;
 const minScale = .5;
 const maxScale = 40;
 
@@ -25,8 +29,8 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 
-	const mouseDownCallback = ({ clientX, clientY }: any) => {
-		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
+	const mouseDownCallback = ({ clientX, clientY, target }: any) => {
+		if (rootRef.current?.contains(target as Node) && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			cur.current = [clientX, clientY, false];
 		}
 	};
@@ -38,9 +42,27 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 
 			const [,, moved] = cur.current;
 
-			setPos((pos) => ({ x: pos.x + moveX, y: pos.y + moveY }));
+			const { width = 0, height = 0 } = rootRef.current?.getBoundingClientRect() || {};
+			const { width: canvasW = 0, height: canvasH = 0 } = canvasRef.current?.getBoundingClientRect() || {};
+			const center = [
+				width / 2,
+				height / 2,
+			];
+
+			const leftFrontier = center[0] - canvasW / scale;
+			const rightFrontier = center[0];
+			const topFrontier = center[1] - canvasH / scale;
+			const bottomFrontier = center[1];
+
+			setPos((pos) => {
+				return {
+					x: getInRange(pos.x + moveX, [leftFrontier, rightFrontier]),
+					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
+				}
+			});
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
+
 
 		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
@@ -71,8 +93,7 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	}
 
 	const handleRootWheel = (event: any) => {
-
-		setScale((scale) => Math.min(Math.max(scale + (event.deltaY < 0 ? .2 : -.2), minScale), maxScale));
+		setScale((scale) => getInRange(scale + (event.deltaY < 0 ? scaleStep : -scaleStep), [minScale, maxScale]));
 	};
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
@@ -115,6 +136,18 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 		};
 	}
 
+	const handleClickDraw = useCallback(() => {
+		setScale((scale) => Math.max(scale, showPixelScale));
+	}, []);
+
+	const handleClickPlus = useCallback(() => {
+		setScale((scale) => getInRange(scale * 2, [minScale, maxScale]));
+	}, []);
+
+	const ohandleClickinus = useCallback(() => {
+		setScale((scale) => getInRange(scale / 2, [minScale, maxScale]));
+	}, []);
+
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
 			firstRender.current = false;
@@ -140,31 +173,39 @@ export const Canvas: FC<Props> = ({ onClick }) => {
 	}, [rootRef.current, canvasRef.current, pixelRef.current, scale]);
 
 	return (
-		<div
-			ref={rootRef}
-			className={s.root}
-			onWheel={handleRootWheel}
-		>
+		<>
 			<div
-				className={s.workbench}
-				style={{ transform: `scale(${scale})` }}
+				ref={rootRef}
+				className={s.root}
+				onWheel={handleRootWheel}
 			>
-				<canvas
-					ref={canvasRef}
-					className={s.canvas}
-					style={{
-						left: `${pos.x}px`,
-						top: `${pos.y}px`,
-					}}
+				<div
+					className={s.workbench}
+					style={{ transform: `scale(${scale})` }}
+				>
+					<canvas
+						ref={canvasRef}
+						className={s.canvas}
+						style={{
+							left: `${pos.x}px`,
+							top: `${pos.y}px`,
+						}}
+					/>
+				</div>
+				<div className={s.coordinates}>
+					[{coord.join(', ')}] x {Number(scale.toFixed(2))}
+				</div>
+				<div
+					className={s.pixel}
+					style={scale ? getPixelStyle() : {}}
 				/>
 			</div>
-			<div className={s.coordinates}>
-				[{coord.join(', ')}] x {Number(scale.toFixed(2))}
-			</div>
-			<div
-				className={s.pixel}
-				style={scale ? getPixelStyle() : {}}
+			<Bar
+				onDraw={handleClickDraw}
+				onPlus={handleClickPlus}
+				onMinus={ohandleClickinus}
 			/>
-		</div>
+			<Palette />
+		</>
 	);
 }
