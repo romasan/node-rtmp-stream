@@ -14,7 +14,7 @@ interface Props {
 }
 
 const globalPadding = 10;
-const showPixelScale = 8;
+const showPixelScale = 6;
 const scaleStep = .3;
 const minScale = .5;
 const maxScale = 40;
@@ -75,10 +75,17 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 		}
 	};
 
-	const mouseUpCallback = ({ clientX, clientY }: any) => {
+	const mouseUpCallback = ({ clientX, clientY, target }: any) => {
 		const [,, moved] = cur.current;
 
-		if (!moved && scale >= showPixelScale && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
+		if (
+			!moved &&
+			!cur.current.some((e) => e === -1) &&
+			rootRef.current?.contains(target as Node) &&
+			scale >= showPixelScale &&
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current)
+		) {
 				const { top, left } = canvasRef.current.getBoundingClientRect();
 				const x = Math.floor((clientX - left) / scale);
 				const y = Math.floor((clientY - top) / scale);
@@ -185,37 +192,39 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color]);
 
 	return (
-		<div
-			ref={rootRef}
-			className={s.root}
-			onWheel={handleRootWheel}
-		>
+		<>
 			<div
-				className={s.workbench}
-				style={{ transform: `scale(${scale})` }}
+				ref={rootRef}
+				className={s.root}
+				onWheel={handleRootWheel}
 			>
-				<canvas
-					ref={canvasRef}
-					className={s.canvas}
-					style={{
-						left: `${pos.x}px`,
-						top: `${pos.y}px`,
-					}}
+				<div
+					className={s.workbench}
+					style={{ transform: `scale(${scale})` }}
+				>
+					<canvas
+						ref={canvasRef}
+						className={s.canvas}
+						style={{
+							left: `${pos.x}px`,
+							top: `${pos.y}px`,
+						}}
+					/>
+				</div>
+				<div className={s.coordinates}>
+					{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
+				</div>
+				<div
+					className={s.pixel}
+					style={scale ? getPixelStyle() : {}}
 				/>
 			</div>
-			<div className={s.coordinates}>
-				{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
-			</div>
-			<div
-				className={s.pixel}
-				style={scale ? getPixelStyle() : {}}
-			/>
 			<Bar
 				onDraw={handleClickDraw}
 				onPlus={handleClickPlus}
 				onMinus={handleClickMinus}
 				onPlace={handleClickPlace}
 			/>
-		</div>
+		</>
 	);
 }

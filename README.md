@@ -12,5 +12,6 @@
 # web
 - [x] drawing
 - [x] zooming
-- [ ] select color
+- [x] select color
+- [ ] FAQ layout
 - [ ] mobile layout
