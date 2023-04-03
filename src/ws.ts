@@ -47,6 +47,7 @@ export const connect = () => {
 	ws.onerror = console.error;
 
 	ws.onopen = () => {
+
 		// => auth uuid | null
 		// <= ok | uuid
 
