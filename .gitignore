@@ -6,4 +6,5 @@ dist/
 .parcel-cache
 .DS_Store
 .env
+*.log
 _*

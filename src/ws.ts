@@ -37,11 +37,12 @@ const ping = () => {
 
 let timer = -1;
 
-const { hostname } = document.location;
-export const WSHost = `${hostname === 'localhost' ? '' : 'ws.'}${hostname.replace('www.', '')}:8080`;
+const { hostname, protocol, hash } = document.location;
+export const WSHost = `${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
 
 export const connect = () => {
-	ws = new WebSocket(`ws://${WSHost}`);
+	ws = new WebSocket(`${WSProtocol}://${WSHost}`);
 
 	ws.onerror = console.error;
 

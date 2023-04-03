@@ -172,9 +172,11 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 			firstRender.current = false;
 
 			const image = new Image();
-			const { protocol } = document.location;
+			const { protocol, hash } = document.location;
 
-			image.src = `${protocol}//${WSHost}/canvas.png`;
+			const sourceProtocol = hash === '#secured' ? 'https:' : protocol;
+
+			image.src = `${sourceProtocol}//${WSHost}/canvas.png`;
 			image.onload = () => imageLoadHandler(image);
 		}
 

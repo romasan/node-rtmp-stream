@@ -7,7 +7,7 @@
 
 # server
 
-- [ ] backup frames / pixels for timelapse
+- [x] backup frames / pixels for timelapse
 
 # web
 - [x] drawing
