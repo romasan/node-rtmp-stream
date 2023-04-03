@@ -10,7 +10,7 @@ import { sendMessage } from './ws';
 import ee from './ee';
 
 export const App: React.FC = () => {
-	const [showed, toggle] = useState(true);
+	const [showed, toggle] = useState(false);
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
 

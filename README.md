@@ -2,8 +2,8 @@
 
 - [ ] auth by chat command
 - [ ] cooldown
-- [ ] githib actions deploy (front only?)
-- [ ] ssl support
+- [x] githib actions deploy (front only?)
+- [x] ssl support
 
 # server
 
