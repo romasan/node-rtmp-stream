@@ -69,9 +69,9 @@ const upscale = (input, ouptut, scale) => {
 	fs.writeFileSync(ouptut, canvas.toBuffer());
 }
 
-upscale('inout.png', 'upscaled.png', 3);
+// upscale('inout.png', 'upscaled.png', 3);
 
-// func('inout.png');
+func('inout.png');
 
 // func('head2.png');
 // func('head3.png');

@@ -72,3 +72,35 @@ module.exports = {
 	saveCanvas,
 	getImageBuffer,
 };
+
+
+/*
+
+const fs = require('fs');
+const { promisify } = require('util');
+
+// Функция для чтения файла
+const readFileAsync = promisify(fs.readFile);
+
+// Путь к изображению, которое нужно отправить в stdout
+const imagePath = 'path/to/image.png';
+
+async function main() {
+  // Прочитать изображение
+  const imageBuffer = await readFileAsync(imagePath);
+
+  // Заголовок PPM-изображения
+  const header = `P6\n${image.width} ${image.height}\n255\n`;
+
+  // Преобразовать изображение в PPM
+  const pixelData = Buffer.from(imageBuffer).toString('binary');
+  const imageData = pixelData.replace(/^data:image\/\w+;base64,/, '');
+  const decodedImage = Buffer.from(imageData, 'base64');
+  const imagePPM = Buffer.concat([Buffer.from(header), decodedImage]);
+
+  // Отправить PPM-изображение в stdout
+  process.stdout.write(imagePPM);
+}
+
+
+*/
