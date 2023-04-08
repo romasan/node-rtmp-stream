@@ -1,10 +1,12 @@
 import React, { FC, useRef, useState, useMemo, useCallback, useEffect, MouseEvent, WheelEventHandler } from 'react';
 
-import ee from '../../ee';
-import { WSHost } from '../../ws';
+import ee from '../../lib/ee';
+import { WSHost } from '../../lib/ws';
 import { posIsAbove, getInRange } from '../../helpers';
 
 import { Bar } from '../Bar';
+
+import image404 from 'url:../../res/404.png';
 
 import s from './Canvas.module.scss';
 
@@ -28,6 +30,7 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 	const [coord, setCoord] = useState<[number, number]>([-1, -1]);
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
+	const [error, setError] = useState('');
 
 	const mouseDownCallback = ({ clientX, clientY, target }: any) => {
 		if (rootRef.current?.contains(target as Node) && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
@@ -178,6 +181,10 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 
 			image.src = `${sourceProtocol}//${WSHost}/canvas.png`;
 			image.onload = () => imageLoadHandler(image);
+			image.onerror = (err) => {
+				setError(err.toString());
+				setScale(1);
+			}
 		}
 
 		document.addEventListener('mousedown', mouseDownCallback);
@@ -212,6 +219,7 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 							top: `${pos.y}px`,
 						}}
 					/>
+					{error && <img className={s.image404} src={image404} />}
 				</div>
 				<div className={s.coordinates}>
 					{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}

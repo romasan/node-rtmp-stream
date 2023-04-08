@@ -6,8 +6,8 @@ import { Canvas } from './components/Canvas';
 import { Palette } from './components/Palette';
 import { Modal } from './components/Modal';
 
-import { sendMessage } from './ws';
-import ee from './ee';
+import { sendMessage } from './lib/ws';
+import ee from './lib/ee';
 
 export const App: React.FC = () => {
 	const [showed, toggle] = useState(false);
