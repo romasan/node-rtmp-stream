@@ -1,4 +1,5 @@
 inout.png
+server/pid
 ssl-cert/
 node_modules/
 dist/

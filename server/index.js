@@ -3,6 +3,9 @@ const ee = require('./lib/ee');
 const { drawPix, saveCanvas, COLORS } = require('./canvas');
 const chat = require('./vkplay-chat-listener');
 require('./ws');
+const fs = require('fs');
+
+fs.writeFileSync('./pid', process.pid.toString());
 
 const { STREAM_ENABLE } = process.env;
 
