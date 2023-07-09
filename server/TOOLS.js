@@ -1,5 +1,6 @@
 const { createCanvas, Image } = require('canvas');
 const fs = require('fs');
+const readline = require('readline');
 
 const WIDTH = 426;//854;
 const HEIGHT = 240;//480;
@@ -21,7 +22,7 @@ const COLORS = [
 	'#976c49',
 ];
 
-const func = (file) => {
+const drawDefaultCanvas = (file) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 	ctx.fillStyle = '#ffffff';
@@ -69,12 +70,38 @@ const upscale = (input, ouptut, scale) => {
 	fs.writeFileSync(ouptut, canvas.toBuffer());
 }
 
+const drawDiffMask = (file, output) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+	
+	rl.on('line', (line) => {
+		const [,,x,y,color] = line.split(';');
+
+		ctx.fillStyle = '#00000033';
+		ctx.fillRect(x, y, 1, 1);
+	});
+
+	rl.on('close', () => {
+		fs.writeFileSync(output, canvas.toBuffer());
+	});
+};
+
 // upscale('inout.png', 'upscaled.png', 3);
 
-func('inout.png');
+// drawDefaultCanvas('inout.png');
 
-// func('head2.png');
-// func('head3.png');
-// func('head4.png');
-// func('head5.png');
-// func('head6.png');
+// drawDefaultCanvas('head2.png');
+// drawDefaultCanvas('head3.png');
+// drawDefaultCanvas('head4.png');
+// drawDefaultCanvas('head5.png');
+// drawDefaultCanvas('head6.png');
+
+drawDiffMask('./pixels.log.txt', './output.png');

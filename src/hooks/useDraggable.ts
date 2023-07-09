@@ -3,22 +3,23 @@ import { useEffect, useRef } from 'react';
 interface Props {
 	x: number;
 	y: number;
+	ready?: boolean;
 }
 
-export const useDraggable = ({ x, y }: Props): { anchorRef: React.RefObject<HTMLDivElement>, draggableRef: React.RefObject<HTMLDivElement> } => {
+export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.RefObject<HTMLDivElement>, draggableRef: React.RefObject<HTMLDivElement> } => {
 	const pos = useRef({ x, y });
 	const cur = useRef([-1, -1]);
 	const anchorRef = useRef<HTMLDivElement>(null);
 	const draggableRef = useRef<HTMLDivElement>(null);
 
 	const mouseDownCallback = ({ clientX, clientY, target }: MouseEvent) => {
-		if (anchorRef.current?.contains(target as Node)) {
+		if (ready && anchorRef.current?.contains(target as Node)) {
 			cur.current = [clientX, clientY];
 		}
 	};
 
 	const mouseMoveCallback = ({ clientX, clientY }: MouseEvent) => {
-		if (cur.current.every((e) => e >= 0)) {
+		if (ready && cur.current.every((e) => e >= 0)) {
 			const moveX = clientX - cur.current[0];
 			const moveY = clientY - cur.current[1];
 
@@ -41,7 +42,7 @@ export const useDraggable = ({ x, y }: Props): { anchorRef: React.RefObject<HTML
 	}
 
 	useEffect(() => {
-		if (anchorRef.current && draggableRef.current) {
+		if (ready && anchorRef.current && draggableRef.current) {
 			draggableRef.current.style.top = `${pos.current.y}px`;
 			draggableRef.current.style.left = `${pos.current.x}px`;
 
@@ -59,7 +60,7 @@ export const useDraggable = ({ x, y }: Props): { anchorRef: React.RefObject<HTML
 		}
 
 		return undefined;
-	}, [anchorRef.current, draggableRef.current]);
+	}, [ready, anchorRef.current, draggableRef.current]);
 
 	return {
 		anchorRef,

@@ -20,6 +20,11 @@ ctx.drawImage(image, 0, 0);
 let scaledCanvas = null;
 let scaledCTX = null;
 
+// scale = Math.min(
+// 	Math.floor(background.width / canvas.width),
+// 	Math.floor(background.height / canvas.height),
+// );
+
 if (scale > 1) {
 	scaledCanvas = createCanvas(image.width * scale, image.height * scale);
 	scaledCTX = scaledCanvas.getContext('2d');

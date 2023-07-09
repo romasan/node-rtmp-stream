@@ -5,6 +5,7 @@
 - [x] githib actions deploy (front only?)
 - [x] ssl support
 - [ ] read chat from stream?
+- [ ] support for multiple colors
 
 # server
 
@@ -12,6 +13,7 @@
 - [ ] auto restart on fail (fix ffmpeg problems)
 - [ ] auto restart: write process.pid to file
 - [ ] auto restart: add servise with chatbot for notification
+- [ ] fit the canvas into the frame
 
 # web
 - [x] drawing

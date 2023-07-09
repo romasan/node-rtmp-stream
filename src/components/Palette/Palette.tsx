@@ -1,4 +1,7 @@
 import React, { FC } from 'react';
+
+import mobile from 'is-mobile';
+
 import { useDraggable } from '../../hooks/useDraggable';
 
 import s from './Palette.module.scss';
@@ -10,11 +13,13 @@ interface Props {
 }
 
 export const Palette: FC<Props> = ({ color, colors, setColor }) => {
-	const { anchorRef, draggableRef } = useDraggable({ x: 30, y: window.innerHeight - 160});
+	const isMobile = mobile();
+
+	const { anchorRef, draggableRef } = useDraggable({ x: 20, y: window.innerHeight - 100, ready: !isMobile });
 
 	return (
 		<div className={s.root} ref={draggableRef}>
-			<div className={s.draggable} ref={anchorRef}></div>
+			{!isMobile && <div className={s.draggable} ref={anchorRef}></div>}
 			<div className={s.paletteContent}>
 
 				<div className={s.paletteControls}>

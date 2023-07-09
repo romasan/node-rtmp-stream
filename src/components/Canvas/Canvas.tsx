@@ -1,5 +1,9 @@
 import React, { FC, useRef, useState, useMemo, useCallback, useEffect, MouseEvent, WheelEventHandler } from 'react';
 
+import mobile from 'is-mobile';
+
+import cn from 'classnames';
+
 import ee from '../../lib/ee';
 import { WSHost } from '../../lib/ws';
 import { posIsAbove, getInRange } from '../../helpers';
@@ -17,11 +21,12 @@ interface Props {
 
 const globalPadding = 10;
 const showPixelScale = 6;
-const scaleStep = .3;
+const scaleDegree = 1.05;
 const minScale = .5;
 const maxScale = 40;
 
 export const Canvas: FC<Props> = ({ color, onClick }) => {
+	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
@@ -32,13 +37,27 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 	const [error, setError] = useState('');
 
-	const mouseDownCallback = ({ clientX, clientY, target }: any) => {
-		if (rootRef.current?.contains(target as Node) && canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
+	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
+		if (touches && touches.length === 1) {
+			clientX = touches[0].clientX;
+			clientY = touches[0].clientY;
+		}
+
+		if (
+			rootRef.current?.contains(target as Node) &&
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current)
+		) {
 			cur.current = [clientX, clientY, false];
 		}
 	};
 
-	const mouseMoveCallback = ({ clientX, clientY }: any) => {
+	const mouseMoveCallback = ({ clientX, clientY, touches }: any) => {
+		if (touches) {
+			clientX = touches[0].clientX;
+			clientY = touches[0].clientY;
+		}
+
 		if (!cur.current.some((e) => e === -1)) {
 			const moveX = (clientX - cur.current[0]) / scale;
 			const moveY = (clientY - cur.current[1]) / scale;
@@ -78,7 +97,12 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 		}
 	};
 
-	const mouseUpCallback = ({ clientX, clientY, target }: any) => {
+	const mouseUpCallback = ({ clientX, clientY, target, touches }: any) => {
+		if (touches) {
+			clientX = cur.current[0];
+			clientY = cur.current[1];
+		}
+
 		const [,, moved] = cur.current;
 
 		if (
@@ -95,6 +119,16 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 
 				onClick(x, y);
 		}
+
+		if (
+			!moved &&
+			scale < showPixelScale &&
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current)
+		) {
+			setScale(showPixelScale);
+		}
+
 		cur.current = [-1, -1, false];
 	}
 
@@ -103,7 +137,7 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 	}
 
 	const handleRootWheel = (event: any) => {
-		setScale((scale) => getInRange(scale + (event.deltaY < 0 ? scaleStep : -scaleStep), [minScale, maxScale]));
+		setScale((scale) => getInRange(event.deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
 	};
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
@@ -187,16 +221,28 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 			}
 		}
 
-		document.addEventListener('mousedown', mouseDownCallback);
-		document.addEventListener('mousemove', mouseMoveCallback);
-		document.addEventListener('mouseup', mouseUpCallback);
-		document.addEventListener('drag', dragCallback);
+		if (isMobile) {
+			document.addEventListener('touchstart', mouseDownCallback);
+			document.addEventListener('touchmove', mouseMoveCallback);
+			document.addEventListener('touchend', mouseUpCallback);
+		} else {
+			document.addEventListener('mousedown', mouseDownCallback);
+			document.addEventListener('mousemove', mouseMoveCallback);
+			document.addEventListener('mouseup', mouseUpCallback);
+			document.addEventListener('drag', dragCallback);
+		}
 
 		return () => {
-			document.removeEventListener('mousedown', mouseDownCallback);
-			document.removeEventListener('mousemove', mouseMoveCallback);
-			document.removeEventListener('mouseup', mouseUpCallback);
-			document.removeEventListener('drag', dragCallback);
+			if (isMobile) {
+				document.removeEventListener('touchstart', mouseDownCallback);
+				document.removeEventListener('touchmove', mouseMoveCallback);
+				document.removeEventListener('touchend', mouseUpCallback);
+			} else {
+				document.removeEventListener('mousedown', mouseDownCallback);
+				document.removeEventListener('mousemove', mouseMoveCallback);
+				document.removeEventListener('mouseup', mouseUpCallback);
+				document.removeEventListener('drag', dragCallback);
+			}
 		}
 	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color]);
 
@@ -213,7 +259,9 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 				>
 					<canvas
 						ref={canvasRef}
-						className={s.canvas}
+						className={cn(s.canvas, {
+							[s.inactive]: scale < showPixelScale,
+						})}
 						style={{
 							left: `${pos.x}px`,
 							top: `${pos.y}px`,
@@ -221,20 +269,26 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 					/>
 					{error && <img className={s.image404} src={image404} />}
 				</div>
-				<div className={s.coordinates}>
-					{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
-				</div>
-				<div
-					className={s.pixel}
-					style={scale ? getPixelStyle() : {}}
-				/>
+				{!isMobile && (
+					<>
+						<div className={s.coordinates}>
+							{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
+						</div>
+						<div
+							className={s.pixel}
+							style={scale ? getPixelStyle() : {}}
+						/>
+					</>
+				)}
 			</div>
-			<Bar
-				onDraw={handleClickDraw}
-				onPlus={handleClickPlus}
-				onMinus={handleClickMinus}
-				onPlace={handleClickPlace}
-			/>
+			{!isMobile && (
+				<Bar
+					onDraw={handleClickDraw}
+					onPlus={handleClickPlus}
+					onMinus={handleClickMinus}
+					onPlace={handleClickPlace}
+				/>
+			)}
 		</>
 	);
 }

@@ -1,12 +1,15 @@
+@import "../../styles/mixins";
+
 .root {
+	@include size(calc(100% - 20px));
+
 	position: relative;
-	width: 100%;
-	height: 100%;
 	background-image: repeating-conic-gradient(#d9d7ff 0% 25%, #f4f4f4 0% 50%);
 	background-position: 0 0, 16px 16px;
 	background-size: 32px 32px;
 	background-color: #c5c4fe;
 	overflow: hidden;
+	margin: 10px;
 }
 
 .workbench {
@@ -47,4 +50,15 @@
 	left: 50%;
 	transform: translate(-50%, -50%);
 	image-rendering: pixelated;
+}
+
+.inactive {
+	cursor: pointer;
+}
+
+:global(.mobile) {
+	.root {
+		@include size(100%);
+		margin: 0px;
+	}
 }
