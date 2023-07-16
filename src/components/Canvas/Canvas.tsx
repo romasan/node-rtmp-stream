@@ -204,6 +204,37 @@ export const Canvas: FC<Props> = ({ color, onClick }) => {
 		}
 	}, [rootRef.current, canvasRef.current, scale]);
 
+	/*
+	var initialDistance = null;
+
+	function handleZoom(event) {
+		if (event.touches.length < 2) {
+			initialDistance = null;
+			return;
+		}
+
+		if (!initialDistance) {
+			initialDistance = getDistance(event.touches);
+		} else {
+			var currentDistance = getDistance(event.touches);
+			var delta = currentDistance - initialDistance;
+			// Используйте delta для определения масштабирования
+		}
+	}
+
+	function getDistance(touches) {
+		var touch1 = touches[0];
+		var touch2 = touches[1];
+		var dx = touch1.clientX - touch2.clientX;
+		var dy = touch1.clientY - touch2.clientY;
+		return Math.sqrt(dx*dx + dy*dy);
+	}
+
+	document.addEventListener("touchstart", handleZoom);
+	document.addEventListener("touchmove", handleZoom);
+	document.addEventListener("touchend", handleZoom);
+	*/
+
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
 			firstRender.current = false;

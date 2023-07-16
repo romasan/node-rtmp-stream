@@ -3,6 +3,7 @@ server/pid
 ssl-cert/
 node_modules/
 dist/
+sessions/
 .cache/
 .parcel-cache
 .DS_Store

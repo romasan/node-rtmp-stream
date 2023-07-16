@@ -2,35 +2,40 @@ const WebSocket = require('ws')
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
-const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
-const { canvas, drawPix } = require('./canvas');
 const ee = require('./lib/ee');
+const web = require('./web');
+const {
+	getPathByToken,
+} = require('./web/helpers');
 const { COLORS, CHAT_WINDOW_LOCATION } = require('./const');
+const parseCookies = require('./lib/cookies');
 
-const { WS_SERVER_PORT, WS_SECURE } = process.env;
+const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN } = process.env;
 
 let webServer = null;
 
 const webServerHandler = (req, res) => {
-	if (req.url === '/canvas.png') {
-		res.writeHead(200, {'Content-Type': 'image/png'});
-		res.end(canvas.toBuffer());
+	res.setHeader('Access-Control-Allow-Origin', WS_SERVER_ORIGIN);
+	res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+	if (req.method === 'OPTIONS') {
+		res.writeHead(200);
+		res.end();
+
 		return;
 	}
-	res.writeHead(200, {'Content-Type': 'text/html'});
-	res.write('=)');
-	res.end();
-}
 
-const handleMessage = ({ user, event, payload }) => {
-	if (event === 'pushPix' /* && user.authorized */) {
-		drawPix({
-			color: payload.color,
-			x: Math.floor(payload.x),
-			y: Math.floor(payload.y),
-			nickname: user.nickname,
-		});
+	try {
+		if (web[req.url]) {
+			web[req.url](req, res);
+		} else {
+			web.default(req, res);
+		}
+	} catch (error) {
+		console.log('Error:', error);
 	}
 }
 
@@ -44,6 +49,10 @@ if (WS_SECURE === 'true') {
 	webServer = http.createServer(webServerHandler);
 }
 
+webServer.on('error', error => {
+	console.error('Server error:', error);
+});
+
 webServer.listen(WS_SERVER_PORT);
 
 const wss = new WebSocket.Server({ server: webServer });
@@ -54,7 +63,8 @@ const send = (ws, event, payload) => {
 
 const spam = (data) => {
 	const message = JSON.stringify(data);
-	wss.clients.forEach(ws => {
+
+	wss.clients.forEach((ws) => {
 		if (ws.readyState === WebSocket.OPEN) {
 			ws.send(message);
 		}
@@ -63,36 +73,47 @@ const spam = (data) => {
 
 ee.on('spam', spam);
 
-wss.on('connection', ws => {
-	const user = {
-		authorized: false,
-		nickname: null,
-		cooldown: Date.now(),
+const clients = {};
+
+wss.on('connection', (ws, req) => {
+	const { token } = parseCookies(req.headers.cookie);
+
+	const filePath = getPathByToken(token);
+
+	if (!filePath || !fs.existsSync(filePath)) {
+		ws.close();
+
+		return;
+	}
+
+	// TODO check auth
+	// if not, break
+
+	clients[token] = {
+		ws,
+		env: {
+			cooldown: 5000,
+		},
+		cooldown: Date.now() + 5000,
 	};
 
 	send(ws, 'environment', {
 		palette: COLORS,
 		authLocation: CHAT_WINDOW_LOCATION,
+		...clients[token].env,
 	});
 
 	ws.on('message', (buf) => {
-		const raw = buf.toString()
+		const raw = buf.toString();
+
 		if (raw === '2') {
 			ws.send(3);
 			return;
 		}
-		try {
-			const { event, payload } = JSON.parse(raw);
-			if (event) {
-				handleMessage({ event, payload, user });
-			}
-		} catch (e) {
-			console.log('Error: parse json', e)
-		}
 	});
 
 	ws.on('close', () => {
-		// console.log(`disconnected: client #${id} ${new Date()}`);
+		delete clients[token];
 	})
 });
 

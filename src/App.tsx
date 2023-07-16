@@ -6,7 +6,7 @@ import { Canvas } from './components/Canvas';
 import { Palette } from './components/Palette';
 import { Modal } from './components/Modal';
 
-import { sendMessage } from './lib/ws';
+import { addPix } from './lib/api';
 import ee from './lib/ee';
 
 import twitch from 'url:./res/twitch.svg';
@@ -29,7 +29,7 @@ export const App: React.FC = () => {
 	}, [color, wsStore]);
 
 	const handleCanvasClick = (x: number, y: number) => {
-		sendMessage('pushPix', { x, y, color });
+		addPix({ x, y, color });
 	}
 
 	const handleOpenChatClick = () => {

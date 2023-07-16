@@ -94,6 +94,81 @@ const drawDiffMask = (file, output) => {
 	});
 };
 
+const sec = 1000;
+const min = sec * 60;
+const hour = min * 60;
+const checkLog = (file, input, output) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+
+	const imgBuf = fs.readFileSync(input);
+	const image = new Image;
+	image.src = imgBuf;
+
+	ctx.drawImage(image, 0, 0);
+
+	// const breakTime = 1689268190114 - (1000 * 60 * 60);
+	const breakTime = 1689383152575 - 3 * hour - 25 * min;
+	// head -127190 pixels.log > pixels.log2
+	// tail -615 pixels.log >> pixels.log2
+	// 176099-175484=615
+
+	let n = 0;
+
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+	
+	rl.on('line', (line) => {
+		n++;
+		const [time,,x,y,color] = line.split(';');
+
+		if (Number(time) >= breakTime) {
+			rl.pause();
+			rl.removeAllListeners('line');
+			rl.close();
+			console.log(`#${n} ${time} => ${breakTime}`);
+			return;
+		}
+
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, 1, 1);
+	});
+
+	rl.on('close', () => {
+		console.log('EOF');
+		fs.writeFileSync(output, canvas.toBuffer());
+	});
+};
+
+const recover = (file, backgroundImage, output) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+
+	const imgBuf = fs.readFileSync(backgroundImage);
+	const image = new Image;
+	image.src = imgBuf;
+
+	ctx.drawImage(image, 0, 0);
+
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+	
+	rl.on('line', (line) => {
+		const [,,x,y,color] = line.split(';');
+
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, 1, 1);
+	});
+
+	rl.on('close', () => {
+		fs.writeFileSync(output, canvas.toBuffer());
+	});
+};
+
 // upscale('inout.png', 'upscaled.png', 3);
 
 // drawDefaultCanvas('inout.png');
@@ -104,4 +179,6 @@ const drawDiffMask = (file, output) => {
 // drawDefaultCanvas('head5.png');
 // drawDefaultCanvas('head6.png');
 
-drawDiffMask('./pixels.log.txt', './output.png');
+// drawDiffMask('./pixels.log', './output.png');
+// checkLog('./pixels.log', '426x240.png', './output.png');
+recover('./pixels.log2', './426x240.png', './output.png');

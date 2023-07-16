@@ -14,18 +14,10 @@ const reduceMessage = ({ data }: any) => {
 		);
 	} catch (e) {}
 
-	console.log('==== message receive:', json);
-
 	const { event, payload } = json;
 
 	if (event && payload) {
 		ee.emit(`ws:${event}`, payload);
-	}
-}
-
-export const sendMessage = (event: string, payload: any) => {
-	if (ws) {
-		ws.send(JSON.stringify({ event, payload }));
 	}
 };
 
@@ -33,7 +25,7 @@ const ping = () => {
 	if (ws) {
 		ws.send('2');
 	}
-}
+};
 
 let timer = -1;
 
@@ -47,18 +39,14 @@ export const connect = () => {
 	ws.onerror = console.error;
 
 	ws.onopen = () => {
-
-		// => auth uuid | null
-		// <= ok | uuid
-
 		clearInterval(timer);
-		timer = setInterval(ping, 1000);
+		timer = setInterval(ping, 10_000);
 	};
 
 	ws.onmessage = reduceMessage;
 
 	ws.onclose = () => {
 		clearInterval(timer);
-		setTimeout(connect, 10 * 1000);
-	}
-}
+		setTimeout(connect, 10_000);
+	};
+};

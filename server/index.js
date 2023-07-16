@@ -16,6 +16,7 @@ if (STREAM_ENABLE == 'true') {
 const isCommand = (command) => (value) => value.toLowerCase() === command;
 const isNumber = (value) => String(Number(value)) === String(value);
 const isColor = (value) => value.toLowerCase() in COLORS;
+const isHEXColor = (value) => value.toUpperCase().match(/^#([1-9A-F]{3}|[1-9A-F]{3})$/);
 const checkMessage = (words, validations) => validations.every((cb, index) => cb(words[index]));
 
 const handleMessage = ({ from, text }) => {
@@ -29,6 +30,7 @@ const handleMessage = ({ from, text }) => {
 			y: Number(y),
 			color,
 			nickname: from,
+			uuid: '',
 		});
 	}
 

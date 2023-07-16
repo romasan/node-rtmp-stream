@@ -26,7 +26,13 @@ const wsAuth = (token) => {
 
 const reduceMessage = (data, channel) => {
 	try {
-		const json = JSON.parse(data.toString());
+		let json = {};
+
+		try {
+			json = JSON.parse(data.toString());
+		} catch (error) {
+			console.log('Error:', error);
+		}
 
 		if (json?.result?.channel === channel) {
 			const from = json.result?.data?.data?.data?.author?.nick;
