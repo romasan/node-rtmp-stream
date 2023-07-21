@@ -8,6 +8,7 @@
 - [ ] read chat from stream?
 - [ ] support for multiple colors
 - [x] bot protection
+- [ ] session caching
 
 # admin panel
 
@@ -18,8 +19,8 @@
 - [ ] preview last changes, heatmap, changes by user
 - [ ] get pixel author (uuid, IP, nickname, auth service)
 - [ ] get users on IP address
-- [ ] ban by uuid
-- [ ] ban by IP address
+- [ ] ban by uuid (shadow)
+- [ ] ban by IP address (shadow)
 
 # server
 

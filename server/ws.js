@@ -89,6 +89,7 @@ wss.on('connection', (ws, req) => {
 	// TODO check auth
 	// if not, break
 
+	// if client with token exist send them "you open canwas in another browser"
 	clients[token] = {
 		ws,
 		env: {

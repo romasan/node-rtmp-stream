@@ -108,7 +108,7 @@ const checkLog = (file, input, output) => {
 	ctx.drawImage(image, 0, 0);
 
 	// const breakTime = 1689268190114 - (1000 * 60 * 60);
-	const breakTime = 1689383152575 - 3 * hour - 25 * min;
+	const breakTime = 1689695462221 - 5 * min - 15 * sec;
 	// head -127190 pixels.log > pixels.log2
 	// tail -615 pixels.log >> pixels.log2
 	// 176099-175484=615
@@ -179,6 +179,6 @@ const recover = (file, backgroundImage, output) => {
 // drawDefaultCanvas('head5.png');
 // drawDefaultCanvas('head6.png');
 
-// drawDiffMask('./pixels.log', './output.png');
+drawDiffMask('./pixels.log', './output.png');
 // checkLog('./pixels.log', '426x240.png', './output.png');
-recover('./pixels.log2', './426x240.png', './output.png');
+// recover('./pixels.log2', './426x240.png', './output.png');

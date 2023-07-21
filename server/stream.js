@@ -18,6 +18,7 @@ const writeCanvas = () => {
 writeCanvas();
 
 const frame = () => {
+	// check has changes
 	writeCanvas();
 }
 

@@ -5,10 +5,12 @@ const package = require('../package.json');
 const parseCookies = require('./lib/cookies');
 const {
 	getAuthToken,
-	validateToken,
-	getPathByToken,
 	getPostPayload,
 } = require('./web/helpers');
+const {
+	checkSession,
+	addSession,
+} = require('./sessions');
 require('dotenv').config();
 
 const { WS_SECURE, MAX_PIX_PER_SEC } = process.env;
@@ -53,40 +55,36 @@ const addPix = async (req, res) => {
 			return;
 		}
 
-		if (cookie.token) {
-			if (!validateToken(cookie.token)) {
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('fail');
-
-				return;
-			}
-
-			const filePath = getPathByToken(cookie.token, false);
-
+		if (checkSession(cookie.token)) {
 			// TODO check auth
-			// remove check file
 
-			if (fs.existsSync(filePath)) {
-				if (
-					pixList.length < MAX_PIX_PER_SEC ||
-					(Date.now() - pixList[0]) > 1000
-				) {
-					// check cooldown
+			if (
+				pixList.length < MAX_PIX_PER_SEC ||
+				(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
+			) {
 
-					pixList.push(Date.now());
-					pixList = pixList.slice(-MAX_PIX_PER_SEC);
+				// check cooldown
+				// check ban
 
-					drawPix({
-						color: payload.color,
-						x: Math.floor(payload.x),
-						y: Math.floor(payload.y),
-						nickname: '',
-						uuid: cookie.token,
-					});
+				pixList.push(Date.now());
+				pixList = pixList.slice(-MAX_PIX_PER_SEC);
 
-					// send to <uuid> restart cooldown command
-				}
+				drawPix({
+					color: payload.color,
+					x: Math.floor(payload.x),
+					y: Math.floor(payload.y),
+					nickname: '',
+					uuid: cookie.token,
+				});
+
+				// send to <uuid> restart cooldown timer command
+				// and id for next pixel
 			}
+		} else {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			return;
 		}
 
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -103,53 +101,21 @@ const start = (req, res) => {
 	const ip = req.socket.remoteAddress;
 	// const userAgent = req.headers['user-agent'];
 
-	let token = cookie.token || getAuthToken();
+	if (checkSession(cookie.token)) {
+		// TODO check auth
+		// if not, send "login"
+	} else {
+		const token = getAuthToken();
 
-	if (!validateToken(token)) {
-		res.setHeader('Set-Cookie', `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT`);
-		res.writeHead(200, { 'Content-Type': 'text/plain' });
-		res.end('fail');
-
-		return;
-	}
-
-	if (!cookie.token) {
 		if (WS_SECURE === 'true') {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly; Secure`);
 		} else {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly`);
 		}
-	}
 
-	const filePath = getPathByToken(token, false);
-	const fileContent = [
-		Date.now(),
-		ip,
-	].join(';') + '\n';
+		addSession(token, [ip]);
 
-	const dirname = path.dirname(filePath);
-
-	if (!fs.existsSync(dirname)) {
-		fs.mkdirSync(dirname, { recursive: true });
-	}
-
-	// TODO check auth
-	// if not, send "login"
-
-	if (fs.existsSync(filePath)) {
-		fs.appendFileSync(filePath, fileContent);
-	} else {
-		if (!cookie.token) {
-			fs.writeFileSync(filePath, fileContent);
-		} else {
-			// TODO if not authorized
-			// else create new file
-			res.setHeader('Set-Cookie', `token=; expires=Thu, 01 Jan 1970 00:00:00 GMT`);
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-
-			return;
-		}
+		// send "login"
 	}
 
 	res.writeHead(200, { 'Content-Type': 'text/plain' });
