@@ -97,6 +97,7 @@ const drawDiffMask = (file, output) => {
 const sec = 1000;
 const min = sec * 60;
 const hour = min * 60;
+
 const checkLog = (file, input, output) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
@@ -169,6 +170,62 @@ const recover = (file, backgroundImage, output) => {
 	});
 };
 
+const PPF = 30;
+
+const drawSteps = (file, backgroundImage) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+
+	const imgBuf = fs.readFileSync(backgroundImage);
+	const image = new Image;
+	image.src = imgBuf;
+
+	ctx.drawImage(image, 0, 0);
+
+	let i = 0;
+	let frame = 0;
+
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+	
+	rl.on('line', (line) => {
+		const [,,x,y,color] = line.split(';');
+
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, 1, 1);
+
+		if (i % PPF === 0) {
+			const output = 'frames/' + String(++frame).padStart(8, '0') + '.png';
+
+			fs.writeFileSync(output, canvas.toBuffer());
+		}
+
+		if (i % 54000 === 0) {
+			console.log(`${Math.floor(frame / (1080))} minute, #${frame} frame, ${i} pixels`);
+		}
+
+		i++;
+
+		// if (i >= 1000) {
+		// 	rl.pause();
+		// 	rl.removeAllListeners('line');
+		// 	rl.close();
+		// 	console.log(`break, pixel #${i}, frame #${frame}`);
+		// 	return;
+		// }
+	});
+
+	rl.on('close', () => {
+		const output = 'frames/' + String(++frame).padStart(8, '0') + '.png';
+
+		fs.writeFileSync(output, canvas.toBuffer());
+
+		console.log(`Total: ${Math.floor(frame / (1080))} minute(s), #${frame} frames, ${i} pixels`);
+	});
+}
+
 // upscale('inout.png', 'upscaled.png', 3);
 
 // drawDefaultCanvas('inout.png');
@@ -179,6 +236,13 @@ const recover = (file, backgroundImage, output) => {
 // drawDefaultCanvas('head5.png');
 // drawDefaultCanvas('head6.png');
 
-drawDiffMask('./pixels.log', './output.png');
+// drawDiffMask('./pixels.log', './output.png');
 // checkLog('./pixels.log', '426x240.png', './output.png');
 // recover('./pixels.log2', './426x240.png', './output.png');
+drawSteps('./pixels.log', './426x240.png');
+// ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+// ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+// 155.03s user 6.16s system 96% cpu 2:47.86 total (2.58 min)
+// 206745 pixels.log 15*30*60=27000 7.65 min. video
+// ~ 1 min
+// 17 mb

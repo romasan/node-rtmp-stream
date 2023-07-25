@@ -64,7 +64,7 @@ export const App: React.FC = () => {
 					<img src={vkplay} />
 				</a>
 				<a href="https://www.twitch.tv/place_ru" target="_blank">
-					<img src={twitch} />
+					<img src={twitch} className={s.unavaible} />
 				</a>
 			</div>
 		</div>

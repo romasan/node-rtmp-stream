@@ -63,7 +63,7 @@ const addPix = async (req, res) => {
 				(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
 			) {
 
-				// check cooldown
+				// check countdown
 				// check ban
 
 				pixList.push(Date.now());
@@ -77,7 +77,7 @@ const addPix = async (req, res) => {
 					uuid: cookie.token,
 				});
 
-				// send to <uuid> restart cooldown timer command
+				// send to <uuid> restart countdown timer command
 				// and id for next pixel
 			}
 		} else {

@@ -58,8 +58,13 @@
 	display: flex;
 	gap: 10px;
 	position: absolute;
-	bottom: 20px;
-	right: 20px;
+	bottom: 10px;
+	right: 10px;
+}
+
+.unavaible {
+	filter: grayscale(.5);
+	opacity: .5;
 }
 
 :global(.mobile) {

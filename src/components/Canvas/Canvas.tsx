@@ -16,16 +16,18 @@ import s from './Canvas.module.scss';
 
 interface Props {
 	color: string;
+	mode?: 'click' | 'select';
 	onClick(x: number, y: number): void;
+	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
 }
 
 const globalPadding = 10;
 const showPixelScale = 6;
-const scaleDegree = 1.05;
+const scaleDegree = 1.1;
 const minScale = .5;
-const maxScale = 40;
+const maxScale = 50;
 
-export const Canvas: FC<Props> = ({ color, onClick }) => {
+export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);

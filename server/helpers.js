@@ -4,7 +4,7 @@ const getSecret = () => {
 	return Array(4).fill().map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
 };
 
-const coolDownRanges = {
+const countdownRanges = {
 	authorized: {
 		10: 1,
 		50: 5,
@@ -18,7 +18,7 @@ const coolDownRanges = {
 	},
 }
 
-const getCooldown = (token) => {
+const getCountdown = (token) => {
 	const isAuthorized = true;
 	const onlineCount = 10;
 	const isFirstTime = true;

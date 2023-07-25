@@ -15,7 +15,7 @@ interface Props {
 export const Palette: FC<Props> = ({ color, colors, setColor }) => {
 	const isMobile = mobile();
 
-	const { anchorRef, draggableRef } = useDraggable({ x: 20, y: window.innerHeight - 100, ready: !isMobile });
+	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: window.innerHeight - 100, ready: !isMobile });
 
 	return (
 		<div className={s.root} ref={draggableRef}>
@@ -38,7 +38,7 @@ export const Palette: FC<Props> = ({ color, colors, setColor }) => {
 					</div>
 				</div>
 
-				<div className={s.cooldown}>
+				<div className={s.countdown}>
 					<div className={s.progress} style={{ width: '100%'}}></div>
 				</div>
 

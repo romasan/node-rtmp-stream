@@ -2,7 +2,7 @@
 
 - [ ] auth by chat command
 - [ ] auth by vkplay/twitch
-- [ ] cooldown
+- [ ] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
 - [ ] read chat from stream?
@@ -12,7 +12,7 @@
 
 # admin panel
 
-- [ ] change cooldown
+- [ ] change countdown
 - [ ] freeze area
 - [ ] cover up area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)

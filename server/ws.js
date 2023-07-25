@@ -93,9 +93,9 @@ wss.on('connection', (ws, req) => {
 	clients[token] = {
 		ws,
 		env: {
-			cooldown: 5000,
+			countdown: 5000,
 		},
-		cooldown: Date.now() + 5000,
+		countdown: Date.now() + 5000,
 	};
 
 	send(ws, 'environment', {

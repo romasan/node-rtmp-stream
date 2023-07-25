@@ -17,7 +17,7 @@ export const Bar: FC<Props> = ({
 	onMinus,
 	onPlace,
 }) => {
-	const { anchorRef, draggableRef } = useDraggable({ x: 20, y: 20});
+	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: 10});
 
 	return (
 		<div className={s.root} ref={draggableRef}>
