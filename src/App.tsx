@@ -59,14 +59,14 @@ export const App: React.FC = () => {
 					</div>
 				</Modal>
 			)}
-			<div className={s.footer}>
+			{/* <div className={s.footer}>
 				<a href="https://vkplay.live/place_ru" target="_blank">
 					<img src={vkplay} />
 				</a>
 				<a href="https://www.twitch.tv/place_ru" target="_blank">
-					<img src={twitch} className={s.unavaible} />
+					<img src={twitch} />
 				</a>
-			</div>
+			</div> */}
 		</div>
 	)
 }

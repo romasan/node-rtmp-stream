@@ -62,11 +62,6 @@
 	right: 10px;
 }
 
-.unavaible {
-	filter: grayscale(.5);
-	opacity: .5;
-}
-
 :global(.mobile) {
 	.footer {
 		display: none;
