@@ -9,8 +9,9 @@ import { Modal } from './components/Modal';
 import { addPix } from './lib/api';
 import ee from './lib/ee';
 
-import twitch from 'url:./res/twitch.svg';
-import vkplay from 'url:./res/vkplay.svg';
+// import twitch from 'url:./res/twitch.svg';
+// import vkplay from 'url:./res/vkplay.svg';
+import discord from 'url:./res/discord.svg';
 
 import s from './App.module.scss';
 
@@ -59,14 +60,17 @@ export const App: React.FC = () => {
 					</div>
 				</Modal>
 			)}
-			{/* <div className={s.footer}>
-				<a href="https://vkplay.live/place_ru" target="_blank">
+			<div className={s.footer}>
+				{/* <a href="https://vkplay.live/place_ru" target="_blank">
 					<img src={vkplay} />
-				</a>
-				<a href="https://www.twitch.tv/place_ru" target="_blank">
+				</a> */}
+				{/* <a href="https://www.twitch.tv/place_ru" target="_blank">
 					<img src={twitch} />
+				</a> */}
+				<a href="https://discord.gg/DC44V22y" target="_blank">
+					<img src={discord} />
 				</a>
-			</div> */}
+			</div>
 		</div>
 	)
 }
