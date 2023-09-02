@@ -346,8 +346,8 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 					<div
 						className={s.draggable}
 						style={{
-							left: `${pos.x}px`,
-							top: `${pos.y}px`,
+							left: `${Math.floor(pos.x)}px`,
+							top: `${Math.floor(pos.y)}px`,
 						}}
 					>
 							<canvas
