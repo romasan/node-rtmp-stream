@@ -136,7 +136,7 @@ const getFavicon = (req, res) => {
 
 const _default = async (req, res) => {
 	if (
-		!twitchAuth(req, res)
+		!await twitchAuth(req, res)
 	) {
 		getInfo(req, res);
 	}
