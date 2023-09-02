@@ -12,6 +12,8 @@ let failed = {};
 const maxLength = 1000;
 const gap = 100;
 
+const file = fs.createWriteStream(__dirname + '/list', { flags : 'a' });
+
 const trim = (obj) => {
 	return Object.entries(obj)
 		.sort(([, a], [, b]) => a > b ? 1 : -1)
@@ -60,7 +62,6 @@ const checkSession = (token, prevalidate = true) => {
 
 const addSession = (token, data) => {
 	const filePath = getPathByToken(token, false);
-
 	const dirname = path.dirname(filePath);
 
 	if (!fs.existsSync(dirname)) {
@@ -75,6 +76,7 @@ const addSession = (token, data) => {
 	if (fs.existsSync(filePath)) {
 		fs.appendFileSync(filePath, fileContent);
 	} else {
+		file.write(token + '\n');
 		fs.writeFileSync(filePath, fileContent);
 	}
 

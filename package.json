@@ -3,9 +3,9 @@
   "version": "1.1.0",
   "description": "",
   "scripts": {
-    "start": "parcel index.html",
+    "start": "parcel pages/index.html pages/qq/index.html",
     "prebuild": "rm -rf dist/*.*",
-    "build": "parcel build index.html",
+    "build": "parcel build pages/index.html pages/qq/index.html",
     "serve": "cd ./server && node index.js"
   },
   "author": "",
@@ -24,6 +24,7 @@
     "react-dom": "^18.2.0",
     "res": "^0.4.0",
     "src": "^1.1.2",
+    "twitch-auth": "^4.6.7",
     "typescript": "^5.0.2",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"

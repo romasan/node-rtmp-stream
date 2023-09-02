@@ -12,6 +12,7 @@
 
 # admin panel
 
+- [x] add admin route
 - [ ] change countdown
 - [ ] freeze area
 - [ ] cover up area
@@ -31,6 +32,7 @@
 - [ ] fit the canvas into the frame
 - [ ] write start datetime to file
 - [ ] freeze frame to stream from admin panel
+- [ ] rotated access log
 
 # web
 - [x] drawing

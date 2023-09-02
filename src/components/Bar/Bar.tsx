@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
-import s from './Bar.module.scss';
+import * as s from './Bar.module.scss';
 
 interface Props {
 	onDraw(): void;

@@ -18,7 +18,7 @@ import { Bar } from '../Bar';
 
 import image404 from 'url:../../res/404.png';
 
-import s from './Canvas.module.scss';
+import * as s from './Canvas.module.scss';
 
 interface Props {
 	color: string;

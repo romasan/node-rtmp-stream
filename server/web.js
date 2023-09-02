@@ -12,6 +12,7 @@ const {
 	addSession,
 } = require('./sessions');
 require('dotenv').config();
+// const twitchAuth = require('./web/twitchAuth');
 
 const { WS_SECURE, MAX_PIX_PER_SEC } = process.env;
 
@@ -27,44 +28,58 @@ const getCanvas = (req, res) => {
 
 let pixList = [];
 
+const checkAccessWrapper = async (req, res, callback) => {
+	const cookie = parseCookies(req.headers.cookie || '');
+
+	if (checkSession(cookie.token)) {
+		// TODO check auth
+		// TODO check ban
+		// TODO check countdown
+
+		callback();
+	} else {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('fail');
+
+		return;
+	}
+
+	res.writeHead(200, { 'Content-Type': 'text/plain' });
+	res.end('ok');
+};
+
 const addPix = async (req, res) => {
+	checkAccessWrapper(req, res, async () => {
+		if (req.method === 'PUT') {
+			const cookie = parseCookies(req.headers.cookie || '');
+			const postPayload = await getPostPayload(req);
 
-	if (req.method === 'PUT') {
-		const cookie = parseCookies(req.headers.cookie || '');
-		const postPayload = await getPostPayload(req);
+			let payload = {};
 
-		let payload = {};
+			try {
+				payload = JSON.parse(postPayload);
+			} catch (error) {
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('fail');
 
-		try {
-			payload = JSON.parse(postPayload);
-		} catch (error) {
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-
-			return;
-		}
-
-		if (
-			typeof payload.x !== 'number' ||
-			typeof payload.y !== 'number' ||
-			typeof payload.color !== 'string'
-		) {
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-
-			return;
-		}
-
-		if (checkSession(cookie.token)) {
-			// TODO check auth
+				return;
+			}
 
 			if (
 				pixList.length < MAX_PIX_PER_SEC ||
 				(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
 			) {
 
-				// check countdown
-				// check ban
+				if (
+					typeof payload.x !== 'number' ||
+					typeof payload.y !== 'number' ||
+					typeof payload.color !== 'string'
+				) {
+					res.writeHead(200, { 'Content-Type': 'text/plain' });
+					res.end('fail');
+		
+					return;
+				}
 
 				pixList.push(Date.now());
 				pixList = pixList.slice(-MAX_PIX_PER_SEC);
@@ -81,20 +96,10 @@ const addPix = async (req, res) => {
 				// and id for next pixel
 			}
 		} else {
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-
-			return;
+			getInfo(req, res);
 		}
-
-		res.writeHead(200, { 'Content-Type': 'text/plain' });
-		res.end('ok');
-
-		return;
-	}
-
-	getInfo(req, res);
-};
+	})
+}
 
 const start = (req, res) => {
 	const cookie = parseCookies(req.headers.cookie || '');
@@ -127,10 +132,18 @@ const getFavicon = (req, res) => {
 	fs.createReadStream('./favicon.ico').pipe(res);
 };
 
+const _default = async (req, res) => {
+	// if (
+	// 	!twitchAuth(req, res)
+	// ) {
+		getInfo(req, res);
+	// }
+}
+
 module.exports = {
 	'/start': start,
 	'/pix': addPix,
 	'/canvas.png': getCanvas,
 	'/favicon.ico': getFavicon,
-	default: getInfo,
+	default: _default,
 }

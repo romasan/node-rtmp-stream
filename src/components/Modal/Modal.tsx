@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren } from 'react';
 
-import s from './Modal.module.scss';
+import * as s from './Modal.module.scss';
 
 interface Props {
 	onClose(): void;

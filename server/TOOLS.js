@@ -1,6 +1,7 @@
 const { createCanvas, Image } = require('canvas');
 const fs = require('fs');
 const readline = require('readline');
+const path = require('path');
 
 const WIDTH = 426;//854;
 const HEIGHT = 240;//480;
@@ -256,7 +257,7 @@ const drawSteps = (file, backgroundImage) => {
 // drawDefaultCanvas('head5.png');
 // drawDefaultCanvas('head6.png');
 
-drawDiffMask('./pixels.log', './output.png');
+// drawDiffMask('./pixels.log', './output.png');
 
 const filterByUUID = (input, output, uuid) => {
 	const rl = readline.createInterface({
@@ -289,3 +290,20 @@ const filterByUUID = (input, output, uuid) => {
 // 206745 pixels.log 15*30*60=27000 7.65 min. video
 // ~ 1 min
 // 17 mb
+
+const getDirectoriesRecursive = (directory) => {
+	fs.readdirSync(directory).forEach((file) => {
+		const absolutePath = path.join(directory, file);
+		if (fs.statSync(absolutePath).isDirectory()) {
+			getDirectoriesRecursive(absolutePath);
+		} else {
+			const [_, a, b, c] = directory.split('/');
+			const [x, y, z] = file.split('');
+			if (a === x && b === y && c === z) {
+				console.log(file);
+			}
+		}
+	});
+}
+
+getDirectoriesRecursive('./sessions');

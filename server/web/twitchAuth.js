@@ -1,7 +1,11 @@
-const http = require('http');
 const TwitchAuth = require('twitch-auth');
+require('dotenv').config();
 
-// extension ID: pcm5ki83kq7z7ucbg6n4xoy2reh89a
+const {
+	TWITCH_AUTH_CLIENT_ID,
+	TWITCH_AUTH_CLIENT_SECRET,
+	TWITCH_AUTH_REDIRECT_URI,
+} = process.env;
 
 const twitchAuth = new TwitchAuth({
 	client_id: TWITCH_AUTH_CLIENT_ID,
@@ -30,5 +34,11 @@ const twitch = async (req, res) => {
 			res.writeHead(302, { Location: url });
 			res.end();
 		}
+
+		return true;
 	}
+
+	return false;
 };
+
+module.exports = twitch;

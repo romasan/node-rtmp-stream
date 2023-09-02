@@ -14,7 +14,7 @@ import vkplay from 'url:./res/vkplay.svg';
 import youtube from 'url:./res/youtube.svg';
 import discord from 'url:./res/discord.svg';
 
-import s from './App.module.scss';
+import * as s from './App.module.scss';
 
 export const App: React.FC = () => {
 	const [showed, toggle] = useState(false);

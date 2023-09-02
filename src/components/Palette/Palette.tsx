@@ -4,7 +4,7 @@ import mobile from 'is-mobile';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
-import s from './Palette.module.scss';
+import * as s from './Palette.module.scss';
 
 interface Props {
 	color: string;
