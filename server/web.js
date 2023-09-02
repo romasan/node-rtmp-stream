@@ -43,9 +43,6 @@ const checkAccessWrapper = async (req, res, callback) => {
 
 		return;
 	}
-
-	res.writeHead(200, { 'Content-Type': 'text/plain' });
-	res.end('ok');
 };
 
 const addPix = async (req, res) => {
@@ -96,6 +93,9 @@ const addPix = async (req, res) => {
 
 				// send to <uuid> restart countdown timer command
 				// and id for next pixel
+
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('ok');
 			}
 		} else {
 			getInfo(req, res);
