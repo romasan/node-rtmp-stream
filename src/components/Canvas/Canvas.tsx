@@ -109,7 +109,7 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		if (
 			!moved &&
 			!cur.current.some((e) => e === -1) &&
-			canvasRef.current?.contains(target as Node) &&
+			document.elementsFromPoint(clientX, clientY).includes(canvasRef.current as HTMLCanvasElement) &&
 			scale >= showPixelScale &&
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current)
