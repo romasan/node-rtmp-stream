@@ -12,7 +12,7 @@ const {
 	addSession,
 } = require('./sessions');
 require('dotenv').config();
-// const twitchAuth = require('./web/twitchAuth');
+const twitchAuth = require('./web/twitchAuth');
 
 const { WS_SECURE, MAX_PIX_PER_SEC } = process.env;
 
@@ -81,6 +81,8 @@ const addPix = async (req, res) => {
 					return;
 				}
 
+				// TODO check prev pixel color
+
 				pixList.push(Date.now());
 				pixList = pixList.slice(-MAX_PIX_PER_SEC);
 
@@ -133,11 +135,11 @@ const getFavicon = (req, res) => {
 };
 
 const _default = async (req, res) => {
-	// if (
-	// 	!twitchAuth(req, res)
-	// ) {
+	if (
+		!twitchAuth(req, res)
+	) {
 		getInfo(req, res);
-	// }
+	}
 }
 
 module.exports = {

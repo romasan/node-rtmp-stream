@@ -1,0 +1,14 @@
+<html>
+	<head>
+		<title>Авторизация</title>
+		<script>
+			const { hostname, protocol } = document.location;
+			const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+
+			document.location.href = `${APIhost}/auth/twitch`;
+		</script>
+	</head>
+	<body>
+		Авторизация
+	</body>
+</html>

@@ -36,10 +36,17 @@ export const App: React.FC = () => {
 
 	const handleOpenChatClick = () => {
 		window.open('https://vkplay.live/pixel_battle/only-chat', '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
-	}
+	};
+
+	const handleTwitchLoginClick = () => {
+		const { hostname, protocol } = document.location;
+		const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+		// window.open(`${APIhost}/auth/twitch`, '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
+		document.location.href = `${APIhost}/auth/twitch`;
+	};
 
 	useEffect(() => {
-		ee.on('ws:environment', (payload) => {
+		ee.on('ws:environment', (payload: any) => {
 			setWsStore((store = {}) => ({ ...store, environment: payload }));
 		});
 	}, []);
@@ -58,6 +65,9 @@ export const App: React.FC = () => {
 						<div><input type="text" className={s.input} placeholder="nickname" /></div>
 						<div>и отправь в чат стрима <span className={s.command}>!join</span></div>
 						<button onClick={handleOpenChatClick} className={s.button}>ОТКРЫТЬ ЧАТ</button>
+						<button onClick={handleTwitchLoginClick} className={s.button}>Залогинься через Twitch</button>
+						<div>или</div>
+						<button onClick={handleTwitchLoginClick} className={s.button}>Залогинься через ВК</button>
 					</div>
 				</Modal>
 			)}
