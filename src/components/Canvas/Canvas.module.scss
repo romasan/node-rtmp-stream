@@ -19,8 +19,23 @@
 	height: 100%;
 }
 
-.canvas {
+.draggable {
 	position: absolute;
+
+	&::before {
+		@include size(300px);
+
+		content: '';
+		position: absolute;
+		left: -150px;
+		top: -150px;
+		// background-image: url('../../res/corner.png');
+		z-index: -1;
+		transform: scale(0.02);
+	}
+}
+
+.canvas {
 	image-rendering: pixelated;
 }
 

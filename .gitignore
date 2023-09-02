@@ -12,3 +12,4 @@ server/frames/
 .env
 *.log
 _*
+*.mp4

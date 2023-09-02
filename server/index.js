@@ -7,7 +7,7 @@ const fs = require('fs');
 
 fs.writeFileSync('./pid', process.pid.toString());
 
-const { STREAM_ENABLE } = process.env;
+const { STREAM_ENABLE, VKPLAY_CHAT_ENABLE } = process.env;
 
 if (STREAM_ENABLE == 'true') {
 	require('./stream');
@@ -42,5 +42,8 @@ const handleMessage = ({ from, text }) => {
 
 setInterval(saveCanvas, 60 * 1000);
 
-chat.init();
+if (VKPLAY_CHAT_ENABLE === 'true') {
+	chat.init();
+}
+
 ee.on('message', handleMessage);

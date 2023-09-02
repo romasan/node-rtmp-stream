@@ -29,12 +29,14 @@
 - [ ] auto restart: write process.pid to file
 - [ ] auto restart: add servise with chatbot for notification
 - [ ] fit the canvas into the frame
+- [ ] write start datetime to file
+- [ ] freeze frame to stream from admin panel
 
 # web
 - [x] drawing
 - [x] zooming
 - [x] select color
-- [ ] zooming at cursor
+- [x] zooming at cursor
 - [ ] FAQ page
 - [ ] mobile layout
 - [ ] check is offline

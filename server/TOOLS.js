@@ -83,10 +83,17 @@ const drawDiffMask = (file, output) => {
 	});
 	
 	rl.on('line', (line) => {
-		const [,,x,y,color] = line.split(';');
+		const [,,x,y,color,uuid] = line.split(';');
 
-		ctx.fillStyle = '#00000033';
-		ctx.fillRect(x, y, 1, 1);
+		if (uuid !== 'e26ba007-3fcf-4fcc-a8e2-e163ca01b729') {
+		// if (uuid === 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc') {
+			ctx.fillStyle = color;
+			ctx.fillRect(x, y, 1, 1);
+		}
+
+		// ctx.fillStyle = '#00000033';
+		// ctx.fillRect(x, y, 1, 1);
+
 	});
 
 	rl.on('close', () => {
@@ -97,6 +104,7 @@ const drawDiffMask = (file, output) => {
 const sec = 1000;
 const min = sec * 60;
 const hour = min * 60;
+const day = hour * 24;
 
 const checkLog = (file, input, output) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
@@ -109,7 +117,7 @@ const checkLog = (file, input, output) => {
 	ctx.drawImage(image, 0, 0);
 
 	// const breakTime = 1689268190114 - (1000 * 60 * 60);
-	const breakTime = 1689695462221 - 5 * min - 15 * sec;
+	const breakTime = 1691531668859 - 3 * hour - 30 * min;
 	// head -127190 pixels.log > pixels.log2
 	// tail -615 pixels.log >> pixels.log2
 	// 176099-175484=615
@@ -170,20 +178,25 @@ const recover = (file, backgroundImage, output) => {
 	});
 };
 
-const PPF = 30;
+const PPF = 50;
 
 const drawSteps = (file, backgroundImage) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 
-	const imgBuf = fs.readFileSync(backgroundImage);
-	const image = new Image;
-	image.src = imgBuf;
+	// const imgBuf = fs.readFileSync(backgroundImage);
+	// const image = new Image;
+	// image.src = imgBuf;
+	// ctx.drawImage(image, 0, 0);
 
-	ctx.drawImage(image, 0, 0);
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-	let i = 0;
+	let i = -1;
 	let frame = 0;
+
+	// const breakTime = Date.now() - day * 3;
+	const breakLine = 1758020 - 300_000;
 
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),
@@ -191,7 +204,16 @@ const drawSteps = (file, backgroundImage) => {
 	});
 	
 	rl.on('line', (line) => {
-		const [,,x,y,color] = line.split(';');
+		i++;
+
+		const [time,,x,y,color] = line.split(';');
+
+		// if (Number(time) < breakTime) {
+		// 	return
+		// }
+		if (i < breakLine) {
+			return
+		}
 
 		ctx.fillStyle = color;
 		ctx.fillRect(x, y, 1, 1);
@@ -205,8 +227,6 @@ const drawSteps = (file, backgroundImage) => {
 		if (i % 54000 === 0) {
 			console.log(`${Math.floor(frame / (1080))} minute, #${frame} frame, ${i} pixels`);
 		}
-
-		i++;
 
 		// if (i >= 1000) {
 		// 	rl.pause();
@@ -236,12 +256,35 @@ const drawSteps = (file, backgroundImage) => {
 // drawDefaultCanvas('head5.png');
 // drawDefaultCanvas('head6.png');
 
-// drawDiffMask('./pixels.log', './output.png');
+drawDiffMask('./pixels.log', './output.png');
+
+const filterByUUID = (input, output, uuid) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(input),
+		crlfDelay: Infinity
+	});
+
+	const file = fs.createWriteStream(output);
+
+	rl.on('line', (line) => {
+		const [,,,,,_uuid] = line.split(';');
+		if (uuid !== _uuid) {
+			file.write(line + '\n');
+		}
+	})
+};
+
+// filterByUUID('./pixels.log', 'pixels2.log', 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc');
+
 // checkLog('./pixels.log', '426x240.png', './output.png');
-// recover('./pixels.log2', './426x240.png', './output.png');
-drawSteps('./pixels.log', './426x240.png');
+
+// recover('./pixels.log', './426x240.png', './output.png');
+
+// drawSteps('./pixels.log', './426x240.png');
+
 // ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
 // ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+// ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
 // 155.03s user 6.16s system 96% cpu 2:47.86 total (2.58 min)
 // 206745 pixels.log 15*30*60=27000 7.65 min. video
 // ~ 1 min

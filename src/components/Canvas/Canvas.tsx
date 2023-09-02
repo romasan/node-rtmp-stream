@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useMemo, useCallback, useEffect, MouseEvent, WheelEventHandler } from 'react';
+import React, { FC, useRef, useState, useCallback, useEffect } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -21,7 +21,6 @@ interface Props {
 	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
 }
 
-const globalPadding = 10;
 const showPixelScale = 6;
 const scaleDegree = 1.1;
 const minScale = .5;
@@ -110,7 +109,7 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		if (
 			!moved &&
 			!cur.current.some((e) => e === -1) &&
-			rootRef.current?.contains(target as Node) &&
+			canvasRef.current?.contains(target as Node) &&
 			scale >= showPixelScale &&
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current)
@@ -138,8 +137,62 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		event.preventDefault();
 	}
 
-	const handleRootWheel = (event: any) => {
-		setScale((scale) => getInRange(event.deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
+	const handleRootWheel = ({ deltaY, clientX, clientY, target }: any) => {
+		if (error) {
+			return;
+		}
+
+		if (posIsAbove([clientX, clientY], canvasRef.current as HTMLCanvasElement)) {
+			const { left, top, width: canvasW = 0, height: canvasH = 0 } = (canvasRef.current as HTMLCanvasElement).getBoundingClientRect();
+			const { offsetWidth, offsetHeight } = document.body;
+			const { width = 0, height = 0 } = rootRef.current?.getBoundingClientRect() || {};
+
+			const x = (clientX - left) / scale;
+			const y = (clientY - top) / scale;
+
+			const ctx = canvasRef.current?.getContext('2d');
+
+			if (ctx) {
+				const relativeCenterX = (offsetWidth / 2 - left) / scale;
+				const relativeCenterY = (offsetHeight / 2 - top) / scale;
+
+				const cursorShiftX = x - relativeCenterX;
+				const cursorShiftY = y - relativeCenterY;
+
+				const shiftX = relativeCenterX - x + cursorShiftX / scaleDegree;
+				const shiftY = relativeCenterY - y + cursorShiftY / scaleDegree;
+
+				const center = [
+					width / 2,
+					height / 2,
+				];
+
+				const leftFrontier = center[0] - canvasW / scale;
+				const rightFrontier = center[0];
+				const topFrontier = center[1] - canvasH / scale;
+				const bottomFrontier = center[1];
+
+				if (
+					(deltaY > 0 && scale <= minScale) ||
+					(deltaY < 0 && scale >= maxScale)
+				) {
+					return;
+				}
+
+				setScale((scale) => getInRange(deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
+				setPos((pos) => (
+					deltaY < 0 ? {
+						x: getInRange(pos.x + shiftX, [leftFrontier, rightFrontier]),
+						y: getInRange(pos.y + shiftY, [topFrontier, bottomFrontier]),
+					} : {
+						x: getInRange(pos.x - shiftX, [leftFrontier, rightFrontier]),
+						y: getInRange(pos.y - shiftY, [topFrontier, bottomFrontier]),
+					}
+				));
+			}
+		} else {
+			setScale((scale) => getInRange(deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
+		}
 	};
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
@@ -174,8 +227,8 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 
 		return {
 			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
-			left: `${-globalPadding + left + x * scale}px`,
-			top: `${-globalPadding + top + y * scale}px`,
+			left: `${left + x * scale}px`,
+			top: `${top + y * scale}px`,
 			width: `${scale}px`,
 			height: `${scale}px`,
 			background: color,
@@ -290,16 +343,20 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 					className={s.workbench}
 					style={{ transform: `scale(${scale})` }}
 				>
-					<canvas
-						ref={canvasRef}
-						className={cn(s.canvas, {
-							[s.inactive]: scale < showPixelScale,
-						})}
+					<div
+						className={s.draggable}
 						style={{
 							left: `${pos.x}px`,
 							top: `${pos.y}px`,
 						}}
-					/>
+					>
+							<canvas
+								ref={canvasRef}
+								className={cn(s.canvas, {
+									[s.inactive]: scale < showPixelScale,
+								})}
+							/>
+					</div>
 					{error && <img className={s.image404} src={image404} />}
 				</div>
 				{!isMobile && (
