@@ -6,7 +6,13 @@ import cn from 'classnames';
 
 import ee from '../../lib/ee';
 import { WSHost } from '../../lib/ws';
-import { posIsAbove, getInRange } from '../../helpers';
+import {
+	posIsAbove,
+	getInRange,
+	hexToRgb,
+	rgbToHex,
+	invertRgb,
+} from '../../helpers';
 
 import { Bar } from '../Bar';
 
@@ -179,46 +185,42 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 			const x = (clientX - left) / scale;
 			const y = (clientY - top) / scale;
 
-			const ctx = canvasRef.current?.getContext('2d');
+			const relativeCenterX = (offsetWidth / 2 - left) / scale;
+			const relativeCenterY = (offsetHeight / 2 - top) / scale;
 
-			if (ctx) {
-				const relativeCenterX = (offsetWidth / 2 - left) / scale;
-				const relativeCenterY = (offsetHeight / 2 - top) / scale;
+			const cursorShiftX = x - relativeCenterX;
+			const cursorShiftY = y - relativeCenterY;
 
-				const cursorShiftX = x - relativeCenterX;
-				const cursorShiftY = y - relativeCenterY;
+			const shiftX = relativeCenterX - x + cursorShiftX / scaleDegree;
+			const shiftY = relativeCenterY - y + cursorShiftY / scaleDegree;
 
-				const shiftX = relativeCenterX - x + cursorShiftX / scaleDegree;
-				const shiftY = relativeCenterY - y + cursorShiftY / scaleDegree;
+			const center = [
+				width / 2,
+				height / 2,
+			];
 
-				const center = [
-					width / 2,
-					height / 2,
-				];
+			const leftFrontier = center[0] - canvasW / scale;
+			const rightFrontier = center[0];
+			const topFrontier = center[1] - canvasH / scale;
+			const bottomFrontier = center[1];
 
-				const leftFrontier = center[0] - canvasW / scale;
-				const rightFrontier = center[0];
-				const topFrontier = center[1] - canvasH / scale;
-				const bottomFrontier = center[1];
-
-				if (
-					(deltaY > 0 && scale <= minScale) ||
-					(deltaY < 0 && scale >= maxScale)
-				) {
-					return;
-				}
-
-				setScale((scale) => getInRange(deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
-				setPos((pos) => (
-					deltaY < 0 ? {
-						x: getInRange(pos.x + shiftX, [leftFrontier, rightFrontier]),
-						y: getInRange(pos.y + shiftY, [topFrontier, bottomFrontier]),
-					} : {
-						x: getInRange(pos.x - shiftX, [leftFrontier, rightFrontier]),
-						y: getInRange(pos.y - shiftY, [topFrontier, bottomFrontier]),
-					}
-				));
+			if (
+				(deltaY > 0 && scale <= minScale) ||
+				(deltaY < 0 && scale >= maxScale)
+			) {
+				return;
 			}
+
+			setScale((scale) => getInRange(deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
+			setPos((pos) => (
+				deltaY < 0 ? {
+					x: getInRange(pos.x + shiftX, [leftFrontier, rightFrontier]),
+					y: getInRange(pos.y + shiftY, [topFrontier, bottomFrontier]),
+				} : {
+					x: getInRange(pos.x - shiftX, [leftFrontier, rightFrontier]),
+					y: getInRange(pos.y - shiftY, [topFrontier, bottomFrontier]),
+				}
+			));
 		} else {
 			setScale((scale) => getInRange(deltaY < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
 		}
@@ -261,6 +263,7 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 			width: `${scale}px`,
 			height: `${scale}px`,
 			background: color,
+			borderColor: color && rgbToHex(invertRgb(hexToRgb(color))),
 		};
 	}
 

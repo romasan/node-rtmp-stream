@@ -39,6 +39,7 @@
 - [x] zooming at cursor
 - [x] zooming at mobile
 - [x] fix pixel cursor position
+- [ ] go to position on click
 - [ ] FAQ page
 - [ ] mobile layout
 - [ ] check is offline
