@@ -37,7 +37,7 @@
 - [x] zooming
 - [x] select color
 - [x] zooming at cursor
-- [ ] zooming at mobile
+- [x] zooming at mobile
 - [x] fix pixel cursor position
 - [ ] FAQ page
 - [ ] mobile layout

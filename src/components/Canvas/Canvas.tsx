@@ -37,11 +37,16 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 	const [error, setError] = useState('');
+	const initialDistance = useRef<number | null>(null);
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
+		}
+
+		if (touches && touches.length === 2) {
+			return;
 		}
 
 		if (
@@ -57,6 +62,23 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		if (touches) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
+		}
+
+		if (touches && touches.length === 2) {
+			const touch1 = touches[0];
+			const touch2 = touches[1];
+			const dx = touch1.clientX - touch2.clientX;
+			const dy = touch1.clientY - touch2.clientY;
+			const currentDistance = Math.sqrt(dx * dx + dy * dy);
+
+			if (!initialDistance.current) {
+				initialDistance.current = currentDistance;
+			} else {
+				const delta = currentDistance - initialDistance.current;
+
+				setScale((scale) => getInRange(delta < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
+			}
+			return;
 		}
 
 		if (!cur.current.some((e) => e === -1)) {
@@ -102,6 +124,12 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		if (touches) {
 			clientX = cur.current[0];
 			clientY = cur.current[1];
+		}
+
+		if (touches && touches.length === 2) {
+			initialDistance.current = null;
+
+			return;
 		}
 
 		const [,, moved] = cur.current;
@@ -258,37 +286,6 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 			setScale(2);
 		}
 	}, [rootRef.current, canvasRef.current, scale]);
-
-	/*
-	var initialDistance = null;
-
-	function handleZoom(event) {
-		if (event.touches.length < 2) {
-			initialDistance = null;
-			return;
-		}
-
-		if (!initialDistance) {
-			initialDistance = getDistance(event.touches);
-		} else {
-			var currentDistance = getDistance(event.touches);
-			var delta = currentDistance - initialDistance;
-			// Используйте delta для определения масштабирования
-		}
-	}
-
-	function getDistance(touches) {
-		var touch1 = touches[0];
-		var touch2 = touches[1];
-		var dx = touch1.clientX - touch2.clientX;
-		var dy = touch1.clientY - touch2.clientY;
-		return Math.sqrt(dx*dx + dy*dy);
-	}
-
-	document.addEventListener("touchstart", handleZoom);
-	document.addEventListener("touchmove", handleZoom);
-	document.addEventListener("touchend", handleZoom);
-	*/
 
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
