@@ -74,7 +74,9 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 			if (!initialDistance.current) {
 				initialDistance.current = currentDistance;
 			} else {
-				const delta = currentDistance - initialDistance.current;
+				const delta = initialDistance.current - currentDistance;
+
+				console.log('====', delta);
 
 				setScale((scale) => getInRange(delta < 0 ? scale * scaleDegree : scale / scaleDegree, [minScale, maxScale]));
 			}
