@@ -37,6 +37,10 @@ const getImageBuffer = () => {
 		return scaledCanvas.toBuffer();
 	}
 
+	// if (FREEZE_STREAM_FRAME) {
+	// 	return freezeCanvas.toBuffer();
+	// }
+
 	return canvas.toBuffer();
 }
 

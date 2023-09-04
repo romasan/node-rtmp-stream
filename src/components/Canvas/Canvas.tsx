@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useCallback, useEffect } from 'react';
+import React, { FC, useRef, useState, useCallback, useEffect, PropsWithChildren } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -23,6 +23,7 @@ import * as s from './Canvas.module.scss';
 interface Props {
 	color: string;
 	mode?: 'click' | 'select';
+	className?: string;
 	onClick(x: number, y: number): void;
 	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
 }
@@ -32,7 +33,7 @@ const scaleDegree = 1.1;
 const minScale = .5;
 const maxScale = 50;
 
-export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
+export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = 'click', onClick, className, children }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
@@ -337,7 +338,7 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 		<>
 			<div
 				ref={rootRef}
-				className={s.root}
+				className={cn(s.root, className)}
 				onWheel={handleRootWheel}
 			>
 				<div
@@ -357,6 +358,7 @@ export const Canvas: FC<Props> = ({ color, mode = 'click', onClick }) => {
 									[s.inactive]: scale < showPixelScale,
 								})}
 							/>
+							{children}
 					</div>
 					{error && <img className={s.image404} src={image404} />}
 				</div>

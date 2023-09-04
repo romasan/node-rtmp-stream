@@ -1,0 +1,70 @@
+@import "../../styles/mixins";
+
+.joinModalContent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	gap: 20px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.command {
+	background: #9594c0;
+	padding: 3px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.input {
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #b6b5eb;
+	border-bottom-color: #b6b5eb;
+	border-top-color: #2d2d3a;
+	border-left-color: #2d2d3a;
+	background: #bbbaf1;
+	font-family: 'Custom Font', monospace;
+	font-size: 20px;
+	font-weight: bold;
+	padding: 10px;
+	width: 400px;
+	text-align: center;
+	border-radius: 5px;
+
+	&:focus{
+		outline: none;
+		&::placeholder {
+			color: transparent;
+		}
+	}
+
+	&::placeholder {
+		text-transform: uppercase;
+	}
+}
+
+.button {
+	@include buttonLike();
+
+	font-family: 'Custom Font', monospace;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.canvas.canvas {
+	background-image: unset;
+	background-color: #3c3c3c;
+}
+
+.layout {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: red;
+	width: 100%;
+	height: 100%;
+	opacity: 0.5;
+}

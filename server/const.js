@@ -23,7 +23,23 @@ const COLORS = {
 
 const CHAT_WINDOW_LOCATION = `${VKPLAY_HOST}/${VKPLAY_USER_NAME}/only-chat`;
 
+const countdownRanges = {
+	authorized: {
+		0: 1,
+		10: 3,
+		50: 5,
+		100: 10,
+		200: 30,
+		500: 60,
+		1000: 60 * 3,
+	},
+	guest: {
+		0: 60 * 3,
+	},
+};
+
 module.exports = {
 	COLORS,
 	CHAT_WINDOW_LOCATION,
+	countdownRanges,
 };

@@ -1,18 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const { canvas, drawPix } = require('./canvas');
-const package = require('../package.json');
-const parseCookies = require('./lib/cookies');
+const { canvas, drawPix } = require('../canvas');
+const package = require('../../package.json');
+const parseCookies = require('../lib/cookies');
 const {
 	getAuthToken,
 	getPostPayload,
-} = require('./web/helpers');
+} = require('./helpers');
 const {
 	checkSession,
 	addSession,
-} = require('./sessions');
+} = require('../sessions');
 require('dotenv').config();
-const twitchAuth = require('./web/twitchAuth');
+const twitchAuth = require('./twitchAuth');
 
 const { WS_SECURE, MAX_PIX_PER_SEC } = process.env;
 
@@ -137,6 +137,8 @@ const getFavicon = (req, res) => {
 const _default = async (req, res) => {
 	if (
 		!await twitchAuth(req, res)
+		// && !await discordAuth(req, res)
+		// && !await vkAuth(req, res)
 	) {
 		getInfo(req, res);
 	}

@@ -7,6 +7,7 @@ const ee = require('./lib/ee');
 const web = require('./web');
 const {
 	getPathByToken,
+	getCountdown,
 } = require('./web/helpers');
 const { COLORS, CHAT_WINDOW_LOCATION } = require('./const');
 const parseCookies = require('./lib/cookies');
@@ -89,13 +90,15 @@ wss.on('connection', (ws, req) => {
 	// TODO check auth
 	// if not, break
 
-	// if client with token exist send them "you open canwas in another browser"
+	// if client with token exist send then "you open canwas in another browser"
+	const countdown = getCountdown(token) * 1000;
+
 	clients[token] = {
 		ws,
 		env: {
-			countdown: 5000,
+			countdown,
 		},
-		countdown: Date.now() + 5000,
+		countdown: Date.now() + countdown,
 	};
 
 	send(ws, 'environment', {

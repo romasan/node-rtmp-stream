@@ -2,6 +2,8 @@ const fetch = require("node-fetch");
 const url = require('url');
 require('dotenv').config();
 
+const  { addNewUser } = require('../auth');
+
 const parseCookies = require('../lib/cookies');
 
 const {
@@ -40,7 +42,7 @@ const twitch = async (req, res) => {
 	
 				const jsonUserInfo = await respUserInfo.json();
 
-				console.log('==== auth success', cookie, jsonUserInfo);
+				addNewUser(cookie.token, jsonUserInfo);
 
 				res.writeHead(302, { Location: WS_SERVER_ORIGIN });
 				res.end();
