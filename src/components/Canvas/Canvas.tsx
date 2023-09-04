@@ -20,9 +20,14 @@ import image404 from 'url:../../res/404.png';
 
 import * as s from './Canvas.module.scss';
 
+export enum EMode {
+	CLICK = 'CLICK',
+	SELECT = 'SELECT',
+}
+
 interface Props {
 	color: string;
-	mode?: 'click' | 'select';
+	mode?: EMode;
 	className?: string;
 	onClick(x: number, y: number): void;
 	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
@@ -33,7 +38,7 @@ const scaleDegree = 1.1;
 const minScale = .5;
 const maxScale = 50;
 
-export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = 'click', onClick, className, children }) => {
+export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK, onClick, className, children }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
@@ -359,6 +364,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = 'click', on
 								})}
 							/>
 							{children}
+							{mode === EMode.SELECT && (
+								<div className={s.select} />
+							)}
 					</div>
 					{error && <img className={s.image404} src={image404} />}
 				</div>

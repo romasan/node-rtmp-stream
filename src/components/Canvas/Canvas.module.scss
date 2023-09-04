@@ -23,13 +23,13 @@
 	position: absolute;
 
 	&::before {
-		@include size(300px);
+		@include size(448px);
 
 		content: '';
 		position: absolute;
-		left: -150px;
-		top: -150px;
-		// background-image: url('../../res/corner.png');
+		left: -224px;
+		top: -224px;
+		background-image: url('../../res/corner.png');
 		z-index: -1;
 		transform: scale(0.02);
 	}
@@ -68,6 +68,17 @@
 
 .inactive {
 	cursor: pointer;
+}
+
+.select {
+	position: absolute;
+	border: 1px solid #5757ff;
+	background-color: #5757ff99;
+
+	top: 10px;
+	left: 10px;
+	width: 200px;
+	height: 100px;
 }
 
 :global(.mobile) {

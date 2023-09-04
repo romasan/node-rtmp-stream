@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import mobile from 'is-mobile';
 
-import { Canvas } from '../../components/Canvas';
+import { Canvas, EMode } from '../../components/Canvas';
 import { Palette } from '../../components/Palette';
 
 // import { addPix } from './lib/api';
@@ -36,7 +36,7 @@ export const App: React.FC = () => {
 
 	return (
 		<div className={isMobile ? 'mobile' : ''}>
-			<Canvas className={s.canvas} color={wsStore?.environment?.palette[color]} onClick={handleCanvasClick}>
+			<Canvas mode={EMode.SELECT} className={s.canvas} color={wsStore?.environment?.palette[color]} onClick={handleCanvasClick}>
 				<div className={s.layout}>FOO</div>
 			</Canvas>
 			{wsStore?.environment?.palette && (
