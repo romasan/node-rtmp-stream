@@ -18,6 +18,7 @@ import twitch from 'url:./res/twitch.svg';
 import vkplay from 'url:./res/vkplay.svg';
 import youtube from 'url:./res/youtube.svg';
 import discord from 'url:./res/discord.svg';
+import telegram from 'url:./res/telegram.svg';
 // import chat from 'url:./res/chat.svg';
 import login from 'url:./res/login.svg';
 import logout from 'url:./res/logout.svg';
@@ -163,8 +164,11 @@ export const App: React.FC = () => {
 				<a href="https://www.youtube.com/@Place-ru" target="_blank">
 					<img src={youtube} />
 				</a>
-				<a href="https://discord.gg/FfVjurYrus" target="_blank">
+				{/* <a href="https://discord.gg/FfVjurYrus" target="_blank">
 					<img src={discord} />
+				</a> */}
+				<a href="https://t.me/pixel_battle_online" target="_blank">
+					<img src={telegram} />
 				</a>
 			</div>
 			{chatIsShowed && (
