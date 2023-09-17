@@ -92,7 +92,7 @@ const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, update
 
 		if (
 			pixList.length >= MAX_PIX_PER_SEC &&
-			(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
+			(Date.now() - pixList[0]) < 1000 // TODO check per one user (authorized first)
 		) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
