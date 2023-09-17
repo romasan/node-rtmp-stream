@@ -21,11 +21,9 @@ const COLORS = {
 	brown: '#976c49',
 };
 
-const CHAT_WINDOW_LOCATION = `${VKPLAY_HOST}/${VKPLAY_USER_NAME}/only-chat`;
-
 const countdownRanges = {
 	authorized: {
-		0: 1,
+		0: 0.3,
 		10: 3,
 		50: 5,
 		100: 10,
@@ -34,12 +32,15 @@ const countdownRanges = {
 		1000: 60 * 3,
 	},
 	guest: {
-		0: 60 * 3,
+		0: 3,
+		5: 5,
+		10: 10,
+		100: 60,
+		500: 60 * 3,
 	},
 };
 
 module.exports = {
 	COLORS,
-	CHAT_WINDOW_LOCATION,
 	countdownRanges,
 };

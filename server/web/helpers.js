@@ -1,5 +1,6 @@
 const { v4: uuid } = require('uuid');
 const { countdownRanges } = require('../const');
+const { checkUserAuthByToken, checkIsAdmin } = require('../auth');
 
 const getAuthToken = () => {
 	return uuid();
@@ -49,18 +50,44 @@ let _countdownRanges = Object.entries(countdownRanges)
 		[key]: humanListToArray(value),
 	}), {});
 
-const getCountdown = (token) => {
-	const isAdmin = false;
-	const isAuthorized = true;
-	const onlineCount = 10;
-	const isFirstTime = false;
+const tempExpiration = {};
+
+const resetCountdownTemp = (token) => {
+	delete tempExpiration[token];
+};
+
+const getCountdown = (token, onlineCount, isFirstTime, reset) => {
+	if (reset) {
+		resetCountdownTemp(token);
+	}
+
+	if (tempExpiration[token]) {
+		if (tempExpiration[token] > Date.now()) {
+			return Math.ceil((tempExpiration[token] - Date.now()) / 1000);
+		} else {
+			return 0;
+		}
+	}
+
+	// const forceMin = Infinity;
+	const isAdmin = checkIsAdmin(token);
+	const isAuthorized = checkUserAuthByToken(token);
 
 	if (isAdmin || isFirstTime) {
 		return 0;
 	}
 
-	return (isAuthorized ? _countdownRanges.authorized : _countdownRanges.guest)
-		.filter((item) => inRange(onlineCount, item))?.[2] || 5;
+	// if (forceMin) {
+	// 	return forceMin;
+	// }
+
+	const value = (isAuthorized ? _countdownRanges.authorized : _countdownRanges.guest)
+		.find((item) => inRange(onlineCount, item))?.[2] ?? 5;
+
+	tempExpiration[token] = Date.now() + (value * 1000);
+
+	// return Math.min(forceMin, value);
+	return value;
 }
 
 module.exports = {
@@ -69,4 +96,5 @@ module.exports = {
 	getPathByToken,
 	getPostPayload,
 	getCountdown,
+	resetCountdownTemp,
 };

@@ -8,13 +8,41 @@ const web = require('./web');
 const {
 	getPathByToken,
 	getCountdown,
+	resetCountdownTemp,
 } = require('./web/helpers');
-const { COLORS, CHAT_WINDOW_LOCATION } = require('./const');
+const { checkFirstTime } = require('./sessions');
+const { COLORS } = require('./const');
 const parseCookies = require('./lib/cookies');
+const { getUserData, checkUserAuthByToken } = require('./auth');
 
 const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN } = process.env;
 
 let webServer = null;
+
+const clients = {};
+
+const getClientExpiration = (token) => clients[token]?.expiration || 0;
+
+const send = (ws, event, payload) => {
+	ws.send(JSON.stringify({ event, payload }))
+};
+
+const updateClientCountdown = (token) => {
+	if (clients[token]) {
+		const onlineCount = Object.keys(clients).length;
+		const countdown = getCountdown(token, onlineCount, false, true) * 1000;
+
+		clients[token].env.countdown = countdown;
+		clients[token].expiration = Date.now() + countdown;
+
+		send(clients[token].ws, 'countdown', countdown);
+	}
+};
+
+const callbacks = {
+	getClientExpiration,
+	updateClientCountdown,
+};
 
 const webServerHandler = (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', WS_SERVER_ORIGIN);
@@ -31,12 +59,15 @@ const webServerHandler = (req, res) => {
 
 	try {
 		if (web[req.url]) {
-			web[req.url](req, res);
+			web[req.url](req, res, callbacks);
 		} else {
 			web.default(req, res);
 		}
 	} catch (error) {
 		console.log('Error:', error);
+
+		res.writeHead(200);
+		res.end('fail');
 	}
 }
 
@@ -58,10 +89,6 @@ webServer.listen(WS_SERVER_PORT);
 
 const wss = new WebSocket.Server({ server: webServer });
 
-const send = (ws, event, payload) => {
-	ws.send(JSON.stringify({ event, payload }))
-};
-
 const spam = (data) => {
 	const message = JSON.stringify(data);
 
@@ -74,8 +101,6 @@ const spam = (data) => {
 
 ee.on('spam', spam);
 
-const clients = {};
-
 wss.on('connection', (ws, req) => {
 	const { token } = parseCookies(req.headers.cookie);
 
@@ -87,23 +112,23 @@ wss.on('connection', (ws, req) => {
 		return;
 	}
 
-	// TODO check auth
-	// if not, break
-
-	// if client with token exist send then "you open canwas in another browser"
-	const countdown = getCountdown(token) * 1000;
+	const onlineCount = Object.keys(clients).length;
+	const isFirstTime = checkFirstTime(token);
+	const countdown = getCountdown(token, onlineCount, isFirstTime) * 1000;
+	const user = getUserData(token);
 
 	clients[token] = {
 		ws,
 		env: {
 			countdown,
+			isAuthorized: checkUserAuthByToken(token),
+			...user,
 		},
-		countdown: Date.now() + countdown,
+		expiration: Date.now() + countdown,
 	};
 
-	send(ws, 'environment', {
+	send(ws, 'init', {
 		palette: COLORS,
-		authLocation: CHAT_WINDOW_LOCATION,
 		...clients[token].env,
 	});
 
@@ -118,7 +143,7 @@ wss.on('connection', (ws, req) => {
 
 	ws.on('close', () => {
 		delete clients[token];
-	})
+	});
 });
 
 module.exports = {

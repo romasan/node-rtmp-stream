@@ -1,9 +1,11 @@
+import ee from '../lib/ee';
+
 const { hostname, protocol } = document.location;
 const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
 
-export const addPix = ({ x, y, color }) => {
+export const addPix = async ({ x, y, color }) => {
 	try {
-		fetch(`${APIhost}/pix`, {
+		const resp = await fetch(`${APIhost}/pix`, {
 			method: 'PUT',
 			credentials: 'include',
 			headers: {
@@ -11,6 +13,10 @@ export const addPix = ({ x, y, color }) => {
 			},
 			body: JSON.stringify({ x, y, color }),
 		});
+
+		const text = await resp.text();
+
+		ee.emit('ws:pix', text);
 	} catch (e) {}
 };
 

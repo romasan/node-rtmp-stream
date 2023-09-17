@@ -3,9 +3,9 @@
   "version": "1.1.0",
   "description": "",
   "scripts": {
-    "start": "parcel pages/index.html pages/auth/index.html pages/qq/index.html",
+    "start": "parcel pages/index.html pages/*/index.html",
     "prebuild": "rm -rf dist/*.*",
-    "build": "parcel build pages/index.html pages/auth/index.html pages/qq/index.html",
+    "build": "parcel build pages/index.html pages/*/index.html",
     "serve": "cd ./server && node index.js"
   },
   "author": "",

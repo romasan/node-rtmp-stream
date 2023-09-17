@@ -71,7 +71,7 @@ const upscale = (input, ouptut, scale) => {
 	fs.writeFileSync(ouptut, canvas.toBuffer());
 }
 
-const drawDiffMask = (file, output) => {
+const drawDiffMask = (file, output, uuid) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 
@@ -84,16 +84,18 @@ const drawDiffMask = (file, output) => {
 	});
 	
 	rl.on('line', (line) => {
-		const [,,x,y,color,uuid] = line.split(';');
+		const [time, nick, x, y, color, _uuid] = line.split(';');
 
-		if (uuid !== 'e26ba007-3fcf-4fcc-a8e2-e163ca01b729') {
-		// if (uuid === 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc') {
-			ctx.fillStyle = color;
+		if (uuid) {
+			if (_uuid === uuid) {
+				ctx.fillStyle = color;
+				ctx.fillRect(x, y, 1, 1);
+			}
+		} else {
+			ctx.fillStyle = '#00000033';
 			ctx.fillRect(x, y, 1, 1);
 		}
 
-		// ctx.fillStyle = '#00000033';
-		// ctx.fillRect(x, y, 1, 1);
 
 	});
 
@@ -132,7 +134,7 @@ const checkLog = (file, input, output) => {
 	
 	rl.on('line', (line) => {
 		n++;
-		const [time,,x,y,color] = line.split(';');
+		const [time, nick, x, y, color] = line.split(';');
 
 		if (Number(time) >= breakTime) {
 			rl.pause();
@@ -179,25 +181,25 @@ const recover = (file, backgroundImage, output) => {
 	});
 };
 
-const PPF = 50;
+const PPF = 100;
 
 const drawSteps = (file, backgroundImage) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 
-	// const imgBuf = fs.readFileSync(backgroundImage);
-	// const image = new Image;
-	// image.src = imgBuf;
-	// ctx.drawImage(image, 0, 0);
+	const imgBuf = fs.readFileSync(backgroundImage);
+	const image = new Image;
+	image.src = imgBuf;
+	ctx.drawImage(image, 0, 0);
 
-	ctx.fillStyle = '#ffffff';
-	ctx.fillRect(0, 0, WIDTH, HEIGHT);
+	// ctx.fillStyle = '#ffffff';
+	// ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
 	let i = -1;
 	let frame = 0;
 
 	// const breakTime = Date.now() - day * 3;
-	const breakLine = 1758020 - 300_000;
+	// const breakLine = 1758020 - 300_000;
 
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),
@@ -207,14 +209,15 @@ const drawSteps = (file, backgroundImage) => {
 	rl.on('line', (line) => {
 		i++;
 
-		const [time,,x,y,color] = line.split(';');
+		const [time, name, x, y, color] = line.split(';');
 
 		// if (Number(time) < breakTime) {
 		// 	return
 		// }
-		if (i < breakLine) {
-			return
-		}
+
+		// if (i < breakLine) {
+		// 	return
+		// }
 
 		ctx.fillStyle = color;
 		ctx.fillRect(x, y, 1, 1);
@@ -247,18 +250,6 @@ const drawSteps = (file, backgroundImage) => {
 	});
 }
 
-// upscale('inout.png', 'upscaled.png', 3);
-
-// drawDefaultCanvas('inout.png');
-
-// drawDefaultCanvas('head2.png');
-// drawDefaultCanvas('head3.png');
-// drawDefaultCanvas('head4.png');
-// drawDefaultCanvas('head5.png');
-// drawDefaultCanvas('head6.png');
-
-// drawDiffMask('./pixels.log', './output.png');
-
 const filterByUUID = (input, output, uuid) => {
 	const rl = readline.createInterface({
 		input: fs.createReadStream(input),
@@ -275,22 +266,6 @@ const filterByUUID = (input, output, uuid) => {
 	})
 };
 
-// filterByUUID('./pixels.log', 'pixels2.log', 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc');
-
-// checkLog('./pixels.log', '426x240.png', './output.png');
-
-// recover('./pixels.log', './426x240.png', './output.png');
-
-// drawSteps('./pixels.log', './426x240.png');
-
-// ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
-// ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
-// ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
-// 155.03s user 6.16s system 96% cpu 2:47.86 total (2.58 min)
-// 206745 pixels.log 15*30*60=27000 7.65 min. video
-// ~ 1 min
-// 17 mb
-
 const getDirectoriesRecursive = (directory) => {
 	fs.readdirSync(directory).forEach((file) => {
 		const absolutePath = path.join(directory, file);
@@ -305,8 +280,6 @@ const getDirectoriesRecursive = (directory) => {
 		}
 	});
 }
-
-// getDirectoriesRecursive('./sessions');
 
 const getPixelsInfo = (file, output) => {
 	const list = {};
@@ -325,12 +298,6 @@ const getPixelsInfo = (file, output) => {
 		fs.writeFileSync(output, JSON.stringify(list, true, 2));
 	});
 }
-
-const _map = require('./map.json');
-
-// console.log('====', _map['0:0']?.uuid);
-
-// getPixelsInfo('./pixels.log', './map.json');
 
 const genMapByUsers = (map, output) => {
 	const canvas = createCanvas(WIDTH, HEIGHT);
@@ -379,4 +346,211 @@ const genMapByUsers = (map, output) => {
 	fs.writeFileSync(output, canvas.toBuffer());
 }
 
-genMapByUsers(_map, './output.png');
+const HSLToRGB = ([h, s, l]) => {
+	if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
+		return [0, 0, 0];
+	}
+
+	s /= 100;
+	l /= 100;
+
+	if (s === 0) {
+		const value = Math.round(l * 255);
+
+		return [value, value, value];
+	}
+
+	const c = (1 - Math.abs(2 * l - 1)) * s;
+	const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+	const m = l - c / 2;
+
+	let rgb;
+
+	if (h >= 0 && h < 60) {
+		rgb = [c, x, 0];
+	} else if (h >= 60 && h < 120) {
+		rgb = [x, c, 0];
+	} else if (h >= 120 && h < 180) {
+		rgb = [0, c, x];
+	} else if (h >= 180 && h < 240) {
+		rgb = [0, x, c];
+	} else if (h >= 240 && h < 300) {
+		rgb = [x, 0, c];
+	} else if (h >= 300 && h < 360) {
+		rgb = [c, 0, x];
+	}
+
+	const [r, g, b] = rgb;
+
+	return [
+		Math.round((r + m) * 255),
+		Math.round((g + m) * 255),
+		Math.round((b + m) * 255),
+	]
+}
+
+const RGBToHEX = ([r, g, b]) => '#' +
+	r.toString(16).padStart(2, '0') +
+	g.toString(16).padStart(2, '0') +
+	b.toString(16).padStart(2, '0');
+
+const heatmap = (file, output) => {
+	const canvas = createCanvas(WIDTH, HEIGHT);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+	const list = [];
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+
+	// let max = 0;
+
+	rl.on('line', (line) => {
+		const [time, nick, x, y, color, uuid] = line.split(';');
+
+		if (!list[x]) {
+			list[x] = [];
+		}
+
+		list[x][y] = (list[x][y] | 0) + 1;
+
+		// max = debugValue || Math.max(max, list[x][y]);
+	});
+
+	rl.on('close', () => {
+		const sorted = list
+			.reduce((list, item) => [
+				...list,
+				...item, // .filter((e) => !list.includes(e))
+			], [])
+			.reduce((list, e) => list.includes(e) ? list : [...list, e], [])
+			.sort((a, b) => a < b ? 1 : -1);
+		const med = sorted[Math.floor(sorted.length / 2)];
+		
+		// const _sorted = list
+		// 	.reduce((list, item, x) => [
+		// 		...list,
+		// 		...item.map((value, y) => ({ value, x, y })),
+		// 	], [])
+		// 	.sort((a, b) => a.value < b.value ? 1 : -1)
+		// 	.map((e) => `${e?.x}-${e?.y}: ${e?.value}`);
+
+		// fs.writeFileSync(
+		// 	'./pixels.top',
+		// 	sorted.join('\n'),
+		// );
+
+		for (const x in list) {
+			for (const y in list[x]) {
+				const h = (1.0 - (Math.min(list[x][y] / med, 1))) * 240;
+				const hsl = [h, 100, 50];
+				const rgb = HSLToRGB(hsl);
+				const color = RGBToHEX(rgb);
+
+				// if (list[x][y] > 1000) {
+				// 	console.log('====', med, list[x][y], x, y, hsl, rgb);
+				// }
+				// if (list[x][y] < med * 2) {
+				ctx.fillStyle = color;
+				ctx.fillRect(x, y, 1, 1);
+				// }
+			}
+		}
+
+		fs.writeFileSync(output, canvas.toBuffer());
+	});
+};
+
+const filterByXY = (input, output, x, y) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(input),
+		crlfDelay: Infinity
+	});
+
+	const file = fs.createWriteStream(output);
+
+	rl.on('line', (line) => {
+		const [time, nick, _x, _y, color, uuid] = line.split(';');
+
+		if (x === _x && y === _y) {
+			file.write(line + '\n');
+		}
+	})
+};
+
+const topUUIDs = (input, output) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(input),
+		crlfDelay: Infinity
+	});
+
+	// const file = fs.createWriteStream(output);
+
+	const UUIDs = {};
+
+	rl.on('line', (line) => {
+		const [time, nick, _x, _y, color, uuid] = line.split(';');
+
+		UUIDs[uuid] = (UUIDs[uuid] || 0) + 1;
+	});
+
+	rl.on('close', () => {
+		fs.writeFileSync(
+			output,
+			Object.entries(UUIDs)
+				.sort(([, aValue], [, bValue]) => aValue < bValue ? 1 : -1)
+				.map(([uuid, count]) => `${uuid}: ${count}`)
+				.join('\n'),
+		);
+	});
+
+	// file.write(line + '\n');
+}
+
+// const _map = require('./map.json');
+// console.log('====', _map['0:0']?.uuid);
+
+// getPixelsInfo('./pixels.log', './map.json');
+// upscale('inout.png', 'upscaled.png', 3);
+// drawDefaultCanvas('inout.png');
+// drawDiffMask('./pixels.log', './output.png');
+// drawDiffMask('./pixels.log', './output.png', 'cf610675-9af1-4fea-b268-b2d13f5d816e');
+// filterByUUID('./pixels.log', 'pixels2.log', 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc');
+// checkLog('./pixels.log', '426x240.png', './output.png');
+// recover('./pixels.log', './426x240.png', './output.png');
+drawSteps('./pixels.log', './426x240.png');
+// getDirectoriesRecursive('./sessions');
+// heatmap('./pixels.log', './output.png');
+// filterByXY('./pixels.log', 'pixels.output', '143', '86');
+// genMapByUsers(_map, './output.png');
+// topUUIDs('./pixels.output', './uuids.top')
+
+const LIST = {
+	drawDefaultCanvas,       // сохраняет в файл картинку в клеточку
+	upscale,                 // берёт картинку и растягивает, сохраняет
+	drawDiffMask,            // сохраняет картинку с пикселями конкретного юзера (или аналог heatmap)
+	checkLog,                // сохраняет пиксели с определённого времени
+	recover,                 // сохраняет картинку со всеми пикселями
+	drawSteps,               // каждые N пикселей сохраняет кадр в файл
+	filterByUUID,            // сохраняет лог пикселей тольк определённого юзера
+	getDirectoriesRecursive, // выводит на экран uuid сессий из дерева
+	getPixelsInfo,           // сохраняет карту последних пикселей json
+	genMapByUsers,           // получает карту пикселей рисует пиксели с уникальным цветом для юзера
+	heatmap,                 // сохраняет картинку с тепловой картой по точкам
+	filterByXY,              // сохраняет лог пикселей определённой координаты
+	topUUIDs,                // сохраняет список топ uuid по количеству точек
+}
+
+// ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+// ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+// ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
+// 155.03s user 6.16s system 96% cpu 2:47.86 total (2.58 min)
+// 206745 pixels.log 15*30*60=27000 7.65 min. video
+// ~ 1 min
+// 17 mb
+
+// ffmpeg -i https://play.lofiradio.ru:8000/mp3_128 -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4

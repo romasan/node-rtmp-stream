@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -9,13 +9,33 @@ import * as s from './Palette.module.scss';
 interface Props {
 	color: string;
 	colors: any;
+	expiration?: number;
 	setColor(value: string): void;
 }
 
-export const Palette: FC<Props> = ({ color, colors, setColor }) => {
+export const Palette: FC<Props> = ({ color, colors, expiration = 0, setColor }) => {
 	const isMobile = mobile();
+	const [shouldShowProgress, setShowedProgress] = useState(false);
+	const [isProgressInited, setIsProgressInited] = useState(false);
 
 	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: window.innerHeight - 100, ready: !isMobile });
+
+	useEffect(() => {
+		setShowedProgress(false);
+		setIsProgressInited(false);
+
+		setTimeout(() => {
+			setShowedProgress(true);
+		}, 0);
+	}, [expiration]);
+
+	useEffect(() => {
+		if (shouldShowProgress) {
+			setTimeout(() => {
+				setIsProgressInited(true);
+			}, 100);
+		}
+	}, [shouldShowProgress]);
 
 	return (
 		<div className={s.root} ref={draggableRef}>
@@ -39,7 +59,12 @@ export const Palette: FC<Props> = ({ color, colors, setColor }) => {
 				</div>
 
 				<div className={s.countdown}>
-					<div className={s.progress} style={{ width: '100%'}}></div>
+					{shouldShowProgress && (
+						<div className={s.progress} style={{
+							transition: `all ${expiration - Date.now()}ms linear`,
+							width: isProgressInited ? '100%' : '0%',
+						}}></div>
+					)}
 				</div>
 
 			</div>

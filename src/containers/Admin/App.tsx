@@ -17,8 +17,8 @@ export const App: React.FC = () => {
 	const isMobile = mobile();
 
 	useEffect(() => {
-		if (!color && wsStore?.environment?.palette) {
-			const firstColor = 'black' in wsStore?.environment?.palette ? 'black' : (Object.keys(wsStore?.environment?.palette) || []).pop();
+		if (!color && wsStore?.palette) {
+			const firstColor = 'black' in wsStore?.palette ? 'black' : (Object.keys(wsStore?.palette) || []).pop();
 			setColor(firstColor as string);
 		}
 	}, [color, wsStore]);
@@ -29,18 +29,18 @@ export const App: React.FC = () => {
 	}
 
 	useEffect(() => {
-		ee.on('ws:environment', (payload: any) => {
-			setWsStore((store = {}) => ({ ...store, environment: payload }));
+		ee.on('ws:init', (payload: any) => {
+			setWsStore((store = {}) => ({ ...store, ...payload }));
 		});
 	}, []);
 
 	return (
 		<div className={isMobile ? 'mobile' : ''}>
-			<Canvas mode={EMode.SELECT} className={s.canvas} color={wsStore?.environment?.palette[color]} onClick={handleCanvasClick}>
+			<Canvas mode={EMode.SELECT} className={s.canvas} color={wsStore?.palette?.[color]} onClick={handleCanvasClick}>
 				<div className={s.layout}>FOO</div>
 			</Canvas>
-			{wsStore?.environment?.palette && (
-				<Palette color={color} colors={wsStore?.environment?.palette} setColor={setColor} />
+			{wsStore?.palette && (
+				<Palette color={color} colors={wsStore?.palette} setColor={setColor} />
 			)}
 		</div>
 	)

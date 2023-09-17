@@ -33,7 +33,11 @@ const trimFailed = () => {
 	}
 }
 
+const tempFirstTime = {}
+
 const checkSession = (token, prevalidate = true) => {
+	delete tempFirstTime[token];
+
 	if (sessions[token]) {
 		return true;
 	}
@@ -61,6 +65,8 @@ const checkSession = (token, prevalidate = true) => {
 };
 
 const addSession = (token, data) => {
+	tempFirstTime[token] = true;
+
 	const filePath = getPathByToken(token, false);
 	const dirname = path.dirname(filePath);
 
@@ -85,7 +91,12 @@ const addSession = (token, data) => {
 	trimSessions();
 }
 
+const checkFirstTime = (token) => {
+	return token in tempFirstTime;
+};
+
 module.exports = {
 	checkSession,
 	addSession,
+	checkFirstTime,
 };

@@ -1,14 +1,15 @@
 # basic
 
 - [ ] auth by chat command
-- [ ] auth by vkplay/twitch
-- [ ] countdown
+- [x] auth by twitch
+- [ ] auth by vkplay
+- [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
 - [ ] read chat from stream?
 - [ ] support for multiple colors
 - [x] bot protection
-- [ ] session caching
+- [x] session caching
 
 # admin panel
 
@@ -46,7 +47,10 @@
 - [ ] mobile layout
 - [ ] check is offline
 - [x] link to stream
-- [ ] contrast border for pixel placeholder
+- [x] contrast border for pixel placeholder
+
+# page with infinity map
+ - [ ] parts of map like geo
 
 # configurate
 

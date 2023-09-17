@@ -29,16 +29,17 @@ interface Props {
 	color: string;
 	mode?: EMode;
 	className?: string;
+	expiration?: number;
 	onClick(x: number, y: number): void;
 	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
 }
 
 const showPixelScale = 6;
 const scaleDegree = 1.1;
-const minScale = .5;
+const minScale = 1;
 const maxScale = 50;
 
-export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK, onClick, className, children }) => {
+export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK, onClick, className, expiration = 0, children }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
@@ -50,6 +51,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 	const [error, setError] = useState('');
 	const initialDistance = useRef<number | null>(null);
+	const [countdown, setCoundown] = useState(0);
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
@@ -91,6 +93,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 
 				setScale((scale) => getInRange(scale + delta, [minScale, maxScale]));
 			}
+
 			return;
 		}
 
@@ -297,6 +300,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 		}
 	}, [rootRef.current, canvasRef.current, scale]);
 
+	const renderCountdown = () => {
+		const sec = Math.ceil(countdown / 1000);
+		const min = Math.floor(sec / 60);
+
+		return `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+	};
+
 	useEffect(() => {
 		if (rootRef.current && canvasRef.current && firstRender.current) {
 			firstRender.current = false;
@@ -339,6 +349,21 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 		}
 	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color]);
 
+	useEffect(() => {
+		const timer = setInterval(() => {
+			if (expiration && Date.now() < expiration) {
+				setCoundown(expiration - Date.now());
+			} else {
+				setCoundown(0);
+				clearInterval(timer);
+			}
+		}, 300);
+
+		return () => {
+			clearInterval(timer);
+		};
+	}, [expiration]);
+
 	return (
 		<>
 			<div
@@ -373,7 +398,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 				{!isMobile && (
 					<>
 						<div className={s.coordinates}>
-							{coord[0] >= 0 && `[${coord.join(', ')}]`} x {Number(scale.toFixed(2))}
+							{countdown > 0 && (
+								<>{renderCountdown()}&nbsp;</>
+							)}
+							{coord[0] >= 0 && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
 						<div
 							className={s.pixel}

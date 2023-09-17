@@ -11,10 +11,11 @@ const {
 	checkSession,
 	addSession,
 } = require('../sessions');
+const { checkIsAdmin, removeUser } = require('../auth');
 require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 
-const { WS_SECURE, MAX_PIX_PER_SEC } = process.env;
+const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -28,89 +29,125 @@ const getCanvas = (req, res) => {
 
 let pixList = [];
 
-const checkAccessWrapper = async (req, res, callback) => {
-	const cookie = parseCookies(req.headers.cookie || '');
+const checkAccessWrapper = (callback) => {
+	return async (req, res, callbacks) => {
+		const cookie = parseCookies(req.headers.cookie || '');
 
-	if (checkSession(cookie.token)) {
-		// TODO check auth
-		// TODO check ban
-		// TODO check countdown
+		if (checkSession(cookie.token)) {
+			// TODO check auth
+			// TODO check ban
+			// TODO check countdown (only for pixel)
 
-		callback();
-	} else {
-		res.writeHead(200, { 'Content-Type': 'text/plain' });
-		res.end('fail');
+			callback(req, res, callbacks);
+		} else {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
 
-		return;
+			return;
+		}
 	}
 };
 
-const addPix = async (req, res) => {
-	checkAccessWrapper(req, res, async () => {
-		if (req.method === 'PUT') {
-			const cookie = parseCookies(req.headers.cookie || '');
-			const postPayload = await getPostPayload(req);
+const chatInside = checkAccessWrapper(async (req, res) => {
+	if (req.method === 'PUT') {
+		const postPayload = await getPostPayload(req);
 
-			let payload = {};
+		if (typeof postPayload === 'string') {
+			const text = postPayload
+				.slice(0, 500)
+				.replace('<', '&lt;')
+				.replace('>', '&gt;');
 
-			try {
-				payload = JSON.parse(postPayload);
-			} catch (error) {
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('fail');
-
-				return;
-			}
-
-			if (
-				pixList.length < MAX_PIX_PER_SEC ||
-				(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
-			) {
-
-				if (
-					typeof payload.x !== 'number' ||
-					typeof payload.y !== 'number' ||
-					typeof payload.color !== 'string'
-				) {
-					res.writeHead(200, { 'Content-Type': 'text/plain' });
-					res.end('fail');
-		
-					return;
-				}
-
-				// TODO check prev pixel color
-
-				pixList.push(Date.now());
-				pixList = pixList.slice(-MAX_PIX_PER_SEC);
-
-				drawPix({
-					color: payload.color,
-					x: Math.floor(payload.x),
-					y: Math.floor(payload.y),
-					nickname: '',
-					uuid: cookie.token,
-				});
-
-				// send to <uuid> restart countdown timer command
-				// and id for next pixel
-
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('ok');
-			}
+			// spam()
+			console.log('Chat new message:', text);
 		} else {
-			getInfo(req, res);
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
 		}
-	})
-}
+	} else {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('fail');
+	}
+});
+
+const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, updateClientCountdown }) => {
+	if (req.method === 'PUT') {
+		const { token } = parseCookies(req.headers.cookie);
+		const postPayload = await getPostPayload(req);
+
+		let payload = {};
+
+		try {
+			payload = JSON.parse(postPayload);
+		} catch (error) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			return;
+		}
+
+		if (
+			pixList.length >= MAX_PIX_PER_SEC &&
+			(Date.now() - pixList[0]) > 1000 // TODO check per one user (authorized first)
+		) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			return;
+		}
+
+		if (
+			typeof payload.x !== 'number' ||
+			typeof payload.y !== 'number' ||
+			typeof payload.color !== 'string'
+		) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			return;
+		}
+
+		if (Date.now() < getClientExpiration(token)) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('await');
+
+			return;
+		}
+
+		// TODO check prev pixel color
+
+		pixList.push(Date.now());
+		pixList = pixList.slice(-MAX_PIX_PER_SEC);
+
+		drawPix({
+			color: payload.color,
+			x: Math.floor(payload.x),
+			y: Math.floor(payload.y),
+			nickname: '',
+			uuid: token,
+		});
+
+		updateClientCountdown(token);
+
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('ok');
+	} else {
+		getInfo(req, res);
+	}
+});
 
 const start = (req, res) => {
-	const cookie = parseCookies(req.headers.cookie || '');
+	const { token } = parseCookies(req.headers.cookie);
 	const ip = req.socket.remoteAddress;
 	// const userAgent = req.headers['user-agent'];
 
-	if (checkSession(cookie.token)) {
-		// TODO check auth
-		// if not, send "login"
+	if (checkSession(token)) {
+		if (checkIsAdmin(token)) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('qq');
+
+			return;
+		}
 	} else {
 		const token = getAuthToken();
 
@@ -121,8 +158,6 @@ const start = (req, res) => {
 		}
 
 		addSession(token, [ip]);
-
-		// send "login"
 	}
 
 	res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -132,6 +167,15 @@ const start = (req, res) => {
 const getFavicon = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'image/x-icon' });
 	fs.createReadStream('./favicon.ico').pipe(res);
+};
+
+const logout = (req, res) => {
+	const { token } = parseCookies(req.headers.cookie);
+
+	removeUser(token);
+
+	res.writeHead(302, { Location: WS_SERVER_ORIGIN });
+	res.end();
 };
 
 const _default = async (req, res) => {
@@ -149,5 +193,7 @@ module.exports = {
 	'/pix': addPix,
 	'/canvas.png': getCanvas,
 	'/favicon.ico': getFavicon,
+	'/chat': chatInside,
+	'/auth/logout': logout,
 	default: _default,
 }

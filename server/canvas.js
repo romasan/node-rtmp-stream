@@ -30,6 +30,8 @@ if (scale > 1) {
 	scaledCTX = scaledCanvas.getContext('2d');
 	scaledCTX.imageSmoothingEnabled = false;
 	scaledCTX.drawImage(image, 0, 0, image.width * scale, image.height * scale);
+
+	// add background like ZX Spectrum but squares
 }
 
 const getImageBuffer = () => {
