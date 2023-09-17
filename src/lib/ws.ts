@@ -41,6 +41,8 @@ export const connect = () => {
 	ws.onopen = () => {
 		clearInterval(timer);
 		timer = setInterval(ping, 10_000);
+
+		ee.emit('ws:connect', true);
 	};
 
 	ws.onmessage = reduceMessage;
@@ -48,5 +50,7 @@ export const connect = () => {
 	ws.onclose = () => {
 		clearInterval(timer);
 		setTimeout(connect, 10_000);
+
+		ee.emit('ws:connect', false);
 	};
 };

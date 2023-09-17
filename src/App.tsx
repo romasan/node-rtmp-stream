@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+
+import cn from 'classnames';
 
 import mobile from 'is-mobile';
 
@@ -35,6 +37,9 @@ export const App: React.FC = () => {
 	const [chatIsShowed, setChatIsShowed] = useState(false);
 	const [isAuthorized, setIsAuthorized] = useState(false);
 	const [expiration, setExpiration] = useState(0);
+	const [isOnline, setIsOnline] = useState(false);
+	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
+	const blinkedTimer = useRef(-1);
 
 	// const toggleChat = () => {
 	// 	setChatIsShowed((value) => !value);
@@ -67,24 +72,44 @@ export const App: React.FC = () => {
 		document.location.href = `${APIhost}/auth/twitch`;
 	};
 
+	const onWsInit = (payload: any) => {
+		setWsStore((store = {}) => ({ ...store, ...payload }));
+		setExpiration(Date.now() + payload?.countdown);
+		setIsAuthorized(payload?.isAuthorized);
+	};
+
+	const onWsCountdown = (countdown: number) => {
+		setWsStore((store = {}) => ({ ...store, countdown }));
+		setExpiration(Date.now() + countdown);
+	};
+
+	const onWsPix = (payload: string) => {
+		if (payload === 'await' && !isAuthorized) {
+			setBlinkedLoginAnimation(true);
+			clearTimeout(blinkedTimer.current);
+			blinkedTimer.current = setTimeout(() => {
+				setBlinkedLoginAnimation(false);
+			}, 3000);
+		}
+	};
+
+	const onWsConnect = (payload: boolean) => {
+		setIsOnline(payload);
+	};
+
 	useEffect(() => {
-		ee.on('ws:init', (payload: any) => {
-			setWsStore((store = {}) => ({ ...store, ...payload }));
-			setExpiration(Date.now() + payload?.countdown);
-			setIsAuthorized(payload?.isAuthorized);
-		});
+		ee.on('ws:init', onWsInit);
+		ee.on('ws:countdown', onWsCountdown);
+		ee.on('ws:pix', onWsPix);
+		ee.on('ws:connect', onWsConnect);
 
-		ee.on('ws:countdown', (countdown) => {
-			setWsStore((store = {}) => ({ ...store, countdown }));
-			setExpiration(Date.now() + countdown);
-		});
-
-		ee.on('ws:pix', (payload: string) => {
-			if (payload === 'await') {
-				// console.log('==== AWAIT');
-			}
-		});
-	}, []);
+		return () => {
+			ee.off('ws:init', onWsInit);
+			ee.off('ws:countdown', onWsCountdown);
+			ee.off('ws:pix', onWsPix);
+			ee.off('ws:connect', onWsConnect);
+		};
+	}, [isAuthorized]);
 
 	return (
 		<div className={isMobile ? 'mobile' : ''}>
@@ -94,18 +119,23 @@ export const App: React.FC = () => {
 						<div className={s.userName}>
 							{wsStore?.name}
 						</div>
-						<a href="/logout">
+						<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
 							<img src={logout} className={s.iconButton} />
 						</a>
 					</>
 					) : (
-						<a href="/login">
+						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
 							<img src={login} className={s.iconButton} />
 						</a>
 				)}
 				{/* <img src={chat} onClick={toggleChat} className={s.iconButton} /> */}
 			</div>
-			<Canvas color={wsStore?.palette?.[color]} onClick={handleCanvasClick} expiration={expiration} />
+			<Canvas
+				color={wsStore?.palette?.[color]}
+				onClick={handleCanvasClick}
+				expiration={expiration}
+				isAuthorized={isAuthorized}
+			/>
 			{wsStore?.palette && (
 				<Palette color={color} colors={wsStore?.palette} setColor={setColor} expiration={expiration} />
 			)}

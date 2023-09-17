@@ -43,6 +43,8 @@ const checkAccessWrapper = (callback) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
+			console.log('Error: failed check access');
+
 			return;
 		}
 	}
@@ -83,6 +85,8 @@ const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, update
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
+			console.log('Error: failed on add pixel (read payload)');
+
 			return;
 		}
 
@@ -92,6 +96,8 @@ const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, update
 		) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
+
+			console.log('Error: failed on add pixel (too many pixels per second)');
 
 			return;
 		}
@@ -103,6 +109,8 @@ const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, update
 		) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
+
+			console.log('Error: failed on add pixel (incorrect format of pixel)');
 
 			return;
 		}

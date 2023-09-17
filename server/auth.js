@@ -63,7 +63,7 @@ const getUserData = (token) => {
 const removeUser = (token) => {
 	const user = getUserByToken(token);
 
-	console.log('Error remove user authorization:', token);
+	// console.log('Error remove user authorization:', token);
 
 	if (!user) {
 		return;

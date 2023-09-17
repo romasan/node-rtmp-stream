@@ -30,6 +30,7 @@ interface Props {
 	mode?: EMode;
 	className?: string;
 	expiration?: number;
+	isAuthorized?: boolean;
 	onClick(x: number, y: number): void;
 	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
 }
@@ -39,7 +40,15 @@ const scaleDegree = 1.1;
 const minScale = 1;
 const maxScale = 50;
 
-export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK, onClick, className, expiration = 0, children }) => {
+export const Canvas: FC<PropsWithChildren<Props>> = ({
+	color,
+	mode = EMode.CLICK,
+	className,
+	expiration = 0,
+	isAuthorized = false,
+	children,
+	onClick,
+}) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
 	const rootRef = useRef<null | HTMLDivElement>(null);
@@ -52,6 +61,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 	const [error, setError] = useState('');
 	const initialDistance = useRef<number | null>(null);
 	const [countdown, setCoundown] = useState(0);
+	const [animatedPixel, setAnimatedPixel] = useState(false);
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
@@ -271,8 +281,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 			top: `${top + y * scale}px`,
 			width: `${scale}px`,
 			height: `${scale}px`,
-			background: color,
-			borderColor: color && rgbToHex(invertRgb(hexToRgb(color))),
+			'--bg-color': color,
+			'--border-color': color && rgbToHex(invertRgb(hexToRgb(color))),
 		};
 	}
 
@@ -364,6 +374,23 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 		};
 	}, [expiration]);
 
+	const onWsPix = (payload: string) => {
+		if (payload === 'await' && !isAuthorized) {
+			setAnimatedPixel(true);
+			setTimeout(() => {
+				setAnimatedPixel(false);
+			}, 500);
+		}
+	};
+
+	useEffect(() => {
+		ee.on('ws:pix', onWsPix);
+
+		return () => {
+			ee.off('ws:pix', onWsPix);
+		};
+	}, [isAuthorized]);
+
 	return (
 		<>
 			<div
@@ -404,9 +431,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({ color, mode = EMode.CLICK
 							{coord[0] >= 0 && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
 						<div
-							className={s.pixel}
+							className={cn(s.pixel, { [s.animated]: animatedPixel })}
 							style={scale ? getPixelStyle() : {}}
-						/>
+						>
+							<div className={s.pixelInside}></div>
+						</div>
 					</>
 				)}
 			</div>
