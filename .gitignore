@@ -13,3 +13,4 @@ server/frames/
 *.log
 _*
 *.mp4
+auth.json
