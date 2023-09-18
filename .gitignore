@@ -3,8 +3,8 @@ server/pid
 ssl-cert/
 node_modules/
 dist/
-server/sessions/*
-!server/sessions/*.js
+# server/sessions/*
+# !server/sessions/*.js
 server/frames/
 .cache/
 .parcel-cache
@@ -13,4 +13,4 @@ server/frames/
 *.log
 _*
 *.mp4
-auth.json
+# auth.json
