@@ -514,7 +514,7 @@ const topUUIDs = (input, output) => {
 // const _map = require('./map.json');
 // console.log('====', _map['0:0']?.uuid);
 
-// getPixelsInfo('./pixels.log', './map.json');
+getPixelsInfo('./pixels.log', './map.json');
 // upscale('inout.png', 'upscaled.png', 3);
 // drawDefaultCanvas('inout.png');
 // drawDiffMask('./pixels.log', './output.png');
@@ -522,7 +522,7 @@ const topUUIDs = (input, output) => {
 // filterByUUID('./pixels.log', 'pixels2.log', 'c1dc793a-ed45-4ff3-9730-a9fc2710afcc');
 // checkLog('./pixels.log', '426x240.png', './output.png');
 // recover('./pixels.log', './426x240.png', './output.png');
-drawSteps('./pixels.log', './426x240.png');
+// drawSteps('./pixels.log', './426x240.png');
 // getDirectoriesRecursive('./sessions');
 // heatmap('./pixels.log', './output.png');
 // filterByXY('./pixels.log', 'pixels.output', '143', '86');

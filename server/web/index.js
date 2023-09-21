@@ -11,9 +11,10 @@ const {
 	checkSession,
 	addSession,
 } = require('../sessions');
-const { checkIsAdmin, removeUser } = require('../auth');
+const { checkIsAdmin, removeUser, checkUserAuthByToken } = require('../auth');
 require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
+const { addMessage, getMessages } = require('../chat');
 
 const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
 
@@ -27,16 +28,21 @@ const getCanvas = (req, res) => {
 	res.end(canvas.toBuffer());
 };
 
-let pixList = [];
-
-const checkAccessWrapper = (callback) => {
+const checkAccessWrapper = (callback, checkAuth) => {
 	return async (req, res, callbacks) => {
-		const cookie = parseCookies(req.headers.cookie || '');
+		const { token } = parseCookies(req.headers.cookie || '');
 
-		if (checkSession(cookie.token)) {
-			// TODO check auth
+		if (checkSession(token)) {
 			// TODO check ban
-			// TODO check countdown (only for pixel)
+
+			if (checkAuth && !checkUserAuthByToken(token)) {
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('fail');
+
+				console.log('Error: failed check authorized');
+
+				return;
+			}
 
 			callback(req, res, callbacks);
 		} else {
@@ -50,18 +56,25 @@ const checkAccessWrapper = (callback) => {
 	}
 };
 
-const chatInside = checkAccessWrapper(async (req, res) => {
+const getChatMessages = checkAccessWrapper(async (req, res) => {
+	const messages = getMessages();
+
+	res.writeHead(200, { 'Content-Type': 'text/json' });
+	res.end(JSON.stringify(messages));
+});
+
+const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	if (req.method === 'PUT') {
+		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
 
 		if (typeof postPayload === 'string') {
-			const text = postPayload
-				.slice(0, 500)
-				.replace('<', '&lt;')
-				.replace('>', '&gt;');
+			addMessage(token, postPayload);
 
-			// spam()
-			console.log('Chat new message:', text);
+			console.log('Chat new message:', postPayload);
+
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('ok');
 		} else {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
@@ -70,7 +83,9 @@ const chatInside = checkAccessWrapper(async (req, res) => {
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('fail');
 	}
-});
+}, true);
+
+let pixList = [];
 
 const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, updateClientCountdown }) => {
 	if (req.method === 'PUT') {
@@ -201,7 +216,8 @@ module.exports = {
 	'/pix': addPix,
 	'/canvas.png': getCanvas,
 	'/favicon.ico': getFavicon,
-	'/chat': chatInside,
+	'/chat': sendChatMessage,
+	'/messages': getChatMessages,
 	'/auth/logout': logout,
 	default: _default,
 }

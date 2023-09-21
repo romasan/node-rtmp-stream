@@ -19,7 +19,7 @@ import vkplay from 'url:./res/vkplay.svg';
 import youtube from 'url:./res/youtube.svg';
 import discord from 'url:./res/discord.svg';
 import telegram from 'url:./res/telegram.svg';
-// import chat from 'url:./res/chat.svg';
+import chat from 'url:./res/chat.svg';
 import login from 'url:./res/login.svg';
 import logout from 'url:./res/logout.svg';
 
@@ -42,9 +42,9 @@ export const App: React.FC = () => {
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const blinkedTimer = useRef(-1);
 
-	// const toggleChat = () => {
-	// 	setChatIsShowed((value) => !value);
-	// };
+	const toggleChat = () => {
+		setChatIsShowed((value) => !value);
+	};
 
 	const isMobile = mobile();
 
@@ -129,7 +129,7 @@ export const App: React.FC = () => {
 							<img src={login} className={s.iconButton} />
 						</a>
 				)}
-				{/* <img src={chat} onClick={toggleChat} className={s.iconButton} /> */}
+				<img src={chat} onClick={toggleChat} className={s.iconButton} />
 			</div>
 			<Canvas
 				color={wsStore?.palette?.[color]}
@@ -172,7 +172,7 @@ export const App: React.FC = () => {
 				</a>
 			</div>
 			{chatIsShowed && (
-				<Chat />
+				<Chat isAuthorized={isAuthorized} {...disableMouse} />
 			)}
 		</div>
 	)

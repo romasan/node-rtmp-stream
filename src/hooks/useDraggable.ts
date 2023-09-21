@@ -12,13 +12,21 @@ export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.
 	const anchorRef = useRef<HTMLDivElement>(null);
 	const draggableRef = useRef<HTMLDivElement>(null);
 
-	const mouseDownCallback = ({ clientX, clientY, target }: MouseEvent) => {
+	const mouseDownCallback = (event: MouseEvent) => {
+		event.stopPropagation();
+
+		const { clientX, clientY, target } = event;
+
 		if (ready && anchorRef.current?.contains(target as Node)) {
 			cur.current = [clientX, clientY];
 		}
 	};
 
-	const mouseMoveCallback = ({ clientX, clientY }: MouseEvent) => {
+	const mouseMoveCallback = (event: MouseEvent) => {
+		event.stopPropagation();
+
+		const { clientX, clientY } = event;
+
 		if (ready && cur.current.every((e) => e >= 0)) {
 			const moveX = clientX - cur.current[0];
 			const moveY = clientY - cur.current[1];
@@ -33,7 +41,9 @@ export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.
 		}
 	};
 
-	const mouseUpCallback = () => {
+	const mouseUpCallback = (event: MouseEvent) => {
+		event.stopPropagation();
+
 		cur.current = [-1, -1];
 	}
 

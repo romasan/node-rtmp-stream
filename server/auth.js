@@ -5,7 +5,7 @@ const { ADMIN_EMAIL } = process.env;
 
 const DBFileName = './sessions/auth.json';
 
-const logoutLog = fs.createWriteStream(__dirname + '/logout.log', { flags : 'a' });
+const logoutLog = fs.createWriteStream(__dirname + '/sessions/logout.log', { flags : 'a' });
 
 let users = {};
 
