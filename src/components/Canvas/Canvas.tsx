@@ -16,7 +16,7 @@ import {
 
 import { Bar } from '../Bar';
 
-import image404 from 'url:../../res/404.png';
+import image404 from 'url:../../../res/404.png';
 
 import * as s from './Canvas.module.scss';
 
@@ -32,13 +32,18 @@ interface Props {
 	expiration?: number;
 	isAuthorized?: boolean;
 	onClick(x: number, y: number): void;
-	onSelect?: (start: { x: number, y: number }, end: { x: number, y: number }) => void;
+	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
 }
 
 const showPixelScale = 6;
 const scaleDegree = 1.1;
 const minScale = 1;
 const maxScale = 50;
+
+const defautSelected = {
+	from: { x: 0, y: 0 },
+	to: { x: 0, y: 0 },
+};
 
 export const Canvas: FC<PropsWithChildren<Props>> = ({
 	color,
@@ -48,6 +53,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	isAuthorized = false,
 	children,
 	onClick,
+	onSelect,
 }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
@@ -62,6 +68,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const initialDistance = useRef<number | null>(null);
 	const [countdown, setCoundown] = useState(0);
 	const [animatedPixel, setAnimatedPixel] = useState(false);
+	// const [selected, setSelected] = useState(defautSelected);
+	const selected = useRef(defautSelected);
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
@@ -79,6 +87,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			posIsAbove([clientX, clientY], canvasRef.current)
 		) {
 			cur.current = [clientX, clientY, false];
+
+			if (mode === EMode.SELECT) {
+				const { top, left } = canvasRef.current.getBoundingClientRect();
+				const x = Math.floor((clientX - left) / scale);
+				const y = Math.floor((clientY - top) / scale);
+
+				selected.current = {
+					from: { x, y },
+					to: { x, y },
+				};
+			}
 		}
 	};
 
@@ -107,7 +126,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			return;
 		}
 
-		if (!cur.current.some((e) => e === -1)) {
+		if (!cur.current.some((e) => e === -1) && mode === EMode.CLICK) {
 			const moveX = (clientX - cur.current[0]) / scale;
 			const moveY = (clientY - cur.current[1]) / scale;
 
@@ -134,11 +153,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
 
-
 		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
 			const x = Math.floor((clientX - left) / scale);
 			const y = Math.floor((clientY - top) / scale);
+
+			if (mode === EMode.SELECT && !cur.current.some((e) => e === -1)) {
+				selected.current = {
+					from: selected.current.from,
+					to: { x, y },
+				};
+			}
 
 			setCoord([x, y]);
 		} else {
@@ -164,7 +189,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			!moved &&
 			!cur.current.some((e) => e === -1) &&
 			document.elementsFromPoint(clientX, clientY).includes(canvasRef.current as HTMLCanvasElement) &&
-			scale >= showPixelScale &&
+			(scale >= showPixelScale || mode === EMode.SELECT) &&
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current)
 		) {
@@ -172,14 +197,20 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				const x = Math.floor((clientX - left) / scale);
 				const y = Math.floor((clientY - top) / scale);
 
-				onClick(x, y);
+				if (mode === EMode.SELECT) {
+					onSelect?.(selected.current.from, { x, y });
+					selected.current = defautSelected;
+				} else {
+					onClick(x, y);
+				}
 		}
 
 		if (
 			!moved &&
 			scale < showPixelScale &&
 			canvasRef.current &&
-			posIsAbove([clientX, clientY], canvasRef.current)
+			posIsAbove([clientX, clientY], canvasRef.current) &&
+			mode === EMode.CLICK
 		) {
 			setScale(showPixelScale);
 		}
@@ -283,6 +314,25 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			height: `${scale}px`,
 			'--bg-color': color,
 			'--border-color': color && rgbToHex(invertRgb(hexToRgb(color))),
+		};
+	};
+
+	const getSelectedStyle = () => {
+		const { from, to } = selected.current;
+		const x = Math.min(from.x, to.x);
+		const y = Math.min(from.y, to.y);
+		const width = Math.max(from.x, to.x) - x;
+		const height = Math.max(from.y, to.y) - y;
+
+		if (!width && !height) {
+			return {};
+		}
+
+		return {
+			top: `${y}px`,
+			left: `${x}px`,
+			width: `${width}px`,
+			height: `${height}px`,
 		};
 	}
 
@@ -417,7 +467,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							/>
 							{children}
 							{mode === EMode.SELECT && (
-								<div className={s.select} />
+								<div
+									className={s.select}
+									style={getSelectedStyle()}
+								/>
 							)}
 					</div>
 					{error && <img className={s.image404} src={image404} />}

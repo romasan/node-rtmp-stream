@@ -6,6 +6,7 @@ const parseCookies = require('../lib/cookies');
 const {
 	getAuthToken,
 	getPostPayload,
+	getExpiration,
 } = require('./helpers');
 const {
 	checkSession,
@@ -87,7 +88,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 
 let pixList = [];
 
-const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, updateClientCountdown }) => {
+const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
 	if (req.method === 'PUT') {
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
@@ -130,7 +131,7 @@ const addPix = checkAccessWrapper(async (req, res, { getClientExpiration, update
 			return;
 		}
 
-		if (Date.now() < getClientExpiration(token)) {
+		if (Date.now() < getExpiration(token)) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('await');
 

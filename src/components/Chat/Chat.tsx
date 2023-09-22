@@ -80,6 +80,9 @@ export const Chat: FC<Props> = ({
 						<div className={s.text}>{message.text}</div>
 					</div>
 				))}
+				{list.length === 0 && (
+					<div>messages: 0</div>
+				)}
 			</div>
 			<div className={s.publisher} {...props}>
 				<input

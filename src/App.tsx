@@ -14,14 +14,14 @@ import {
 import { addPix } from './lib/api';
 import ee from './lib/ee';
 
-import twitch from 'url:./res/twitch.svg';
-import vkplay from 'url:./res/vkplay.svg';
-import youtube from 'url:./res/youtube.svg';
-import discord from 'url:./res/discord.svg';
-import telegram from 'url:./res/telegram.svg';
-import chat from 'url:./res/chat.svg';
-import login from 'url:./res/login.svg';
-import logout from 'url:./res/logout.svg';
+import twitch from 'url:../res/twitch.svg';
+import vkplay from 'url:../res/vkplay.svg';
+import youtube from 'url:../res/youtube.svg';
+import discord from 'url:../res/discord.svg';
+import telegram from 'url:../res/telegram.svg';
+import chat from 'url:../res/chat.svg';
+import login from 'url:../res/login.svg';
+import logout from 'url:../res/logout.svg';
 
 import * as s from './App.module.scss';
 

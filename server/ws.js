@@ -2,46 +2,62 @@ const WebSocket = require('ws')
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
-require('dotenv').config();
 const ee = require('./lib/ee');
 const web = require('./web');
-const {
-	getPathByToken,
-	getCountdown,
-	resetCountdownTemp,
-} = require('./web/helpers');
-const { checkFirstTime } = require('./sessions');
+const { getCountdown } = require('./web/helpers');
+const { checkFirstTime, checkSession } = require('./sessions');
 const { COLORS } = require('./const');
 const parseCookies = require('./lib/cookies');
-const { getUserData, checkUserAuthByToken } = require('./auth');
+const { getUserData } = require('./auth');
+require('dotenv').config();
 
 const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN } = process.env;
 
 let webServer = null;
+let wss = null;
 
-const clients = {};
-
-const getClientExpiration = (token) => clients[token]?.expiration || 0;
-
-const send = (ws, event, payload) => {
-	ws.send(JSON.stringify({ event, payload }))
+const send = (token, event, payload) => {
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN && ws._token === token) {
+			ws.send(JSON.stringify({ event, payload }));
+		}
+	});
 };
 
 const updateClientCountdown = (token) => {
-	if (clients[token]) {
-		const onlineCount = Object.keys(clients).length;
-		const countdown = getCountdown(token, onlineCount, false, true) * 1000;
+	const onlineCount = getOnlineCount();
+	const countdown = getCountdown(token, onlineCount, false, true) * 1000;
 
-		clients[token].env.countdown = countdown;
-		clients[token].expiration = Date.now() + countdown;
-
-		send(clients[token].ws, 'countdown', countdown);
-	}
+	send(token, 'countdown', countdown);
 };
 
 const callbacks = {
-	getClientExpiration,
 	updateClientCountdown,
+};
+
+const spam = (data) => {
+	const message = JSON.stringify(data);
+
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			ws.send(message);
+		}
+	});
+};
+
+ee.on('spam', spam);
+
+// TODO add cache
+const getOnlineCount = () => {
+	let count = 0;
+
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			count++;
+		}
+	});
+
+	return count;
 };
 
 const webServerHandler = (req, res) => {
@@ -64,8 +80,6 @@ const webServerHandler = (req, res) => {
 			web.default(req, res);
 		}
 	} catch (error) {
-		console.log('Error:', error);
-
 		res.writeHead(200);
 		res.end('fail');
 
@@ -89,49 +103,28 @@ webServer.on('error', error => {
 
 webServer.listen(WS_SERVER_PORT);
 
-const wss = new WebSocket.Server({ server: webServer });
-
-const spam = (data) => {
-	const message = JSON.stringify(data);
-
-	wss.clients.forEach((ws) => {
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(message);
-		}
-	});
-};
-
-ee.on('spam', spam);
+wss = new WebSocket.Server({ server: webServer });
 
 wss.on('connection', (ws, req) => {
 	const { token } = parseCookies(req.headers.cookie);
 
-	const filePath = getPathByToken(token);
-
-	if (!filePath || !fs.existsSync(filePath)) {
+	if (!checkSession(token, true, false)) {
 		ws.close();
 
 		return;
 	}
 
-	const onlineCount = Object.keys(clients).length;
+	const onlineCount = getOnlineCount();
 	const isFirstTime = checkFirstTime(token);
 	const countdown = getCountdown(token, onlineCount, isFirstTime) * 1000;
 	const user = getUserData(token);
 
-	clients[token] = {
-		ws,
-		env: {
-			countdown,
-			isAuthorized: checkUserAuthByToken(token),
-			...user,
-		},
-		expiration: Date.now() + countdown,
-	};
+	ws._token = token;
 
-	send(ws, 'init', {
+	send(token, 'init', {
 		palette: COLORS,
-		...clients[token].env,
+		...user,
+		countdown,
 	});
 
 	ws.on('message', (buf) => {
@@ -141,10 +134,6 @@ wss.on('connection', (ws, req) => {
 			ws.send(3);
 			return;
 		}
-	});
-
-	ws.on('close', () => {
-		delete clients[token];
 	});
 });
 

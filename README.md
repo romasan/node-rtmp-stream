@@ -14,9 +14,10 @@
 # admin panel
 
 - [x] add admin route
+- [ ] update stream frame
+- [ ] cover up area
 - [ ] change countdown
 - [ ] freeze area
-- [ ] cover up area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
 - [ ] preview last changes, heatmap, changes by user
 - [ ] get pixel author (uuid, IP, nickname, auth service)

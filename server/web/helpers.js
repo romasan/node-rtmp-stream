@@ -50,10 +50,14 @@ let _countdownRanges = Object.entries(countdownRanges)
 		[key]: humanListToArray(value),
 	}), {});
 
-const tempExpiration = {};
+const expirationsList = {};
 
 const resetCountdownTemp = (token) => {
-	delete tempExpiration[token];
+	delete expirationsList[token];
+};
+
+const getExpiration = (token) => {
+	return expirationsList[token] || 0;
 };
 
 const getCountdown = (token, onlineCount, isFirstTime, reset) => {
@@ -61,9 +65,9 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 		resetCountdownTemp(token);
 	}
 
-	if (tempExpiration[token]) {
-		if (tempExpiration[token] > Date.now()) {
-			return Math.ceil((tempExpiration[token] - Date.now()) / 1000);
+	if (expirationsList[token]) {
+		if (expirationsList[token] > Date.now()) {
+			return Math.ceil((expirationsList[token] - Date.now()) / 1000);
 		} else {
 			return 0;
 		}
@@ -84,7 +88,7 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 	const value = (isAuthorized ? _countdownRanges.authorized : _countdownRanges.guest)
 		.find((item) => inRange(onlineCount, item))?.[2] ?? 5;
 
-	tempExpiration[token] = Date.now() + (value * 1000);
+	expirationsList[token] = Date.now() + (value * 1000);
 
 	// return Math.min(forceMin, value);
 	return value;
@@ -95,6 +99,7 @@ module.exports = {
 	validateToken,
 	getPathByToken,
 	getPostPayload,
+	getExpiration,
 	getCountdown,
 	resetCountdownTemp,
 };

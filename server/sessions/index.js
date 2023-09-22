@@ -35,18 +35,20 @@ const trimFailed = () => {
 
 const tempFirstTime = {}
 
-const checkSession = (token, prevalidate = true) => {
-	delete tempFirstTime[token];
+const checkSession = (token, prevalidate = true, skipFirstTime = true) => {
+	if (prevalidate && !validateToken(token)) {
+		return false;
+	}
+
+	if (skipFirstTime) {
+		delete tempFirstTime[token];
+	}
 
 	if (sessions[token]) {
 		return true;
 	}
 
 	if (failed[token]) {
-		return false;
-	}
-
-	if (prevalidate && !validateToken(token)) {
 		return false;
 	}
 
