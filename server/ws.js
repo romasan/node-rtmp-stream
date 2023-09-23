@@ -8,7 +8,7 @@ const { getCountdown } = require('./web/helpers');
 const { checkFirstTime, checkSession } = require('./sessions');
 const { COLORS } = require('./const');
 const parseCookies = require('./lib/cookies');
-const { getUserData } = require('./auth');
+const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
 
 const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN } = process.env;
@@ -117,12 +117,14 @@ wss.on('connection', (ws, req) => {
 	const onlineCount = getOnlineCount();
 	const isFirstTime = checkFirstTime(token);
 	const countdown = getCountdown(token, onlineCount, isFirstTime) * 1000;
+	const isAuthorized = checkUserAuthByToken(token);
 	const user = getUserData(token);
 
 	ws._token = token;
 
 	send(token, 'init', {
 		palette: COLORS,
+		isAuthorized,
 		...user,
 		countdown,
 	});

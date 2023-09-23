@@ -2,8 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 
 import mobile from 'is-mobile';
 
-import { Canvas, EMode } from '../../components/Canvas';
-import { Palette } from '../../components/Palette';
+import { Canvas, EMode, Palette, Tools } from '../../components';
 
 // import { addPix } from './lib/api';
 import ee from '../../lib/ee';
@@ -54,6 +53,7 @@ export const App: React.FC = () => {
 			{wsStore?.palette && (
 				<Palette color={color} colors={wsStore?.palette} setColor={setColor} />
 			)}
+			<Tools />
 		</div>
 	)
 }

@@ -1,0 +1,12 @@
+@import "../../../../styles/mixins";
+
+.root {
+	@include buttonLike();
+
+	padding: 3px;
+	margin-bottom: 3px;
+}
+
+.opened {
+
+}

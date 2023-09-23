@@ -4,3 +4,4 @@ export * from './Chat';
 export * from './FAQ';
 export * from './Modal';
 export * from './Palette';
+export * from './Tools';

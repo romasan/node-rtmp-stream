@@ -6,7 +6,9 @@
     "start": "parcel pages/index.html pages/*/index.html",
     "prebuild": "rm -rf dist/*.*",
     "build": "parcel build pages/index.html pages/*/index.html",
-    "serve": "cd ./server && node index.js"
+    "serve": "cd ./server && node index.js",
+    "tools": "node ./server/tools/index.js",
+    "recover": "npm run tools recover ./server/pixels.log ./server/426x240.png ./server/output.png"
   },
   "author": "",
   "license": "ISC",
@@ -37,6 +39,7 @@
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",
     "postcss-modules": "^4.3.1",
-    "typescript-plugin-css-modules": "^5.0.0"
+    "typescript-plugin-css-modules": "^5.0.0",
+    "yargs": "^17.7.2"
   }
 }
