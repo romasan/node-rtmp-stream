@@ -1,13 +1,9 @@
 const fs = require('fs');
-const path = require('path');
+const { v4: uuid } = require('uuid');
 const { canvas, drawPix } = require('../canvas');
 const package = require('../../package.json');
-const parseCookies = require('../lib/cookies');
-const {
-	getAuthToken,
-	getPostPayload,
-	getExpiration,
-} = require('./helpers');
+const { getPostPayload, parseCookies } = require('./helpers');
+const { getExpiration } = require('./countdown');
 const {
 	checkSession,
 	addSession,
@@ -27,6 +23,38 @@ const getInfo = (req, res) => {
 const getCanvas = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'image/png' });
 	res.end(canvas.toBuffer());
+};
+
+const admin = async (req, res) => {
+	const { token } = parseCookies(req.headers.cookie || '');
+
+	if (
+		checkSession(token) &&
+		checkIsAdmin(token)
+	) {
+		const postPayload = req.method === 'POST' && (await getPostPayload(req));
+
+		const command = req.url.split('?')[1];
+
+		switch (command) {
+			case 'stat':
+				const stats = {}; // getStats();
+
+				res.writeHead(200, { 'Content-Type': 'text/json' });
+				res.end(JSON.stringify(stats));
+				return;
+			case 'heatmap':
+				// const canvas = getHeatmap();
+				// res.writeHead(200, { 'Content-Type': 'image/png' });
+				// res.end(canvas.toBuffer());
+				return;
+		}
+
+		res.writeHead(200, { 'Content-Type': 'text/json' });
+		res.end('{}');
+	} else {
+		getInfo(req, res);
+	}
 };
 
 const checkAccessWrapper = (callback, checkAuth) => {
@@ -57,7 +85,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 	}
 };
 
-const getChatMessages = checkAccessWrapper(async (req, res) => {
+const getChatMessages = checkAccessWrapper((req, res) => {
 	const messages = getMessages();
 
 	res.writeHead(200, { 'Content-Type': 'text/json' });
@@ -173,7 +201,7 @@ const start = (req, res) => {
 			return;
 		}
 	} else {
-		const token = getAuthToken();
+		const token = uuid();
 
 		if (WS_SECURE === 'true') {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly; Secure`);
@@ -203,8 +231,14 @@ const logout = (req, res) => {
 };
 
 const _default = async (req, res) => {
+	if (req.url.startsWith('/qq')) {
+		admin(req, res);
+		return;
+	}
+
 	if (
 		!await twitchAuth(req, res)
+		// && !await vkPlayAuth(req, res)
 		// && !await discordAuth(req, res)
 		// && !await vkAuth(req, res)
 	) {

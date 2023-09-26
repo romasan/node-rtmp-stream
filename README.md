@@ -35,6 +35,7 @@
 - [ ] write start datetime to file
 - [ ] freeze frame to stream from admin panel
 - [ ] rotated access log
+- [ ] use database instead files
 
 # web
 - [x] drawing
@@ -55,8 +56,25 @@
 
 # configurate
 
-SSL
+# how to configurate ssl certificate
 ```bash
 sudo certbot certonly --webroot -w /var/www/html -d api.pixelbattle.online
 sudo cp /etc/letsencrypt/live/api.pixelbattle.online/* ./
+```
+
+# how to render timelapse
+```bash
+ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+```
+or
+```bash
+ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
+```
+or
+```bash
+ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
+```
+or
+```bash
+ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest output.mp4
 ```

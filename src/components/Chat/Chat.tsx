@@ -46,7 +46,7 @@ export const Chat: FC<Props> = ({
 				goToBottom();
 			}, 0);
 			ee.on('ws:chatMessage', handleChatMessage);
-		});
+		}).catch(() => {});
 
 		return () => {
 			ee.off('ws:chatMessage', handleChatMessage);
@@ -81,7 +81,7 @@ export const Chat: FC<Props> = ({
 					</div>
 				))}
 				{list.length === 0 && (
-					<div>messages: 0</div>
+					<div>no new messsages</div>
 				)}
 			</div>
 			<div className={s.publisher} {...props}>

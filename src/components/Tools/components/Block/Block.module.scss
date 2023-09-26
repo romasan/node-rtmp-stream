@@ -1,12 +1,28 @@
 @import "../../../../styles/mixins";
 
 .root {
-	@include buttonLike();
-
-	padding: 3px;
 	margin-bottom: 3px;
 }
 
-.opened {
+.title {
+	@include buttonLike();
 
+	&,
+	&:active,
+	&:hover {
+		padding: 5px 3px;
+	}
+}
+
+.content {
+	border-right-color: $color-window-border-light;
+	border-bottom-color: $color-window-border-light;
+	border-left-color: $color-window-border-dark;
+	border-top-color: $color-window-border-dark;
+	background: #dbdbef;
+	color: #000;
+	border-style: solid;
+	border-width: 2px;
+	padding: 3px;
+	box-sizing: border-box;
 }

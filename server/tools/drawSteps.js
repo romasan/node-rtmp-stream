@@ -4,44 +4,100 @@
 
 const fs = require('fs');
 const readline = require('readline');
-const { createCanvas, Image } = require('canvas');
+const { createCanvas, Image, registerFont } = require('canvas');
+const drawDefaultCanvas = require('./drawDefaultCanvas');
+
+registerFont(__dirname + '/../../res/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
 const {
 	WIDTH,
 	HEIGHT,
-	PPF,
 } = require('./constants.json');
+
+const PPF = 333;
+const FPS = 30;
+const PPS = PPF * FPS;
 
 const sec = 1000;
 const min = sec * 60;
 const hour = min * 60;
 const day = hour * 24;
 
+const textX = 1500;
+const textY = 1000;
+const textLineHeight = 70;
+
+const videoWidth = 1920;
+const videoHeight = 1080;
+
+const scale = 4;
+
+const drawDayBG = (ctx, day) => {
+	const bg = drawDefaultCanvas('DATA', videoWidth, videoHeight);
+	ctx.drawImage(bg, 0, 0);
+
+	const text = `Day #${day}`;
+	ctx.fillStyle = '#000';
+	ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
+	ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
+	ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
+	ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
+	ctx.fillStyle = '#fff';
+	ctx.fillText(text, textX, textY + textLineHeight);
+};
+
+const backupFixelsFrame = (canvas) => {
+	const backupCanvas = createCanvas(WIDTH * scale, HEIGHT * scale);
+	const backupCtx = backupCanvas.getContext('2d');
+
+	const frameX = videoWidth / 2 - WIDTH * scale / 2;
+	const frameY = videoHeight / 2 - HEIGHT * scale / 2;
+
+	backupCtx.drawImage(
+		canvas,
+		frameX, frameY, WIDTH * scale, HEIGHT * scale,
+		0, 0, WIDTH * scale, HEIGHT * scale
+	);
+
+	return backupCanvas;
+}
+
 const drawSteps = (file, backgroundImage) => {
-	const canvas = createCanvas(WIDTH, HEIGHT);
+
+	const canvas = createCanvas(videoWidth, videoHeight);
 	const ctx = canvas.getContext('2d');
+	ctx.imageSmoothingEnabled = false;
 
-	const imgBuf = fs.readFileSync(backgroundImage);
-	const image = new Image;
-	image.src = imgBuf;
-	ctx.drawImage(image, 0, 0);
+	ctx.font = `bold ${textLineHeight}px "Custom Font"`;
 
-	// ctx.fillStyle = '#ffffff';
-	// ctx.fillRect(0, 0, WIDTH, HEIGHT);
+	drawDayBG(ctx, 1);
+
+	const firstFrameBuf = fs.readFileSync(backgroundImage);
+	const firstFrame = new Image;
+	firstFrame.src = firstFrameBuf;
+
+	const pixelsFrameX = videoWidth / 2 - WIDTH * scale / 2;
+	const pixelsFrameY = videoHeight / 2 - HEIGHT * scale / 2;
+
+	ctx.drawImage(firstFrame, pixelsFrameX, pixelsFrameY, WIDTH * scale, HEIGHT * scale);
 
 	let i = -1;
 	let frame = 0;
-
-	// const breakTime = Date.now() - day * 3;
-	// const breakLine = 1758020 - 300_000;
 
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),
 		crlfDelay: Infinity
 	});
+
+	let firstPixelTime = 0;
+	let dayNumber = 0;
 	
 	rl.on('line', (line) => {
 		i++;
+
+		// if (i < breakLine) {
+		// 	return
+		// }
 
 		const [time, name, x, y, color] = line.split(';');
 
@@ -49,38 +105,47 @@ const drawSteps = (file, backgroundImage) => {
 		// 	return
 		// }
 
-		// if (i < breakLine) {
-		// 	return
-		// }
+		if (!firstPixelTime) {
+			firstPixelTime = time;
+		}
+
+		const _dayNumber = Math.floor((time - firstPixelTime) / day);
+
+		if (_dayNumber !== dayNumber) {
+			dayNumber = _dayNumber;
+
+			console.log(`DAY #${dayNumber + 1}`);
+
+			const backup = backupFixelsFrame(canvas);
+
+			drawDayBG(ctx, dayNumber + 1);
+			ctx.drawImage(backup, pixelsFrameX, pixelsFrameY);
+		}
 
 		ctx.fillStyle = color;
-		ctx.fillRect(x, y, 1, 1);
+		ctx.fillRect(pixelsFrameX + x * scale, pixelsFrameY + y * scale, scale, scale);
 
 		if (i % PPF === 0) {
-			const output = 'frames/' + String(++frame).padStart(8, '0') + '.png';
+			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
 
 			fs.writeFileSync(output, canvas.toBuffer());
 		}
 
-		if (i % 54000 === 0) {
-			console.log(`${Math.floor(frame / (1080))} minute, #${frame} frame, ${i} pixels`);
-		}
+		if (i % 50_000 === 0) {
+			const sec = Math.floor(frame / PPS);
 
-		// if (i >= 1000) {
-		// 	rl.pause();
-		// 	rl.removeAllListeners('line');
-		// 	rl.close();
-		// 	console.log(`break, pixel #${i}, frame #${frame}`);
-		// 	return;
-		// }
+			console.log(`duration: ${Math.floor(sec / 60)}:${sec % 60}, #${frame} frame, ${i} pixels`);
+		}
 	});
 
 	rl.on('close', () => {
-		const output = 'frames/' + String(++frame).padStart(8, '0') + '.png';
+		const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
 
 		fs.writeFileSync(output, canvas.toBuffer());
 
-		console.log(`Total: ${Math.floor(frame / (1080))} minute(s), #${frame} frames, ${i} pixels`);
+		const sec = Math.floor(frame / PPS);
+
+		console.log(`Total. duration: ${Math.floor(sec / 60)}:${sec % 60}, #${frame} frame, ${i} pixels`);
 	});
 };
 

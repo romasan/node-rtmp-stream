@@ -5,7 +5,17 @@ const { COLORS } = require('./const');
 const log = require('./log');
 const ee = require('./lib/ee');
 
-const { IN_OUT_IMAGE, UPSCALE } = process.env;
+const { IN_OUT_IMAGE, UPSCALE, FREEZED_FRAME } = process.env;
+
+const conf = {
+	freezed: FREEZED_FRAME === 'true',
+	// withBg: true,
+};
+
+const updateConf = (value) => {
+	conf.freezed = value.freezed || conf.freezed;
+	conf.withBg = value.withBg || conf.withBg;
+};
 
 const scale = Number(UPSCALE) || 1;
 
@@ -34,7 +44,24 @@ if (scale > 1) {
 	// add background like ZX Spectrum but squares
 }
 
+const freezeCanvas = (scale > 1 && scaledCanvas)
+	? createCanvas(image.width * scale, image.height * scale)
+	: createCanvas(image.width, image.height);
+const freezedCanvasCtx = freezeCanvas.getContext('2d');
+
+const updateFreezedFrame = () => {
+	if (scale > 1 && scaledCanvas) {
+		freezedCanvasCtx.drawImage(scaledCanvas, 0, 0);
+	} else {
+		freezedCanvasCtx.drawImage(canvas, 0, 0);
+	}
+};
+
 const getImageBuffer = () => {
+	if (conf.freezed) {
+		return freezedCanvas.toBuffer();
+	}
+
 	if (scale > 1 && scaledCanvas) {
 		return scaledCanvas.toBuffer();
 	}
@@ -80,6 +107,9 @@ const saveCanvas = () => {
 module.exports = {
 	canvas,
 	COLORS,
+	conf,
+	updateConf,
+	updateFreezedFrame,
 	drawPix,
 	saveCanvas,
 	getImageBuffer,

@@ -1,6 +1,6 @@
-import React, { FC, PropsWithChildren, useMemo, useRef, useState, useEffect, useContext } from 'react';
+import React, { FC, PropsWithChildren, useMemo, useContext } from 'react';
 
-import cn from 'classnames';
+// import cn from 'classnames';
 
 import { v4 as uuid } from 'uuid';
 
@@ -27,12 +27,12 @@ export const Block: FC<PropsWithChildren<Props>> = ({ id, title, children }) => 
 	};
 
 	return (
-		<div className={cn(s.root, { [s.opened]: isOpened })}>
-			<div onClick={toggle}>
+		<div className={s.root}>
+			<div className={s.title} onClick={toggle}>
 				{title}
 			</div>
 			{isOpened && (
-				<div>{children}</div>
+				<div className={s.content}>{children}</div>
 			)}
 		</div>
 	);

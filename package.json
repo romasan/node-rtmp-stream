@@ -8,7 +8,9 @@
     "build": "parcel build pages/index.html pages/*/index.html",
     "serve": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
-    "recover": "npm run tools recover ./server/pixels.log ./server/426x240.png ./server/output.png"
+    "recover": "npm run tools recover ./server/pixels.log ./server/426x240.png ./server/inout.png",
+    "clearcanvas": "npm run tools drawDefaultCanvas ./server/inout.png 240 240 WHITE",
+    "render": "npm run tools drawSteps ./server/pixels.log ./server/426x240.png"
   },
   "author": "",
   "license": "ISC",

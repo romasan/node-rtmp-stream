@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const  { addNewUser } = require('../auth');
 
-const parseCookies = require('../lib/cookies');
+const { parseCookies } = require('./helpers');
 
 const {
 	TWITCH_AUTH_CLIENT_ID,

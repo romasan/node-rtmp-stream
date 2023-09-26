@@ -5,3 +5,4 @@ export * from './FAQ';
 export * from './Modal';
 export * from './Palette';
 export * from './Tools';
+export * from './Info';

@@ -9,6 +9,7 @@ import {
 	Palette,
 	Modal,
 	Chat,
+	Info,
 } from './components/'
 
 import { addPix } from './lib/api';
@@ -22,6 +23,7 @@ import telegram from 'url:../res/telegram.svg';
 import chat from 'url:../res/chat.svg';
 import login from 'url:../res/login.svg';
 import logout from 'url:../res/logout.svg';
+import info from 'url:../res/info.svg';
 
 import * as s from './App.module.scss';
 
@@ -36,6 +38,7 @@ export const App: React.FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
 	const [chatIsShowed, setChatIsShowed] = useState(false);
+	const [infoIsShowed, setInfoIsShowed] = useState(false);
 	const [isAuthorized, setIsAuthorized] = useState(false);
 	const [expiration, setExpiration] = useState(0);
 	const [isOnline, setIsOnline] = useState(false);
@@ -44,6 +47,10 @@ export const App: React.FC = () => {
 
 	const toggleChat = () => {
 		setChatIsShowed((value) => !value);
+	};
+
+	const toggleInfo = () => {
+		setInfoIsShowed((value) => !value);
 	};
 
 	const isMobile = mobile();
@@ -130,6 +137,7 @@ export const App: React.FC = () => {
 						</a>
 				)}
 				<img src={chat} onClick={toggleChat} className={s.iconButton} />
+				{/* <img src={info} onClick={toggleInfo} className={s.iconButton} /> */}
 			</div>
 			<Canvas
 				color={wsStore?.palette?.[color]}
@@ -173,6 +181,9 @@ export const App: React.FC = () => {
 			</div>
 			{chatIsShowed && (
 				<Chat isAuthorized={isAuthorized} {...disableMouse} />
+			)}
+			{infoIsShowed && (
+				<Info {...disableMouse} />
 			)}
 		</div>
 	)

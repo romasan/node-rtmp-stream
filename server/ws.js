@@ -4,10 +4,10 @@ const https = require('https');
 const http = require('http');
 const ee = require('./lib/ee');
 const web = require('./web');
-const { getCountdown } = require('./web/helpers');
+const { getCountdown } = require('./web/countdown');
 const { checkFirstTime, checkSession } = require('./sessions');
 const { COLORS } = require('./const');
-const parseCookies = require('./lib/cookies');
+const { parseCookies } = require('./web/helpers');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
 

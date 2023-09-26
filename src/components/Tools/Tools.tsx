@@ -28,7 +28,17 @@ export const Tools: FC<Props> = ({}) => {
 				<div className={s.draggable} ref={anchorRef}></div>
 				<div className={s.content}>
 					<Block title="Статистика (онлайн, кол-во точек, аптайм, последняя активность)">FOO</Block>
-					<Block title="Обновить кадр / разблокировать кадр">FOO</Block>
+					<Block title="Обновить кадр / разблокировать кадр">
+						<div>
+							<input type="radio" id="realTime" name="stream" />
+							<label for="realTime">В реальном времени</label>
+						</div>
+						<div>
+							<input type="radio" id="frame" name="stream" />
+							<label for="frame">Один кадр</label>
+						</div>
+						<button>Обновить кадр</button>
+					</Block>
 					<Block title="Узнать чей пиксель">FOO</Block>
 					<Block title="Откат области без пикселей конкретного юзера?">FOO</Block>
 					<Block title="Статистика на карте (heatmap, цвет по юзерам)">FOO</Block>
