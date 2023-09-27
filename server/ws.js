@@ -11,7 +11,7 @@ const { parseCookies } = require('./web/helpers');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
 
-const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN } = process.env;
+const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
 
 let webServer = null;
 let wss = null;
@@ -127,6 +127,7 @@ wss.on('connection', (ws, req) => {
 		isAuthorized,
 		...user,
 		countdown,
+		finish: FINISH_TIME_STAMP ? 'newer' : FINISH_TIME_STAMP - Date.now(),
 	});
 
 	ws.on('message', (buf) => {

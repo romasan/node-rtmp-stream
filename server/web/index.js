@@ -13,7 +13,7 @@ require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
 
-const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
+const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -117,6 +117,13 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 let pixList = [];
 
 const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
+	if (FINISH_TIME_STAMP && FINISH_TIME_STAMP < Date.now()) {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('fail');
+
+		return;
+	}
+
 	if (req.method === 'PUT') {
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);

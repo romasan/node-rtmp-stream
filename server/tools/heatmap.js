@@ -16,14 +16,14 @@ const {
 	RGBToHEX,
 } = require('./helpers');
 
-const heatmap = (file, output) => {
+const heatmap = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 
 	ctx.fillStyle = '#000000';
 	ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-	const list = [];
+	let list = [];
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),
 		crlfDelay: Infinity
@@ -38,20 +38,42 @@ const heatmap = (file, output) => {
 			list[x] = [];
 		}
 
-		list[x][y] = (list[x][y] | 0) + 1;
+		if (mode === 'NEWEST') {
+			list[x][y] = time;
+		} else {
+			list[x][y] = (list[x][y] | 0) + 1;
+		}
 
 		// max = debugValue || Math.max(max, list[x][y]);
 	});
 
 	rl.on('close', () => {
-		const sorted = list
-			.reduce((list, item) => [
-				...list,
-				...item, // .filter((e) => !list.includes(e))
-			], [])
-			.reduce((list, e) => list.includes(e) ? list : [...list, e], [])
-			.sort((a, b) => a < b ? 1 : -1);
-		const med = sorted[Math.floor(sorted.length / 2)];
+		let med = 0;
+
+		if (mode === 'NEWEST') {
+			const min = list
+				.reduce((list, item) => [...list, ...item], [])
+				.reduce((_min, item) => typeof item === 'undefined' ? _min : Math.min(_min, item), Infinity);
+
+			list = list.map((line) => (
+				line.map((item) => item - min)
+			));
+
+			const sorted = list
+				.reduce((list, item) => [...list, ...item], [])
+				.sort((a, b) => a < b ? 1 : -1);
+			med = sorted[Math.floor(sorted.length / 2)];
+			// const _list = list
+			// 	.reduce((list, item) => [...list, ...item], [])
+			// 	.filter((item) => typeof item !== 'undefined');
+			// med = Math.floor(_list.reduce((sum, item) => sum + item, 0) / list.length);
+		} else {
+			const sorted = list
+				.reduce((list, item) => [...list, ...item], [])
+				.reduce((list, e) => list.includes(e) ? list : [...list, e], [])
+				.sort((a, b) => a < b ? 1 : -1);
+			med = sorted[Math.floor(sorted.length / 2)];
+		}
 		
 		// const _sorted = list
 		// 	.reduce((list, item, x) => [
@@ -68,22 +90,23 @@ const heatmap = (file, output) => {
 
 		for (const x in list) {
 			for (const y in list[x]) {
+				// console.log('====', x, y, med, list[x][y]);
+
 				const h = (1.0 - (Math.min(list[x][y] / med, 1))) * 240;
 				const hsl = [h, 100, 50];
 				const rgb = HSLToRGB(hsl);
 				const color = RGBToHEX(rgb);
 
-				// if (list[x][y] > 1000) {
-				// 	console.log('====', med, list[x][y], x, y, hsl, rgb);
-				// }
-				// if (list[x][y] < med * 2) {
 				ctx.fillStyle = color;
 				ctx.fillRect(x, y, 1, 1);
-				// }
 			}
 		}
 
-		fs.writeFileSync(output, canvas.toBuffer());
+		if (output === 'DATA') {
+			return canvas;
+		} else {
+			fs.writeFileSync(output, canvas.toBuffer());
+		}
 	});
 };
 
