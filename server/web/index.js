@@ -1,6 +1,12 @@
 const fs = require('fs');
 const { v4: uuid } = require('uuid');
-const { canvas, drawPix } = require('../canvas');
+const {
+	canvas,
+	drawPix,
+	getPixelColor,
+	getTotalPixels,
+	getTopLeaderboard,
+} = require('../canvas');
 const package = require('../../package.json');
 const { getPostPayload, parseCookies } = require('./helpers');
 const { getExpiration } = require('./countdown');
@@ -8,10 +14,16 @@ const {
 	checkSession,
 	addSession,
 } = require('../sessions');
-const { checkIsAdmin, removeUser, checkUserAuthByToken } = require('../auth');
+const {
+	checkIsAdmin,
+	removeUser,
+	checkUserAuthByToken,
+	getUserData,
+} = require('../auth');
 require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
+const { COLORS } = require('../const');
 
 const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
 
@@ -173,7 +185,15 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			return;
 		}
 
-		// TODO check prev pixel color
+		const rawColor = COLORS[payload.color];
+		const pixelColor = getPixelColor(Math.floor(payload.x), Math.floor(payload.y));
+
+		if (pixelColor === rawColor) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('skip');
+
+			return;
+		}
 
 		pixList.push(Date.now());
 		pixList = pixList.slice(-MAX_PIX_PER_SEC);
@@ -237,6 +257,25 @@ const logout = (req, res) => {
 	res.end();
 };
 
+const stats = (req, res) => {
+	const total = getTotalPixels();
+	const leaderboard = getTopLeaderboard()
+		.map((item) => {
+			const user = getUserData(item.uuid);
+
+			return {
+				name: user?.name || 'Guest',
+				count: item.count,
+			};
+		});
+
+	res.writeHead(200, { 'Content-Type': 'text/json' });
+	res.end(JSON.stringify({
+		total,
+		leaderboard,
+	}));
+};
+
 const _default = async (req, res) => {
 	if (req.url.startsWith('/qq')) {
 		admin(req, res);
@@ -261,5 +300,6 @@ module.exports = {
 	'/chat': sendChatMessage,
 	'/messages': getChatMessages,
 	'/auth/logout': logout,
+	'/stats': stats,
 	default: _default,
 }

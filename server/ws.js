@@ -83,7 +83,7 @@ const webServerHandler = (req, res) => {
 		res.writeHead(200);
 		res.end('fail');
 
-		console.log('Error: url handler not found');
+		console.log('Error: url handler', error);
 	}
 }
 

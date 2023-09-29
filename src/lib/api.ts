@@ -43,3 +43,11 @@ export const getChatMessages = async () => {
 
 	return await resp.json();
 };
+
+export const getStats = async () => {
+	const resp = await fetch(`${APIhost}/stats`, {
+		credentials: 'include',
+	});
+
+	return await resp.json();
+};

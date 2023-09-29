@@ -9,6 +9,7 @@ import * as s from './Chat.module.scss';
 
 interface Props {
 	isAuthorized: boolean;
+	onClose: Function;
 }
 
 interface IMessage {
@@ -21,6 +22,7 @@ interface IMessage {
 
 export const Chat: FC<Props> = ({
 	isAuthorized,
+	onClose,
 	...props,
 }) => {
 	const [list, setList] = useState<IMessage[]>([]);
@@ -72,7 +74,9 @@ export const Chat: FC<Props> = ({
 
 	return (
 		<div className={s.root} ref={draggableRef}>
-			<div className={s.draggable} ref={anchorRef}></div>
+			<div className={s.draggable} ref={anchorRef}>
+				<button className={s.close} onClick={onClose}>&times;</button>
+			</div>
 			<div className={s.content} ref={contentRef} {...props}>
 				{list.map((message) => (
 					<div key={message.id}>

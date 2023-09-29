@@ -10,6 +10,10 @@ let uuidsCache = {};
 const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	const key = `${x}:${y}`;
 
+	// if (!stats.starttime) {
+	// 	stats.starttime = time;
+	// }
+
 	let uuid = uuidsCache[_uuid];
 	if (typeof uuid === 'undefined') {
 		stats.uuids.push(_uuid);

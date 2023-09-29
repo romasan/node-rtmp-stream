@@ -2,12 +2,14 @@ import React, { FC, useRef, useState, useEffect } from 'react';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
-// import { getChatMessages, sendChatMessage } from '../../lib/api';
+import { getStats } from '../../lib/api';
+
+import { formatNumber } from '../../helpers';
 
 import * as s from './Info.module.scss';
 
 interface Props {
-	isAuthorized: boolean;
+	onClose: Function;
 }
 
 interface IMessage {
@@ -19,36 +21,43 @@ interface IMessage {
 }
 
 export const Info: FC<Props> = ({
-	isAuthorized,
+	onClose,
 	...props,
 }) => {
+	const [stats, setStats] = useState({
+		loading: true,
+	});
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 240, y: 60});
 
-	// useEffect(() => {
-	// 	getInfoMessages().then((data) => {
-			
-	// 	});
-	// }, []);
+	useEffect(() => {
+		getStats().then(setStats).catch(() => {});
+	}, []);
 
 	return (
 		<div className={s.root} ref={draggableRef}>
-			<div className={s.draggable} ref={anchorRef}></div>
+			<div className={s.draggable} ref={anchorRef}>
+				<button className={s.close} onClick={onClose}>&times;</button>
+			</div>
 			<div className={s.content} {...props}>
-				<div>Loading...</div>
-				{/* <div>Online: 0</div>
-				<div>Total pixels: 2 999 999</div>
-				<div>
-					<div>1. Foo: 1 000 000</div>
-					<div>2. Bar: 900 000</div>
-					<div>3. Buz: 100 000</div>
-					<div>4. Guest: 90 000</div>
-					<div>5. Guest: 80 000</div>
-					<div>6. Guest: 70 000</div>
-					<div>7. Guest: 60 000</div>
-					<div>8. Guest: 50 000</div>
-					<div>9. Guest: 40 000</div>
-					<div>10. Guest: 30 000</div>
-				</div> */}
+				{stats?.loading ? (
+					<div>Loading...</div>
+				) : (
+					<div>
+						{/* <div>Online: 0</div> */}
+						<div>Total pixels: {formatNumber(stats?.total)}</div>
+						<div>
+							<div>Leaderboard</div>
+							{(stats?.leaderboard || []).map((item, index) => (
+								<div key={String(index)}>
+									{index < 9 && <>&nbsp;</>}
+									{index + 1}.
+									{item.name}:
+									{formatNumber(item.count)}
+								</div>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);

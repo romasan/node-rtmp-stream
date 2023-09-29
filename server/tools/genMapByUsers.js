@@ -37,8 +37,6 @@ const genMapByUsers = (map, output) => {
 		).toString(16).padStart(6, '0')
 	));
 
-	console.log('====', count);
-
 	let i = 0;
 
 	for (const index in uuids) {

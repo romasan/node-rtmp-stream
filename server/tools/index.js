@@ -16,7 +16,6 @@ const lib = {
 	heatmap: require('./heatmap'),
 	filterByXY: require('./filterByXY'),
 	topUUIDs: require('./topUUIDs'),
-	fixMessagesLog: require('./fixMessagesLog'),
 	// newest pixels heatmap
 };
 

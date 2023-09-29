@@ -4,12 +4,57 @@ const { createCanvas, Image } = require('canvas');
 const { COLORS } = require('./const');
 const log = require('./log');
 const ee = require('./lib/ee');
+const { getPixelsInfo, updateStats } = require('./tools/getPixelsInfo');
 
 const { IN_OUT_IMAGE, UPSCALE, FREEZED_FRAME } = process.env;
 
 const conf = {
 	freezed: FREEZED_FRAME === 'true',
 	// withBg: true,
+};
+
+let stats = {};
+
+console.log('init canvas');
+
+const initStats = async () => {
+	stats = await getPixelsInfo();
+
+	console.log('stats inited/updated');
+};
+
+initStats();
+
+const getStats = () => stats;
+
+const getPixelColor = (x, y) => {
+	const key = `${x}:${y}`;
+	const [
+		currentTime,
+		currentUuid,
+		currentColor,
+		prevColorUuid,
+		prevColorColor,
+		prevUserUuid,
+		prevUserColor,
+		count,
+	] = stats?.[key] || [];
+
+	return stats?.colors?.[currentColor];
+};
+
+const getTotalPixels = () => {
+	return stats?.totalCount;
+};
+
+const getTopLeaderboard = (count = 10) => {
+	return Object.entries(stats?.leaderboard || {})
+		.sort(([, a], [, b]) => a < b ? 1 : -1)
+		.slice(0, count)
+		.reduce((list, [key, value]) => [
+			...list,
+			{ uuid: stats?.uuids[key], count: value },
+		], []);
 };
 
 const updateConf = (value) => {
@@ -80,6 +125,15 @@ const drawPix = ({ x, y, color, nickname, uuid }) => {
 
 	const rawColor = COLORS[color];
 
+	updateStats(stats, [
+		Date.now(),
+		nickname,
+		x,
+		y,
+		rawColor,
+		uuid,
+	]);
+
 	ctx.fillStyle = rawColor;
 	ctx.fillRect(x, y, 1, 1);
 
@@ -113,4 +167,8 @@ module.exports = {
 	drawPix,
 	saveCanvas,
 	getImageBuffer,
+	getStats,
+	getPixelColor,
+	getTotalPixels,
+	getTopLeaderboard,
 };

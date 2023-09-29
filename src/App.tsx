@@ -137,7 +137,7 @@ export const App: React.FC = () => {
 						</a>
 				)}
 				<img src={chat} onClick={toggleChat} className={s.iconButton} />
-				{/* <img src={info} onClick={toggleInfo} className={s.iconButton} /> */}
+				<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} />
 			</div>
 			<Canvas
 				color={wsStore?.palette?.[color]}
@@ -180,10 +180,10 @@ export const App: React.FC = () => {
 				</a>
 			</div>
 			{chatIsShowed && (
-				<Chat isAuthorized={isAuthorized} {...disableMouse} />
+				<Chat isAuthorized={isAuthorized} {...disableMouse} onClose={toggleChat} />
 			)}
 			{infoIsShowed && (
-				<Info {...disableMouse} />
+				<Info {...disableMouse} onClose={toggleInfo} />
 			)}
 		</div>
 	)

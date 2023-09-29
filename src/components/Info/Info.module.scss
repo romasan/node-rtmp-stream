@@ -106,3 +106,17 @@
 		text-transform: uppercase;
 	}
 }
+
+.close {
+	@include buttonLike();
+
+	position: absolute;
+	top: 2px;
+	right: 5px;
+	outline: 4px solid $color-window-bg;;
+
+	&,
+	&:active {
+		padding: 0px 3px;
+	}
+}
