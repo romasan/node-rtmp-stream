@@ -16,7 +16,7 @@ const lib = {
 	heatmap: require('./heatmap'),
 	filterByXY: require('./filterByXY'),
 	topUUIDs: require('./topUUIDs'),
-	// newest pixels heatmap
+	expand: require('./expand'),
 };
 
 const [command, ...attrs] = argv;

@@ -14,6 +14,8 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	// 	stats.starttime = time;
 	// }
 
+	stats.lastActivity = time;
+
 	let uuid = uuidsCache[_uuid];
 	if (typeof uuid === 'undefined') {
 		stats.uuids.push(_uuid);

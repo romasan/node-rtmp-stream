@@ -1,3 +1,6 @@
+const fs = require('fs');
+const readline = require('readline');
+
 const validateToken = (token) => {
 	return typeof token === 'string' && token.match(/^[0-9a-f]{1}[0-9a-f\-]{35}$/);
 };
@@ -39,10 +42,28 @@ const parseCookies = (cookies = '') => {
 		.reduce((list, [key, value]) => ({ ...list, [key?.trim()]: value?.trim() }), {});
 };
 
+const getFileLinesCount = (file) => new Promise((resolve) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+
+	let count = 0;
+
+	rl.on('line', (line) => {
+		count++;
+	});
+
+	rl.on('close', () => {
+		resolve(count);
+	});
+});
+
 module.exports = {
 	validateToken,
 	getPathByToken,
 	getPostPayload,
 	inRange,
 	parseCookies,
+	getFileLinesCount,
 };

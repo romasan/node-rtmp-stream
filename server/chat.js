@@ -3,6 +3,7 @@ const readline = require('readline');
 const { v4: uuid } = require('uuid');
 const { getUserData } = require('./auth');
 const ee = require('./lib/ee');
+const { getFileLinesCount } = require('./web/helpers');
 
 const LIST_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 500;
@@ -10,23 +11,6 @@ const MAX_MESSAGE_LENGTH = 500;
 const messagesFile = __dirname + '/messages.log';
 
 let messages = [];
-
-const getFileLinesCount = (file) => new Promise((resolve) => {
-	const rl = readline.createInterface({
-		input: fs.createReadStream(file),
-		crlfDelay: Infinity
-	});
-
-	let count = 0;
-
-	rl.on('line', (line) => {
-		count++;
-	});
-
-	rl.on('close', () => {
-		resolve(count);
-	});
-});
 
 getFileLinesCount(messagesFile).then((count) => {
 	const rl = readline.createInterface({
