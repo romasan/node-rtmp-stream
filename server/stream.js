@@ -5,7 +5,7 @@ const { RTMP_HOST_KEY, INPUT_AUDIO, FFMPEG_LOG } = process.env;
 
 const { getImageBuffer } = require('./canvas');
 
-const args = `-thread_queue_size 1024 -i ${INPUT_AUDIO} -f image2pipe -framerate 2 -i - -f flv -vcodec libx264 -pix_fmt yuv420p -preset slow -r 25 -movflags +faststart ${RTMP_HOST_KEY}`;
+const args = `-thread_queue_size 1024 -i ${INPUT_AUDIO} -f image2pipe -framerate 2 -i - -f flv -vcodec libx264 -pix_fmt yuv420p -preset slow -r 25 -g 30 -movflags +faststart ${RTMP_HOST_KEY}`;
 const ffmpeg = spawn('ffmpeg', args.split(' '));
 
 if (FFMPEG_LOG === 'true') {
