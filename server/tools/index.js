@@ -17,6 +17,7 @@ const lib = {
 	filterByXY: require('./filterByXY'),
 	topUUIDs: require('./topUUIDs'),
 	expand: require('./expand'),
+	debugStream: require('./debugStream'),
 };
 
 const [command, ...attrs] = argv;

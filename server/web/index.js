@@ -6,6 +6,9 @@ const {
 	getPixelColor,
 	getTotalPixels,
 	getTopLeaderboard,
+	getCanvasConf,
+	updateCanvasConf,
+	updateFreezedFrame,
 } = require('../canvas');
 const package = require('../../package.json');
 const { getPostPayload, parseCookies } = require('./helpers');
@@ -44,9 +47,15 @@ const admin = async (req, res) => {
 		checkSession(token) &&
 		checkIsAdmin(token)
 	) {
-		const postPayload = req.method === 'POST' && (await getPostPayload(req));
+		const payloadRaw = ['POST', 'PUT', 'PATCH'].includes(req.method) && (await getPostPayload(req));
 
-		const command = req.url.split('?')[1];
+		let payload = {};
+
+		try {
+			payload = JSON.parse(payloadRaw);
+		} catch (error) {}
+
+		const command = req.url.split('/qq/').pop();
 
 		switch (command) {
 			case 'stat':
@@ -54,6 +63,23 @@ const admin = async (req, res) => {
 
 				res.writeHead(200, { 'Content-Type': 'text/json' });
 				res.end(JSON.stringify(stats));
+				return;
+			case 'streamSettings':
+				if (req.method === 'PATCH') {
+					updateCanvasConf(payload);
+	
+					res.writeHead(200, { 'Content-Type': 'text/plain' });
+					res.end('ok');
+				} else {
+					res.writeHead(200, { 'Content-Type': 'text/json' });
+					res.end(JSON.stringify(getCanvasConf()));
+				}
+				return;
+			case 'updateFreezedFrame':
+				updateFreezedFrame();
+
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('ok');
 				return;
 			case 'heatmap':
 				// const canvas = getHeatmap();

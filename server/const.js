@@ -36,7 +36,13 @@ const countdownRanges = {
 	},
 };
 
+const videoSize = {
+	width: 1280, // 1920
+	height: 720, // 1080
+};
+
 module.exports = {
 	COLORS,
 	countdownRanges,
+	videoSize,
 };

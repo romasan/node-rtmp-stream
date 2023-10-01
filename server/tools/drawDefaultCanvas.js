@@ -11,7 +11,7 @@ const {
 	COLORS,
 } = require('./constants.json');
 
-const drawDefaultCanvas = (file, width = WIDTH, height = HEIGHT, mode = 'RANDOM') => { // WHITE, RANDOM, CHESS, TEXT
+const drawDefaultCanvas = (file, width = WIDTH, height = HEIGHT, mode = 'RANDOM') => { // WHITE, RANDOM, CHESS, CHESSX, TEXT
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
@@ -29,7 +29,7 @@ const drawDefaultCanvas = (file, width = WIDTH, height = HEIGHT, mode = 'RANDOM'
 		}
 	}
 
-	if (mode === 'CHESS') {
+	if (mode === 'CHESS' || mode === 'CHESSX') {
 		const squareSize = 40;
 		const rows = Math.ceil(height / squareSize);
 		const cols = Math.ceil(width / squareSize);
@@ -37,13 +37,15 @@ const drawDefaultCanvas = (file, width = WIDTH, height = HEIGHT, mode = 'RANDOM'
 		for (let x = 0; x < cols; x++) {
 			for (let y = 0; y < rows; y++) {
 				if ((x + y) % 2 === 0) {
-					ctx.fillStyle = '#ff00ff';
+					ctx.fillStyle = '#aaa8d9';
 					ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 				}
-				ctx.fillStyle = '#008000';
-				ctx.fillRect(x * squareSize, y * squareSize, 1, 1);
-				ctx.fillStyle = '#0000ff';
-				ctx.fillText(`${y + 1}:${x + 1}`, x * squareSize + 5, y * squareSize + 15);
+				if (mode === 'CHESSX') {
+					ctx.fillStyle = '#008000';
+					ctx.fillRect(x * squareSize, y * squareSize, 1, 1);
+					ctx.fillStyle = '#0000ff';
+					ctx.fillText(`${y + 1}:${x + 1}`, x * squareSize + 5, y * squareSize + 15);
+				}
 			}
 		}
 	}
