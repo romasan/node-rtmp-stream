@@ -1,7 +1,8 @@
 import ee from '../lib/ee';
 
 const { hostname, protocol } = document.location;
-const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+// const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+const APIhost = `http://${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
 
 export const addPix = async ({ x, y, color }) => {
 	try {
