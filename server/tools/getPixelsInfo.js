@@ -7,13 +7,7 @@ const readline = require('readline');
 
 let uuidsCache = {};
 
-let initing = false;
-
 const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
-	if (initing) {
-		return;
-	}
-
 	const key = `${x}:${y}`;
 
 	// if (!stats.starttime) {
@@ -71,7 +65,6 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 
 const getPixelsInfo = () => {
 	return new Promise((resolve) => {
-		initing = true;
 
 		const rl = readline.createInterface({
 			input: fs.createReadStream(__dirname + '/../pixels.log'),
@@ -124,7 +117,6 @@ const getPixelsInfo = () => {
 	
 		rl.on('close', () => {
 			fs.writeFileSync(__dirname + '/../stats.json', JSON.stringify(stats));
-			initing = false;
 			resolve(stats);
 		});
 	});
