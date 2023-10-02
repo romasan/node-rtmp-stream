@@ -31,8 +31,7 @@ let timer = -1;
 
 const { hostname, protocol, hash } = document.location;
 export const WSHost = `${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
-// const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
-const WSProtocol = 'ws';
+const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
 
 export const connect = () => {
 	ws = new WebSocket(`${WSProtocol}://${WSHost}`);
