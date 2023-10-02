@@ -189,6 +189,7 @@ const drawPix = ({ x, y, color, nickname, uuid }) => {
 	ctx.fillRect(x, y, 1, 1);
 
 	if (scale > 1 && scaledCTX) {
+		scaledCTX.fillStyle = rawColor;
 		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
 	}
 
