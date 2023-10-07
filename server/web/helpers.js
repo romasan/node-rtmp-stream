@@ -59,6 +59,12 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 	});
 });
 
+const getSearch = (url) => url.split('?')[1]?.split('&')
+	.map((e) => e.split('='))
+	.reduce((list, [key, value]) => ({ ...list, [key]: value }), {}) || {};
+
+const isNumber = (number) => number && Number(number).toString() === number.toString();
+
 module.exports = {
 	validateToken,
 	getPathByToken,
@@ -66,4 +72,6 @@ module.exports = {
 	inRange,
 	parseCookies,
 	getFileLinesCount,
+	getSearch,
+	isNumber,
 };

@@ -51,3 +51,12 @@ export const getStats = async () => {
 
 	return await resp.json();
 };
+
+export const getPixel = async (x: number, y: number) => {
+	const search = new URLSearchParams({ x, y }).toString();
+	const resp = await fetch(`${APIhost}/pix?${search}`, {
+		credentials: 'include',
+	});
+
+	return await resp.json();
+};

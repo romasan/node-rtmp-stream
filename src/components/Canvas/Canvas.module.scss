@@ -57,6 +57,33 @@
 	position: absolute;
 }
 
+.withTitle {
+	&:before {
+		content: attr(data-title);
+		position: absolute;
+		top: -28px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
+		background: #fff;
+		border: 1px solid #000;
+		color: #000;
+		padding: 2px 4px;
+	}
+
+	&:after {
+		content: '';
+		position: absolute;
+		left: 110px;
+		top: -16px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 20px;
+		height: 20px;
+		background-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' height='20' width='20' style='transform:rotate(-60deg);' viewBox='90 80 400 250'%3E%3Cpolygon points='250,60 190,250 385,300' style='fill:none;stroke:%23000;stroke-width:20px;fill:%23fff;stroke-dasharray:870;stroke-dashoffset:470;' /%3E%3C/svg%3E");
+	}
+}
+
 .pixelInside {
 	background-color: var(--bg-color);
 	border-color: var(--border-color);

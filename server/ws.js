@@ -47,8 +47,7 @@ const spam = (data) => {
 
 ee.on('spam', spam);
 
-// TODO add cache
-const getOnlineCount = () => {
+const getOnlineCountRaw = () => {
 	let count = 0;
 
 	wss.clients.forEach((ws) => {
@@ -58,6 +57,30 @@ const getOnlineCount = () => {
 	});
 
 	return count;
+};
+
+let updatedCacheTime = 0;
+let cachedOnline = 0;
+const getOnlineCount = () => {
+	if (Date.now() - updatedCacheTime < 5_000) {
+		return cachedOnline;
+	}
+
+	updatedCacheTime = Date.now();
+
+	const list = [];
+
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			if (!list.includes(ws._token)) {
+				list.push(ws._token);
+			}
+		}
+	});
+
+	cachedOnline = list.length;
+
+	return cachedOnline;
 };
 
 const webServerHandler = (req, res) => {
@@ -74,8 +97,10 @@ const webServerHandler = (req, res) => {
 	}
 
 	try {
-		if (web[req.url]) {
-			web[req.url](req, res, callbacks);
+		const reqUrl = req.url.split('?')[0];
+
+		if (web[reqUrl]) {
+			web[reqUrl](req, res, callbacks);
 		} else {
 			web.default(req, res);
 		}

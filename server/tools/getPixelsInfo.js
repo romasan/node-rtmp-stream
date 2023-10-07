@@ -71,7 +71,7 @@ const getPixelsInfo = () => {
 			crlfDelay: Infinity
 		});
 
-		const stats = require(__dirname + '/../stats.json');
+		const stats = {}; // require(__dirname + '/../stats.json');
 
 		if (!stats.leaderboard) {
 			stats.leaderboard = {};
@@ -116,7 +116,7 @@ const getPixelsInfo = () => {
 		});
 	
 		rl.on('close', () => {
-			fs.writeFileSync(__dirname + '/../stats.json', JSON.stringify(stats));
+			// fs.writeFileSync(__dirname + '/../stats.json', JSON.stringify(stats));
 			resolve(stats);
 		});
 	});

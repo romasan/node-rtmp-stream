@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useCallback, useEffect, PropsWithChildren } from 'react';
+import React, { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -13,6 +13,7 @@ import {
 	rgbToHex,
 	invertRgb,
 } from '../../helpers';
+import { getPixel } from '../../lib/api';
 
 import { Bar } from '../Bar';
 
@@ -68,8 +69,78 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const initialDistance = useRef<number | null>(null);
 	const [countdown, setCoundown] = useState(0);
 	const [animatedPixel, setAnimatedPixel] = useState(false);
-	// const [selected, setSelected] = useState(defautSelected);
 	const selected = useRef(defautSelected);
+	const timer = useRef(0);
+	const [pixelData, setPixelData] = useState({});
+
+	const pixelTitle = useMemo(() => {
+		const [x, y] = coord;
+		const sec = Math.floor(pixelData.time / 1000);
+		const min = Math.floor(sec / 60);
+		const hour = Math.floor(min / 60);
+		const day = Math.floor(hour / 24);
+		const time = `${day ? `${day}d. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+
+		if (pixelData.x === x && pixelData.y === y) {
+			if (pixelData.time >= 0) {
+				return `${pixelData.name}, ${time} ago`;
+			}
+
+			return 'Empty pixel, be first';
+		}
+
+		return null;
+	}, [coord, pixelData]);
+
+	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
+		if (canvasRef.current) {
+			canvasRef.current.width = image.width;
+			canvasRef.current.height = image.height;
+
+			if (rootRef.current) {
+				const { width, height } = rootRef.current.getBoundingClientRect();
+
+				setPos({
+					x: width / 2 - image.width / 2,
+					y: height / 2 - image.height / 2,
+				});
+			}
+		}
+
+		const ctx = canvasRef.current?.getContext('2d');
+		ctx?.drawImage(image, 0, 0);
+
+		ee.on('ws:drawPix', ({ x, y, color }) => {
+			if (ctx) {
+				ctx.fillStyle = color;
+				ctx.fillRect(x, y, 1, 1);
+			}
+		});
+	}, [canvasRef.current]);
+
+	const handleClickDraw = useCallback(() => {
+		setScale((scale) => Math.max(scale, showPixelScale));
+	}, []);
+
+	const handleClickPlus = useCallback(() => {
+		setScale((scale) => getInRange(scale * 2, [minScale, maxScale]));
+	}, []);
+
+	const handleClickMinus = useCallback(() => {
+		setScale((scale) => getInRange(scale / 2, [minScale, maxScale]));
+	}, []);
+
+	const handleClickPlace = useCallback(() => {
+		if (rootRef.current && canvasRef.current) {
+			const { width, height } = rootRef.current.getBoundingClientRect();
+			const canvas = canvasRef.current.getBoundingClientRect();
+			setPos({
+				x: width / 2 - canvas.width / scale / 2,
+				y: height / 2 - canvas.height / scale / 2,
+			});
+			setScale(2);
+		}
+	}, [rootRef.current, canvasRef.current, scale]);
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
@@ -202,6 +273,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					selected.current = defautSelected;
 				} else {
 					onClick(x, y);
+					setPixelData({});
 				}
 		}
 
@@ -216,11 +288,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		}
 
 		cur.current = [-1, -1, false];
-	}
+	};
 
 	const dragCallback = (event: DragEvent) => {
 		event.preventDefault();
-	}
+	};
 
 	const handleRootWheel = ({ deltaY, clientX, clientY, target }: any) => {
 		if (error) {
@@ -276,32 +348,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		}
 	};
 
-	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
-		if (canvasRef.current) {
-			canvasRef.current.width = image.width;
-			canvasRef.current.height = image.height;
-
-			if (rootRef.current) {
-				const { width, height } = rootRef.current.getBoundingClientRect();
-
-				setPos({
-					x: width / 2 - image.width / 2,
-					y: height / 2 - image.height / 2,
-				});
-			}
-		}
-
-		const ctx = canvasRef.current?.getContext('2d');
-		ctx?.drawImage(image, 0, 0);
-
-		ee.on('ws:drawPix', ({ x, y, color }) => {
-			if (ctx) {
-				ctx.fillStyle = color;
-				ctx.fillRect(x, y, 1, 1);
-			}
-		});
-	}, [canvasRef.current]);
-
 	const getPixelStyle = () => {
 		const { left = 0, top = 0 } = canvasRef.current?.getBoundingClientRect() || {};
 		const [x, y] = coord;
@@ -334,37 +380,22 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			width: `${width}px`,
 			height: `${height}px`,
 		};
-	}
-
-	const handleClickDraw = useCallback(() => {
-		setScale((scale) => Math.max(scale, showPixelScale));
-	}, []);
-
-	const handleClickPlus = useCallback(() => {
-		setScale((scale) => getInRange(scale * 2, [minScale, maxScale]));
-	}, []);
-
-	const handleClickMinus = useCallback(() => {
-		setScale((scale) => getInRange(scale / 2, [minScale, maxScale]));
-	}, []);
-
-	const handleClickPlace = useCallback(() => {
-		if (rootRef.current && canvasRef.current) {
-			const { width, height } = rootRef.current.getBoundingClientRect();
-			const canvas = canvasRef.current.getBoundingClientRect();
-			setPos({
-				x: width / 2 - canvas.width / scale / 2,
-				y: height / 2 - canvas.height / scale / 2,
-			});
-			setScale(2);
-		}
-	}, [rootRef.current, canvasRef.current, scale]);
+	};
 
 	const renderCountdown = () => {
 		const sec = Math.ceil(countdown / 1000);
 		const min = Math.floor(sec / 60);
 
 		return `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+	};
+
+	const onWsPix = (payload: string) => {
+		if (payload === 'await' && !isAuthorized) {
+			setAnimatedPixel(true);
+			setTimeout(() => {
+				setAnimatedPixel(false);
+			}, 500);
+		}
 	};
 
 	useEffect(() => {
@@ -424,15 +455,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		};
 	}, [expiration]);
 
-	const onWsPix = (payload: string) => {
-		if (payload === 'await' && !isAuthorized) {
-			setAnimatedPixel(true);
-			setTimeout(() => {
-				setAnimatedPixel(false);
-			}, 500);
-		}
-	};
-
 	useEffect(() => {
 		ee.on('ws:pix', onWsPix);
 
@@ -440,6 +462,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			ee.off('ws:pix', onWsPix);
 		};
 	}, [isAuthorized]);
+
+	useEffect(() => {
+		clearTimeout(timer.current);
+
+		if (scale >= showPixelScale && !coord.some((e) => e < 0)) {
+			timer.current = setTimeout(() => {
+				getPixel(...coord).then(setPixelData);
+			}, 1000);
+		}
+	}, [coord, scale]);
 
 	return (
 		<>
@@ -484,8 +516,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							{coord[0] >= 0 && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
 						<div
-							className={cn(s.pixel, { [s.animated]: animatedPixel })}
+							className={cn(s.pixel, { [s.animated]: animatedPixel, [s.withTitle]: pixelTitle })}
 							style={scale ? getPixelStyle() : {}}
+							data-title={pixelTitle}
 						>
 							<div className={s.pixelInside}></div>
 						</div>

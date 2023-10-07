@@ -26,14 +26,35 @@ let stats = {};
 console.log('init canvas');
 
 const initStats = async () => {
+	const _start = Date.now();
+
 	stats = await getPixelsInfo();
 
-	console.log('stats inited/updated');
+	console.log(`\nstats inited at ${((Date.now() - _start) / 1000).toFixed(1)}s.\n`);
 };
 
 initStats();
 
 const getStats = () => stats;
+
+const getPixelAuthor = (x, y) => {
+	const key = `${x}:${y}`;
+	const [
+		currentTime,
+		currentUuid,
+		currentColor,
+		prevColorUuid,
+		prevColorColor,
+		prevUserUuid,
+		prevUserColor,
+		count,
+	] = stats?.[key] || [];
+
+	return {
+		uuid: stats?.uuids[currentUuid],
+		time: currentTime,
+	};
+};
 
 const getPixelColor = (x, y) => {
 	const key = `${x}:${y}`;
@@ -167,7 +188,7 @@ const getImageBuffer = () => {
 	}
 
 	return _canvas.toBuffer();
-}
+};
 
 const drawPix = ({ x, y, color, nickname, uuid }) => {
 	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
@@ -221,6 +242,7 @@ module.exports = {
 	getImageBuffer,
 	getStats,
 	getPixelColor,
+	getPixelAuthor,
 	getTotalPixels,
 	getTopLeaderboard,
 };

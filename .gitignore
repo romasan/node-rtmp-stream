@@ -12,5 +12,6 @@ server/frames/
 .env
 *.log
 _*
+*.mp3
 *.mp4
 *.json

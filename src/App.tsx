@@ -172,9 +172,9 @@ export const App: React.FC = () => {
 				<a href="https://www.youtube.com/@Place-ru" target="_blank">
 					<img src={youtube} />
 				</a>
-				{/* <a href="https://discord.gg/FfVjurYrus" target="_blank">
+				<a href="https://discord.gg/FfVjurYrus" target="_blank">
 					<img src={discord} />
-				</a> */}
+				</a>
 				<a href="https://t.me/pixel_battle_online" target="_blank">
 					<img src={telegram} />
 				</a>

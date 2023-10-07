@@ -4,6 +4,7 @@ const {
 	canvas,
 	drawPix,
 	getPixelColor,
+	getPixelAuthor,
 	getTotalPixels,
 	getTopLeaderboard,
 	getCanvasConf,
@@ -11,7 +12,12 @@ const {
 	updateFreezedFrame,
 } = require('../canvas');
 const package = require('../../package.json');
-const { getPostPayload, parseCookies } = require('./helpers');
+const {
+	getPostPayload,
+	parseCookies,
+	getSearch,
+	isNumber,
+} = require('./helpers');
 const { getExpiration } = require('./countdown');
 const {
 	checkSession,
@@ -155,14 +161,14 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 let pixList = [];
 
 const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
-	if (FINISH_TIME_STAMP && FINISH_TIME_STAMP < Date.now()) {
-		res.writeHead(200, { 'Content-Type': 'text/plain' });
-		res.end('fail');
-
-		return;
-	}
-
 	if (req.method === 'PUT') {
+		if (FINISH_TIME_STAMP && FINISH_TIME_STAMP < Date.now()) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+	
+			return;
+		}
+
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
 
@@ -237,7 +243,21 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('ok');
 	} else {
-		getInfo(req, res);
+		const { x, y } = getSearch(req.url);
+		const { uuid, time } = getPixelAuthor(x, y);
+		const user = getUserData(uuid);
+
+		if (isNumber(x) && isNumber(y)) {
+			res.writeHead(200, { 'Content-Type': 'text/json' });
+			res.end(JSON.stringify({
+				x: Number(x),
+				y: Number(y),
+				name: user?.name || 'Guest',
+				time: time ? (Date.now() - time) : -1,
+			}));
+		} else {
+			getInfo(req, res);
+		}
 	}
 });
 
