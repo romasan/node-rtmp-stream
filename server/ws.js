@@ -31,10 +31,6 @@ const updateClientCountdown = (token) => {
 	send(token, 'countdown', countdown);
 };
 
-const callbacks = {
-	updateClientCountdown,
-};
-
 const spam = (data) => {
 	const message = JSON.stringify(data);
 
@@ -49,14 +45,16 @@ ee.on('spam', spam);
 
 const getOnlineCountRaw = () => {
 	let count = 0;
+	let openedCount = 0;
 
 	wss.clients.forEach((ws) => {
+		count++;
 		if (ws.readyState === WebSocket.OPEN) {
-			count++;
+			openedCount++;
 		}
 	});
 
-	return count;
+	return [openedCount, count];
 };
 
 let updatedCacheTime = 0;
@@ -83,6 +81,12 @@ const getOnlineCount = () => {
 	return cachedOnline;
 };
 
+const callbacks = {
+	updateClientCountdown,
+	getOnlineCountRaw,
+	getOnlineCount,
+};
+
 const webServerHandler = (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', WS_SERVER_ORIGIN);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -98,12 +102,9 @@ const webServerHandler = (req, res) => {
 
 	try {
 		const reqUrl = req.url.split('?')[0];
+		const key = web[reqUrl] ? reqUrl : 'default';
 
-		if (web[reqUrl]) {
-			web[reqUrl](req, res, callbacks);
-		} else {
-			web.default(req, res);
-		}
+		web[key](req, res, callbacks);
 	} catch (error) {
 		res.writeHead(200);
 		res.end('fail');

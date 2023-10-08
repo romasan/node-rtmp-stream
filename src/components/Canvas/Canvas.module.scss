@@ -49,8 +49,6 @@
 	font-family: 'Custom Font', monospace;
 	font-size: 20px;
 	font-weight: bold;
-	user-select: none;
-	pointer-events: none;
 }
 
 .pixel {
@@ -62,6 +60,7 @@
 		content: attr(data-title);
 		position: absolute;
 		top: -28px;
+		line-height: 16px;
 		left: 50%;
 		transform: translateX(-50%);
 		width: max-content;

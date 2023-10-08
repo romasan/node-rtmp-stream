@@ -4,14 +4,23 @@ import mobile from 'is-mobile';
 
 import { Canvas, EMode, Palette, Tools } from '../../components';
 
-// import { addPix } from './lib/api';
 import ee from '../../lib/ee';
 
 import * as s from './App.module.scss';
 
+const disableMouse = {
+	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
+	onMouseMove: (e: MouseEvent) => e.stopPropagation(),
+	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
+};
+
 export const App: React.FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
+	const [canvasMode, setCanvasMode] = useState(EMode.CLICK);
+	const [coord, setCoord] = useState({});
+	const [range, setRange] = useState({});
+	const [size, setSize] = useState({ width: 0, height: 0 });
 
 	const isMobile = mobile();
 
@@ -25,11 +34,18 @@ export const App: React.FC = () => {
 	}, [color, wsStore]);
 
 	const handleCanvasClick = (x: number, y: number) => {
-		console.log('==== click', { x, y });
+		setCoord({ x, y });
 	};
 
 	const handleSelect = (from: { x: number; y: number }, to: { x: number; y: number }) => {
-		console.log('==== select', from, to);
+		setRange({ from, to });
+	};
+
+	const onInitCanvas = (canvas: any) => {
+		setSize({
+			width: canvas.width,
+			height: canvas.height,
+		});
 	};
 
 	useEffect(() => {
@@ -41,19 +57,26 @@ export const App: React.FC = () => {
 	return (
 		<div className={isMobile ? 'mobile' : ''}>
 			<Canvas
-				mode={EMode.CLICK}
+				mode={canvasMode}
 				className={s.canvas}
 				color={wsStore?.palette?.[color]}
 				onClick={handleCanvasClick}
 				onSelect={handleSelect}
+				onInit={onInitCanvas}
 			>
-				{/* <div className={s.layout}></div> */}
-				<canvas className={s.layer} width="426px" height="240px" ref={layer}></canvas>
+				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
 			</Canvas>
 			{wsStore?.palette && (
 				<Palette color={color} colors={wsStore?.palette} setColor={setColor} />
 			)}
-			<Tools />
+			<Tools
+				canvas={layer.current}
+				coord={coord}
+				range={range}
+				color={color}
+				setCanvasMode={setCanvasMode}
+				{...disableMouse}
+			/>
 		</div>
 	)
 }

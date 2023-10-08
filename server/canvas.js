@@ -42,16 +42,16 @@ const getPixelAuthor = (x, y) => {
 	const [
 		currentTime,
 		currentUuid,
-		currentColor,
-		prevColorUuid,
-		prevColorColor,
-		prevUserUuid,
-		prevUserColor,
-		count,
+		// currentColor,
+		// prevColorUuid,
+		// prevColorColor,
+		// prevUserUuid,
+		// prevUserColor,
+		// count,
 	] = stats?.[key] || [];
 
 	return {
-		uuid: stats?.uuids[currentUuid],
+		uuid: stats?.uuids?.[currentUuid],
 		time: currentTime,
 	};
 };
@@ -62,11 +62,11 @@ const getPixelColor = (x, y) => {
 		currentTime,
 		currentUuid,
 		currentColor,
-		prevColorUuid,
-		prevColorColor,
-		prevUserUuid,
-		prevUserColor,
-		count,
+		// prevColorUuid,
+		// prevColorColor,
+		// prevUserUuid,
+		// prevUserColor,
+		// count,
 	] = stats?.[key] || [];
 
 	return stats?.colors?.[currentColor];
@@ -84,6 +84,10 @@ const getTopLeaderboard = (count = 10) => {
 			...list,
 			{ uuid: stats?.uuids[key], count: value },
 		], []);
+};
+
+const getLastActivity = () => {
+	return stats?.lastActivity || 0;
 };
 
 const bg = drawDefaultCanvas('DATA', videoSize.width, videoSize.height, 'CHESS');
@@ -245,4 +249,5 @@ module.exports = {
 	getPixelAuthor,
 	getTotalPixels,
 	getTopLeaderboard,
+	getLastActivity,
 };

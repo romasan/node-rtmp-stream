@@ -14,7 +14,13 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	// 	stats.starttime = time;
 	// }
 
-	stats.lastActivity = time;
+	stats.lastActivity = {
+		time,
+		uuid: _uuid,
+		x,
+		y,
+		color: _color,
+	};
 
 	let uuid = uuidsCache[_uuid];
 	if (typeof uuid === 'undefined') {
@@ -33,26 +39,26 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 		currentTime,
 		currentUuid,
 		currentColor,
-		prevColorUuid,
-		prevColorColor,
-		prevUserUuid,
-		prevUserColor,
+		// prevColorUuid,
+		// prevColorColor,
+		// prevUserUuid,
+		// prevUserColor,
 		count,
 	] = stats[key] || [];
 
-	const prevUser = prevUserUuid === currentUuid
-		? [prevUserUuid, prevUserColor]
-		: [currentUuid, currentColor];
-	const prevColor = prevColorColor === currentColor
-		? [prevColorUuid, prevColorColor]
-		: [currentUuid, currentColor];
+	// const prevUser = prevUserUuid === currentUuid
+	// 	? [prevUserUuid, prevUserColor]
+	// 	: [currentUuid, currentColor];
+	// const prevColor = prevColorColor === currentColor
+	// 	? [prevColorUuid, prevColorColor]
+	// 	: [currentUuid, currentColor];
 
 	stats[key] = [
 		time,
 		uuid,
 		color,
-		...prevColor,
-		...prevUser,
+		// ...prevColor,
+		// ...prevUser,
 		(count || 0) + 1,
 	];
 	stats.totalCount = (stats.totalCount || 0) + 1;

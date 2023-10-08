@@ -32,6 +32,7 @@ const {
 require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
+const admin = require('./admin');
 const { COLORS } = require('../const');
 
 const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
@@ -44,61 +45,6 @@ const getInfo = (req, res) => {
 const getCanvas = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'image/png' });
 	res.end(canvas.toBuffer());
-};
-
-const admin = async (req, res) => {
-	const { token } = parseCookies(req.headers.cookie || '');
-
-	if (
-		checkSession(token) &&
-		checkIsAdmin(token)
-	) {
-		const payloadRaw = ['POST', 'PUT', 'PATCH'].includes(req.method) && (await getPostPayload(req));
-
-		let payload = {};
-
-		try {
-			payload = JSON.parse(payloadRaw);
-		} catch (error) {}
-
-		const command = req.url.split('/qq/').pop();
-
-		switch (command) {
-			case 'stat':
-				const stats = {}; // getStats();
-
-				res.writeHead(200, { 'Content-Type': 'text/json' });
-				res.end(JSON.stringify(stats));
-				return;
-			case 'streamSettings':
-				if (req.method === 'PATCH') {
-					updateCanvasConf(payload);
-	
-					res.writeHead(200, { 'Content-Type': 'text/plain' });
-					res.end('ok');
-				} else {
-					res.writeHead(200, { 'Content-Type': 'text/json' });
-					res.end(JSON.stringify(getCanvasConf()));
-				}
-				return;
-			case 'updateFreezedFrame':
-				updateFreezedFrame();
-
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('ok');
-				return;
-			case 'heatmap':
-				// const canvas = getHeatmap();
-				// res.writeHead(200, { 'Content-Type': 'image/png' });
-				// res.end(canvas.toBuffer());
-				return;
-		}
-
-		res.writeHead(200, { 'Content-Type': 'text/json' });
-		res.end('{}');
-	} else {
-		getInfo(req, res);
-	}
 };
 
 const checkAccessWrapper = (callback, checkAuth) => {
@@ -322,9 +268,10 @@ const stats = (req, res) => {
 	}));
 };
 
-const _default = async (req, res) => {
+const _default = async (req, res, callbacks) => {
 	if (req.url.startsWith('/qq')) {
-		admin(req, res);
+		admin(req, res, { getInfo, ...callbacks });
+
 		return;
 	}
 

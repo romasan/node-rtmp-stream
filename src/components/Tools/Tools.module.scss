@@ -21,7 +21,29 @@
 
 .content {
 	width: 300px;
-	height: 600px;
+	max-height: 600px;
 	overflow-y: auto;
 	overflow-x: hidden;
+}
+
+.close {
+	@include buttonLike();
+
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	outline: 4px solid $color-window-bg;;
+
+	&,
+	&:active {
+		padding: 0px 3px;
+	}
+
+	& > div {
+		rotate: -90deg;
+	}
+}
+
+.toggled > div {
+	rotate: 90deg;
 }

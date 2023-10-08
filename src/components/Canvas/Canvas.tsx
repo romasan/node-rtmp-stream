@@ -34,6 +34,7 @@ interface Props {
 	isAuthorized?: boolean;
 	onClick(x: number, y: number): void;
 	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
+	onInit?: (value: any) => void;
 }
 
 const showPixelScale = 6;
@@ -55,6 +56,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	children,
 	onClick,
 	onSelect,
+	onInit,
 }) => {
 	const isMobile = mobile();
 	const firstRender = useRef(true);
@@ -109,6 +111,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		const ctx = canvasRef.current?.getContext('2d');
 		ctx?.drawImage(image, 0, 0);
+
+		onInit?.(image);
 
 		ee.on('ws:drawPix', ({ x, y, color }) => {
 			if (ctx) {
@@ -438,7 +442,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				document.removeEventListener('drag', dragCallback);
 			}
 		}
-	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color]);
+	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color, mode]);
 
 	useEffect(() => {
 		const timer = setInterval(() => {

@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useMemo, useContext } from 'react';
+import React, { FC, PropsWithChildren, useRef, useMemo, useContext, useEffect } from 'react';
 
 // import cn from 'classnames';
 
@@ -11,16 +11,34 @@ import * as s from './Block.module.scss';
 interface Props {
 	id?: string;
 	title: string;
+	onOpen?: () => void;
+	onClose?: () => void;
+	onToggle?: (value: boolean) => void;
 }
 
-export const Block: FC<PropsWithChildren<Props>> = ({ id, title, children }) => {
+export const Block: FC<PropsWithChildren<Props>> = ({ id, title, onOpen, onClose, onToggle, children }) => {
 	const { opened, setOpened } = useContext(ToolsContext);
+	const first = useRef(true);
 
 	const _id = useMemo(() => {
 		return id || uuid();
 	}, [id]);
 
 	const isOpened = opened === _id;
+
+	useEffect(() => {
+		if (isOpened) {
+			onOpen?.();
+		} else {
+			if (first.current) {
+				first.current = false;
+			} else {
+				onClose?.();
+			}
+		}
+
+		onToggle?.(isOpened);
+	}, [isOpened]);
 
 	const toggle = () => {
 		setOpened?.((value: string) => value === _id ? '' : _id);

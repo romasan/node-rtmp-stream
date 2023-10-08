@@ -59,18 +59,9 @@
 	background-color: #3c3c3c;
 }
 
-.layout {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	background: red;
-	width: 100%;
-	height: 100%;
-	opacity: 0.5;
-}
-
 .layer {
 	position: absolute;
 	top: 0px;
 	left: 0px;
+	image-rendering: pixelated;
 }
