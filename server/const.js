@@ -20,7 +20,8 @@ const COLORS = {
 const countdownRanges = {
 	authorized: {
 		0: 0.3,
-		10: 3,
+		10: 1,
+		30: 2,
 		50: 5,
 		100: 10,
 		200: 30,

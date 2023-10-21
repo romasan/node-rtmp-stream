@@ -85,7 +85,7 @@ export const Chat: FC<Props> = ({
 					</div>
 				))}
 				{list.length === 0 && (
-					<div>no new messsages</div>
+					<div>пока никто не писал</div>
 				)}
 			</div>
 			<div className={s.publisher} {...props}>

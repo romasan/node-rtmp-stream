@@ -27,7 +27,7 @@ export const Info: FC<Props> = ({
 	const [stats, setStats] = useState({
 		loading: true,
 	});
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 240, y: 60});
+	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 280, y: 60});
 
 	useEffect(() => {
 		getStats().then(setStats).catch(() => {});
@@ -40,19 +40,25 @@ export const Info: FC<Props> = ({
 			</div>
 			<div className={s.content} {...props}>
 				{stats?.loading ? (
-					<div>Loading...</div>
+					<div>Загрузка...</div>
 				) : (
 					<div>
 						{/* <div>Online: 0</div> */}
-						<div>Total pixels: {formatNumber(stats?.total)}</div>
+						<div>Всего пикселей: {formatNumber(stats?.total)}</div>
+						<div>&nbsp;</div>
 						<div>
-							<div>Leaderboard</div>
+							<div>ТОП 10 участников:</div>
+							<div>&nbsp;</div>
 							{(stats?.leaderboard || []).map((item, index) => (
-								<div key={String(index)}>
-									{index < 9 && <>&nbsp;</>}
-									{index + 1}.
-									{item.name}:
-									{formatNumber(item.count)}
+								<div key={String(index)} className={s.leaderBoardItem}>
+									<span>
+										{index < 9 && <>&nbsp;</>}
+										{index + 1}.
+										{item.name}
+									</span>
+									<span>
+										{formatNumber(item.count)}
+									</span>
 								</div>
 							))}
 						</div>

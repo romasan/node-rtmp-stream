@@ -8,6 +8,26 @@ const {
 	readJSON,
 } = require('./helpers');
 
+const readPixels = () => new Promise((resolve) => {
+	const pixelsUUIDs = {};
+
+	const rlPixels = readline.createInterface({
+		input: fs.createReadStream(__dirname + '/../pixels.log'),
+		crlfDelay: Infinity
+	});
+
+	rlPixels.on('line', (line) => {
+		const [,,,,, uuid] = line.split(';');
+		if (uuid) {
+			pixelsUUIDs[uuid] = 1;
+		}
+	});
+
+	rlPixels.on('close', () => {
+		resolve(pixelsUUIDs);
+	});
+});
+
 const fixGuests = async (stats, logoutlog, auth) => {
 	// stats = await readJSON(stats);
 	// auth = await readJSON(auth);
@@ -18,39 +38,26 @@ const fixGuests = async (stats, logoutlog, auth) => {
 	// rewrite nicknames by logout
 	// rewrite nicknames by authorized
 
-	const pixelsUUIDs = {};
+	const pixelsUUIDs = await readPixels();
 	// const sessionsUUIDs = {};
 	let sessionsCount = 0;
-
-	const rlPixels = readline.createInterface({
-		input: fs.createReadStream(__dirname + '/../pixels.log'),
-		crlfDelay: Infinity
-	});
 
 	const rlSessions = readline.createInterface({
 		input: fs.createReadStream(__dirname + '/../sessions/list'),
 		crlfDelay: Infinity
 	});
 
-	rlPixels.on('line', (line) => {
-		const [,,,,, uuid] = line.split(';');
-		if (uuid) {
-			pixelsUUIDs[uuid] = true;
+	rlSessions.on('line', (uuid) => {
+		if (pixelsUUIDs[uuid]) {
+			pixelsUUIDs[uuid] = 2;
 		}
-	});
-
-	rlSessions.on('line', (line) => {
 		sessionsCount++;
 	});
 
-	rlPixels.on('close', () => {
-		const count = Object.keys(pixelsUUIDs).length;
-
-		console.log(`pixels list unique uuids count: ${count}`);
-	});
-
 	rlSessions.on('close', () => {
-		console.log(`sessions list unique uuids count: ${sessionsCount}`);
+		const count = Object.keys(pixelsUUIDs).length;
+		const pixUUIDInSessionsCount = Object.entries(pixelsUUIDs).filter(([key, value]) => value === 2).length;
+		console.log(`count: ${count}/${pixUUIDInSessionsCount}/${sessionsCount}`);
 	});
 };
 

@@ -20,8 +20,8 @@
 }
 
 .content {
-	width: 200px;
-	height: 200px;
+	width: 230px;
+	height: 230px;
 	overflow-y: auto;
 	overflow: overlay;
 	border-style: solid;
@@ -32,7 +32,7 @@
 	border-left-color: #2d2d3a;
 	background: #dbdbef;
 	color: #000;
-	padding: 3px;
+	padding: 10px;
 	border-radius: 5px;
 
 	scrollbar-width: thin;
@@ -56,6 +56,11 @@
 	&::-webkit-scrollbar-thumb {
 		background-color: #8080a6;
 	}
+}
+
+.leaderBoardItem {
+	display: flex;
+	justify-content: space-between;
 }
 
 .text {

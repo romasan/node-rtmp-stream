@@ -1,4 +1,5 @@
 const fs = require('fs');
+const readline = require('readline');
 const path = require('path');
 
 const {
@@ -12,6 +13,17 @@ let failed = {};
 const maxLength = 1000;
 const gap = 100;
 
+let index = 0;
+
+const rl = readline.createInterface({
+	input: fs.createReadStream(__dirname + '/list'),
+	crlfDelay: Infinity
+});
+
+rl.on('line', (uuid) => {
+	sessions[uuid] = ++index;
+});
+
 const file = fs.createWriteStream(__dirname + '/list', { flags : 'a' });
 
 const trim = (obj) => {
@@ -21,11 +33,11 @@ const trim = (obj) => {
 		.reduce((list, [key, value]) => ({ ...list, [key]: value }), {});
 };
 
-const trimSessions = () => {
-	if (Object.keys(sessions).length > (maxLength + gap)) {
-		sessions = trim(sessions);
-	}
-};
+// const trimSessions = () => {
+// 	if (Object.keys(sessions).length > (maxLength + gap)) {
+// 		sessions = trim(sessions);
+// 	}
+// };
 
 const trimFailed = () => {
 	if (Object.keys(failed).length > (maxLength + gap)) {
@@ -55,7 +67,7 @@ const checkSession = (token, prevalidate = true, skipFirstTime = true) => {
 	const filePath = getPathByToken(token, false);
 
 	if (fs.existsSync(filePath)) {
-		sessions[token] = Date.now();
+		// sessions[token] = Date.now();
 
 		return true;
 	} else {
@@ -86,11 +98,11 @@ const addSession = (token, data) => {
 	} else {
 		file.write(token + '\n');
 		fs.writeFileSync(filePath, fileContent);
+		sessions[token] = ++index;
 	}
 
-	sessions[token] = Date.now();
 	delete failed[token];
-	trimSessions();
+	// trimSessions();
 }
 
 const checkFirstTime = (token) => {
@@ -98,7 +110,9 @@ const checkFirstTime = (token) => {
 };
 
 const getSessionUserName = (token) => {
-	return 'Guest';
+	const guestIndex = sessions[token] || '';
+
+	return `Гость${guestIndex}`;
 };
 
 module.exports = {
