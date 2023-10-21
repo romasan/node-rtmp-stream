@@ -1,5 +1,5 @@
 const { hostname, protocol } = document.location;
-const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+export const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
 
 export const get = async (command: string, type = 'JSON') => {
 	const resp = await fetch(`${APIhost}/qq/${command}`, {

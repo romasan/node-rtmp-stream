@@ -18,6 +18,7 @@ import {
 	Stream,
 	PixelStats,
 	FillSquare,
+	Maps,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -65,27 +66,7 @@ export const Tools: FC<Props> = ({
 							<Stats />
 							<Stream />
 							<PixelStats />
-							<Block title="Карты">
-								TODO
-								<div>
-									<button>по юзеру</button>
-								</div>
-								<div>
-									<button>по давности</button>
-								</div>
-								<div>
-									<button>heatmap</button>
-								</div>
-								<div>
-									<button>последние</button>
-									<select>
-										<option>100</option>
-										<option>1 000</option>
-										<option>10 000</option>
-										<option>100 000</option>
-									</select>
-								</div>
-							</Block>
+							<Maps canvas={canvas} />
 							<FillSquare
 								canvas={canvas}
 								range={range}

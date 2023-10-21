@@ -4,6 +4,7 @@ const {
 	updateFreezedFrame,
 	drawPix,
 	getLastActivity,
+	getStats,
 } = require('../canvas');
 const {
 	getPostPayload,
@@ -11,11 +12,17 @@ const {
 } = require('./helpers');
 const {
 	checkSession,
+	getSessionUserName,
 } = require('../sessions');
 const {
 	checkIsAdmin,
 	getUserData,
 } = require('../auth');
+const {
+	heatmapFromStats,
+	mapByUsersFromStats,
+	heatmapNewestFromStats,
+} = require('../tools');
 
 const admin = async (req, res, {
 	getInfo,
@@ -51,7 +58,7 @@ const admin = async (req, res, {
 						all,
 					},
 					lastActivity: Date.now() - lastActivity?.time,
-					lastUserName: user?.name || 'Guest',
+					lastUserName: user?.name || getSessionUserName(lastActivity?.uuid),
 					lastUserUUID: lastActivity.uuid,
 					coord: {
 						x: lastActivity.x,
@@ -80,10 +87,23 @@ const admin = async (req, res, {
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
 				res.end('ok');
 				return;
-			case 'heatmap':
-				// const canvas = getHeatmap();
-				// res.writeHead(200, { 'Content-Type': 'image/png' });
-				// res.end(canvas.toBuffer());
+			case 'heatmap.png':
+				const heatmapCanvas = await heatmapFromStats(getStats());
+
+				res.writeHead(200, { 'Content-Type': 'image/png' });
+				res.end(heatmapCanvas.toBuffer());
+				return;
+			case 'newestmap.png':
+				const newestCanvas = await heatmapNewestFromStats(getStats());
+
+				res.writeHead(200, { 'Content-Type': 'image/png' });
+				res.end(newestCanvas.toBuffer());
+				return;
+			case 'usersmap.png':
+				const usersCanvas = await mapByUsersFromStats(getStats());
+
+				res.writeHead(200, { 'Content-Type': 'image/png' });
+				res.end(usersCanvas.toBuffer());
 				return;
 			case 'fillSquare':
 				if (req.method === 'PUT') {

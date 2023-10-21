@@ -97,8 +97,13 @@ const checkFirstTime = (token) => {
 	return token in tempFirstTime;
 };
 
+const getSessionUserName = (token) => {
+	return 'Guest';
+};
+
 module.exports = {
 	checkSession,
 	addSession,
 	checkFirstTime,
+	getSessionUserName,
 };

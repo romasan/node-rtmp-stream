@@ -14,9 +14,10 @@ const {
 const {
 	HSLToRGB,
 	RGBToHEX,
+	readJSON,
 } = require('./helpers');
 
-const heatmap = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
+const heatmapCLI = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
 	const canvas = createCanvas(WIDTH, HEIGHT);
 	const ctx = canvas.getContext('2d');
 
@@ -110,4 +111,124 @@ const heatmap = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
 	});
 };
 
-module.exports = heatmap;
+const heatmapFromStats =  async (stats, output) => {
+	if (typeof stats === 'string') {
+		stats = await readJSON(stats)
+	}
+
+	let width = 0;
+	let height = 0;
+	let max = 0;
+	let sum = 0;
+	let length = 0;
+	// const list = [];
+
+	Object.keys(stats).forEach((key) => {
+		if (key.indexOf(':') > 0) {
+			const [x, y] = key.split(':');
+			const [,,, count] = stats[key];
+
+			width = Math.max(Number(x), width);
+			height = Math.max(Number(y), height);
+			max = Math.max(max, count);
+			sum += count;
+			length++;
+			// list.push(count);
+		}
+	});
+
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, width, height);
+
+	// const med = max / 2;
+	const med = sum / length;
+	// list.sort();
+	// const med = list[Math.floor(list.length / 2)];
+
+	for (let x = 0; x < width; x++) {
+		for (let y = 0; y < height; y++) {
+			const key = `${x}:${y}`;
+			const [,,, count = 0] = stats[key] || [];
+			const h = (1.0 - (Math.min(count / med, 1))) * 240;
+			const hsl = [h, 100, 50];
+			const rgb = HSLToRGB(hsl);
+			const color = RGBToHEX(rgb);
+
+			ctx.fillStyle = color;
+			ctx.fillRect(x, y, 1, 1);
+		}
+	}
+
+	if (output) {
+		fs.writeFileSync(output, canvas.toBuffer());
+	} else {
+		return canvas;
+	}
+};
+
+const heatmapNewestFromStats =  async (stats, output) => {
+	if (typeof stats === 'string') {
+		stats = await readJSON(stats)
+	}
+
+	let width = 0;
+	let height = 0;
+	let max = 0;
+	let min = Infinity;
+
+	const times = [];
+
+	Object.keys(stats).forEach((key) => {
+		if (key.indexOf(':') > 0) {
+			const [x, y] = key.split(':');
+			const [time] = stats[key];
+
+			width = Math.max(Number(x), width);
+			height = Math.max(Number(y), height);
+			max = Math.max(max, time);
+			min = Math.min(min, time);
+			times.push(time);
+		}
+	});
+
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, width, height);
+
+	// const med = (max - min) / 2;
+	const med = times.sort()[Math.floor(times.length / 2)] - min;
+
+	for (let x = 0; x < width; x++) {
+		for (let y = 0; y < height; y++) {
+			const key = `${x}:${y}`;
+
+			if (stats[key]) {
+				const [time] = stats[key];
+				const h = (1.0 - (Math.min((time - min) / med, 1))) * 240;
+				const hsl = [h, 100, 50];
+				const rgb = HSLToRGB(hsl);
+				const color = RGBToHEX(rgb);
+	
+				ctx.fillStyle = color;
+				ctx.fillRect(x, y, 1, 1);
+			}
+		}
+	}
+
+	if (output) {
+		fs.writeFileSync(output, canvas.toBuffer());
+	} else {
+		return canvas;
+	}
+};
+
+module.exports = {
+	heatmapCLI,
+	heatmapFromStats,
+	heatmapNewestFromStats,
+};

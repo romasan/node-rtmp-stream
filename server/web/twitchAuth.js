@@ -42,6 +42,10 @@ const twitch = async (req, res) => {
 
 				const jsonUserInfo = await respUserInfo.json();
 
+				if (jsonUserInfo.error) {
+					throw new Error(jsonUserInfo.error);
+				}
+
 				addNewUser(token, {
 					...jsonUserInfo,
 					_authType: 'twitch',

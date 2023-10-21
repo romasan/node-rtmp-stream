@@ -69,7 +69,7 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	}
 }
 
-const getPixelsInfo = () => {
+const getPixelsInfo = (output) => {
 	return new Promise((resolve) => {
 
 		const rl = readline.createInterface({
@@ -123,10 +123,13 @@ const getPixelsInfo = () => {
 	
 		rl.on('close', () => {
 			// fs.writeFileSync(__dirname + '/../stats.json', JSON.stringify(stats));
+			if (output) {
+				fs.writeFileSync(output, JSON.stringify(stats));
+			}
 			resolve(stats);
 		});
 	});
-}
+};
 
 module.exports = {
 	getPixelsInfo,

@@ -55,4 +55,61 @@ const genMapByUsers = (map, output) => {
 	fs.writeFileSync(output, canvas.toBuffer());
 };
 
-module.exports = genMapByUsers;
+const mapByUsersFromStats =  async (stats, output) => {
+	if (typeof stats === 'string') {
+		stats = await readJSON(stats)
+	}
+
+	let width = 0;
+	let height = 0;
+
+	let uuids = {};
+
+	Object.keys(stats).forEach((key) => {
+		if (key.indexOf(':') > 0) {
+			const [x, y] = key.split(':');
+			const [, uuid] = stats[key];
+			uuids[uuid] = true;
+
+			width = Math.max(Number(x), width);
+			height = Math.max(Number(y), height);
+		}
+	});
+
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, width, height);
+
+	const length = Object.keys(uuids).length;
+	const colors = Array(length).fill().map((e, i) => (
+		'#' + (
+				Math.floor(0xffffff / (length + 1)) * i
+		).toString(16).padStart(6, '0')
+	));
+
+	uuids = Object.keys(uuids).reduce((list, key, index) => ({ ...list, [key]: index }), {});
+
+	for (let x = 0; x < width; x++) {
+		for (let y = 0; y < height; y++) {
+			const key = `${x}:${y}`;
+			const [, uuid] = stats[key] || [];
+			if (uuid) {
+				ctx.fillStyle = colors[uuids[uuid]];
+				ctx.fillRect(x, y, 1, 1);
+			}
+		}
+	}
+
+	if (output) {
+		fs.writeFileSync(output, canvas.toBuffer());
+	} else {
+		return canvas;
+	}
+};
+
+module.exports = {
+	genMapByUsers,
+	mapByUsersFromStats,
+};

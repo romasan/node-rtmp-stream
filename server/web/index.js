@@ -22,6 +22,7 @@ const { getExpiration } = require('./countdown');
 const {
 	checkSession,
 	addSession,
+	getSessionUserName,
 } = require('../sessions');
 const {
 	checkIsAdmin,
@@ -198,7 +199,7 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			res.end(JSON.stringify({
 				x: Number(x),
 				y: Number(y),
-				name: user?.name || 'Guest',
+				name: user?.name || getSessionUserName(uuid),
 				time: time ? (Date.now() - time) : -1,
 			}));
 		} else {
@@ -256,7 +257,7 @@ const stats = (req, res) => {
 			const user = getUserData(item.uuid);
 
 			return {
-				name: user?.name || 'Guest',
+				name: user?.name || getSessionUserName(item.uuid),
 				count: item.count,
 			};
 		});
