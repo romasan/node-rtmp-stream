@@ -81,11 +81,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const min = Math.floor(sec / 60);
 		const hour = Math.floor(min / 60);
 		const day = Math.floor(hour / 24);
-		const time = `${day ? `${day}d. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+		const time = `${day ? `${day} д. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
 
 		if (pixelData.x === x && pixelData.y === y) {
 			if (pixelData.time >= 0) {
-				return `${pixelData.name}, ${time} ago`;
+				return `${pixelData.name}, ${time} назад`;
 			}
 
 			return 'Empty pixel, be first';
