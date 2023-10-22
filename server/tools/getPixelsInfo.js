@@ -69,6 +69,8 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	}
 }
 
+let inited = false;
+
 const getPixelsInfo = (output) => {
 	return new Promise((resolve) => {
 
@@ -126,12 +128,18 @@ const getPixelsInfo = (output) => {
 			if (output) {
 				fs.writeFileSync(output, JSON.stringify(stats));
 			}
+			inited = true;
 			resolve(stats);
 		});
 	});
 };
 
+const getStatus = () => {
+	return inited;
+};
+
 module.exports = {
 	getPixelsInfo,
 	updateStats,
+	getStatus,
 };

@@ -10,6 +10,7 @@ const { COLORS } = require('./const');
 const { parseCookies } = require('./web/helpers');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
+const { getStatus } = require('./tools/getPixelsInfo');
 
 const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
 
@@ -92,6 +93,13 @@ const webServerHandler = (req, res) => {
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+	if (!getStatus()) {
+		res.writeHead(200);
+		res.end('fail');
+
+		return;
+	}
 
 	if (req.method === 'OPTIONS') {
 		res.writeHead(200);
