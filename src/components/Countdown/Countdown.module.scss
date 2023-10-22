@@ -1,0 +1,15 @@
+.root {
+	position: absolute;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 48px;
+	color: #fff;
+	text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.timeout {
+	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	font-size: 72px;
+}

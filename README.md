@@ -14,8 +14,8 @@
 # admin panel
 
 - [x] add admin route
-- [ ] update stream frame
-- [ ] cover up area
+- [x] update stream frame
+- [x] cover up area
 - [ ] change countdown
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)

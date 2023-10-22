@@ -7,9 +7,6 @@ const {
 	getPixelAuthor,
 	getTotalPixels,
 	getTopLeaderboard,
-	getCanvasConf,
-	updateCanvasConf,
-	updateFreezedFrame,
 } = require('../canvas');
 const package = require('../../package.json');
 const {
@@ -109,9 +106,9 @@ let pixList = [];
 
 const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
 	if (req.method === 'PUT') {
-		if (FINISH_TIME_STAMP && FINISH_TIME_STAMP < Date.now()) {
+		if (FINISH_TIME_STAMP && new Date(FINISH_TIME_STAMP).getTime() < Date.now()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
+			res.end('timeout');
 	
 			return;
 		}

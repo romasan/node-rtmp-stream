@@ -10,6 +10,7 @@ import {
 	Modal,
 	Chat,
 	Info,
+	Countdown,
 } from './components/'
 
 import { addPix } from './lib/api';
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
 	const [expiration, setExpiration] = useState(0);
 	const [isOnline, setIsOnline] = useState(false);
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
+	const [finish, setFinish] = useState(0);
 	const blinkedTimer = useRef(-1);
 
 	const toggleChat = () => {
@@ -84,6 +86,9 @@ export const App: React.FC = () => {
 		setWsStore((store = {}) => ({ ...store, ...payload }));
 		setExpiration(Date.now() + payload?.countdown);
 		setIsAuthorized(payload?.isAuthorized);
+		if (payload.finish !== 'newer') {
+			setFinish(Date.now() + payload.finish);
+		}
 	};
 
 	const onWsCountdown = (countdown: number) => {
@@ -161,6 +166,9 @@ export const App: React.FC = () => {
 						<button onClick={handleTwitchLoginClick} className={s.button}>Залогинься через ВК</button>
 					</div>
 				</Modal>
+			)}
+			{Boolean(finish) && (
+				<Countdown finish={finish} />
 			)}
 			<div className={s.footer} {...disableMouse}>
 				<a href="https://vkplay.live/place_tv" target="_blank">

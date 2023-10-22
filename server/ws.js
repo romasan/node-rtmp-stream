@@ -153,7 +153,7 @@ wss.on('connection', (ws, req) => {
 		isAuthorized,
 		...user,
 		countdown,
-		finish: FINISH_TIME_STAMP ? 'newer' : FINISH_TIME_STAMP - Date.now(),
+		finish: FINISH_TIME_STAMP ? new Date(FINISH_TIME_STAMP).getTime() - Date.now() : 'newer',
 	});
 
 	ws.on('message', (buf) => {
