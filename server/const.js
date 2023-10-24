@@ -42,6 +42,13 @@ const videoSize = {
 	height: 720, // 1080
 };
 
+const tempBans = {
+	uuid: {},
+	nick: {
+		
+	},
+}
+
 module.exports = {
 	COLORS,
 	countdownRanges,

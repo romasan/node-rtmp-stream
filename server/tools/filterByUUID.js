@@ -5,7 +5,7 @@
 const fs = require('fs');
 const readline = require('readline');
 
-const filterByUUID = (input, output, uuid) => {
+const filterByUUID = (input, output, uuid, ago) => {
 	const rl = readline.createInterface({
 		input: fs.createReadStream(input),
 		crlfDelay: Infinity
@@ -14,10 +14,17 @@ const filterByUUID = (input, output, uuid) => {
 	const file = fs.createWriteStream(output);
 
 	rl.on('line', (line) => {
-		const [,,,,,_uuid] = line.split(';');
-		if (uuid !== _uuid) {
-			file.write(line + '\n');
+		const [time,,,,,_uuid] = line.split(';');
+
+		if (uuid == _uuid) {
+			return;
 		}
+
+		if (time && (Date.now() - ago) > time) {
+			return
+		}
+
+		file.write(line + '\n');
 	})
 };
 

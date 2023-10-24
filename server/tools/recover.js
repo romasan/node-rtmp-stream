@@ -11,8 +11,8 @@ const {
 	HEIGHT,
 } = require('./constants.json');
 
-const recover = (file, backgroundImage, output) => {
-	const canvas = createCanvas(WIDTH, HEIGHT);
+const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) => {
+	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
 	const imgBuf = fs.readFileSync(backgroundImage);
