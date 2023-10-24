@@ -55,4 +55,5 @@ module.exports = {
 	COLORS,
 	countdownRanges,
 	videoSize,
+	tempBans,
 };
