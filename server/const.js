@@ -43,9 +43,11 @@ const videoSize = {
 };
 
 const tempBans = {
-	uuid: {},
+	uuid: {
+		"0309fb36-a56a-4a42-8003-d8eafb8fbcf9": true,
+	},
 	nick: {
-		
+
 	},
 }
 

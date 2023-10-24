@@ -129,6 +129,15 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			return;
 		}
 
+		if (tempBans.uuid[token]) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: failed on add pixel (banned user)', token);
+
+			return;
+		}
+
 		if (
 			pixList.length >= MAX_PIX_PER_SEC &&
 			(Date.now() - pixList[0]) < 1000 // TODO check per one user (authorized first)
