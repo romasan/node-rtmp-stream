@@ -22,6 +22,7 @@ const {
 	heatmapFromStats,
 	mapByUsersFromStats,
 	heatmapNewestFromStats,
+	mapLastPixelsFromStats,
 } = require('../tools');
 
 const admin = async (req, res, {
@@ -43,7 +44,12 @@ const admin = async (req, res, {
 			payload = JSON.parse(payloadRaw);
 		} catch (error) {}
 
-		const command = req.url.split('/qq/').pop();
+		const location = req.url.split(/(\/qq\/)|(\?)/);
+		const command = location[3];
+		const query = location[6]
+			?.split('&')
+			.map((item) => item.split('='))
+			.reduce((list, [key, value]) => ({ ...list, [key]: value }), {}) || {};
 
 		switch (command) {
 			case 'stats':
@@ -105,11 +111,17 @@ const admin = async (req, res, {
 				res.writeHead(200, { 'Content-Type': 'image/png' });
 				res.end(usersCanvas.toBuffer());
 				return;
+			case 'lastPixels.png':
+				const lastPixelsCanvas = await mapLastPixelsFromStats(getStats(), query.count);
+
+				res.writeHead(200, { 'Content-Type': 'image/png' });
+				res.end(lastPixelsCanvas.toBuffer());
+				return;
 			case 'fillSquare':
 				if (req.method === 'PUT') {
 					const { from, to, color } = payload;
-					const [startX, endX] = [from.x, to.x].sort();
-					const [startY, endY] = [from.y, to.y].sort();
+					const [startX, endX] = from.x < to.x ? [from.x, to.x] : [to.x, from.x];
+					const [startY, endY] = from.y < to.y ? [from.y, to.y] : [to.y, from.y];
 
 					for (let x = startX; x < endX; x++) {
 						for (let y = startY; y < endY; y++) {

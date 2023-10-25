@@ -96,7 +96,7 @@ const webServerHandler = (req, res) => {
 
 	if (!getStatus()) {
 		res.writeHead(200);
-		res.end('fail');
+		res.end('init');
 
 		return;
 	}

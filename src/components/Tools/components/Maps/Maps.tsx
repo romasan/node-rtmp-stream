@@ -14,6 +14,7 @@ export const Maps: FC<Props> = ({
 	canvas,
 }) => {
 	const [opened, setOpened] = useState(false);
+	const [lastPixelsValue, setLastPixelsValue] = useState(100);
 
 	const getMap = (name: string) => {
 		const ctx = canvas.getContext('2d');
@@ -40,6 +41,14 @@ export const Maps: FC<Props> = ({
 		getMap('newestmap.png');
 	};
 
+	const getLastPixels = () => {
+		getMap(`lastPixels.png?count=${lastPixelsValue}`);
+	};
+
+	const handleSelect = (event: any) => {
+		setLastPixelsValue(Number(event.target.value));
+	};
+
 	useEffect(() => {
 		if (canvas) {
 			canvas.width = canvas.width;
@@ -57,15 +66,22 @@ export const Maps: FC<Props> = ({
 			<div>
 				<button onClick={getNewestMap}>по давности</button>
 			</div>
-			{/* <div>
-				<button>последние</button>
-				<select>
-					<option>100</option>
-					<option>1 000</option>
-					<option>10 000</option>
-					<option>100 000</option>
+			<div>
+				<button onClick={getLastPixels}>последние</button>
+				<select onChange={handleSelect}>
+					<option value="100">100</option>
+					<option value="300">300</option>
+					<option value="500">500</option>
+					<option value="1000">1 000</option>
+					<option value="2000">2 000</option>
+					<option value="3000">3 000</option>
+					<option value="5000">5 000</option>
+					<option value="10000">10 000</option>
+					<option value="30000">30 000</option>
+					<option value="50000">50 000</option>
+					<option value="100000">100 000</option>
 				</select>
-			</div> */}
+			</div>
 		</Block>
 	);
 }

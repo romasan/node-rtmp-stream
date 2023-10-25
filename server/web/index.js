@@ -276,7 +276,7 @@ const stats = (req, res) => {
 };
 
 const _default = async (req, res, callbacks) => {
-	if (req.url.startsWith('/qq')) {
+	if (req.url.startsWith('/qq/')) {
 		admin(req, res, { getInfo, ...callbacks });
 
 		return;

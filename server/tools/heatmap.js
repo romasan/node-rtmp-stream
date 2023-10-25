@@ -169,7 +169,7 @@ const heatmapFromStats =  async (stats, output) => {
 	}
 };
 
-const heatmapNewestFromStats =  async (stats, output) => {
+const heatmapNewestFromStats = async (stats, output) => {
 	if (typeof stats === 'string') {
 		stats = await readJSON(stats)
 	}
@@ -227,8 +227,51 @@ const heatmapNewestFromStats =  async (stats, output) => {
 	}
 };
 
+const mapLastPixelsFromStats = (stats, count) => {
+	let width = 0;
+	let height = 0;
+	let max = 0;
+
+	let times = [];
+
+	Object.keys(stats).forEach((key) => {
+		if (key.indexOf(':') > 0) {
+			const [x, y] = key.split(':');
+			const [time] = stats[key];
+
+			width = Math.max(Number(x), width);
+			height = Math.max(Number(y), height);
+			max = Math.max(max, time);
+			times.push({ x, y, time });
+		}
+	});
+
+	times.sort((a, b) => a.time < b.time ? 1 : -1);
+
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#f658b8';
+	ctx.fillRect(0, 0, width, height);
+
+	for (let i = 0; i < count; i++) {
+		const { x, y, time } = times[i];
+		const key = `${x}:${y}`;
+
+		if (stats[key]) {
+			const color = stats.colors[stats[key][2]];
+
+			ctx.fillStyle = color;
+			ctx.fillRect(x, y, 1, 1);
+		}
+	}
+
+	return canvas;
+}
+
 module.exports = {
 	heatmapCLI,
 	heatmapFromStats,
 	heatmapNewestFromStats,
+	mapLastPixelsFromStats,
 };
