@@ -15,6 +15,9 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
+	ctx.fillStyle = '#fff';
+	ctx.fillRect(0, 0, width, height);
+
 	const imgBuf = fs.readFileSync(backgroundImage);
 	const image = new Image;
 	image.src = imgBuf;
