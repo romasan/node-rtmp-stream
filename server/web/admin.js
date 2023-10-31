@@ -5,6 +5,7 @@ const {
 	drawPix,
 	getLastActivity,
 	getStats,
+	getTotalPixels,
 } = require('../canvas');
 const {
 	getPostPayload,
@@ -57,6 +58,8 @@ const admin = async (req, res, {
 				const uniq = getOnlineCount();
 				const lastActivity = getLastActivity();
 				const user = getUserData(lastActivity?.uuid);
+				const total = getTotalPixels();
+
 				const stats = {
 					online: {
 						uniq,
@@ -71,6 +74,7 @@ const admin = async (req, res, {
 						y: lastActivity.y,
 					},
 					color: lastActivity.color,
+					total,
 				};
 
 				res.writeHead(200, { 'Content-Type': 'text/json' });

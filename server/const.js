@@ -17,6 +17,35 @@ const COLORS = {
 	brown: '#976c49',
 };
 
+/*
+const COLORS = {
+	deepcarmine: '#ae233d',
+	flame: '#ec5427',
+	yelloworange: '#f4ab3c',
+	naplesyellow: '#f9d759',
+	mediumseagreen: '#48a06d',
+	emerald: '#5cc87f',
+	inchworm: '#9ae96c',
+	myrtlegreen: '#317270',
+	verdigris: '#469ca8',
+	cyancobaltblue: '#2d519e',
+	unitednationsblue: '#4d90e3',
+	mediumskyblue: '#7ee6f2',
+	oceanblue: '#4440ba',
+	VeryLightBlue: '#6662f6',
+	grape: '#772b99',
+	purpleplum: '#a754ba',
+	darkpink: '#eb4e81',
+	mauvelous: '#f19eab',
+	coffee: '#684a34',
+	coconut: '#956a34',
+	black: '#000000',
+	philippinegray: '#898d90',
+	lightsilver: '#d5d7d9',
+	white: '#ffffff',
+};
+*/
+
 const countdownRanges = {
 	authorized: {
 		0: 0.3,
@@ -47,9 +76,12 @@ const tempBans = {
 		"0309fb36-a56a-4a42-8003-d8eafb8fbcf9": true,
 	},
 	nick: {
-
+		"foo_bar": true,
 	},
-}
+	ip: {
+		"1.2.3.4": true,
+	},
+};
 
 module.exports = {
 	COLORS,

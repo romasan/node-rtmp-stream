@@ -12,6 +12,8 @@ import {
 	hexToRgb,
 	rgbToHex,
 	invertRgb,
+	getPixelColor,
+	formatDate,
 } from '../../helpers';
 import { getPixel } from '../../lib/api';
 
@@ -32,6 +34,7 @@ interface Props {
 	className?: string;
 	expiration?: number;
 	isAuthorized?: boolean;
+	finished?: boolean;
 	onClick(x: number, y: number): void;
 	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
 	onInit?: (value: any) => void;
@@ -53,6 +56,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	className,
 	expiration = 0,
 	isAuthorized = false,
+	finished,
 	children,
 	onClick,
 	onSelect,
@@ -77,22 +81,33 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
-		const sec = Math.floor(pixelData.time / 1000);
-		const min = Math.floor(sec / 60);
-		const hour = Math.floor(min / 60);
-		const day = Math.floor(hour / 24);
-		const time = `${day ? `${day} д. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+
+		let time = '';
+		if (finished) {
+			time = formatDate(Number(pixelData.time));
+		} else {
+			const sec = Math.floor(pixelData.time / 1000);
+			const min = Math.floor(sec / 60);
+			const hour = Math.floor(min / 60);
+			const day = Math.floor(hour / 24);
+			
+			time = `${day ? `${day} д. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+		}
 
 		if (pixelData.x === x && pixelData.y === y) {
 			if (pixelData.time >= 0) {
-				return `${pixelData.name}, ${time} назад`;
+				return finished
+				 ? `${pixelData.name}, ${time} `
+				 : `${pixelData.name}, ${time} назад`;
 			}
 
-			return 'Empty pixel, be first';
+			return finished
+				? 'Про этот пиксель все забыли'
+				: 'Пустой пиксель, закрась его';
 		}
 
 		return null;
-	}, [coord, pixelData]);
+	}, [coord, pixelData, finished]);
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
 		if (canvasRef.current) {
@@ -356,14 +371,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const { left = 0, top = 0 } = canvasRef.current?.getBoundingClientRect() || {};
 		const [x, y] = coord;
 
+		const _color = finished ? getPixelColor(canvasRef.current, x, y) : color;
+
 		return {
 			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
 			left: `${left + x * scale}px`,
 			top: `${top + y * scale}px`,
 			width: `${scale}px`,
 			height: `${scale}px`,
-			'--bg-color': color,
-			'--border-color': color && rgbToHex(invertRgb(hexToRgb(color))),
+			'--bg-color': _color,
+			'--border-color': _color && rgbToHex(invertRgb(hexToRgb(_color))),
 		};
 	};
 
@@ -412,6 +429,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const sourceProtocol = hash === '#secured' ? 'https:' : protocol;
 
 			image.src = `${sourceProtocol}//${WSHost}/canvas.png`;
+			image.setAttribute('crossOrigin', '');
 			image.onload = () => imageLoadHandler(image);
 			image.onerror = (err) => {
 				setError(err.toString());
@@ -519,19 +537,21 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							)}
 							{coord[0] >= 0 && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
-						<div
-							className={cn(s.pixel, { [s.animated]: animatedPixel, [s.withTitle]: pixelTitle })}
-							style={scale ? getPixelStyle() : {}}
-							data-title={pixelTitle}
-						>
-							<div className={s.pixelInside}></div>
-						</div>
+						{scale >= showPixelScale && (
+							<div
+								className={cn(s.pixel, { [s.animated]: animatedPixel, [s.withTitle]: pixelTitle })}
+								style={scale ? getPixelStyle() : {}}
+								data-title={pixelTitle}
+							>
+								<div className={s.pixelInside}></div>
+							</div>
+						)}
 					</>
 				)}
 			</div>
 			{!isMobile && (
 				<Bar
-					onDraw={handleClickDraw}
+					onDraw={finished ? undefined : handleClickDraw}
 					onPlus={handleClickPlus}
 					onMinus={handleClickMinus}
 					onPlace={handleClickPlace}

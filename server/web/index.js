@@ -200,13 +200,19 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 		const { uuid, time } = getPixelAuthor(x, y);
 		const user = getUserData(uuid);
 
+		const finished = FINISH_TIME_STAMP && new Date(FINISH_TIME_STAMP).getTime() < Date.now();
+
+		const _time = finished
+			? time
+			: (Date.now() - time)
+
 		if (isNumber(x) && isNumber(y)) {
 			res.writeHead(200, { 'Content-Type': 'text/json' });
 			res.end(JSON.stringify({
 				x: Number(x),
 				y: Number(y),
 				name: user?.name || getSessionUserName(uuid),
-				time: time ? (Date.now() - time) : -1,
+				time: time ? _time : -1,
 			}));
 		} else {
 			getInfo(req, res);

@@ -13,10 +13,16 @@ import {
 // import * as s from './Stats.module.scss';
 
 interface Props {
+	coord: {
+		x: number;
+		y: number;
+	}
 }
 
-export const PixelStats: FC<Props> = ({}) => {
+export const PixelStats: FC<Props> = ({ coord }) => {
 	const [stats, setStats] = useState<any>({});
+
+	const { x, y } = coord || {};
 
 	// const onChangeFreeze = (event: any) => {
 	// 	setCanvasConf((value: any) => ({ ...value, freezed: event.target.value === 'true' }));
@@ -35,7 +41,7 @@ export const PixelStats: FC<Props> = ({}) => {
 		<Block title="Чей пиксель">
 			TODO
 			<div>
-				X:Y #fff 00:05 назад
+				{x}:{y} #fff 00:05 назад
 			</div>
 			<div>
 				Первый вход: 5дн. 00:05 назад

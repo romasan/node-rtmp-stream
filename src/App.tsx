@@ -45,6 +45,7 @@ export const App: React.FC = () => {
 	const [isOnline, setIsOnline] = useState(false);
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const [finish, setFinish] = useState(0);
+	const [finished, setFinished] = useState(false);
 	const blinkedTimer = useRef(-1);
 
 	const toggleChat = () => {
@@ -66,6 +67,22 @@ export const App: React.FC = () => {
 			setColor(firstColor as string);
 		}
 	}, [color, wsStore]);
+
+	useEffect(() => {
+		if (finish) {
+			const timer = setInterval(() => {
+				if (finish <= Date.now()) {
+					setFinished(true);
+					clearInterval(timer);
+				}
+			}, 1000);
+	
+			return () => {
+				clearInterval(timer);
+			};
+		}
+
+	}, [finish]);
 
 	const handleCanvasClick = (x: number, y: number) => {
 		addPix({ x, y, color });
@@ -149,8 +166,9 @@ export const App: React.FC = () => {
 				onClick={handleCanvasClick}
 				expiration={expiration}
 				isAuthorized={isAuthorized}
+				finished={finished}
 			/>
-			{wsStore?.palette && (
+			{wsStore?.palette && !finished && (
 				<Palette color={color} colors={wsStore?.palette} setColor={setColor} expiration={expiration} />
 			)}
 			{showed && (
@@ -168,7 +186,7 @@ export const App: React.FC = () => {
 				</Modal>
 			)}
 			{Boolean(finish) && (
-				<Countdown finish={finish} />
+				<Countdown finish={finish} text={wsStore.finishText}/>
 			)}
 			<div className={s.footer} {...disableMouse}>
 				<a href="https://vkplay.live/place_tv" target="_blank">

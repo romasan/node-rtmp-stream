@@ -12,7 +12,13 @@ const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
 const { getStatus } = require('./tools/getPixelsInfo');
 
-const { WS_SERVER_PORT, WS_SECURE, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
+const {
+	WS_SERVER_PORT,
+	WS_SECURE,
+	WS_SERVER_ORIGIN,
+	FINISH_TIME_STAMP,
+	FINISH_TEXT,
+} = process.env;
 
 let webServer = null;
 let wss = null;
@@ -162,6 +168,7 @@ wss.on('connection', (ws, req) => {
 		...user,
 		countdown,
 		finish: FINISH_TIME_STAMP ? new Date(FINISH_TIME_STAMP).getTime() - Date.now() : 'newer',
+		finishText: FINISH_TEXT || 'TIMEOUT',
 	});
 
 	ws.on('message', (buf) => {

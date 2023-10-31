@@ -11,10 +11,10 @@ import clock from 'url:../../../res/clock.svg';
 import * as s from './Bar.module.scss';
 
 interface Props {
-	onDraw(): void;
-	onPlus(): void;
-	onMinus(): void;
-	onPlace(): void;
+	onDraw?(): void;
+	onPlus?(): void;
+	onMinus?(): void;
+	onPlace?(): void;
 }
 
 export const Bar: FC<Props> = ({
@@ -28,18 +28,26 @@ export const Bar: FC<Props> = ({
 	return (
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}></div>
-			<button className={s.button} onClick={onDraw}>
-				<img src={pen} />
-			</button>
-			<button className={s.button} onClick={onPlus}>
-				<img src={plus} />
-			</button>
-			<button className={s.button} onClick={onMinus}>
-				<img src={minus} />
-			</button>
-			<button className={s.button} onClick={onPlace}>
-				<img src={expand} />
-			</button>
+			{onDraw && (
+				<button className={s.button} onClick={onDraw}>
+					<img src={pen} />
+				</button>
+			)}
+			{onPlus && (
+					<button className={s.button} onClick={onPlus}>
+					<img src={plus} />
+				</button>
+			)}
+			{onMinus && (
+				<button className={s.button} onClick={onMinus}>
+					<img src={minus} />
+				</button>
+			)}
+			{onPlace && (
+					<button className={s.button} onClick={onPlace}>
+					<img src={expand} />
+				</button>
+			)}
 			{/* TODO */}
 			{/* <button className={s.button}>
 				<img src={clock} />

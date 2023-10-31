@@ -65,7 +65,7 @@ export const Tools: FC<Props> = ({
 						<>
 							<Stats />
 							<Stream />
-							<PixelStats />
+							<PixelStats coord={coord} />
 							<Maps canvas={canvas} />
 							<FillSquare
 								canvas={canvas}

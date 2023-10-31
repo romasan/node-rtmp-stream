@@ -82,3 +82,17 @@ ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:
 ```bash
 ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
 ```
+
+
+# S1E2 TODO
+
+- [ ] move and re create:
+- pixels.log
+- expands.log
+- messages.log?
+- inout.log (112x112)
+
+- [ ] add new colors
+
+- [ ] update .env file
+- clear FINISH_TIME_STAMP

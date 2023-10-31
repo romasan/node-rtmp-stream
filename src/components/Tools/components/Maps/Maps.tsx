@@ -82,6 +82,22 @@ export const Maps: FC<Props> = ({
 					<option value="100000">100 000</option>
 				</select>
 			</div>
+			<div>
+				<button>за последний</button>
+				<select>
+					<option value="60000">1 минута</option>
+					<option value="60000">5 минут</option>
+					<option value="60000">10 минут</option>
+					<option value="60000">15 минут</option>
+					<option value="60000">30 минут</option>
+					<option value="60000">час</option>
+					<option value="60000">2 часа</option>
+					<option value="60000">3 часа</option>
+					<option value="60000">5 часов</option>
+					<option value="60000">10 часов</option>
+					<option value="60000">сутки</option>
+				</select>
+			</div>
 		</Block>
 	);
 }

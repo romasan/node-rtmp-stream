@@ -6,9 +6,10 @@ import * as s from './Countdown.module.scss';
 
 interface Props {
 	finish: number;
+	text: string;
 }
 
-export const Countdown: FC<Props> = ({ finish }) => {
+export const Countdown: FC<Props> = ({ finish, text }) => {
 	const [countdown, setCountdown] = useState(0);
 	useEffect(() => {
 		setCountdown(finish - Date.now());
@@ -38,7 +39,7 @@ export const Countdown: FC<Props> = ({ finish }) => {
 	if (countdown < 0) {
 		return (
 			<div className={cn(s.root, s.timeout)}>
-				TIMEOUT
+				{text || 'TIMEOUT'}
 			</div>
 		);
 	}

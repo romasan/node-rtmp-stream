@@ -10,6 +10,8 @@ import {
 	patch,
 } from '../../helpers';
 
+import { formatNumber } from '../../../../helpers';
+
 // import * as s from './Stats.module.scss';
 
 interface Props {
@@ -42,6 +44,9 @@ export const Stats: FC<Props> = ({}) => {
 			</div>
 			<div>
 				{stats.lastUserName} ({stats?.lastUserUUID}) {stats?.coord?.x}:{stats?.coord?.y} {stats?.color};
+			</div>
+			<div>
+				Total: {formatNumber(stats.total)}
 			</div>
 			{/* <div>
 				Uptime: 999 д. 01:02:03
