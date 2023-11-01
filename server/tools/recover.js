@@ -18,11 +18,13 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(0, 0, width, height);
 
-	const imgBuf = fs.readFileSync(backgroundImage);
-	const image = new Image;
-	image.src = imgBuf;
-
-	ctx.drawImage(image, 0, 0);
+	if (backgroundImage !== 'NOIMAGE') {
+		const imgBuf = fs.readFileSync(backgroundImage);
+		const image = new Image;
+		image.src = imgBuf;
+	
+		ctx.drawImage(image, 0, 0);
+	}
 
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),

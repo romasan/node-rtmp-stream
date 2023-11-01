@@ -1,4 +1,4 @@
-const COLORS = {
+const COLORS_1 = {
 	yellow: '#e2d747',
 	lightgreen: '#a5dd5f',
 	green: '#56ba37',
@@ -17,7 +17,6 @@ const COLORS = {
 	brown: '#976c49',
 };
 
-/*
 const COLORS = {
 	deepcarmine: '#ae233d',
 	flame: '#ec5427',
@@ -44,25 +43,19 @@ const COLORS = {
 	lightsilver: '#d5d7d9',
 	white: '#ffffff',
 };
-*/
 
 const countdownRanges = {
 	authorized: {
-		0: 0.3,
-		10: 1,
-		30: 2,
-		50: 5,
-		100: 10,
-		200: 30,
-		500: 60,
+		0: 15,
+		50: 30,
+		100: 60,
 		1000: 60 * 3,
 	},
 	guest: {
-		0: 3,
-		5: 5,
-		10: 10,
-		100: 60,
-		500: 60 * 3,
+		0: 60,
+		30: 60 * 3,
+		100: 60 * 5,
+		500: 60 * 10,
 	},
 };
 

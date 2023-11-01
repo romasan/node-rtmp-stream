@@ -87,12 +87,15 @@ ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a a
 # S1E2 TODO
 
 - [ ] move and re create:
-- pixels.log
-- expands.log
-- messages.log?
-- inout.log (112x112)
+- (auto) pixels.log
+- (auto) expands.log
+- (auto) inout.log (112x112)
 
 - [ ] add new colors
 
 - [ ] update .env file
 - clear FINISH_TIME_STAMP
+- UPSCALE=true
+
+- [ ] update constants
+- coundown

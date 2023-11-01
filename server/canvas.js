@@ -73,7 +73,7 @@ const getPixelColor = (x, y) => {
 };
 
 const getTotalPixels = () => {
-	return stats?.totalCount;
+	return stats?.totalCount || 0;
 };
 
 const getTopLeaderboard = (count = 10) => {

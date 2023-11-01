@@ -30,20 +30,20 @@ const textLineHeight = 70;
 const videoWidth = 1920;
 const videoHeight = 1080;
 
-const scale = 4;
+const scale = 2;
 
 const drawDayBG = (ctx, day) => {
 	const bg = drawDefaultCanvas('DATA', videoWidth, videoHeight);
 	ctx.drawImage(bg, 0, 0);
 
-	const text = `Day #${day}`;
-	ctx.fillStyle = '#000';
-	ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
-	ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
-	ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
-	ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
-	ctx.fillStyle = '#fff';
-	ctx.fillText(text, textX, textY + textLineHeight);
+	// const text = `Day #${day}`;
+	// ctx.fillStyle = '#000';
+	// ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
+	// ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
+	// ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
+	// ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
+	// ctx.fillStyle = '#fff';
+	// ctx.fillText(text, textX, textY + textLineHeight);
 };
 
 const backupFixelsFrame = (canvas) => {
@@ -62,24 +62,29 @@ const backupFixelsFrame = (canvas) => {
 	return backupCanvas;
 }
 
-const drawSteps = (file, backgroundImage) => {
+const drawSteps = (file, backgroundImage, width = WIDTH, height = HEIGHT, skip = 0) => {
 
 	const canvas = createCanvas(videoWidth, videoHeight);
 	const ctx = canvas.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
 
-	ctx.font = `bold ${textLineHeight}px "Custom Font"`;
+	// ctx.font = `bold ${textLineHeight}px "Custom Font"`;
 
 	drawDayBG(ctx, 1);
 
-	const firstFrameBuf = fs.readFileSync(backgroundImage);
-	const firstFrame = new Image;
-	firstFrame.src = firstFrameBuf;
+	const pixelsFrameX = videoWidth / 2 - width * scale / 2;
+	const pixelsFrameY = videoHeight / 2 - height * scale / 2;
 
-	const pixelsFrameX = videoWidth / 2 - WIDTH * scale / 2;
-	const pixelsFrameY = videoHeight / 2 - HEIGHT * scale / 2;
+	if (backgroundImage !== 'NOIMAGE') {
+		const firstFrameBuf = fs.readFileSync(backgroundImage);
+		const firstFrame = new Image;
+		firstFrame.src = firstFrameBuf;
 
-	ctx.drawImage(firstFrame, pixelsFrameX, pixelsFrameY, WIDTH * scale, HEIGHT * scale);
+		ctx.drawImage(firstFrame, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
+	}
+
+	ctx.fillStyle = '#fff';
+	ctx.fillRect(pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
 	let i = -1;
 	let frame = 0;
@@ -90,7 +95,7 @@ const drawSteps = (file, backgroundImage) => {
 	});
 
 	let firstPixelTime = 0;
-	let dayNumber = 0;
+	// let dayNumber = 0;
 	
 	rl.on('line', (line) => {
 		i++;
@@ -109,23 +114,23 @@ const drawSteps = (file, backgroundImage) => {
 			firstPixelTime = time;
 		}
 
-		const _dayNumber = Math.floor((time - firstPixelTime) / day);
+		// const _dayNumber = Math.floor((time - firstPixelTime) / day);
 
-		if (_dayNumber !== dayNumber) {
-			dayNumber = _dayNumber;
+		// if (_dayNumber !== dayNumber) {
+		// 	dayNumber = _dayNumber;
 
-			console.log(`DAY #${dayNumber + 1}`);
+		// 	console.log(`DAY #${dayNumber + 1}`);
 
-			const backup = backupFixelsFrame(canvas);
+		// 	const backup = backupFixelsFrame(canvas);
 
-			drawDayBG(ctx, dayNumber + 1);
-			ctx.drawImage(backup, pixelsFrameX, pixelsFrameY);
-		}
+		// 	drawDayBG(ctx, dayNumber + 1);
+		// 	ctx.drawImage(backup, pixelsFrameX, pixelsFrameY);
+		// }
 
 		ctx.fillStyle = color;
 		ctx.fillRect(pixelsFrameX + x * scale, pixelsFrameY + y * scale, scale, scale);
 
-		if (i % PPF === 0) {
+		if ((i % PPF === 0 || i === skip) && i >= skip) {
 			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
 
 			fs.writeFileSync(output, canvas.toBuffer());
