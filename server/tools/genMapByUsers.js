@@ -83,11 +83,13 @@ const mapByUsersFromStats =  async (stats, output) => {
 	ctx.fillRect(0, 0, width, height);
 
 	const length = Object.keys(uuids).length;
-	const colors = Array(length).fill().map((e, i) => (
+	const colors = Array(length + 1).fill().map((e, i) => (
 		'#' + (
 				Math.floor(0xffffff / (length + 1)) * i
 		).toString(16).padStart(6, '0')
 	));
+
+	colors.shift();
 
 	uuids = Object.keys(uuids).reduce((list, key, index) => ({ ...list, [key]: index }), {});
 

@@ -46,9 +46,11 @@ export const App: React.FC = () => {
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const [finish, setFinish] = useState(0);
 	const [finished, setFinished] = useState(false);
+	const [hasNewMessage, setHasNewMessage] = useState(false);
 	const blinkedTimer = useRef(-1);
 
 	const toggleChat = () => {
+		setHasNewMessage(false);
 		setChatIsShowed((value) => !value);
 	};
 
@@ -127,11 +129,18 @@ export const App: React.FC = () => {
 		setIsOnline(payload);
 	};
 
+	const handleChatMessage = (message: any) => {
+		if (wsStore?.name && message.text.indexOf(`@${wsStore.name}`) >= 0) {
+			setHasNewMessage(true);
+		}
+	};
+
 	useEffect(() => {
 		ee.on('ws:init', onWsInit);
 		ee.on('ws:countdown', onWsCountdown);
 		ee.on('ws:pix', onWsPix);
 		ee.on('ws:connect', onWsConnect);
+		ee.on('ws:chatMessage', handleChatMessage);
 
 		return () => {
 			ee.off('ws:init', onWsInit);
@@ -158,7 +167,9 @@ export const App: React.FC = () => {
 							<img src={login} className={s.iconButton} />
 						</a>
 				)}
-				<img src={chat} onClick={toggleChat} className={s.iconButton} />
+				<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
+					<img src={chat} onClick={toggleChat} className={s.iconButton} />
+				</span>
 				<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} />
 			</div>
 			<Canvas
@@ -206,7 +217,12 @@ export const App: React.FC = () => {
 				</a>
 			</div>
 			{chatIsShowed && (
-				<Chat isAuthorized={isAuthorized} {...disableMouse} onClose={toggleChat} />
+				<Chat
+					isAuthorized={isAuthorized}
+					nickname={wsStore?.name}
+					onClose={toggleChat}
+					{...disableMouse}
+				/>
 			)}
 			{infoIsShowed && (
 				<Info {...disableMouse} onClose={toggleInfo} />

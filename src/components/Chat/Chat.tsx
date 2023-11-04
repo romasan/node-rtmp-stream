@@ -1,4 +1,6 @@
-import React, { FC, useRef, useState, useEffect } from 'react';
+import React, { FC, useRef, useState, useMemo, useCallback, useEffect } from 'react';
+
+import cn from 'classnames';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
@@ -9,8 +11,19 @@ import * as s from './Chat.module.scss';
 
 interface Props {
 	isAuthorized: boolean;
+	nickname?: string;
 	onClose: Function;
 }
+
+interface MessageProps {
+	message: {
+		name: string;
+		text: string;
+	};
+	isAuthorized: boolean;
+	nickname?: string;
+	handleMention(name: string): void;
+};
 
 interface IMessage {
 	id: string;
@@ -20,14 +33,44 @@ interface IMessage {
 	avatar: string;
 }
 
+const renderText = (raw: string, nickname?: string): string => {
+	return raw
+		.replace(nickname ? new RegExp(`@(${nickname})`, "ig") : '\n', '<b>$1</b>')
+		.replace(/(https\:\/\/www\.youtube\.com\/watch\?v\=[A-Za-z0-9_]+)/ig, '<a href="$1" target="_blank">$1</a>')
+		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
+};
+
+export const Message: FC<MessageProps> = ({
+	message,
+	nickname,
+	isAuthorized,
+	handleMention,
+}) => {
+	const html = useMemo(() => renderText(message.text, nickname), []);
+
+	return (
+		<div>
+			<div
+				className={cn({ [s.clickable]: isAuthorized && message.name !== nickname })}
+				onClick={() => handleMention(message.name)}
+			>
+				{message.name || '[EMPTY NICKNAME]'}:
+			</div>
+			<div className={s.text} dangerouslySetInnerHTML={{ __html: html }} />
+		</div>
+	);
+};
+
 export const Chat: FC<Props> = ({
 	isAuthorized,
+	nickname,
 	onClose,
 	...props,
 }) => {
 	const [list, setList] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 60});
+	const inputRef = useRef<HTMLInputElement>(null)l
 	const contentRef = useRef<HTMLDivElement>(null);
 	
 	const goToBottom = () => {
@@ -72,6 +115,13 @@ export const Chat: FC<Props> = ({
 		}
 	};
 
+	const handleMention = useCallback((name: string) => {
+		if (isAuthorized && name && name !== nickname) {
+			setInput((value) => `${value}${value ? ' ' : ''}@${name} `);
+			inputRef.current?.focus();
+		}
+	}, [isAuthorized, nickname]);
+
 	return (
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}>
@@ -79,10 +129,13 @@ export const Chat: FC<Props> = ({
 			</div>
 			<div className={s.content} ref={contentRef} {...props}>
 				{list.map((message) => (
-					<div key={message.id}>
-						<div>{message.name}:</div>
-						<div className={s.text}>{message.text}</div>
-					</div>
+					<Message
+						key={message.id}
+						message={message}
+						isAuthorized={isAuthorized}
+						nickname={nickname}
+						handleMention={handleMention}
+					/>
 				))}
 				{list.length === 0 && (
 					<div>пока никто не писал</div>
@@ -90,6 +143,7 @@ export const Chat: FC<Props> = ({
 			</div>
 			<div className={s.publisher} {...props}>
 				<input
+					ref={inputRef}
 					className={s.input}
 					value={input}
 					onChange={onChange}

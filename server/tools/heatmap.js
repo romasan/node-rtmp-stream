@@ -254,7 +254,7 @@ const mapLastPixelsFromStats = (stats, count) => {
 	ctx.fillStyle = '#f658b8';
 	ctx.fillRect(0, 0, width, height);
 
-	for (let i = 0; i < count; i++) {
+	for (let i = 0; i < Math.min(count, times.length); i++) {
 		const { x, y, time } = times[i];
 		const key = `${x}:${y}`;
 

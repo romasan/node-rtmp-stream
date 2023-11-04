@@ -61,6 +61,11 @@
 
 .text {
 	margin-bottom: 10px;
+
+	& b {
+		background: #000;
+		color: #fff;
+	}
 }
 
 .publisher {
@@ -120,4 +125,8 @@
 	&:active {
 		padding: 0px 3px;
 	}
+}
+
+.clickable {
+	cursor: pointer;
 }
