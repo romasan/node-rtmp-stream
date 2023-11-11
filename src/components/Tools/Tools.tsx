@@ -78,7 +78,7 @@ export const Tools: FC<Props> = ({
 								onOpen={() => console.log('==== open #1')}
 								onClose={() => console.log('==== close #1')}
 							>TODO</Block>
-							<Block title="Поменять размер полотна"
+							<Block title="Увеличить размер полотна"
 								onOpen={() => console.log('==== open #2')}
 								onClose={() => console.log('==== close #2')}
 							>TODO</Block>
@@ -90,4 +90,4 @@ export const Tools: FC<Props> = ({
 			</div>
 		</ToolsContext.Provider>
 	);
-}
+};

@@ -97,8 +97,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (pixelData.x === x && pixelData.y === y) {
 			if (pixelData.time >= 0) {
 				return finished
-				 ? `${pixelData.name}, ${time} `
-				 : `${pixelData.name}, ${time} назад`;
+					? `${pixelData.name}, ${time} `
+					: `${pixelData.name}, ${time} назад`;
 			}
 
 			return finished
@@ -238,7 +238,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				return {
 					x: getInRange(pos.x + moveX, [leftFrontier, rightFrontier]),
 					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
-				}
+				};
 			});
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
@@ -283,17 +283,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current)
 		) {
-				const { top, left } = canvasRef.current.getBoundingClientRect();
-				const x = Math.floor((clientX - left) / scale);
-				const y = Math.floor((clientY - top) / scale);
+			const { top, left } = canvasRef.current.getBoundingClientRect();
+			const x = Math.floor((clientX - left) / scale);
+			const y = Math.floor((clientY - top) / scale);
 
-				if (mode === EMode.SELECT) {
-					onSelect?.(selected.current.from, { x, y });
-					selected.current = defautSelected;
-				} else {
-					onClick(x, y);
-					setPixelData({});
-				}
+			if (mode === EMode.SELECT) {
+				onSelect?.(selected.current.from, { x, y });
+				selected.current = defautSelected;
+			} else {
+				onClick(x, y);
+				setPixelData({});
+			}
 		}
 
 		if (
@@ -313,7 +313,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		event.preventDefault();
 	};
 
-	const handleRootWheel = ({ deltaY, clientX, clientY, target }: any) => {
+	const handleRootWheel = ({ deltaY, clientX, clientY }: any) => {
 		if (error) {
 			return;
 		}
@@ -410,7 +410,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		return `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
 	};
 
-	const onWsPix = (payload: string) => {
+	const onPix = (payload: string) => {
 		if (payload === 'await' && !isAuthorized) {
 			setAnimatedPixel(true);
 			setTimeout(() => {
@@ -434,7 +434,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			image.onerror = (err) => {
 				setError(err.toString());
 				setScale(1);
-			}
+			};
 		}
 
 		if (isMobile) {
@@ -459,7 +459,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				document.removeEventListener('mouseup', mouseUpCallback);
 				document.removeEventListener('drag', dragCallback);
 			}
-		}
+		};
 	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color, mode]);
 
 	useEffect(() => {
@@ -478,10 +478,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [expiration]);
 
 	useEffect(() => {
-		ee.on('ws:pix', onWsPix);
+		ee.on('pix', onPix);
 
 		return () => {
-			ee.off('ws:pix', onWsPix);
+			ee.off('pix', onPix);
 		};
 	}, [isAuthorized]);
 
@@ -513,19 +513,19 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							top: `${Math.floor(pos.y)}px`,
 						}}
 					>
-							<canvas
-								ref={canvasRef}
-								className={cn(s.canvas, {
-									[s.inactive]: scale < showPixelScale,
-								})}
+						<canvas
+							ref={canvasRef}
+							className={cn(s.canvas, {
+								[s.inactive]: scale < showPixelScale,
+							})}
+						/>
+						{children}
+						{mode === EMode.SELECT && (
+							<div
+								className={s.select}
+								style={getSelectedStyle()}
 							/>
-							{children}
-							{mode === EMode.SELECT && (
-								<div
-									className={s.select}
-									style={getSelectedStyle()}
-								/>
-							)}
+						)}
 					</div>
 					{error && <img className={s.image404} src={image404} />}
 				</div>
@@ -559,4 +559,4 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			)}
 		</>
 	);
-}
+};

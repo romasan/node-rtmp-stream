@@ -1,7 +1,5 @@
 import React, { FC, useState, useMemo } from 'react';
 
-import cn from 'classnames';
-
 import { Block } from '../Block';
 
 import {
@@ -33,7 +31,7 @@ export const Stream: FC<Props> = ({}) => {
 
 	const checked = useMemo(() => {
 		return canvasConf?.freezed || false;
-	}, [canvasConf])
+	}, [canvasConf]);
 
 	return (
 		<Block title="Трансляция" onOpen={onOpen}>
@@ -52,4 +50,4 @@ export const Stream: FC<Props> = ({}) => {
 			)}
 		</Block>
 	);
-}
+};

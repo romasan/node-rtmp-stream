@@ -6,7 +6,7 @@ import pen from 'url:../../../res/pen.svg';
 import plus from 'url:../../../res/plus.svg';
 import minus from 'url:../../../res/minus.svg';
 import expand from 'url:../../../res/expand.svg';
-import clock from 'url:../../../res/clock.svg';
+// import clock from 'url:../../../res/clock.svg';
 
 import * as s from './Bar.module.scss';
 
@@ -44,7 +44,7 @@ export const Bar: FC<Props> = ({
 				</button>
 			)}
 			{onPlace && (
-					<button className={s.button} onClick={onPlace}>
+				<button className={s.button} onClick={onPlace}>
 					<img src={expand} />
 				</button>
 			)}
@@ -54,4 +54,4 @@ export const Bar: FC<Props> = ({
 			</button> */}
 		</div>
 	);
-}
+};

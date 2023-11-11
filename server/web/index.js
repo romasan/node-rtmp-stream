@@ -14,6 +14,7 @@ const {
 	parseCookies,
 	getSearch,
 	isNumber,
+	checkStillTime,
 } = require('./helpers');
 const { getExpiration } = require('./countdown');
 const {
@@ -33,7 +34,7 @@ const { addMessage, getMessages } = require('../chat');
 const admin = require('./admin');
 const { COLORS, tempBans } = require('../const');
 
-const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN, FINISH_TIME_STAMP } = process.env;
+const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -102,11 +103,9 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	}
 }, true);
 
-let pixList = [];
-
 const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
 	if (req.method === 'PUT') {
-		if (FINISH_TIME_STAMP && new Date(FINISH_TIME_STAMP).getTime() < Date.now()) {
+		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('timeout');
 	
@@ -134,18 +133,6 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			res.end('fail');
 
 			console.log('Error: failed on add pixel (banned user)', token);
-
-			return;
-		}
-
-		if (
-			pixList.length >= MAX_PIX_PER_SEC &&
-			(Date.now() - pixList[0]) < 1000 // TODO check per one user (authorized first)
-		) {
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-
-			console.log('Error: failed on add pixel (too many pixels per second)');
 
 			return;
 		}
@@ -180,9 +167,6 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			return;
 		}
 
-		pixList.push(Date.now());
-		pixList = pixList.slice(-MAX_PIX_PER_SEC);
-
 		drawPix({
 			color: payload.color,
 			x: Math.floor(payload.x),
@@ -199,8 +183,9 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 		const { x, y } = getSearch(req.url);
 		const { uuid, time } = getPixelAuthor(x, y);
 		const user = getUserData(uuid);
+		const color = getPixelColor(x, y);
 
-		const finished = FINISH_TIME_STAMP && new Date(FINISH_TIME_STAMP).getTime() < Date.now();
+		const finished = !checkStillTime();
 
 		const _time = finished
 			? time
@@ -211,8 +196,11 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			res.end(JSON.stringify({
 				x: Number(x),
 				y: Number(y),
-				name: user?.name || getSessionUserName(uuid),
 				time: time ? _time : -1,
+				...(color && {
+					color,
+					name: user?.name || getSessionUserName(uuid),
+				}),
 			}));
 		} else {
 			getInfo(req, res);

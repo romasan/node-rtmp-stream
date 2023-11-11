@@ -6,6 +6,11 @@ import { APIhost } from '../../helpers';
 
 // import * as s from './Maps.module.scss';
 
+const sec = 1000;
+const min = sec * 60;
+const hour = min * 60;
+const day = hour * 24;
+
 interface Props {
 	canvas: any;
 }
@@ -18,9 +23,6 @@ export const Maps: FC<Props> = ({
 
 	const getMap = (name: string) => {
 		const ctx = canvas.getContext('2d');
-
-		ctx.fillStyle = '#000000';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 		const image = new Image();
 		image.src = `${APIhost}/qq/${name}`;
@@ -85,19 +87,19 @@ export const Maps: FC<Props> = ({
 			<div>
 				<button>за последний</button>
 				<select>
-					<option value="60000">1 минута</option>
-					<option value="60000">5 минут</option>
-					<option value="60000">10 минут</option>
-					<option value="60000">15 минут</option>
-					<option value="60000">30 минут</option>
-					<option value="60000">час</option>
-					<option value="60000">2 часа</option>
-					<option value="60000">3 часа</option>
-					<option value="60000">5 часов</option>
-					<option value="60000">10 часов</option>
-					<option value="60000">сутки</option>
+					<option value={min}>1 минута</option>
+					<option value={5 * min}>5 минут</option>
+					<option value={10 * min}>10 минут</option>
+					<option value={15 * min}>15 минут</option>
+					<option value={30 * min}>30 минут</option>
+					<option value={hour}>час</option>
+					<option value={2 * hour}>2 часа</option>
+					<option value={3 * hour}>3 часа</option>
+					<option value={5 * hour}>5 часов</option>
+					<option value={10 * hour}>10 часов</option>
+					<option value={day}>сутки</option>
 				</select>
 			</div>
 		</Block>
 	);
-}
+};

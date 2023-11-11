@@ -16,11 +16,11 @@ const libs = {
 		'topUUIDs',
 		'expand',
 		'debugStream',
-		'fixGuests',
 
 		'getPixelsInfo',
 		'genMapByUsers',
 		'heatmap',
+		'fixSessionByNickName',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

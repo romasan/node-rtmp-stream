@@ -45,11 +45,11 @@ export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.
 		event.stopPropagation();
 
 		cur.current = [-1, -1];
-	}
+	};
 
 	const dragCallback = (event: DragEvent) => {
 		event.preventDefault();
-	}
+	};
 
 	useEffect(() => {
 		if (ready && anchorRef.current && draggableRef.current) {

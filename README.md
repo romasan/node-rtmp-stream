@@ -89,7 +89,7 @@ ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a a
 - [x] move and re create: (bash ./newep.sh)
 - (auto) pixels.log
 - (auto) expands.log
-- (auto) inout.log (112x112)
+- (auto) inout.log (112x112) // 120x120
 
 - [x] update .env file
 - clear FINISH_TIME_STAMP

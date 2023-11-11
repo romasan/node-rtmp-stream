@@ -16,7 +16,7 @@ export const formatDate = (date) => {
 	const currentYear = new Date().getFullYear();
 	const _date = new Date(date);
 
-	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
+	const [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());
 
 	month = MONTHS[month + 1];

@@ -70,4 +70,4 @@ export const Palette: FC<Props> = ({ color, colors, expiration = 0, setColor }) 
 			</div>
 		</div>
 	);
-}
+};

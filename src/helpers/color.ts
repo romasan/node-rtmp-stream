@@ -22,5 +22,5 @@ export const getPixelColor = (canvas: any, x: number, y: number) => {
 
 	const ctx = canvas.getContext('2d');
 
-	return rgbToHex(ctx.getImageData(x, y, 1, 1).data)
+	return rgbToHex(ctx.getImageData(x, y, 1, 1).data);
 };

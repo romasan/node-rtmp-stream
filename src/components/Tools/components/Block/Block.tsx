@@ -1,7 +1,5 @@
 import React, { FC, PropsWithChildren, useRef, useMemo, useContext, useEffect } from 'react';
 
-// import cn from 'classnames';
-
 import { v4 as uuid } from 'uuid';
 
 import { ToolsContext } from '../../context';
@@ -54,4 +52,4 @@ export const Block: FC<PropsWithChildren<Props>> = ({ id, title, onOpen, onClose
 			)}
 		</div>
 	);
-}
+};

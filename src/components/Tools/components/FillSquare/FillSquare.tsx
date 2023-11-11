@@ -1,18 +1,10 @@
-import React, { FC, useState, useMemo, useEffect } from 'react';
-
-import cn from 'classnames';
+import React, { FC, useState, useEffect } from 'react';
 
 import { Block } from '../Block';
 
-import {
-	get,
-	put,
-	patch,
-} from '../../helpers';
+import { put } from '../../helpers';
 
 import { EMode } from '../../../Canvas';
-
-// import * as s from './FillSquare.module.scss';
 
 interface Props {
 	canvas: any;
@@ -79,4 +71,4 @@ export const FillSquare: FC<Props> = ({
 			</div>
 		</Block>
 	);
-}
+};

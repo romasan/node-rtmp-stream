@@ -1,18 +1,10 @@
 import React, { FC, useState, useMemo } from 'react';
 
-import cn from 'classnames';
-
 import { Block } from '../Block';
 
-import {
-	get,
-	put,
-	patch,
-} from '../../helpers';
+import { get } from '../../helpers';
 
 import { formatNumber } from '../../../../helpers';
-
-// import * as s from './Stats.module.scss';
 
 interface Props {
 }
@@ -53,4 +45,4 @@ export const Stats: FC<Props> = ({}) => {
 			</div> */}
 		</Block>
 	);
-}
+};

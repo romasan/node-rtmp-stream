@@ -88,4 +88,4 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 			</div>
 		</Block>
 	);
-}
+};

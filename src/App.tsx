@@ -11,7 +11,7 @@ import {
 	Chat,
 	Info,
 	Countdown,
-} from './components/'
+} from './components/';
 
 import { addPix } from './lib/api';
 import ee from './lib/ee';
@@ -88,7 +88,7 @@ export const App: React.FC = () => {
 
 	const handleCanvasClick = (x: number, y: number) => {
 		addPix({ x, y, color });
-	}
+	};
 
 	const handleOpenChatClick = () => {
 		window.open('https://vkplay.live/pixel_battle/only-chat', '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
@@ -115,7 +115,7 @@ export const App: React.FC = () => {
 		setExpiration(Date.now() + countdown);
 	};
 
-	const onWsPix = (payload: string) => {
+	const onPix = (payload: string) => {
 		if (payload === 'await' && !isAuthorized) {
 			setBlinkedLoginAnimation(true);
 			clearTimeout(blinkedTimer.current);
@@ -138,14 +138,14 @@ export const App: React.FC = () => {
 	useEffect(() => {
 		ee.on('ws:init', onWsInit);
 		ee.on('ws:countdown', onWsCountdown);
-		ee.on('ws:pix', onWsPix);
+		ee.on('pix', onPix);
 		ee.on('ws:connect', onWsConnect);
 		ee.on('ws:chatMessage', handleChatMessage);
 
 		return () => {
 			ee.off('ws:init', onWsInit);
 			ee.off('ws:countdown', onWsCountdown);
-			ee.off('ws:pix', onWsPix);
+			ee.off('pix', onPix);
 			ee.off('ws:connect', onWsConnect);
 		};
 	}, [isAuthorized]);
@@ -162,10 +162,10 @@ export const App: React.FC = () => {
 							<img src={logout} className={s.iconButton} />
 						</a>
 					</>
-					) : (
-						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
-							<img src={login} className={s.iconButton} />
-						</a>
+				) : (
+					<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
+						<img src={login} className={s.iconButton} />
+					</a>
 				)}
 				<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
 					<img src={chat} onClick={toggleChat} className={s.iconButton} />
@@ -200,19 +200,19 @@ export const App: React.FC = () => {
 				<Countdown finish={finish} text={wsStore.finishText}/>
 			)}
 			<div className={s.footer} {...disableMouse}>
-				<a href="https://vkplay.live/place_tv" target="_blank">
+				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer">
 					<img src={vkplay} />
 				</a>
-				<a href="https://www.twitch.tv/place_ru" target="_blank">
+				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer">
 					<img src={twitch} />
 				</a>
-				<a href="https://www.youtube.com/@Place-ru" target="_blank">
+				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer">
 					<img src={youtube} />
 				</a>
-				<a href="https://discord.gg/FfVjurYrus" target="_blank">
+				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer">
 					<img src={discord} />
 				</a>
-				<a href="https://t.me/pixel_battle_online" target="_blank">
+				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer">
 					<img src={telegram} />
 				</a>
 			</div>
@@ -228,5 +228,5 @@ export const App: React.FC = () => {
 				<Info {...disableMouse} onClose={toggleInfo} />
 			)}
 		</div>
-	)
-}
+	);
+};

@@ -22,4 +22,4 @@ export const Modal: FC<PropsWithChildren<Props>> = ({
 			</div>
 		</div>
 	);
-}
+};

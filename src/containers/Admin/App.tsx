@@ -28,7 +28,9 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		if (!color && wsStore?.palette) {
-			const firstColor = 'black' in wsStore?.palette ? 'black' : (Object.keys(wsStore?.palette) || []).pop();
+			const firstColor = 'black' in wsStore?.palette
+				? 'black'
+				: (Object.keys(wsStore?.palette) || []).pop();
 			setColor(firstColor as string);
 		}
 	}, [color, wsStore]);
@@ -78,5 +80,5 @@ export const App: React.FC = () => {
 				{...disableMouse}
 			/>
 		</div>
-	)
-}
+	);
+};

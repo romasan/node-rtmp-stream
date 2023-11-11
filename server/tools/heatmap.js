@@ -137,6 +137,9 @@ const heatmapFromStats =  async (stats, output) => {
 		}
 	});
 
+	width++;
+	height++;
+
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
@@ -194,6 +197,9 @@ const heatmapNewestFromStats = async (stats, output) => {
 		}
 	});
 
+	width++;
+	height++;
+
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
@@ -246,6 +252,9 @@ const mapLastPixelsFromStats = (stats, count) => {
 		}
 	});
 
+	width++;
+	height++;
+
 	times.sort((a, b) => a.time < b.time ? 1 : -1);
 
 	const canvas = createCanvas(width, height);
@@ -267,7 +276,7 @@ const mapLastPixelsFromStats = (stats, count) => {
 	}
 
 	return canvas;
-}
+};
 
 module.exports = {
 	heatmapCLI,

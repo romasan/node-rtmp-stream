@@ -16,7 +16,7 @@ export const addPix = async ({ x, y, color }) => {
 
 		const text = await resp.text();
 
-		ee.emit('ws:pix', text);
+		ee.emit('pix', text);
 	} catch (e) {}
 };
 

@@ -1,5 +1,8 @@
 const fs = require('fs');
 const readline = require('readline');
+require('dotenv').config();
+
+const { FINISH_TIME_STAMP } = process.env;
 
 const validateToken = (token) => {
 	return typeof token === 'string' && token.match(/^[0-9a-f]{1}[0-9a-f\-]{35}$/);
@@ -65,6 +68,8 @@ const getSearch = (url) => url.split('?')[1]?.split('&')
 
 const isNumber = (number) => number && Number(number).toString() === number.toString();
 
+const checkStillTime = () => !FINISH_TIME_STAMP || new Date(FINISH_TIME_STAMP).getTime() > Date.now();
+
 module.exports = {
 	validateToken,
 	getPathByToken,
@@ -74,4 +79,5 @@ module.exports = {
 	getFileLinesCount,
 	getSearch,
 	isNumber,
+	checkStillTime,
 };

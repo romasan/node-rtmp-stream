@@ -76,16 +76,16 @@ const mapByUsersFromStats =  async (stats, output) => {
 		}
 	});
 
-	const canvas = createCanvas(width, height);
+	const canvas = createCanvas(width + 1, height + 1);
 	const ctx = canvas.getContext('2d');
 
 	ctx.fillStyle = '#000000';
-	ctx.fillRect(0, 0, width, height);
+	ctx.fillRect(0, 0, width + 1, height + 1);
 
 	const length = Object.keys(uuids).length;
 	const colors = Array(length + 1).fill().map((e, i) => (
 		'#' + (
-				Math.floor(0xffffff / (length + 1)) * i
+				Math.floor(0xffffff / length) * i
 		).toString(16).padStart(6, '0')
 	));
 
@@ -93,8 +93,8 @@ const mapByUsersFromStats =  async (stats, output) => {
 
 	uuids = Object.keys(uuids).reduce((list, key, index) => ({ ...list, [key]: index }), {});
 
-	for (let x = 0; x < width; x++) {
-		for (let y = 0; y < height; y++) {
+	for (let x = 0; x <= width; x++) {
+		for (let y = 0; y <= height; y++) {
 			const key = `${x}:${y}`;
 			const [, uuid] = stats[key] || [];
 			if (uuid) {

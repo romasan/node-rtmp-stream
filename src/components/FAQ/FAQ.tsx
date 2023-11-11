@@ -8,4 +8,4 @@ export const FAQ: FC = () => {
 			FAQ
 		</div>
 	);
-}
+};

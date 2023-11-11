@@ -8,9 +8,7 @@
     "build": "parcel build pages/index.html pages/*/index.html --no-source-maps",
     "serve": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
-    "recover": "npm run tools recover ./server/pixels.log ./server/426x240.png ./server/inout.png",
-    "clearcanvas": "npm run tools drawDefaultCanvas ./server/inout.png 240 240 WHITE",
-    "render": "npm run tools drawSteps ./server/pixels.log ./server/426x240.png"
+    "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache"
   },
   "author": "",
   "license": "ISC",
@@ -36,7 +34,11 @@
     "@parcel/transformer-sass": "^2.8.3",
     "@types/react": "^18.0.29",
     "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
     "autoprefixer": "^10.4.14",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react": "^7.33.2",
     "parcel-plugin-static-files-copy": "^2.6.0",
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",

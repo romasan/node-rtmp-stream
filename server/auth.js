@@ -58,7 +58,7 @@ const getUserData = (token) => {
 	}
 
 	return {};
-}
+};
 
 const removeUser = (token) => {
 	const user = getUserByToken(token);
@@ -84,7 +84,7 @@ const removeUser = (token) => {
 
 	delete users[token];
 	saveUsers();
-}
+};
 
 module.exports = {
 	addNewUser,

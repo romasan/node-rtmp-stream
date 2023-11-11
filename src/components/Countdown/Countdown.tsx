@@ -49,4 +49,4 @@ export const Countdown: FC<Props> = ({ finish, text }) => {
 			{renderTime()}
 		</div>
 	);
-}
+};
