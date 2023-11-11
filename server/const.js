@@ -70,7 +70,8 @@ const tempBans = {
 		"0309fb36-a56a-4a42-8003-d8eafb8fbcf9": true,
 	},
 	nick: {
-		"foo_bar": true,
+		"hiki1kamaz1top": true,
+		"mayhemkidd": true,
 	},
 	ip: {
 		"1.2.3.4": true,

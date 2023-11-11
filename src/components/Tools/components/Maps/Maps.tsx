@@ -84,6 +84,7 @@ export const Maps: FC<Props> = ({
 					<option value="100000">100 000</option>
 				</select>
 			</div>
+			<div>// TODO</div>
 			<div>
 				<button>за последний</button>
 				<select>
@@ -99,6 +100,10 @@ export const Maps: FC<Props> = ({
 					<option value={10 * hour}>10 часов</option>
 					<option value={day}>сутки</option>
 				</select>
+			</div>
+			<div>
+				<button>by session</button>
+				<input placeholder="UUID"/>
 			</div>
 		</Block>
 	);

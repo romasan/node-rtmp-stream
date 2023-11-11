@@ -86,6 +86,20 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
 
+		const user = getUserData(token);
+
+		if (
+			tempBans.uuid[token] ||
+			tempBans.nick[user?.name]
+		) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: failed add messagel (banned user)', token);
+
+			return;
+		}
+
 		if (typeof postPayload === 'string') {
 			addMessage(token, postPayload);
 
@@ -128,7 +142,12 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 			return;
 		}
 
-		if (tempBans.uuid[token]) {
+		const user = getUserData(token);
+
+		if (
+			tempBans.uuid[token] ||
+			tempBans.nick[user?.name]
+		) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
