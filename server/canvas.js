@@ -76,14 +76,33 @@ const getTotalPixels = () => {
 	return stats?.totalCount || 0;
 };
 
-const getTopLeaderboard = (count = 10) => {
-	return Object.entries(stats?.leaderboard || {})
-		.sort(([, a], [, b]) => a < b ? 1 : -1)
+const getTopLeaderboard = (count = 10, uuid) => {
+	const sorted = Object.entries(stats?.leaderboard || {})
+		.sort(([, a], [, b]) => a < b ? 1 : -1);
+	const output = sorted
 		.slice(0, count)
-		.reduce((list, [key, value]) => [
+		.reduce((list, [key, value], index) => [
 			...list,
-			{ uuid: stats?.uuids[key], count: value },
+			{
+				uuid: stats?.uuids[key],
+				count: value,
+				place: index + 1,
+			},
 		], []);
+
+		if (uuid && !output.some((item) => item.uuid === uuid)) {
+			const place = sorted.findIndex(([key]) => stats?.uuids?.[key] === uuid);
+
+			if (place >= 0) {
+				output.push({
+					uuid,
+					count: sorted[place][1],
+					place: place + 1,
+				});
+			}
+		}
+
+		return output;
 };
 
 const getLastActivity = () => {

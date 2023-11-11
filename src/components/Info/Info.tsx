@@ -47,13 +47,13 @@ export const Info: FC<Props> = ({
 						<div>Всего пикселей: {formatNumber(stats?.total)}</div>
 						<div>&nbsp;</div>
 						<div>
-							<div>ТОП 10 участников:</div>
+							<div>ТОП участников:</div>
 							<div>&nbsp;</div>
-							{(stats?.leaderboard || []).map((item, index) => (
-								<div key={String(index)} className={s.leaderBoardItem}>
+							{(stats?.leaderboard || []).map((item) => (
+								<div key={String(item.place)} className={s.leaderBoardItem}>
 									<span>
-										{index < 9 && <>&nbsp;</>}
-										{index + 1}.
+										{item.place < 10 && <>&nbsp;</>}
+										{item.place}.
 										{item.name}
 									</span>
 									<span>

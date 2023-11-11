@@ -270,14 +270,16 @@ const logout = (req, res) => {
 };
 
 const stats = (req, res) => {
+	const { token } = parseCookies(req.headers.cookie);
 	const total = getTotalPixels();
-	const leaderboard = getTopLeaderboard()
+	const leaderboard = getTopLeaderboard(10, token)
 		.map((item) => {
 			const user = getUserData(item.uuid);
 
 			return {
 				name: user?.name || getSessionUserName(item.uuid),
 				count: item.count,
+				place: item.place,
 			};
 		});
 
