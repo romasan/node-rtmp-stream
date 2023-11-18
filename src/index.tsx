@@ -1,17 +1,30 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { hydrateRoot, createRoot } from 'react-dom/client';
 import { App } from "./App";
 import { start } from './lib/api';
-import { connect } from './lib/ws';
+import { connect as connectWS } from './lib/ws';
 
-start().then((text) => {
-	if (text === 'fail') {
-		document.location.reload();
+const connectAPI = () => {
+	start().then((text) => {
+		if (text === 'fail') {
+			document.location.reload();
+	
+			return;
+		}
+	
+		connectWS();
+	}).catch(() => {});
+};
 
-		return;
+connectAPI();
+
+const container = document.getElementById('root') as HTMLElement;
+
+document.addEventListener('DOMContentLoaded', () => {
+	if (container.hasChildNodes()) {
+		hydrateRoot(container, <App />);
+	} else {
+		createRoot(container).render(<App />);
 	}
+});
 
-	connect();
-}).catch(() => {});
-
-createRoot(document.getElementById('root') as HTMLElement).render(<App />);

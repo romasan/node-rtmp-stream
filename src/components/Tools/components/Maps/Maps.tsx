@@ -84,7 +84,7 @@ export const Maps: FC<Props> = ({
 					<option value="100000">100 000</option>
 				</select>
 			</div>
-			<div>// TODO</div>
+			<div>TODO</div>
 			<div>
 				<button>за последний</button>
 				<select>

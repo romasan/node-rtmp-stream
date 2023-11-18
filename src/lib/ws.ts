@@ -30,7 +30,8 @@ const ping = () => {
 let timer = -1;
 
 const { hostname, protocol, hash } = document.location;
-export const WSHost = `${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
+export const WSHost = `${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}:7777`;
 const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
 
 export const connect = () => {

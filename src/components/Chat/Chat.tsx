@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 
 import cn from 'classnames';
 
@@ -61,11 +61,11 @@ export const Message: FC<MessageProps> = ({
 	);
 };
 
-export const Chat: FC<Props> = ({
+export const Chat: React.FC = ({
 	isAuthorized,
 	nickname,
 	onClose,
-	...props,
+	...props
 }) => {
 	const [list, setList] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
@@ -74,7 +74,9 @@ export const Chat: FC<Props> = ({
 	const contentRef = useRef<HTMLDivElement>(null);
 	
 	const goToBottom = () => {
-		contentRef.current?.scrollTo(0, contentRef.current.scrollHeight);
+		if (contentRef.current) {
+			contentRef.current.scrollTo(0, contentRef.current.scrollHeight);
+		}
 	};
 
 	const handleChatMessage = (message: IMessage) => {
@@ -99,7 +101,7 @@ export const Chat: FC<Props> = ({
 	}, []);
 
 	const onChange = (event: any) => {
-		setInput(event?.target?.value || '');
+		setInput(event.target.value || '');
 	};
 
 	const sendMessage = () => {
@@ -110,7 +112,7 @@ export const Chat: FC<Props> = ({
 	};
 
 	const onKeyUp = (event: any) => {
-		if (event?.code === 'Enter') {
+		if (event.code === 'Enter') {
 			sendMessage();
 		}
 	};
@@ -118,7 +120,9 @@ export const Chat: FC<Props> = ({
 	const handleMention = useCallback((name: string) => {
 		if (isAuthorized && name && name !== nickname) {
 			setInput((value) => `${value}${value ? ' ' : ''}@${name} `);
-			inputRef.current?.focus();
+			if (inputRef.current) {
+				inputRef.current.focus();
+			}
 		}
 	}, [isAuthorized, nickname]);
 

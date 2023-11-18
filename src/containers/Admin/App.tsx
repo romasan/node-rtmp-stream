@@ -2,14 +2,19 @@ import React, { useRef, useState, useEffect } from 'react';
 
 import mobile from 'is-mobile';
 
-import { Canvas, EMode, Palette, Tools } from '../../components';
+import {
+	Canvas,
+	EMode,
+	Palette,
+	Tools,
+} from '../../components';
 
 import ee from '../../lib/ee';
 
 import * as s from './App.module.scss';
 
 const disableMouse = {
-	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
+	onMouseDown: (e: MouseEvent) => e?.stopPropagation(),
 	onMouseMove: (e: MouseEvent) => e.stopPropagation(),
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
@@ -17,7 +22,7 @@ const disableMouse = {
 export const App: React.FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
-	const [canvasMode, setCanvasMode] = useState(EMode.CLICK);
+	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);
 	const [coord, setCoord] = useState({});
 	const [range, setRange] = useState({});
 	const [size, setSize] = useState({ width: 0, height: 0 });
@@ -27,10 +32,10 @@ export const App: React.FC = () => {
 	const layer = useRef(null);
 
 	useEffect(() => {
-		if (!color && wsStore?.palette) {
-			const firstColor = 'black' in wsStore?.palette
+		if (!color && wsStore.palette) {
+			const firstColor = 'black' in wsStore.palette
 				? 'black'
-				: (Object.keys(wsStore?.palette) || []).pop();
+				: (Object.keys(wsStore.palette) || []).pop();
 			setColor(firstColor as string);
 		}
 	}, [color, wsStore]);
@@ -61,15 +66,15 @@ export const App: React.FC = () => {
 			<Canvas
 				mode={canvasMode}
 				className={s.canvas}
-				color={wsStore?.palette?.[color]}
+				color={wsStore.palette ? wsStore.palette[color] : ''}
 				onClick={handleCanvasClick}
 				onSelect={handleSelect}
 				onInit={onInitCanvas}
 			>
 				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
 			</Canvas>
-			{wsStore?.palette && (
-				<Palette color={color} colors={wsStore?.palette} setColor={setColor} />
+			{(wsStore && wsStore.palette) && (
+				<Palette color={color} colors={wsStore.palette} setColor={setColor} />
 			)}
 			<Tools
 				canvas={layer.current}

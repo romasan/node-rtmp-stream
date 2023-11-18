@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -13,7 +13,7 @@ interface Props {
 	setColor(value: string): void;
 }
 
-export const Palette: FC<Props> = ({ color, colors, expiration = 0, setColor }) => {
+export const Palette: React.FC<Props> = ({ color, colors, expiration = 0, setColor }) => {
 	const isMobile = mobile();
 	const [shouldShowProgress, setShowedProgress] = useState(false);
 	const [isProgressInited, setIsProgressInited] = useState(false);

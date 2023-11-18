@@ -12,11 +12,12 @@ const MONTHS = [
 	'ноября',
 	'декабря',
 ];
-export const formatDate = (date) => {
+
+export const formatDate = (date: number) => {
 	const currentYear = new Date().getFullYear();
 	const _date = new Date(date);
 
-	const [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
+	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());
 
 	month = MONTHS[month + 1];

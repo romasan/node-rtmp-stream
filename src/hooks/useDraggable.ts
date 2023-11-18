@@ -17,7 +17,7 @@ export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.
 
 		const { clientX, clientY, target } = event;
 
-		if (ready && anchorRef.current?.contains(target as Node)) {
+		if (ready && anchorRef.current && anchorRef.current.contains(target as Node)) {
 			cur.current = [clientX, clientY];
 		}
 	};

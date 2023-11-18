@@ -43,17 +43,17 @@ export const FillSquare: FC<Props> = ({
 	};
 
 	useEffect(() => {
-		if (opened) {
+		if (opened && range.from && range.to) {
 			canvas.width = canvas.width;
 
 			const ctx = canvas.getContext('2d');
 
 			ctx.fillStyle = color;
 			ctx.fillRect(
-				range?.from?.x,
-				range?.from?.y,
-				range?.to?.x - range?.from?.x,
-				range?.to?.y - range?.from?.y,
+				range.from.x,
+				range.from.y,
+				range.to.x - range.from.x,
+				range.to.y - range.from.y,
 			);
 		}
 	}, [canvas, range, color, opened]);
@@ -64,8 +64,12 @@ export const FillSquare: FC<Props> = ({
 			onClose={onClose}
 			onToggle={setOpened}
 		>
-			<div>[{range?.from?.x || -1}:{range?.from?.y || -1} - {range?.to?.x || -1}:{range?.to?.y || -1}] {color}</div>
-			<div>{Math.abs(range?.from?.x - range?.to?.x) * Math.abs(range?.from?.y - range?.to?.y)} pixels</div>
+			{(range.from && range.to) ? (
+				<>
+					<div>[{range.from.x || -1}:{range.from.y || -1} - {range.to.x || -1}:{range.to.y || -1}] {color}</div>
+					<div>{Math.abs(range.from.x - range.to.x) * Math.abs(range.from.y - range.to.y)} pixels</div>
+				</>
+			) : 'Выбери область'}
 			<div>
 				<button onClick={fillSquare}>готово</button>
 			</div>

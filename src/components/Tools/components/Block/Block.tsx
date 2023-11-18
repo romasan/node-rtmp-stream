@@ -26,20 +26,28 @@ export const Block: FC<PropsWithChildren<Props>> = ({ id, title, onOpen, onClose
 
 	useEffect(() => {
 		if (isOpened) {
-			onOpen?.();
+			if (onOpen) {
+				onOpen();
+			}
 		} else {
 			if (first.current) {
 				first.current = false;
 			} else {
-				onClose?.();
+				if (onClose) {
+					onClose();
+				}
 			}
 		}
 
-		onToggle?.(isOpened);
+		if (onToggle) {
+			onToggle(isOpened);
+		}
 	}, [isOpened]);
 
 	const toggle = () => {
-		setOpened?.((value: string) => value === _id ? '' : _id);
+		if (setOpened) {
+			setOpened((value: string) => value === _id ? '' : _id);
+		}
 	};
 
 	return (

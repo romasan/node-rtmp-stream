@@ -30,7 +30,7 @@ export const Stream: FC<Props> = ({}) => {
 	};
 
 	const checked = useMemo(() => {
-		return canvasConf?.freezed || false;
+		return canvasConf.freezed || false;
 	}, [canvasConf]);
 
 	return (
@@ -43,7 +43,7 @@ export const Stream: FC<Props> = ({}) => {
 				<input type="radio" id="frame" name="stream" checked={checked} value="true" onChange={onChangeFreeze} />
 				<label htmlFor="frame">Один кадр</label>
 			</div>
-			{canvasConf?.freezed && (
+			{canvasConf.freezed && (
 				<div>
 					<button onClick={updateFreezedFrame}>Обновить кадр</button>
 				</div>

@@ -75,12 +75,12 @@ export const Tools: FC<Props> = ({
 							/>
 							<Block title="Откат области без пикселей конкретного юзера?">FOO</Block>
 							<Block title="Обновление констант"
-								onOpen={() => console.log('==== open #1')}
-								onClose={() => console.log('==== close #1')}
+								// onOpen={() => console.log('==== open #1')}
+								// onClose={() => console.log('==== close #1')}
 							>TODO</Block>
 							<Block title="Увеличить размер полотна"
-								onOpen={() => console.log('==== open #2')}
-								onClose={() => console.log('==== close #2')}
+								// onOpen={() => console.log('==== open #2')}
+								// onClose={() => console.log('==== close #2')}
 							>TODO</Block>
 							<Block title="Выставить окончание пиксельбаттла">TODO</Block>
 							<Block title="Управление банами">TODO</Block>

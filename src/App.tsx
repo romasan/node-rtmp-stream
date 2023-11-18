@@ -7,7 +7,6 @@ import mobile from 'is-mobile';
 import {
 	Canvas,
 	Palette,
-	Modal,
 	Chat,
 	Info,
 	Countdown,
@@ -35,8 +34,10 @@ const disableMouse = {
 };
 
 export const App: React.FC = () => {
-	const [showed, toggle] = useState(false);
-	const [wsStore, setWsStore] = useState<any>({});
+	const [wsStore, setWsStore] = useState<any>({
+		name: '',
+		palette: null,
+	});
 	const [color, setColor] = useState('');
 	const [chatIsShowed, setChatIsShowed] = useState(false);
 	const [infoIsShowed, setInfoIsShowed] = useState(false);
@@ -47,7 +48,7 @@ export const App: React.FC = () => {
 	const [finish, setFinish] = useState(0);
 	const [finished, setFinished] = useState(false);
 	const [hasNewMessage, setHasNewMessage] = useState(false);
-	const blinkedTimer = useRef(-1);
+	const blinkedTimer = useRef<number | NodeJS.Timeout>(-1);
 
 	const toggleChat = () => {
 		setHasNewMessage(false);
@@ -61,10 +62,10 @@ export const App: React.FC = () => {
 	const isMobile = mobile();
 
 	useEffect(() => {
-		if (!color && wsStore?.palette) {
-			const firstColor = 'black' in wsStore?.palette
+		if (!color && wsStore.palette && wsStore.palette) {
+			const firstColor = 'black' in wsStore.palette
 				? 'black'
-				: (Object.keys(wsStore?.palette) || []).pop();
+				: (Object.keys(wsStore.palette) || []).pop();
 
 			setColor(firstColor as string);
 		}
@@ -90,21 +91,10 @@ export const App: React.FC = () => {
 		addPix({ x, y, color });
 	};
 
-	const handleOpenChatClick = () => {
-		window.open('https://vkplay.live/pixel_battle/only-chat', '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
-	};
-
-	const handleTwitchLoginClick = () => {
-		const { hostname, protocol } = document.location;
-		const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
-		// window.open(`${APIhost}/auth/twitch`, '', `width=500,height=500,left=${window.innerWidth / 2 - 250},top=${window.innerHeight / 2 - 250}`);
-		document.location.href = `${APIhost}/auth/twitch`;
-	};
-
 	const onWsInit = (payload: any) => {
 		setWsStore((store = {}) => ({ ...store, ...payload }));
-		setExpiration(Date.now() + payload?.countdown);
-		setIsAuthorized(payload?.isAuthorized);
+		setExpiration(Date.now() + payload.countdown);
+		setIsAuthorized(payload.isAuthorized);
 		if (payload.finish !== 'newer') {
 			setFinish(Date.now() + payload.finish);
 		}
@@ -130,7 +120,7 @@ export const App: React.FC = () => {
 	};
 
 	const handleChatMessage = (message: any) => {
-		if (wsStore?.name && message.text.indexOf(`@${wsStore.name}`) >= 0) {
+		if (wsStore.name && message.text.indexOf(`@${wsStore.name}`) >= 0) {
 			setHasNewMessage(true);
 		}
 	};
@@ -156,7 +146,7 @@ export const App: React.FC = () => {
 				{isAuthorized ? (
 					<>
 						<div className={s.userName}>
-							{wsStore?.name}
+							{wsStore.name}
 						</div>
 						<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
 							<img src={logout} className={s.iconButton} />
@@ -173,28 +163,14 @@ export const App: React.FC = () => {
 				<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} />
 			</div>
 			<Canvas
-				color={wsStore?.palette?.[color]}
+				color={wsStore.palette ? wsStore.palette[color] : ''}
 				onClick={handleCanvasClick}
 				expiration={expiration}
 				isAuthorized={isAuthorized}
 				finished={finished}
 			/>
-			{wsStore?.palette && !finished && (
-				<Palette color={color} colors={wsStore?.palette} setColor={setColor} expiration={expiration} />
-			)}
-			{showed && (
-				<Modal onClose={() => toggle(false)}>
-					<div className={s.joinModalContent}>
-						<div>Чтобы присоединиться к PIXEL BATTLE</div>
-						<div>напиши свой ник на VK Play</div>
-						<div><input type="text" className={s.input} placeholder="nickname" /></div>
-						<div>и отправь в чат стрима <span className={s.command}>!join</span></div>
-						<button onClick={handleOpenChatClick} className={s.button}>ОТКРЫТЬ ЧАТ</button>
-						<button onClick={handleTwitchLoginClick} className={s.button}>Залогинься через Twitch</button>
-						<div>или</div>
-						<button onClick={handleTwitchLoginClick} className={s.button}>Залогинься через ВК</button>
-					</div>
-				</Modal>
+			{wsStore.palette && !finished && (
+				<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
 			)}
 			{Boolean(finish) && (
 				<Countdown finish={finish} text={wsStore.finishText}/>
@@ -219,7 +195,7 @@ export const App: React.FC = () => {
 			{chatIsShowed && (
 				<Chat
 					isAuthorized={isAuthorized}
-					nickname={wsStore?.name}
+					nickname={wsStore.name}
 					onClose={toggleChat}
 					{...disableMouse}
 				/>

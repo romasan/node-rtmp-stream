@@ -1,5 +1,5 @@
-import Emittery from 'emittery';
+import EventEmitter from 'event-emitter';
 
-const ee = new Emittery();
+const ee = new EventEmitter();
 
 export default ee;

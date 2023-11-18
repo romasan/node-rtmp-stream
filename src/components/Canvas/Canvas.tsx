@@ -50,6 +50,13 @@ const defautSelected = {
 	to: { x: 0, y: 0 },
 };
 
+const defaultPixelData = {
+	time: 0,
+	name: '',
+	x: -1,
+	y: -1,
+};
+
 export const Canvas: FC<PropsWithChildren<Props>> = ({
 	color,
 	mode = EMode.CLICK,
@@ -77,7 +84,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const [animatedPixel, setAnimatedPixel] = useState(false);
 	const selected = useRef(defautSelected);
 	const timer = useRef(0);
-	const [pixelData, setPixelData] = useState({});
+	const [pixelData, setPixelData] = useState(defaultPixelData);
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
@@ -124,10 +131,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			}
 		}
 
-		const ctx = canvasRef.current?.getContext('2d');
-		ctx?.drawImage(image, 0, 0);
+		const ctx = canvasRef.current && canvasRef.current.getContext('2d');
 
-		onInit?.(image);
+		if (!ctx) {
+			return;
+		}
+
+		ctx.drawImage(image, 0, 0);
+
+		if (onInit) {
+			onInit(image);
+		}
 
 		ee.on('ws:drawPix', ({ x, y, color }) => {
 			if (ctx) {
@@ -172,7 +186,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		}
 
 		if (
-			rootRef.current?.contains(target as Node) &&
+			rootRef.current &&
+			rootRef.current.contains(target as Node) &&
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current)
 		) {
@@ -222,8 +237,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			const [,, moved] = cur.current;
 
-			const { width = 0, height = 0 } = rootRef.current?.getBoundingClientRect() || {};
-			const { width: canvasW = 0, height: canvasH = 0 } = canvasRef.current?.getBoundingClientRect() || {};
+			const { width = 0, height = 0 } = rootRef.current && rootRef.current.getBoundingClientRect() || {};
+			const { width: canvasW = 0, height: canvasH = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
 			const center = [
 				width / 2,
 				height / 2,
@@ -288,11 +303,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const y = Math.floor((clientY - top) / scale);
 
 			if (mode === EMode.SELECT) {
-				onSelect?.(selected.current.from, { x, y });
+				if (onSelect) {
+					onSelect(selected.current.from, { x, y });
+				}
 				selected.current = defautSelected;
 			} else {
 				onClick(x, y);
-				setPixelData({});
+				setPixelData(defaultPixelData);
 			}
 		}
 
@@ -321,7 +338,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (posIsAbove([clientX, clientY], canvasRef.current as HTMLCanvasElement)) {
 			const { left, top, width: canvasW = 0, height: canvasH = 0 } = (canvasRef.current as HTMLCanvasElement).getBoundingClientRect();
 			const { offsetWidth, offsetHeight } = document.body;
-			const { width = 0, height = 0 } = rootRef.current?.getBoundingClientRect() || {};
+			const { width = 0, height = 0 } = rootRef.current && rootRef.current.getBoundingClientRect() || {};
 
 			const x = (clientX - left) / scale;
 			const y = (clientY - top) / scale;
@@ -368,7 +385,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const getPixelStyle = () => {
-		const { left = 0, top = 0 } = canvasRef.current?.getBoundingClientRect() || {};
+		const { left = 0, top = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
 		const [x, y] = coord;
 
 		const _color = finished ? getPixelColor(canvasRef.current, x, y) : color;

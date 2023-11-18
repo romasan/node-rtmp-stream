@@ -26,6 +26,8 @@ export const Info: FC<Props> = ({
 }) => {
 	const [stats, setStats] = useState({
 		loading: true,
+		leaderboard: [],
+		total: 0,
 	});
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 280, y: 60});
 
@@ -39,17 +41,17 @@ export const Info: FC<Props> = ({
 				<button className={s.close} onClick={onClose}>&times;</button>
 			</div>
 			<div className={s.content} {...props}>
-				{stats?.loading ? (
+				{(stats && stats.loading) ? (
 					<div>Загрузка...</div>
 				) : (
 					<div>
 						{/* <div>Online: 0</div> */}
-						<div>Всего пикселей: {formatNumber(stats?.total)}</div>
+						<div>Всего пикселей: {formatNumber(stats.total)}</div>
 						<div>&nbsp;</div>
 						<div>
 							<div>ТОП участников:</div>
 							<div>&nbsp;</div>
-							{(stats?.leaderboard || []).map((item) => (
+							{(stats.leaderboard || []).map((item) => (
 								<div key={String(item.place)} className={s.leaderBoardItem}>
 									<span>
 										{item.place < 10 && <>&nbsp;</>}

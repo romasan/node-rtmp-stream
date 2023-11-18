@@ -1,7 +1,8 @@
 import ee from '../lib/ee';
 
 const { hostname, protocol } = document.location;
-const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
+const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}:7777`;
 
 export const addPix = async ({ x, y, color }) => {
 	try {
@@ -21,11 +22,11 @@ export const addPix = async ({ x, y, color }) => {
 };
 
 export const start = async () => {
-		const resp = await fetch(`${APIhost}/start`, {
-			credentials: 'include',
-		});
+	const resp = await fetch(`${APIhost}/start`, {
+		credentials: 'include',
+	});
 
-		return await resp.text();
+	return await resp.text();
 };
 
 export const sendChatMessage = (message: string) => {
