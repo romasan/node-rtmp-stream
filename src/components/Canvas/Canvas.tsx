@@ -34,7 +34,8 @@ interface Props {
 	className?: string;
 	expiration?: number;
 	isAuthorized?: boolean;
-	finished?: boolean;
+	isFinished?: boolean;
+	isOnline?: boolean;
 	onClick(x: number, y: number): void;
 	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
 	onInit?: (value: any) => void;
@@ -63,7 +64,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	className,
 	expiration = 0,
 	isAuthorized = false,
-	finished,
+	isFinished,
+	isOnline,
 	children,
 	onClick,
 	onSelect,
@@ -90,7 +92,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const [x, y] = coord;
 
 		let time = '';
-		if (finished) {
+		if (isFinished) {
 			time = formatDate(Number(pixelData.time));
 		} else {
 			const sec = Math.floor(pixelData.time / 1000);
@@ -103,18 +105,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		if (pixelData.x === x && pixelData.y === y) {
 			if (pixelData.time >= 0) {
-				return finished
+				return isFinished
 					? `${pixelData.name}, ${time} `
 					: `${pixelData.name}, ${time} назад`;
 			}
 
-			return finished
+			return isFinished
 				? 'Про этот пиксель все забыли'
 				: 'Пустой пиксель, закрась его';
 		}
 
 		return null;
-	}, [coord, pixelData, finished]);
+	}, [coord, pixelData, isFinished]);
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
 		if (canvasRef.current) {
@@ -388,7 +390,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const { left = 0, top = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
 		const [x, y] = coord;
 
-		const _color = finished ? getPixelColor(canvasRef.current, x, y) : color;
+		const _color = isFinished ? getPixelColor(canvasRef.current, x, y) : color;
 
 		return {
 			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
@@ -546,7 +548,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</div>
 					{error && <img className={s.image404} src={image404} />}
 				</div>
-				{!isMobile && (
+				{!isMobile && isOnline && (
 					<>
 						<div className={s.coordinates}>
 							{countdown > 0 && (
@@ -568,7 +570,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			</div>
 			{!isMobile && (
 				<Bar
-					onDraw={finished ? undefined : handleClickDraw}
+					onDraw={isFinished ? undefined : handleClickDraw}
 					onPlus={handleClickPlus}
 					onMinus={handleClickMinus}
 					onPlace={handleClickPlace}

@@ -46,7 +46,7 @@ export const App: React.FC = () => {
 	const [isOnline, setIsOnline] = useState(false);
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const [finish, setFinish] = useState(0);
-	const [finished, setFinished] = useState(false);
+	const [isFinished, setIsFinished] = useState(false);
 	const [hasNewMessage, setHasNewMessage] = useState(false);
 	const blinkedTimer = useRef<number | NodeJS.Timeout>(-1);
 
@@ -75,7 +75,7 @@ export const App: React.FC = () => {
 		if (finish) {
 			const timer = setInterval(() => {
 				if (finish <= Date.now()) {
-					setFinished(true);
+					setIsFinished(true);
 					clearInterval(timer);
 				}
 			}, 1000);
@@ -167,9 +167,10 @@ export const App: React.FC = () => {
 				onClick={handleCanvasClick}
 				expiration={expiration}
 				isAuthorized={isAuthorized}
-				finished={finished}
+				isFinished={isFinished}
+				isOnline={isOnline}
 			/>
-			{wsStore.palette && !finished && (
+			{wsStore.palette && !isFinished && (
 				<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
 			)}
 			{Boolean(finish) && (
