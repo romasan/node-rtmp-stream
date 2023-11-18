@@ -12,7 +12,11 @@
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache"
   },
   "reactSnap": {
-    "source": "dist"
+    "source": "dist",
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ]
   },
   "author": "Roman Bauer",
   "license": "ISC",
