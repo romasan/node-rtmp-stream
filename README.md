@@ -1,8 +1,11 @@
 # basic
 
-- [ ] auth by chat command
+- [ ] auth by chat command?
 - [x] auth by twitch
 - [ ] auth by vkplay
+- [ ] auth by discord
+- [ ] auth by vk
+- [ ] auth by steam
 - [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
@@ -10,6 +13,9 @@
 - [ ] support for multiple colors
 - [x] bot protection
 - [x] session caching
+- [ ] moderations (with log)
+- [x] replace res/ -> assets/
+- [ ] online users list
 
 # admin panel
 
@@ -37,6 +43,8 @@
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages?
+- [ ] move ssl handle to nginx (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
+- [ ] merge token|uuid vars name?
 
 # web
 - [x] drawing
@@ -46,13 +54,15 @@
 - [x] zooming at mobile
 - [x] fix pixel cursor position
 - [ ] go to position on click
-- [ ] FAQ page
 - [ ] mobile layout
 - [ ] check is offline
 - [x] link to stream
 - [x] contrast border for pixel placeholder
+- [ ] FAQ page
 - [ ] timelapse page
 - [ ] leaderboard page
+- [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
+- [ ] frix layout after resize
 
 # page with infinity map
  - [ ] parts of map like geo

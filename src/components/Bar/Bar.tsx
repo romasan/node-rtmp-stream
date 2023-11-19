@@ -2,11 +2,11 @@ import React, { FC } from 'react';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
-import pen from 'url:../../../res/pen.svg';
-import plus from 'url:../../../res/plus.svg';
-import minus from 'url:../../../res/minus.svg';
-import expand from 'url:../../../res/expand.svg';
-// import clock from 'url:../../../res/clock.svg';
+import pen from 'url:../../../assets/pen.svg';
+import plus from 'url:../../../assets/plus.svg';
+import minus from 'url:../../../assets/minus.svg';
+import expand from 'url:../../../assets/expand.svg';
+// import clock from 'url:../../../assets/clock.svg';
 
 import * as s from './Bar.module.scss';
 

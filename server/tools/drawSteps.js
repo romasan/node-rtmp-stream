@@ -7,7 +7,7 @@ const readline = require('readline');
 const { createCanvas, Image, registerFont } = require('canvas');
 const drawDefaultCanvas = require('./drawDefaultCanvas');
 
-registerFont(__dirname + '/../../res/fonts/CustomFont.ttf', { family: 'Custom Font' });
+registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
 const {
 	WIDTH,
