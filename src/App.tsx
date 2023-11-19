@@ -141,26 +141,32 @@ export const App: React.FC = () => {
 	}, [isAuthorized]);
 
 	return (
-		<div className={isMobile ? 'mobile' : ''}>
+		<div className={cn(s.root, { mobile: isMobile })}>
 			<div className={s.header} {...disableMouse}>
-				{isAuthorized ? (
-					<>
-						<div className={s.userName}>
-							{wsStore.name}
-						</div>
-						<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
-							<img src={logout} className={s.iconButton} />
+				<div className={s.title}>
+					<h1>PIXEL BATTLE</h1>
+					<h2>Пиксель батл 2023 S1E2</h2>
+				</div>
+				<div className={s.controls}>
+					{isAuthorized ? (
+						<>
+							<div className={s.userName}>
+								{wsStore.name}
+							</div>
+							<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
+								<img src={logout} className={s.iconButton} alt="Выход" />
+							</a>
+						</>
+					) : (
+						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
+							<img src={login} className={s.iconButton} alt="Авторизация" />
 						</a>
-					</>
-				) : (
-					<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
-						<img src={login} className={s.iconButton} />
-					</a>
-				)}
-				<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-					<img src={chat} onClick={toggleChat} className={s.iconButton} />
-				</span>
-				<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} />
+					)}
+					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
+						<img src={chat} onClick={toggleChat} className={s.iconButton} alt="Чат" />
+					</span>
+					<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} alt="Статистика" />
+				</div>
 			</div>
 			<Canvas
 				color={wsStore.palette ? wsStore.palette[color] : ''}
@@ -178,19 +184,19 @@ export const App: React.FC = () => {
 			)}
 			<div className={s.footer} {...disableMouse}>
 				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer">
-					<img src={vkplay} />
+					<img src={vkplay} alt="Стрим в VKPlay Live" />
 				</a>
 				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer">
-					<img src={twitch} />
+					<img src={twitch} alt="Стрим в Twitch" />
 				</a>
 				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer">
-					<img src={youtube} />
+					<img src={youtube} alt="Записи таймпапс в Youtube" />
 				</a>
 				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer">
-					<img src={discord} />
+					<img src={discord} alt="Discord сервер пиксель батла" />
 				</a>
 				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer">
-					<img src={telegram} />
+					<img src={telegram} alt="Telegram канал пиксель батла"/>
 				</a>
 			</div>
 			{chatIsShowed && (

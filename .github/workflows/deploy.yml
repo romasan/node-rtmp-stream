@@ -22,7 +22,7 @@ jobs:
 
       - name: Rect Snap
         run: |
-          npm run snap
+          npm run render
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1

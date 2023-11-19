@@ -36,6 +36,7 @@
 - [ ] freeze frame to stream from admin panel
 - [ ] rotated access log
 - [ ] use database instead files
+- [ ] binary ws messages?
 
 # web
 - [x] drawing
@@ -50,6 +51,8 @@
 - [ ] check is offline
 - [x] link to stream
 - [x] contrast border for pixel placeholder
+- [ ] timelapse page
+- [ ] leaderboard page
 
 # page with infinity map
  - [ ] parts of map like geo

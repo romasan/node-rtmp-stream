@@ -40,7 +40,7 @@ const renderText = (raw: string, nickname?: string): string => {
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 };
 
-export const Message: FC<MessageProps> = ({
+export const Message: React.FC<MessageProps> = ({
 	message,
 	nickname,
 	isAuthorized,
@@ -61,7 +61,7 @@ export const Message: FC<MessageProps> = ({
 	);
 };
 
-export const Chat: React.FC = ({
+export const Chat: React.FC<Props> = ({
 	isAuthorized,
 	nickname,
 	onClose,

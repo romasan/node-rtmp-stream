@@ -23,34 +23,34 @@ export const Bar: FC<Props> = ({
 	onMinus,
 	onPlace,
 }) => {
-	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: 10});
+	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: 60});
 
 	return (
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}></div>
 			{onDraw && (
 				<button className={s.button} onClick={onDraw}>
-					<img src={pen} />
+					<img src={pen} alt="Рисовать" />
 				</button>
 			)}
 			{onPlus && (
 					<button className={s.button} onClick={onPlus}>
-					<img src={plus} />
+					<img src={plus} alt="Увеличить масштаб" />
 				</button>
 			)}
 			{onMinus && (
 				<button className={s.button} onClick={onMinus}>
-					<img src={minus} />
+					<img src={minus} alt="Уменьшить масштаб" />
 				</button>
 			)}
 			{onPlace && (
 				<button className={s.button} onClick={onPlace}>
-					<img src={expand} />
+					<img src={expand} alt="Показать всё полотно" />
 				</button>
 			)}
 			{/* TODO */}
 			{/* <button className={s.button}>
-				<img src={clock} />
+				<img src={clock} alt="Таймлапс" />
 			</button> */}
 		</div>
 	);

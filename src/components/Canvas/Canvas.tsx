@@ -546,7 +546,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							/>
 						)}
 					</div>
-					{error && <img className={s.image404} src={image404} />}
+					{error && <img className={s.image404} src={image404} alt="Полотно пиксель батла" />}
 				</div>
 				{!isMobile && isOnline && (
 					<>

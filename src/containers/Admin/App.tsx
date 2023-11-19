@@ -67,6 +67,7 @@ export const App: React.FC = () => {
 				mode={canvasMode}
 				className={s.canvas}
 				color={wsStore.palette ? wsStore.palette[color] : ''}
+				isOnline={true}
 				onClick={handleCanvasClick}
 				onSelect={handleSelect}
 				onInit={onInitCanvas}
@@ -74,7 +75,11 @@ export const App: React.FC = () => {
 				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
 			</Canvas>
 			{(wsStore && wsStore.palette) && (
-				<Palette color={color} colors={wsStore.palette} setColor={setColor} />
+				<Palette
+					color={color}
+					colors={wsStore.palette}
+					setColor={setColor}
+				/>
 			)}
 			<Tools
 				canvas={layer.current}
