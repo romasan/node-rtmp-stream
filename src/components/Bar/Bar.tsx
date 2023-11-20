@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
-import pen from '../../../assets/pen.svg';
-import plus from '../../../assets/plus.svg';
-import minus from '../../../assets/minus.svg';
-import expand from '../../../assets/expand.svg';
+import PenIcon from '../../../assets/pen.svg';
+import PlusIcon from '../../../assets/plus.svg';
+import MinusIcon from '../../../assets/minus.svg';
+import ExpandIcon from '../../../assets/expand.svg';
 // import clock from '../../../assets/clock.svg';
 
 import * as s from './Bar.module.scss';
@@ -30,22 +30,22 @@ export const Bar: FC<Props> = ({
 			<div className={s.draggable} ref={anchorRef}></div>
 			{onDraw && (
 				<button className={s.button} onClick={onDraw}>
-					<img src={'data:image/svg+xml;utf8,' + pen} alt="Рисовать" />
+					<PenIcon />
 				</button>
 			)}
 			{onPlus && (
 					<button className={s.button} onClick={onPlus}>
-					<img src={'data:image/svg+xml;utf8,' + plus} alt="Увеличить масштаб" />
+					<PlusIcon />
 				</button>
 			)}
 			{onMinus && (
 				<button className={s.button} onClick={onMinus}>
-					<img src={'data:image/svg+xml;utf8,' + minus} alt="Уменьшить масштаб" />
+					<MinusIcon />
 				</button>
 			)}
 			{onPlace && (
 				<button className={s.button} onClick={onPlace}>
-					<img src={'data:image/svg+xml;utf8,' + expand} alt="Показать всё полотно" />
+					<ExpandIcon />
 				</button>
 			)}
 			{/* TODO */}
