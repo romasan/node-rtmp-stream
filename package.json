@@ -6,6 +6,7 @@
     "start": "parcel pages/index.html pages/*/index.html",
     "prebuild": "rm -rf dist/*.* .parcel-cache",
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
+    "postbuild": "cp static/* dist/",
     "render": "react-snap && node ./pages/postbuild.js",
     "serve": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
@@ -28,7 +29,7 @@
     "is-mobile": "^4.0.0",
     "node-fetch": "^2.6.9",
     "node-sass": "^8.0.0",
-    "parcel": "^2.8.3",
+    "parcel": "^2.10.3",
     "parcel-bundler": "^1.12.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -39,7 +40,8 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.8.3",
+    "@parcel/transformer-inline-string": "^2.10.2",
+    "@parcel/transformer-sass": "^2.10.3",
     "@types/react": "^18.0.29",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^6.10.0",

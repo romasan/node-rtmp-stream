@@ -15,15 +15,15 @@ import {
 import { addPix } from './lib/api';
 import ee from './lib/ee';
 
-import twitch from 'url:../assets/twitch.svg';
-import vkplay from 'url:../assets/vkplay.svg';
-import youtube from 'url:../assets/youtube.svg';
-import discord from 'url:../assets/discord.svg';
-import telegram from 'url:../assets/telegram.svg';
-import chat from 'url:../assets/chat.svg';
-import login from 'url:../assets/login.svg';
-import logout from 'url:../assets/logout.svg';
-import info from 'url:../assets/info.svg';
+import twitch from '../assets/twitch.svg';
+import vkplay from '../assets/vkplay.svg';
+import youtube from '../assets/youtube.svg';
+import discord from '../assets/discord.svg';
+import telegram from '../assets/telegram.svg';
+import chat from '../assets/chat.svg';
+import login from '../assets/login.svg';
+import logout from '../assets/logout.svg';
+import info from '../assets/info.svg';
 
 import * as s from './App.module.scss';
 
@@ -154,18 +154,18 @@ export const App: React.FC = () => {
 								{wsStore.name}
 							</div>
 							<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
-								<img src={logout} className={s.iconButton} alt="Выход" />
+								<img src={'data:image/svg+xml;utf8,' + logout} className={s.iconButton} alt="Выход" />
 							</a>
 						</>
 					) : (
 						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
-							<img src={login} className={s.iconButton} alt="Авторизация" />
+							<img src={'data:image/svg+xml;utf8,' + login} className={s.iconButton} alt="Авторизация" />
 						</a>
 					)}
 					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-						<img src={chat} onClick={toggleChat} className={s.iconButton} alt="Чат" />
+						<img src={'data:image/svg+xml;utf8,' + chat} onClick={toggleChat} className={s.iconButton} alt="Чат" />
 					</span>
-					<img src={info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} alt="Статистика" />
+					<img src={'data:image/svg+xml;utf8,' + info} onClick={toggleInfo} className={cn(s.iconButton, { [s.disabled]: !isOnline })} alt="Статистика" />
 				</div>
 			</div>
 			<Canvas
@@ -184,19 +184,19 @@ export const App: React.FC = () => {
 			)}
 			<div className={s.footer} {...disableMouse}>
 				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer">
-					<img src={vkplay} alt="Стрим в VKPlay Live" />
+					<img src={'data:image/svg+xml;utf8,' + vkplay} alt="Стрим в VKPlay Live" />
 				</a>
 				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer">
-					<img src={twitch} alt="Стрим в Twitch" />
+					<img src={'data:image/svg+xml;utf8,' + twitch} alt="Стрим в Twitch" />
 				</a>
 				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer">
-					<img src={youtube} alt="Записи таймпапс в Youtube" />
+					<img src={'data:image/svg+xml;utf8,' + youtube} alt="Записи таймпапс в Youtube" />
 				</a>
 				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer">
-					<img src={discord} alt="Discord сервер пиксель батла" />
+					<img src={'data:image/svg+xml;utf8,' + discord} alt="Discord сервер пиксель батла" />
 				</a>
 				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer">
-					<img src={telegram} alt="Telegram канал пиксель батла"/>
+					<img src={'data:image/svg+xml;utf8,' + telegram} alt="Telegram канал пиксель батла"/>
 				</a>
 			</div>
 			{chatIsShowed && (
