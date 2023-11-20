@@ -153,19 +153,19 @@ export const App: React.FC = () => {
 							<div className={s.userName}>
 								{wsStore.name}
 							</div>
-							<a href="/logout" className={cn({ [s.disabled]: !isOnline })}>
+							<a href="/logout" className={cn({ [s.disabled]: !isOnline })} aria-label="Выход">
 								<LogoutIcon />
 							</a>
 						</>
 					) : (
-						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })}>
+						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })} aria-label="Авторизация">
 							<LoginIcon />
 						</a>
 					)}
 					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-						<ChatIcon className={s.iconButton} onClick={toggleChat} />
+						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
 					</span>
-					<InfoIcon className={s.iconButton} onClick={toggleInfo} />
+					<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
 				</div>
 			</div>
 			<Canvas
@@ -183,19 +183,19 @@ export const App: React.FC = () => {
 				<Countdown finish={finish} text={wsStore.finishText}/>
 			)}
 			<div className={s.footer} {...disableMouse}>
-				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer">
+				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">
 					<VkplayIcon />
 				</a>
-				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer">
+				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
 					<TwitchIcon />
 				</a>
-				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer">
+				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
 					<YoutubeIcon />
 				</a>
-				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer">
+				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer" aria-label="Discord сервер пиксель батла">
 					<DiscordIcon />
 				</a>
-				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer">
+				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer" aria-label="Telegram канал пиксель батла">
 					<TelegramIcon />
 				</a>
 			</div>

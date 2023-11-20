@@ -29,22 +29,22 @@ export const Bar: FC<Props> = ({
 		<div className={s.root} ref={draggableRef}>
 			<div className={s.draggable} ref={anchorRef}></div>
 			{onDraw && (
-				<button className={s.button} onClick={onDraw}>
+				<button className={s.button} onClick={onDraw} aria-label="Рисовать">
 					<PenIcon />
 				</button>
 			)}
 			{onPlus && (
-					<button className={s.button} onClick={onPlus}>
+					<button className={s.button} onClick={onPlus} aria-label="Увеличить масштаб">
 					<PlusIcon />
 				</button>
 			)}
 			{onMinus && (
-				<button className={s.button} onClick={onMinus}>
+				<button className={s.button} onClick={onMinus} aria-label="Уменьшить масштаб">
 					<MinusIcon />
 				</button>
 			)}
 			{onPlace && (
-				<button className={s.button} onClick={onPlace}>
+				<button className={s.button} onClick={onPlace} aria-label="Показать всё полотно">
 					<ExpandIcon />
 				</button>
 			)}
