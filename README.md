@@ -45,6 +45,8 @@
 - [ ] binary ws messages?
 - [ ] move ssl handle to nginx (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
 - [ ] merge token|uuid vars name?
+- [ ] const.js -> config.json
+- [ ] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
 
 # web
 - [x] drawing
