@@ -75,7 +75,7 @@ const getPixelsInfo = (output) => {
 	return new Promise((resolve) => {
 
 		const rl = readline.createInterface({
-			input: fs.createReadStream(__dirname + '/../pixels.log'),
+			input: fs.createReadStream(__dirname + '/../../db/pixels.log'),
 			crlfDelay: Infinity
 		});
 

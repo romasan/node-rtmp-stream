@@ -5,7 +5,7 @@ const path = require('path');
 const {
 	validateToken,
 	getPathByToken,
-} = require('../web/helpers');
+} = require('./web/helpers');
 
 let sessions = {};
 let failed = {};

@@ -8,7 +8,7 @@ const { getFileLinesCount } = require('./web/helpers');
 const LIST_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 500;
 
-const messagesFile = __dirname + '/messages.log';
+const messagesFile = __dirname + '/../db/messages.log';
 
 let messages = [];
 

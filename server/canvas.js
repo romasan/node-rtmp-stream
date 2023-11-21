@@ -7,7 +7,7 @@ const ee = require('./lib/ee');
 const { getPixelsInfo, updateStats } = require('./tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('./tools');
 
-const { IN_OUT_IMAGE, UPSCALE, STREAM_FREEZED_FRAME, STREAM_WITH_BG, STREAM_DEBUG_TIME } = process.env;
+const { UPSCALE, STREAM_FREEZED_FRAME, STREAM_WITH_BG, STREAM_DEBUG_TIME } = process.env;
 
 const conf = {
 	freezed: STREAM_FREEZED_FRAME === 'true',
@@ -112,7 +112,7 @@ const getLastActivity = () => {
 const bg = drawDefaultCanvas('DATA', videoSize.width, videoSize.height, 'CHESS');
 const bgCTX = bg.getContext('2d');
 
-const imgBuf = fs.readFileSync(IN_OUT_IMAGE);
+const imgBuf = fs.readFileSync(__dirname + '/../db/inout.png');
 const image = new Image;
 image.src = imgBuf;
 
@@ -252,7 +252,7 @@ const drawPix = ({ x, y, color, nickname, uuid }) => {
 };
 
 const saveCanvas = () => {
-	fs.writeFileSync(IN_OUT_IMAGE, canvas.toBuffer());
+	fs.writeFileSync(__dirname + '/../db/inout.png', canvas.toBuffer());
 };
 
 module.exports = {

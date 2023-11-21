@@ -3,9 +3,9 @@ require('dotenv').config();
 
 const { ADMIN_EMAIL } = process.env;
 
-const DBFileName = './sessions/auth.json';
+const DBFileName = __dirname + '/../db/auth.json';
 
-const logoutLog = fs.createWriteStream(__dirname + '/sessions/logout.log', { flags : 'a' });
+const logoutLog = fs.createWriteStream(__dirname + '/../db/logout.log', { flags : 'a' });
 
 let users = {};
 

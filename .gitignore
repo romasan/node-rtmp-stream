@@ -3,8 +3,7 @@ server/pid
 ssl-cert/
 node_modules/
 dist/
-server/sessions/*
-!server/sessions/*.js
+db/*
 server/frames/
 .cache/
 .parcel-cache

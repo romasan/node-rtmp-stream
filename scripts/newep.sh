@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../server
+cd ../db
 mkdir archive
 mkdir archive/s1e2
 mv pixels.log archive/s1e2/

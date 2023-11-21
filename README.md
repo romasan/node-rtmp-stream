@@ -16,6 +16,7 @@
 - [ ] moderations (with log)
 - [x] replace res/ -> assets/
 - [ ] online users list
+- [ ] reset countdown on login
 
 # admin panel
 

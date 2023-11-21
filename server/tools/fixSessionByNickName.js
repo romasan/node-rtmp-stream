@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const _fixSessionByNickName = () => {
-	const sessions = require('../sessions/auth.json');
+	const sessions = require('../../db/auth.json');
 
 	const tokens = Object.keys(session);
 
@@ -16,14 +16,14 @@ const _fixSessionByNickName = () => {
 		}
 	});
 
-	fs.writeFileSync(__dirname + '/../sessions/auth.json', JSON.stringify({
+	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify({
 		sessions,
 		users,
 	}));
 };
 
 const checkSessions = () => {
-	const sessions = require('../sessions/auth.json');
+	const sessions = require('../../db/auth.json');
 
 	const users = {};
 	let uniq = 0;
@@ -56,16 +56,16 @@ const checkSessions = () => {
 };
 
 const clearEmpty = () => {
-	const sessions = require('../sessions/auth.json');
+	const sessions = require('../../db/auth.json');
 	const output = Object.entries(sessions)
 		.filter(([key, value]) => Boolean(value?.data?.[0]?.login))
 		.reduce((list, [key, value]) => ({ ...list, [key]: value }), {});
 
-	fs.writeFileSync(__dirname + '/../sessions/auth.json', JSON.stringify(output));
+	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
 };
 
 const removeDuplicates = () => {
-	const sessions = require('../sessions/auth.json');
+	const sessions = require('../../db/auth.json');
 
 	const doubles = {};
 

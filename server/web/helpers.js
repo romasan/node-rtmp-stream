@@ -15,7 +15,7 @@ const getPathByToken = (token = '', prevalidate = true) => {
 
 	const [a, b, c] = token.split('');
 
-	return `./sessions/${a}/${b}/${c}/${token}`;
+	return `${__dirname}/../../db/sessions/${a}/${b}/${c}/${token}`;
 };
 
 const getPostPayload = (req) => {

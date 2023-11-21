@@ -3,9 +3,9 @@ const { createCanvas, Image } = require('canvas');
 const { getFileLinesCount } = require('../web/helpers');
 
 const expand = async (input, output, width, height, shiftX = 0, shiftY = 0) => {
-	const countOfPixels = await getFileLinesCount(__dirname + '/../pixels.log');
+	const countOfPixels = await getFileLinesCount(__dirname + '/../../db/pixels.log');
 
-	const file = fs.createWriteStream(__dirname + '/../expands.log', { flags : 'a' });
+	const file = fs.createWriteStream(__dirname + '/../../db/expands.log', { flags : 'a' });
 
 	const imgBuf = fs.readFileSync(input);
 	const image = new Image;

@@ -5,7 +5,7 @@ const chat = require('./vkplay-chat-listener');
 require('./ws');
 const fs = require('fs');
 
-fs.writeFileSync('./pid', process.pid.toString());
+fs.writeFileSync(__dirname + '/../pid', process.pid.toString());
 
 const { STREAM_ENABLE, VKPLAY_CHAT_ENABLE } = process.env;
 
