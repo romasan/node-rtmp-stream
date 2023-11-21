@@ -19,7 +19,7 @@ import { getPixel } from '../../lib/api';
 
 import { Bar } from '../Bar';
 
-import image404 from 'url:../../../assets/404.png';
+import image404 from 'url:../../../assets/404.webp';
 
 import * as s from './Canvas.module.scss';
 
