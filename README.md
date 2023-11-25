@@ -65,7 +65,8 @@
 - [ ] timelapse page
 - [ ] leaderboard page
 - [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
-- [ ] frix layout after resize
+- [ ] fix layout after resize
+- [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
 
 # page with infinity map
  - [ ] parts of map like geo
