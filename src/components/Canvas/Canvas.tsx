@@ -58,6 +58,22 @@ const defaultPixelData = {
 	y: -1,
 };
 
+const debugCrosshair = (id, left, top, color) => {
+	let el = document.querySelector(`#${id}`);
+	if (!el) {
+		el = document.createElement('div');
+		document.body.appendChild(el);
+		el.id = id;
+		el.style.position = 'absolute';
+		el.style.zIndex = '9999999';
+		el.style.background = color;
+		el.style.width = '50px';
+		el.style.height = '50px';
+	}
+	el.style.left = left;
+	el.style.top = top;
+};
+
 export const Canvas: FC<PropsWithChildren<Props>> = ({
 	color,
 	mode = EMode.CLICK,
@@ -126,6 +142,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			if (rootRef.current) {
 				const { width, height } = rootRef.current.getBoundingClientRect();
 
+				console.log('==== pre set pos #1');
 				setPos({
 					x: width / 2 - image.width / 2,
 					y: height / 2 - image.height / 2,
@@ -169,6 +186,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (rootRef.current && canvasRef.current) {
 			const { width, height } = rootRef.current.getBoundingClientRect();
 			const canvas = canvasRef.current.getBoundingClientRect();
+
+			console.log('==== pre set pos #2');
 			setPos({
 				x: width / 2 - canvas.width / scale / 2,
 				y: height / 2 - canvas.height / scale / 2,
@@ -214,6 +233,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			clientY = touches[0].clientY;
 		}
 
+		// mobile zoom
 		if (touches && touches.length === 2) {
 			const touch1 = touches[0];
 			const touch2 = touches[1];
@@ -233,6 +253,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			return;
 		}
 
+		// drag canvas
 		if (!cur.current.some((e) => e === -1) && mode === EMode.CLICK) {
 			const moveX = (clientX - cur.current[0]) / scale;
 			const moveY = (clientY - cur.current[1]) / scale;
@@ -251,7 +272,12 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const topFrontier = center[1] - canvasH / scale;
 			const bottomFrontier = center[1];
 
+			console.log('==== pre set pos #3');
 			setPos((pos) => {
+				console.log('==== set pos', {
+					x: getInRange(pos.x + moveX, [leftFrontier, rightFrontier]),
+					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
+				});
 				return {
 					x: getInRange(pos.x + moveX, [leftFrontier, rightFrontier]),
 					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
@@ -260,6 +286,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
 
+		// update cursor position
 		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
 			const x = Math.floor((clientX - left) / scale);
@@ -387,15 +414,39 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const getPixelStyle = () => {
-		const { left = 0, top = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
+		const { left = 0, top = 0, width, height } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
 		const [x, y] = coord;
 
 		const _color = isFinished ? getPixelColor(canvasRef.current, x, y) : color;
 
+		// const _left = Math.floor(Math.floor(left) + x * scale);
+		// const _top = Math.floor(Math.floor(top) + y * scale);
+
+		const _left = left;
+		const _top = top;
+
+		const _width = width / scale;
+		const _height = height / scale;
+		// const __left = pos.x
+
+		console.log('==== getPixelStyle', {
+			left,
+			top,
+			x,
+			y,
+			scale,
+			_left: `${_left}px`,
+			_top: `${_top}px`,
+			width,
+			height,
+			_width,
+			_height,
+		});
+
 		return {
 			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
-			left: `${left + x * scale}px`,
-			top: `${top + y * scale}px`,
+			left: `${_left}px`,
+			top: `${_top}px`,
 			width: `${scale}px`,
 			height: `${scale}px`,
 			'--bg-color': _color,
@@ -513,6 +564,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			}, 1000);
 		}
 	}, [coord, scale]);
+
+	console.log('==== render', {
+		left: `${Math.floor(pos.x)}px`,
+		top: `${Math.floor(pos.y)}px`,
+		scale,
+	});
+
+	debugCrosshair('corner', `${pos.x}px`, `${pos.y}px`, 'green');
 
 	return (
 		<>

@@ -23,6 +23,18 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	};
 
 	let uuid = uuidsCache[_uuid];
+
+	console.log('==== updateStats', {
+		time,
+		nick,
+		x,
+		y,
+		_color,
+		_uuid,
+		uuid,
+		uuidsCache,
+	});
+
 	if (typeof uuid === 'undefined') {
 		stats.uuids.push(_uuid);
 		uuid = stats.uuids.length - 1;
@@ -63,7 +75,7 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	];
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
-	if (uuid) {
+	if (typeof uuid === 'number') {
 		// uuid -> nick
 		stats.leaderboard[uuid] = (stats?.leaderboard?.[uuid] || 0) + 1;
 	}

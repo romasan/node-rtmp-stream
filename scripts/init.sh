@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../
+cd ..
 mkdir db
 mkdir db/sessions
 echo -n > db/pixels.log
@@ -10,3 +10,4 @@ echo -n > db/messages.log
 echo -n > db/list
 echo -n > db/logout.log
 echo "{}" > db/auth.json
+cp server/.env.example server/.env

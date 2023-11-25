@@ -79,6 +79,13 @@ const getTotalPixels = () => {
 const getTopLeaderboard = (count = 10, uuid) => {
 	const sorted = Object.entries(stats?.leaderboard || {})
 		.sort(([, a], [, b]) => a < b ? 1 : -1);
+
+	console.log('====',  {
+		stats,
+		leaderboard: stats?.leaderboard,
+		sorted,
+	});
+
 	const output = sorted
 		.slice(0, count)
 		.reduce((list, [key, value], index) => [
