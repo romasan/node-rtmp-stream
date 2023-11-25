@@ -7,6 +7,29 @@ const DBFileName = __dirname + '/../db/auth.json';
 
 const logoutLog = fs.createWriteStream(__dirname + '/../db/logout.log', { flags : 'a' });
 
+/*
+ * TODO
+	{
+		"TOKEN": { DATA }
+	}
+	->
+	{
+		"authorized": {
+			"AUTH_ID": { DATA }
+		},
+		"sessions": {
+			"TOKEN": "AUTH_ID"
+		},
+		// "tokens": {
+		// 	"AUTH_ID": [
+		// 		"TOKEN1",
+		// 		"TOKEN2",
+		// 		"TOKEN3",
+		// 	]
+		// }
+	}
+*/
+
 let users = {};
 
 const getAllUsers = () => {
@@ -26,6 +49,10 @@ const saveUsers = () => {
 
 const addNewUser = (token, data) => {
 	users[token] = data;
+	
+	// TODO find in list user with similar name and authType
+	// merge duplicates
+
 	saveUsers();
 };
 

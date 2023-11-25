@@ -27,6 +27,8 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 		resetCountdownTemp(token);
 	}
 
+	// const _token = getAuthID(token) || token;
+
 	if (expirationsList[token]) {
 		if (expirationsList[token] > Date.now()) {
 			return Math.ceil((expirationsList[token] - Date.now()) / 1000);

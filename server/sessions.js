@@ -13,22 +13,6 @@ let failed = {};
 const maxLength = 1000;
 const gap = 100;
 
-/*
- * TODO
-	{
-		"TOKEN": { DATA }
-	}
-	->
-	{
-		"sessions": {
-			"SESSION_ID": { DATA }
-		},
-		"tokens": {
-			"TOKEN": "SESSION_ID"
-		}
-	}
-*/
-
 let index = 0;
 
 const rl = readline.createInterface({

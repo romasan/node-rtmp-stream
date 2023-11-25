@@ -64,7 +64,8 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
 	if (uuid) {
-		// uuid -> nick
+		// uuid -> nick | authId
+		// getAuthId
 		stats.leaderboard[uuid] = (stats?.leaderboard?.[uuid] || 0) + 1;
 	}
 }
