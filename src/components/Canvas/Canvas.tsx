@@ -635,6 +635,15 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					onPlace={handleClickPlace}
 				/>
 			)}
+			<input
+				className={s.scale}
+				value={scale}
+				onChange={
+					({ target: { value }}) => {
+						setScale(Number(value));
+					}
+				}
+			/>
 		</>
 	);
 };

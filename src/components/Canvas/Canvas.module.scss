@@ -162,3 +162,10 @@
 		margin: 0px;
 	}
 }
+
+.scale {
+	position: fixed;
+	top: 300px;
+	left: 10px;
+	z-index: 999999;
+}

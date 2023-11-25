@@ -24,17 +24,6 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 
 	let uuid = uuidsCache[_uuid];
 
-	console.log('==== updateStats', {
-		time,
-		nick,
-		x,
-		y,
-		_color,
-		_uuid,
-		uuid,
-		uuidsCache,
-	});
-
 	if (typeof uuid === 'undefined') {
 		stats.uuids.push(_uuid);
 		uuid = stats.uuids.length - 1;
