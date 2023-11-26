@@ -7,7 +7,7 @@
     "prebuild": "rm -rf dist/*.* .parcel-cache",
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
     "postbuild": "cp static/* dist/ && node ./scripts/postbuild.js",
-    "render": "react-snap && node ./scripts/postrender.js",
+    "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
     "serve": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache"
