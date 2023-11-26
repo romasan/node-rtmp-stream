@@ -274,10 +274,10 @@ const stats = (req, res) => {
 	const total = getTotalPixels();
 	const leaderboard = getTopLeaderboard(10, token)
 		.map((item) => {
-			const user = getUserData(item.uuid);
+			const user = getUserData(item.id);
 
 			return {
-				name: user?.name || getSessionUserName(item.uuid),
+				name: user?.name || getSessionUserName(item.id),
 				count: item.count,
 				place: item.place,
 			};

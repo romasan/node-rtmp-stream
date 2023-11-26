@@ -4,10 +4,11 @@
 
 const fs = require('fs');
 const readline = require('readline');
+const { getAuthId } = require('../auth');
 
 let uuidsCache = {};
 
-const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
+const updateStats = (stats, [time, nick, x, y, color, uuid]) => {
 	const key = `${x}:${y}`;
 
 	// if (!stats.starttime) {
@@ -16,23 +17,25 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 
 	stats.lastActivity = {
 		time,
-		uuid: _uuid,
+		uuid,
 		x,
 		y,
-		color: _color,
+		color,
 	};
 
-	let uuid = uuidsCache[_uuid];
-	if (typeof uuid === 'undefined') {
-		stats.uuids.push(_uuid);
-		uuid = stats.uuids.length - 1;
-		uuidsCache[_uuid] = stats.uuids.length - 1;
+	let uuidIndex = uuidsCache[uuid];
+
+	if (typeof uuidIndex === 'undefined') {
+		stats.uuids.push(uuid);
+		uuidIndex = stats.uuids.length - 1;
+		uuidsCache[uuid] = stats.uuids.length - 1;
 	}
 
-	let color = stats.colors.indexOf(_color);
-	if (color < 0) {
-		stats.colors.push(_color);
-		color = stats.colors.length - 1;
+	let colorIndex = stats.colors.indexOf(color);
+
+	if (colorIndex < 0) {
+		stats.colors.push(color);
+		colorIndex = stats.colors.length - 1;
 	}
 
 	const [
@@ -55,18 +58,18 @@ const updateStats = (stats, [time, nick, x, y, _color, _uuid]) => {
 
 	stats[key] = [
 		time,
-		uuid,
-		color,
+		uuidIndex,
+		colorIndex,
 		// ...prevColor,
 		// ...prevUser,
 		(count || 0) + 1,
 	];
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
-	if (uuid) {
-		// uuid -> nick | authId
-		// getAuthId
-		stats.leaderboard[uuid] = (stats?.leaderboard?.[uuid] || 0) + 1;
+	if (typeof uuidIndex === 'number') {
+		const _id = getAuthId(uuid) || uuid;
+
+		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
 	}
 }
 
@@ -99,21 +102,9 @@ const getPixelsInfo = (output) => {
 			: {};
 
 		let index = 0;
-
-		let _time = Date.now();
 	
 		rl.on('line', (line) => {
 			index++;
-
-			// if (index % 10000 === 0) {
-			// 	console.log(
-			// 		'====',
-			// 		index,
-			// 		Date.now() - _time,
-			// 		stats.uuids.length,
-			// 	);
-			// 	_time = Date.now();
-			// }
 
 			if (stats.totalCount >= index) {
 				return;

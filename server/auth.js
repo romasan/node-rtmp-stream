@@ -1,5 +1,6 @@
 const fs = require('fs');
 require('dotenv').config();
+const { validateToken } = require('./web/helpers');
 
 const { ADMIN_EMAIL } = process.env;
 
@@ -7,34 +8,22 @@ const DBFileName = __dirname + '/../db/auth.json';
 
 const logoutLog = fs.createWriteStream(__dirname + '/../db/logout.log', { flags : 'a' });
 
-/*
- * TODO
-	{
-		"TOKEN": { DATA }
-	}
-	->
-	{
-		"authorized": {
-			"AUTH_ID": { DATA }
-		},
-		"sessions": {
-			"TOKEN": "AUTH_ID"
-		},
-		// "tokens": {
-		// 	"AUTH_ID": [
-		// 		"TOKEN1",
-		// 		"TOKEN2",
-		// 		"TOKEN3",
-		// 	]
-		// }
-	}
-*/
-
-let users = {};
+let users = {
+	sessions: {},
+	authorized: {},
+};
 
 const getAllUsers = () => {
 	// TODO use database
 	users = require(DBFileName);
+
+	if (!users.sessions) {
+		users.sessions = {};
+	}
+
+	if (!users.authorized) {
+		users.authorized = {};
+	}
 };
 
 getAllUsers();
@@ -48,21 +37,31 @@ const saveUsers = () => {
 };
 
 const addNewUser = (token, data) => {
-	users[token] = data;
+	if (!validateToken(token)) {
+		return;
+	}
+
+	const user = _parseUserData(data);
+
+	if (!user || !user.id || !user.name) {
+		return;
+	}
+
+	const authId = `${user.area}:${user.id}`;
 	
-	// TODO find in list user with similar name and authType
-	// merge duplicates
+	users.authorized[authId] = data;
+	users.sessions[token] = authId;
 
 	saveUsers();
 };
 
 const checkUserAuthByToken = (token) => {
-	return token in users;
+	return token in users.sessions;
 };
 
 const checkIsAdmin = (token) => {
 	const user = getUserByToken(token);
-	
+
 	if (Boolean(user) && ADMIN_EMAIL && user?._authType === 'twitch' && user?.data?.[0]?.email === ADMIN_EMAIL) {
 		return true;
 	}
@@ -71,20 +70,30 @@ const checkIsAdmin = (token) => {
 };
 
 const getUserByToken = (token) => {
-	return users[token];
+	const authId = users.sessions[token] || token;
+
+	return users.authorized[authId];
 };
+
+const _parseUserData = (raw) => {
+	if (raw?._authType === 'twitch') {
+		return {
+			id: raw?.data?.[0]?.id,
+			name: raw?.data?.[0]?.display_name,
+			avatar: raw?.data?.[0]?.profile_image_url,
+			area: 'twitch',
+		};
+	}
+
+	return null;
+}
 
 const getUserData = (token) => {
 	const user = getUserByToken(token);
 
-	if (user?._authType === 'twitch') {
-		return {
-			name: user?.data?.[0]?.display_name,
-			avatar: user?.data?.[0]?.profile_image_url,
-		};
-	}
+	const data = _parseUserData(user);
 
-	return {};
+	return data || {};
 };
 
 const removeUser = (token) => {
@@ -109,9 +118,24 @@ const removeUser = (token) => {
 		login,
 	].join(';') + '\n');
 
-	delete users[token];
+	const authId = users.sessions[token];
+
+	delete users.sessions[token];
+
+	if (authId) {
+		const hasMoreSessions = Object.values(users.sessions).some((id) => id === authId);
+	
+		if (!hasMoreSessions) {
+			delete users.authorized[authId];
+		}
+	}
+
 	saveUsers();
 };
+
+const getAuthId = (token) => {
+	return users.sessions[token];
+}
 
 module.exports = {
 	addNewUser,
@@ -120,4 +144,6 @@ module.exports = {
 	getUserData,
 	removeUser,
 	checkIsAdmin,
+	getAuthId,
+	_parseUserData,
 };

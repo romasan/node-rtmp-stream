@@ -6,6 +6,7 @@ const log = require('./log');
 const ee = require('./lib/ee');
 const { getPixelsInfo, updateStats } = require('./tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('./tools');
+const { getAuthId } = require('./auth');
 
 const { UPSCALE, STREAM_FREEZED_FRAME, STREAM_WITH_BG, STREAM_DEBUG_TIME } = process.env;
 
@@ -81,21 +82,21 @@ const getTopLeaderboard = (count = 10, uuid) => {
 		.sort(([, a], [, b]) => a < b ? 1 : -1);
 	const output = sorted
 		.slice(0, count)
-		.reduce((list, [key, value], index) => [
+		.reduce((list, [id, value], index) => [
 			...list,
 			{
-				uuid: stats?.uuids[key],
+				id,
 				count: value,
 				place: index + 1,
 			},
 		], []);
 
 		if (uuid && !output.some((item) => item.uuid === uuid)) {
-			const place = sorted.findIndex(([key]) => stats?.uuids?.[key] === uuid);
+			const place = sorted.findIndex(([id]) => id === (getAuthId(uuid) || uuid));
 
-			if (place >= 0) {
+			if (place >= output.length) {
 				output.push({
-					uuid,
+					id: uuid,
 					count: sorted[place][1],
 					place: place + 1,
 				});
