@@ -68,6 +68,10 @@
 - [ ] leaderboard page
 - [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
 - [ ] frix layout after resize
+- [ ] fix layout after resize
+- [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
+- [ ] scale with canvas instead of css (for safari?)
+- [ ] decomposite canvas component by hooks (useDrag, useWheel, useTouch)
 
 # page with infinity map
  - [ ] parts of map like geo
