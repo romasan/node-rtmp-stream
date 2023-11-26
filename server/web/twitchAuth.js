@@ -16,9 +16,7 @@ const {
 const twitch = async (req, res) => {
 	if (req.url.startsWith('/auth/twitch')) {
 		if (req.url.startsWith('/auth/twitch/callback')) {
-			console.log('==== #0');
 			try {
-				console.log('==== #2');
 				const { token } = parseCookies(req.headers.cookie || '');
 				const query = url.parse(req.url, true).query;
 
@@ -29,17 +27,11 @@ const twitch = async (req, res) => {
 				urlEncoded.append('grant_type', 'authorization_code');
 				urlEncoded.append('redirect_uri', TWITCH_AUTH_REDIRECT_URI);
 
-				console.log('==== #3');
-
 				const respToken = await fetch(`https://id.twitch.tv/oauth2/token?${urlEncoded}`, {
 					method: 'POST',
 				});
 
-				console.log('==== #4');
-
 				const jsonToken = await respToken.json();
-
-				console.log('==== #5');
 
 				const respUserInfo = await fetch('https://api.twitch.tv/helix/users', {
 					headers: {
@@ -48,24 +40,16 @@ const twitch = async (req, res) => {
 					}
 				});
 
-				console.log('==== #6');
-
 				const jsonUserInfo = await respUserInfo.json();
-
-				console.log('==== #7');
 
 				if (jsonUserInfo.error) {
 					throw new Error(jsonUserInfo.error);
 				}
 
-				console.log('==== #8');
-
 				addNewUser(token, {
 					...jsonUserInfo,
 					_authType: 'twitch',
 				});
-
-				console.log('==== #9');
 
 				res.writeHead(302, { Location: WS_SERVER_ORIGIN });
 				res.end();
@@ -77,7 +61,6 @@ const twitch = async (req, res) => {
 			}
 
 		} else {
-			console.log('==== #10');
 			const urlEncoded = new URLSearchParams();
 			urlEncoded.append('response_type', 'code');
 			urlEncoded.append('grant_type', 'authorization_code');
@@ -91,12 +74,8 @@ const twitch = async (req, res) => {
 			res.end();
 		}
 
-		console.log('==== #11');
-
 		return true;
 	}
-
-	console.log('==== #12');
 
 	return false;
 };
