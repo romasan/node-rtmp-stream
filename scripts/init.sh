@@ -9,5 +9,5 @@ echo "0;0;112;112;0;0" > db/expands.log
 echo -n > db/messages.log
 echo -n > db/list
 echo -n > db/logout.log
-echo "{}" > db/auth.json
+echo "{\"sessions\":{},\"authorized\":{}}" > db/auth.json
 cp server/.env.example server/.env

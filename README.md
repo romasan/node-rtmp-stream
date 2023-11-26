@@ -48,6 +48,8 @@
 - [ ] merge token|uuid vars name?
 - [ ] const.js -> config.json
 - [ ] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
+- [ ] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
+- [ ] replace server/tools/getPixelInfo -> server/
 
 # web
 - [x] drawing

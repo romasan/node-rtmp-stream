@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { _parseUserData } = require('../auth');
 
 const _fixSessionByNickName = () => {
 	const sessions = require('../../db/auth.json');
@@ -58,52 +59,41 @@ const checkSessions = () => {
 const clearEmpty = () => {
 	const sessions = require('../../db/auth.json');
 	const output = Object.entries(sessions)
-		.filter(([key, value]) => Boolean(value?.data?.[0]?.login))
+		.filter(([key, value]) => {
+			const username = Boolean(value?.data?.[0]?.display_name);
+
+			return username && key !== 'undefined' && !value.error;
+		})
 		.reduce((list, [key, value]) => ({ ...list, [key]: value }), {});
 
 	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
 };
 
-const removeDuplicates = () => {
+const mergeSessions = () => {
 	const sessions = require('../../db/auth.json');
 
-	const doubles = {};
+	const _authorized = {};
+	const _sessions = {};
 
-	Object.entries(sessions).forEach(([key, value]) => {
-		const name = value?.data?.[0]?.display_name;
-
-		doubles[name] = [...(doubles[name] || []), key];
+	Object.entries(sessions).forEach(([token, value]) => {
+		try {
+			const user = _parseUserData(value);
+	
+			let authId = `${user.area}:${user.id}`;
+	
+			_sessions[token] = authId;
+			_authorized[authId] = value;
+		} catch (e) {
+			console.log('Failed:', token, value)
+		}
 	});
 
-	let _break = 0;
+	const output = {
+		authorized: _authorized,
+		sessions: _sessions,
+	};
 
-	const output = Object.entries(doubles).reduce((list, [name, keys]) => {
-		let key = keys[0];
-
-		if (keys.length > 1) {
-			console.log(`${name}: ${keys.length}`);
-
-			// fs.readFileSync();
-
-			if (_break) {
-				return;
-			}
-
-			_break++;
-
-			for (const _key of keys) {
-				// read login log
-				// get last date for sort
-			}
-		}
-
-		return {
-			...list,
-			[key]: sessions[key],
-		};
-	}, {})
-
-	// fs.writeFileSync(__dirname + '/../sessions/auth.json', JSON.stringify(output));
+	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
 }
 
 // const fixSessionByNickName = () => {
@@ -114,7 +104,7 @@ module.exports = {
 	// fixSessionByNickName,
 	checkSessions,
 	clearEmpty,
-	removeDuplicates,
+	mergeSessions,
 };
 // total: 298
 // unique: 244
