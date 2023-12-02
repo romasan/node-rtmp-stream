@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import cn from 'classnames';
 import mobile from 'is-mobile';
 
 import { useDraggable } from '../../hooks/useDraggable';
@@ -47,11 +48,11 @@ export const Palette: React.FC<Props> = ({ color, colors, expiration = 0, setCol
 						<div className={s.currentColor} style={{ background: colors[color]}}></div>
 					</div>
 					<div className={s.colors}>
-						{Object.entries(colors).map(([key, color]) => (
+						{Object.entries(colors).map(([key, itemColor]) => (
 							<div
 								key={key}
-								className={s.color}
-								style={{ background: color as string }}
+								className={cn(s.color, { [s.active]: color === key})}
+								style={{ background: itemColor as string }}
 								onClick={() => setColor(key)}
 							/>
 						))}

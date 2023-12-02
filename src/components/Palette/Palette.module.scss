@@ -118,17 +118,32 @@
 		left: 0px;
 		border-bottom-left-radius: 0px;
 		border-bottom-right-radius: 0px;
+		padding: 3px;
+		border-width: 2px;
+	}
+
+	.colors {
+		max-width: calc(100vw - 5px);
+		overflow-x: auto;
+		overflow-y: hidden;
+		grid-template-rows: 1fr;
+		padding: 3px 0;
 	}
 
 	.color {
 		@include size(8vw);
+		border-radius: 10px;
 	}
 
 	.currentColorWrapper {
-		@include size(16vw);
+		display: none;
 	}
 
 	.currentColor {
 		@include size(10vw);
+	}
+
+	.active {
+		box-shadow: 0px 0px 0px 3px #fff;
 	}
 }

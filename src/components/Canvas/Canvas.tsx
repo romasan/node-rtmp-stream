@@ -84,6 +84,22 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const timer = useRef(0);
 	const [pixelData, setPixelData] = useState(defaultPixelData);
 
+	// ===========================================================================
+	const [showDebug, setShowDebug] = useState(false);
+	const [debugLogList, setDebugLogList] = useState<string[]>([]);
+	const debugRef = useRef(null);
+
+	const debugLog = (message: string) => {
+		setDebugLogList((list) => [...list, message]);
+	};
+
+	useEffect(() => {
+		if (document.location.hash === '#debug') {
+			setShowDebug(true);
+		}
+	}, []);
+	// ===========================================================================
+
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
 
@@ -166,6 +182,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
+		if (
+			touches && 
+			new Array(touches?.length || 0).fill(0).some(
+				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
+			)
+		) {
+			return;
+		}
+		debugLog(`mouseDownCallback, touches: ${touches?.length} (${
+			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		})`);
 		if (touches && touches.length === 1) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
@@ -197,6 +224,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseMoveCallback = ({ clientX, clientY, touches }: any) => {
+		if (
+			touches && 
+			new Array(touches?.length || 0).fill(0).some(
+				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
+			)
+		) {
+			return;
+		}
+		debugLog(`mouseMoveCallback, touches: ${touches?.length} (${
+			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		})`);
 		if (touches) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
@@ -211,8 +249,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			if (!initialDistance.current) {
 				initialDistance.current = currentDistance;
+				debugLog(`set initialDistance: ${currentDistance}`);
 			} else {
 				const delta = currentDistance - initialDistance.current;
+				debugLog(`update initialDistance: ${initialDistance.current} -> ${currentDistance}, delte: ${delta}`);
 				initialDistance.current = currentDistance;
 
 				setScale((scale) => getInRange(scale + delta, [minScale, maxScale]));
@@ -267,6 +307,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseUpCallback = ({ clientX, clientY, target, touches }: any) => {
+		if (
+			touches && 
+			new Array(touches?.length || 0).fill(0).some(
+				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
+			)
+		) {
+			return;
+		}
+		debugLog(`mouseUpCallback, touches: ${touches?.length} (${
+			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		})`);
 		if (touches) {
 			clientX = cur.current[0];
 			clientY = cur.current[1];
@@ -556,6 +607,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</>
 				)}
 			</div>
+
+			{showDebug && (
+				<div className={s.debugLog} ref={debugRef}>
+					{debugLogList.map((item) => (
+						<div key={item}>{item}</div>
+					))}
+					{debugLogList.length === 0 && (
+						<div>EMPTY</div>
+					)}
+					<div className={s.debugLogCount}>{debugLogList.length}</div>
+				</div>
+			)}
 		</>
 	);
 };
