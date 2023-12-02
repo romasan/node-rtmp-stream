@@ -184,14 +184,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (
 			touches && 
-			new Array(touches?.length || 0).fill(0).some(
+			new Array(touches.length || 0).fill(0).some(
 				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
 			)
 		) {
 			return;
 		}
-		debugLog(`mouseDownCallback, touches: ${touches?.length} (${
-			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		debugLog(`mouseDownCallback, touches: ${touches ? touches.length : 0} (${
+			touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
 		})`);
 		if (touches && touches.length === 1) {
 			clientX = touches[0].clientX;
@@ -226,14 +226,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const mouseMoveCallback = ({ clientX, clientY, touches }: any) => {
 		if (
 			touches && 
-			new Array(touches?.length || 0).fill(0).some(
+			new Array(touches.length || 0).fill(0).some(
 				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
 			)
 		) {
 			return;
 		}
-		debugLog(`mouseMoveCallback, touches: ${touches?.length} (${
-			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		debugLog(`mouseMoveCallback, touches: ${touches ? touches.length : 0} (${
+			touches && touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
 		})`);
 		if (touches) {
 			clientX = touches[0].clientX;
@@ -309,14 +309,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const mouseUpCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (
 			touches && 
-			new Array(touches?.length || 0).fill(0).some(
+			new Array(touches.length || 0).fill(0).some(
 				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
 			)
 		) {
 			return;
 		}
-		debugLog(`mouseUpCallback, touches: ${touches?.length} (${
-			new Array(touches?.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
+		debugLog(`mouseUpCallback, touches: ${touches ? touches.length : 0} (${
+			touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
 		})`);
 		if (touches) {
 			clientX = cur.current[0];

@@ -14,7 +14,7 @@ import ee from '../../lib/ee';
 import * as s from './App.module.scss';
 
 const disableMouse = {
-	onMouseDown: (e: MouseEvent) => e?.stopPropagation(),
+	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
 

@@ -6,6 +6,8 @@ import { get } from '../../helpers';
 
 import { formatNumber } from '../../../../helpers';
 
+import * as s from './Stats.module.scss';
+
 interface Props {
 	canvas: any;
 }
@@ -55,7 +57,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			{Boolean(stats.online) && (
 				<div>
 					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
-					<div>
+					<div className={s.users}>
 						<a href="#" onClick={getList}>Список</a>
 						{list.map((item) => (
 							<div key={String(item.name)}>
