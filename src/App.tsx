@@ -10,6 +10,7 @@ import {
 	Chat,
 	Info,
 	Countdown,
+	Bar,
 } from './components/';
 
 import { addPix } from './lib/api';
@@ -29,7 +30,6 @@ import * as s from './App.module.scss';
 
 const disableMouse = {
 	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
-	onMouseMove: (e: MouseEvent) => e.stopPropagation(),
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
 
@@ -48,6 +48,7 @@ export const App: React.FC = () => {
 	const [finish, setFinish] = useState(0);
 	const [isFinished, setIsFinished] = useState(false);
 	const [hasNewMessage, setHasNewMessage] = useState(false);
+	const [canvas, setCanvas] = useState<any>({});
 	const blinkedTimer = useRef<number | NodeJS.Timeout>(-1);
 
 	const toggleChat = () => {
@@ -175,7 +176,15 @@ export const App: React.FC = () => {
 				isAuthorized={isAuthorized}
 				isFinished={isFinished}
 				isOnline={isOnline}
+				onInit={setCanvas}
 			/>
+			{!isMobile && (
+				<Bar
+					centering={canvas.centering}
+					setScale={canvas.setScale}
+					isFinished={isFinished}
+				/>
+			)}
 			{wsStore.palette && !isFinished && (
 				<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
 			)}

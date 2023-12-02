@@ -17,7 +17,7 @@ import {
 } from '../../helpers';
 import { getPixel } from '../../lib/api';
 
-import { Bar } from '../Bar';
+import { showPixelScale, scaleDegree, minScale, maxScale } from '../../const';
 
 import image404 from 'url:../../../assets/404.webp';
 
@@ -39,12 +39,8 @@ interface Props {
 	onClick(x: number, y: number): void;
 	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
 	onInit?: (value: any) => void;
+	onScale?: ([scale, setScale]: [number, Function]) => null;
 }
-
-const showPixelScale = 6;
-const scaleDegree = 1.1;
-const minScale = 1;
-const maxScale = 50;
 
 const defautSelected = {
 	from: { x: 0, y: 0 },
@@ -142,7 +138,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		ctx.drawImage(image, 0, 0);
 
 		if (onInit) {
-			onInit(image);
+			onInit({
+				image,
+				setScale,
+				centering,
+			});
 		}
 
 		ee.on('ws:drawPix', ({ x, y, color }) => {
@@ -153,29 +153,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		});
 	}, [canvasRef.current]);
 
-	const handleClickDraw = useCallback(() => {
-		setScale((scale) => Math.max(scale, showPixelScale));
-	}, []);
-
-	const handleClickPlus = useCallback(() => {
-		setScale((scale) => getInRange(scale * 2, [minScale, maxScale]));
-	}, []);
-
-	const handleClickMinus = useCallback(() => {
-		setScale((scale) => getInRange(scale / 2, [minScale, maxScale]));
-	}, []);
-
-	const handleClickPlace = useCallback(() => {
+	const centering = () => {
 		if (rootRef.current && canvasRef.current) {
 			const { width, height } = rootRef.current.getBoundingClientRect();
 			const canvas = canvasRef.current.getBoundingClientRect();
+
 			setPos({
 				x: width / 2 - canvas.width / scale / 2,
 				y: height / 2 - canvas.height / scale / 2,
 			});
-			setScale(2);
 		}
-	}, [rootRef.current, canvasRef.current, scale]);
+	};
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
 		if (touches && touches.length === 1) {
@@ -568,14 +556,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</>
 				)}
 			</div>
-			{!isMobile && (
-				<Bar
-					onDraw={isFinished ? undefined : handleClickDraw}
-					onPlus={handleClickPlus}
-					onMinus={handleClickMinus}
-					onPlace={handleClickPlace}
-				/>
-			)}
 		</>
 	);
 };

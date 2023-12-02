@@ -70,8 +70,8 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			</div>
 			{Boolean(stats.coord) && (
 				<div>
-					{stats.lastUserName} ({stats.lastUserUUID}) &nbsp;
-					<a href="#" onClick={drawPixel}>{stats.coord.x}, {stats.coord.y} {stats.color};</a>
+					{stats.lastUserName} ({stats.lastUserUUID})
+					<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
 				</div>
 			)}
 			<div>

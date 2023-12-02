@@ -15,7 +15,6 @@ import * as s from './App.module.scss';
 
 const disableMouse = {
 	onMouseDown: (e: MouseEvent) => e?.stopPropagation(),
-	onMouseMove: (e: MouseEvent) => e.stopPropagation(),
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
 
@@ -48,10 +47,10 @@ export const App: React.FC = () => {
 		setRange({ from, to });
 	};
 
-	const onInitCanvas = (canvas: any) => {
+	const onInitCanvas = ({ image }: any) => {
 		setSize({
-			width: canvas.width,
-			height: canvas.height,
+			width: image.width,
+			height: image.height,
 		});
 	};
 

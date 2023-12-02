@@ -5,7 +5,9 @@
 }
 
 .title {
-	@include buttonLike();
+	background: #323233;
+	border: 1px solid #797979;
+	cursor: pointer;
 
 	&,
 	&:active,
@@ -15,14 +17,33 @@
 }
 
 .content {
-	border-right-color: $color-window-border-light;
-	border-bottom-color: $color-window-border-light;
-	border-left-color: $color-window-border-dark;
-	border-top-color: $color-window-border-dark;
-	background: #dbdbef;
-	color: #000;
-	border-style: solid;
-	border-width: 2px;
+	background: #323233;
+	border: 1px solid #797979;
+	border-top: 0px;
+	color: #fff;
 	padding: 3px;
 	box-sizing: border-box;
+
+	a,
+	a:active,
+	a:visited,
+	a:hover {
+		color: #fff;
+		font-weight: bold;
+	}
+
+	button {
+		background: #323233;
+		border: 1px solid #797979;
+		color: #fff;
+		cursor: pointer;
+		padding: 3px;
+		margin: 1px
+	}
+	input {
+		background: #323233;
+		border: 1px solid #797979;
+		border-bottom: 2px solid #797979;
+		color: #fff;
+	}
 }

@@ -16,7 +16,7 @@
 - [ ] moderations (with log)
 - [x] replace res/ -> assets/
 - [ ] online users list
-- [ ] reset countdown on login
+- [x] reset countdown on login
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
 
@@ -25,7 +25,7 @@
 - [x] add admin route
 - [x] update stream frame
 - [x] cover up area
-- [ ] change countdown
+- [ ] change countdown in runtime
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
 - [ ] preview last changes, heatmap, changes by user
@@ -38,7 +38,7 @@
 
 - [x] backup frames / pixels for timelapse
 - [ ] auto restart on fail (fix ffmpeg problems)
-- [ ] auto restart: write process.pid to file
+- [x] auto restart: write process.pid to file
 - [ ] auto restart: add servise with chatbot for notification
 - [ ] fit the canvas into the frame
 - [ ] write start datetime to file
@@ -46,10 +46,10 @@
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages?
-- [ ] move ssl handle to nginx (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
+- [ ] move ssl handle to nginx? (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
 - [ ] merge token|uuid vars name?
 - [ ] const.js -> config.json
-- [ ] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
+- [x] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
 - [ ] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
 - [ ] replace server/tools/getPixelInfo -> server/
 
@@ -74,6 +74,7 @@
 - [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
 - [ ] scale with canvas instead of css (for safari?)
 - [ ] decomposite canvas component by hooks (useDrag, useWheel, useTouch)
+- [x] replace Bar panel to App
 
 # page with infinity map
 
