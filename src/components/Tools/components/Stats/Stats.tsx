@@ -7,14 +7,26 @@ import { get } from '../../helpers';
 import { formatNumber } from '../../../../helpers';
 
 interface Props {
+	canvas: any;
 }
 
-export const Stats: FC<Props> = ({}) => {
+export const Stats: FC<Props> = ({ canvas }) => {
 	const [stats, setStats] = useState<any>({});
+	const [list, setList] = useState<{ name: string; active: boolean; }[]>([]);
 
 	const onOpen = () => {
 		get('stats').then(setStats);
 	};
+
+	const onClose = () => {
+		canvas.width = canvas.width;
+	};
+
+	const getList = (event: React.MouseEvent) => {
+		event.preventDefault();
+
+		get('onlineList').then(setList)
+	}
 
 	const agoLabel = useMemo(() => {
 		const sec = Math.floor(stats.lastActivity / 1000);
@@ -26,12 +38,31 @@ export const Stats: FC<Props> = ({}) => {
 		return time;
 	}, [stats.lastActivity]);
 
+	const drawPixel = (event: React.MouseEvent) => {
+		event.preventDefault();
+
+		const ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = '#f658b8';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+		ctx.fillStyle = stats.color;
+		ctx.fillRect(stats.coord.x, stats.coord.y, 1, 1);
+	};
+
 	return (
-		<Block title="Общее" onOpen={onOpen}>
+		<Block title="Общее" onOpen={onOpen} onClose={onClose}>
 			{Boolean(stats.online) && (
 				<div>
-					Сессии: {stats.online.uniq} / {stats.online.open} / {stats.online.all}
-					<a href="#">Список TODO</a>
+					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
+					<div>
+						<a href="#" onClick={getList}>Список</a>
+						{list.map((item) => (
+							<div key={String(item.name)}>
+								{item.name} {item.active ? '*' : ''}
+							</div>
+						))}
+					</div>
 				</div>
 			)}
 			<div>
@@ -39,7 +70,8 @@ export const Stats: FC<Props> = ({}) => {
 			</div>
 			{Boolean(stats.coord) && (
 				<div>
-					{stats.lastUserName} ({stats.lastUserUUID}) {stats.coord.x}:{stats.coord.y} {stats.color};
+					{stats.lastUserName} ({stats.lastUserUUID}) &nbsp;
+					<a href="#" onClick={drawPixel}>{stats.coord.x}, {stats.coord.y} {stats.color};</a>
 				</div>
 			)}
 			<div>

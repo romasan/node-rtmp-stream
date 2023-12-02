@@ -1,0 +1,77 @@
+{
+	"COLORS_1": {
+		"yellow": "#e2d747",
+		"lightgreen": "#a5dd5f",
+		"green": "#56ba37",
+		"cyan": "#5fcfdb",
+		"cyanblue": "#3681c1",
+		"blue": "#091de0",
+		"lightmagenta": "#c276de",
+		"magenta": "#77197c",
+		"white": "#ffffff",
+		"lightgray": "#e4e4e4",
+		"gray": "#888888",
+		"black": "#000000",
+		"pink": "#f1aacf",
+		"red": "#d22d1f",
+		"orange": "#db9834",
+		"brown": "#976c49"
+	},
+	"COLORS": {
+		"deepcarmine": "#ae233d",
+		"flame": "#ec5427",
+		"yelloworange": "#f4ab3c",
+		"naplesyellow": "#f9d759",
+		"mediumseagreen": "#48a06d",
+		"emerald": "#5cc87f",
+		"inchworm": "#9ae96c",
+		"myrtlegreen": "#317270",
+		"verdigris": "#469ca8",
+		"cyancobaltblue": "#2d519e",
+		"unitednationsblue": "#4d90e3",
+		"mediumskyblue": "#7ee6f2",
+		"oceanblue": "#4440ba",
+		"VeryLightBlue": "#6662f6",
+		"grape": "#772b99",
+		"purpleplum": "#a754ba",
+		"darkpink": "#eb4e81",
+		"mauvelous": "#f19eab",
+		"coffee": "#684a34",
+		"coconut": "#956a34",
+		"black": "#000000",
+		"philippinegray": "#898d90",
+		"lightsilver": "#d5d7d9",
+		"white": "#ffffff"
+	},
+	"countdownRanges": {
+		"authorized": {
+			"0": 3,
+			"30": 4,
+			"50": 5,
+			"100": 15,
+			"1000": 60
+		},
+		"guest": {
+			"0": 60,
+			"50": 180,
+			"100": 300,
+			"500": 600
+		}
+	},
+	"videoSize": {
+		"width": 1280,
+		"height": 720
+	},
+	"tempBans": {
+		"uuid": {
+			"0309fb36-a56a-4a42-8003-d8eafb8fbcf9": true
+		},
+		"nick": {
+			"hiki1kamaz1top": true,
+			"mayhemkidd": true
+		},
+		"ip": {
+			"1.2.3.4": true
+		}
+	}
+}

@@ -111,7 +111,7 @@ const heatmapCLI = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
 	});
 };
 
-const heatmapFromStats =  async (stats, output) => {
+const heatmapFromStats = async (stats, output) => {
 	if (typeof stats === 'string') {
 		stats = await readJSON(stats)
 	}

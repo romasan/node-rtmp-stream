@@ -63,7 +63,7 @@ export const Tools: FC<Props> = ({
 				<div className={s.content} {...props}>
 					{expand && (
 						<>
-							<Stats />
+							<Stats canvas={canvas} />
 							<Stream />
 							<PixelStats coord={coord} />
 							<Maps canvas={canvas} />
@@ -73,7 +73,7 @@ export const Tools: FC<Props> = ({
 								color={color}
 								setCanvasMode={setCanvasMode}
 							/>
-							<Block title="Откат области без пикселей конкретного юзера?">FOO</Block>
+							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"
 								// onOpen={() => console.log('==== open #1')}
 								// onClose={() => console.log('==== close #1')}
@@ -81,8 +81,35 @@ export const Tools: FC<Props> = ({
 							<Block title="Увеличить размер полотна"
 								// onOpen={() => console.log('==== open #2')}
 								// onClose={() => console.log('==== close #2')}
-							>TODO</Block>
-							<Block title="Выставить окончание пиксельбаттла">TODO</Block>
+							>
+								<div>TODO</div>
+								<div>
+									<input type="checkbox" /> lock canvas
+								</div>
+								<div>999x999</div>
+								<div>
+									<input size="5" />
+									x
+									<input size="5" />
+								</div>
+								<div>
+									<input type="radio" name="corner" checked />
+									<input type="radio" name="corner" />
+								</div>
+								<div>
+									<input type="radio" name="corner" />
+									<input type="radio" name="corner" />
+								</div>
+								<div>
+									<button>update</button>
+								</div>
+							</Block>
+							<Block title="Выставить окончание пиксельбаттла">
+								<div>TODO</div>
+								<div>
+									<input type="datetime-local" />
+								</div>
+							</Block>
 							<Block title="Управление банами">TODO</Block>
 						</>
 					)}

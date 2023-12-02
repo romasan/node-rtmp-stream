@@ -36,7 +36,7 @@ const saveUsers = () => {
 	);
 };
 
-const addNewUser = (token, data) => {
+const authorizeUser = (token, data) => {
 	if (!validateToken(token)) {
 		return;
 	}
@@ -62,7 +62,7 @@ const checkUserAuthByToken = (token) => {
 const checkIsAdmin = (token) => {
 	const user = getUserByToken(token);
 
-	if (Boolean(user) && ADMIN_EMAIL && user?._authType === 'twitch' && user?.data?.[0]?.email === ADMIN_EMAIL) {
+	if (Boolean(user) && Boolean(ADMIN_EMAIL) && user?._authType === 'twitch' && user?.data?.[0]?.email === ADMIN_EMAIL) {
 		return true;
 	}
 
@@ -138,7 +138,7 @@ const getAuthId = (token) => {
 }
 
 module.exports = {
-	addNewUser,
+	authorizeUser,
 	checkUserAuthByToken,
 	getUserByToken,
 	getUserData,

@@ -17,6 +17,8 @@
 - [x] replace res/ -> assets/
 - [ ] online users list
 - [ ] reset countdown on login
+- [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
+- [ ] rename all qq to admin or super
 
 # admin panel
 
@@ -52,6 +54,7 @@
 - [ ] replace server/tools/getPixelInfo -> server/
 
 # web
+
 - [x] drawing
 - [x] zooming
 - [x] select color
@@ -67,36 +70,50 @@
 - [ ] timelapse page
 - [ ] leaderboard page
 - [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
-- [ ] frix layout after resize
 - [ ] fix layout after resize
 - [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
 - [ ] scale with canvas instead of css (for safari?)
 - [ ] decomposite canvas component by hooks (useDrag, useWheel, useTouch)
 
 # page with infinity map
- - [ ] parts of map like geo
+
+- [ ] parts of map like geo
 
 # configurate
 
 # how to configurate ssl certificate
+
 ```bash
 sudo certbot certonly --webroot -w /var/www/html -d api.pixelbattle.online
+```
+
+OR
+
+```bash
+sudo certbot certonly --standalone -d api.pixelbattle.online
 sudo cp /etc/letsencrypt/live/api.pixelbattle.online/* ./
 ```
 
 # how to render timelapse
+
 ```bash
 ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
 ```
+
 or
+
 ```bash
 ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
 ```
+
 or
+
 ```bash
 ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
 ```
+
 or
+
 ```bash
 ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest output.mp4
 ```
@@ -104,7 +121,6 @@ ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:
 ```bash
 ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
 ```
-
 
 # S1E2 TODO
 
@@ -120,3 +136,46 @@ ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a a
 - [x] update constants
 - coundown
 - add new colors
+
+# nginx
+
+```bash
+sudo apt-get install nginx
+sudo nginx
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example
+sudo ln -s /etc/nginx/sites-available/example /etc/nginx/sites-enabled/example
+sudo vim /etc/nginx/sites-available/example
+sudo /etc/init.d/nginx restart
+sudo nginx -s reload
+```
+
+```bash
+sudo cp /etc/letsencrypt/live/w.nbauer.ru/fullchain.pem /etc/nginx/ssl/server.crt
+sudo cp /etc/letsencrypt/live/w.nbauer.ru/privkey.pem /etc/nginx/ssl/server.key
+```
+
+/etc/nginx/sites-available/example
+
+```
+server {
+	listen 80;
+	server_name api.pixelbattle.online;
+
+	location / {
+		proxy_pass http://localhost:3000;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection 'upgrade';
+		proxy_set_header Host $host;
+		proxy_cache_bypass $http_upgrade;
+	}
+
+	listen 443;
+	server_name api.pixelbattle.online;
+	root /usr/share/nginx/www;
+	index index.html index.htm;
+	ssl on;
+	ssl_certificate /etc/nginx/ssl/server.crt;
+	ssl_certificate_key /etc/nginx/ssl/server.key;
+}
+```

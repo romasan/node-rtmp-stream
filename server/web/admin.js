@@ -30,6 +30,7 @@ const admin = async (req, res, {
 	getInfo,
 	getOnlineCountRaw,
 	getOnlineCount,
+	getOnlineCountList,
 }) => {
 	const { token } = parseCookies(req.headers.cookie || '');
 
@@ -54,7 +55,7 @@ const admin = async (req, res, {
 
 		switch (command) {
 			case 'stats':
-				const [open, all] = getOnlineCountRaw();
+				const [open, all, countByActivity] = getOnlineCountRaw();
 				const uniq = getOnlineCount();
 				const lastActivity = getLastActivity();
 				const user = getUserData(lastActivity?.uuid);
@@ -65,6 +66,7 @@ const admin = async (req, res, {
 						uniq,
 						open,
 						all,
+						countByActivity,
 					},
 					lastActivity: Date.now() - lastActivity?.time,
 					lastUserName: user?.name || getSessionUserName(lastActivity?.uuid),
@@ -141,13 +143,23 @@ const admin = async (req, res, {
 
 					res.writeHead(200, { 'Content-Type': 'text/plain' });
 					res.end('ok');
-
 					return;
 				}
 
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
 				res.end('fail');
+				return;
+			case 'onlineList':
+				const list = getOnlineCountList().map((item) => {
+					const user = getUserData(item?.uuid);
 
+					return {
+						...item,
+						name: user?.name || getSessionUserName(item.uuid),
+					};
+				});
+				res.writeHead(200, { 'Content-Type': 'text/json' });
+				res.end(JSON.stringify(list));
 				return;
 		}
 

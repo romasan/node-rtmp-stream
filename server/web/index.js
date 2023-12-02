@@ -16,7 +16,7 @@ const {
 	isNumber,
 	checkStillTime,
 } = require('./helpers');
-const { getExpiration } = require('./countdown');
+const { getExpiration, resetCountdownTemp } = require('./countdown');
 const {
 	checkSession,
 	addSession,
@@ -32,7 +32,7 @@ require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
 const admin = require('./admin');
-const { COLORS, tempBans } = require('../const');
+const { COLORS, tempBans } = require('../const.json');
 
 const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
 
@@ -117,7 +117,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	}
 }, true);
 
-const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) => {
+const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, uptateActiveTime }) => {
 	if (req.method === 'PUT') {
 		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -130,6 +130,8 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown }) =>
 		const postPayload = await getPostPayload(req);
 
 		let payload = {};
+
+		uptateActiveTime(token);
 
 		try {
 			payload = JSON.parse(postPayload);
@@ -304,6 +306,10 @@ const _default = async (req, res, callbacks) => {
 		// && !await vkAuth(req, res)
 	) {
 		getInfo(req, res);
+	} else {
+		const { token } = parseCookies(req.headers.cookie || '');
+
+		resetCountdownTemp(token)
 	}
 }
 

@@ -55,7 +55,7 @@ const genMapByUsers = (map, output) => {
 	fs.writeFileSync(output, canvas.toBuffer());
 };
 
-const mapByUsersFromStats =  async (stats, output) => {
+const mapByUsersFromStats = async (stats, output) => {
 	if (typeof stats === 'string') {
 		stats = await readJSON(stats)
 	}

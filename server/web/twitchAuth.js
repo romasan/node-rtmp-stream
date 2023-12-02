@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const url = require('url');
 require('dotenv').config();
 
-const  { addNewUser } = require('../auth');
+const { authorizeUser } = require('../auth');
 
 const { parseCookies } = require('./helpers');
 
@@ -46,7 +46,7 @@ const twitch = async (req, res) => {
 					throw new Error(jsonUserInfo.error);
 				}
 
-				addNewUser(token, {
+				authorizeUser(token, {
 					...jsonUserInfo,
 					_authType: 'twitch',
 				});

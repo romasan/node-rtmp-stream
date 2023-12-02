@@ -1,4 +1,4 @@
-const WebSocket = require('ws')
+const WebSocket = require('ws');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
@@ -6,7 +6,7 @@ const ee = require('./lib/ee');
 const web = require('./web');
 const { getCountdown } = require('./web/countdown');
 const { checkFirstTime, checkSession } = require('./sessions');
-const { COLORS } = require('./const');
+const { COLORS } = require('./const.json');
 const { parseCookies } = require('./web/helpers');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 require('dotenv').config();
@@ -18,6 +18,7 @@ const {
 	WS_SERVER_ORIGIN,
 	FINISH_TIME_STAMP,
 	FINISH_TEXT,
+	ACTIVITY_DURATION,
 } = process.env;
 
 let webServer = null;
@@ -48,20 +49,60 @@ const spam = (data) => {
 	});
 };
 
+const delay = (t = 100) => new Promise((resolve) => setTimeout(resolve, t));
+
+const waveSpam = async (data) => {
+	const message = JSON.stringify(data);
+	const count = 0;
+
+	for (const ws of wss.clients) {
+		if (ws.readyState === WebSocket.OPEN) {
+			count++;
+			if (count % 100 === 0) {
+				await delay();
+			}
+			ws.send(message);
+		}
+	}
+};
+
 ee.on('spam', spam);
 
 const getOnlineCountRaw = () => {
 	let count = 0;
 	let openedCount = 0;
+	let countByActivity = 0;
 
 	wss.clients.forEach((ws) => {
 		count++;
 		if (ws.readyState === WebSocket.OPEN) {
 			openedCount++;
 		}
+		if (ws._lastActivity && (Date.now() - ws._lastActivity) <= Number(ACTIVITY_DURATION)) {
+			countByActivity++;
+		}
 	});
 
-	return [openedCount, count];
+	return [openedCount, count, countByActivity];
+};
+
+const getOnlineCountList = () => {
+	const list = [];
+
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			const uuid = ws._token;
+			const lastActivity = ws._lastActivity;
+
+			list.push({
+				uuid,
+				active: (Date.now() - lastActivity) <= Number(ACTIVITY_DURATION),
+				lastActivity,
+			});
+		}
+	});
+
+	return list;
 };
 
 let updatedCacheTime = 0;
@@ -88,10 +129,20 @@ const getOnlineCount = () => {
 	return cachedOnline;
 };
 
+const uptateActiveTime = (token) => {
+	wss.clients.forEach((ws) => {
+		if (ws._token === token) {
+			ws._lastActivity = Date.now();
+		}
+	})
+};
+
 const callbacks = {
 	updateClientCountdown,
 	getOnlineCountRaw,
 	getOnlineCount,
+	uptateActiveTime,
+	getOnlineCountList,
 };
 
 const webServerHandler = (req, res) => {
@@ -125,7 +176,7 @@ const webServerHandler = (req, res) => {
 
 		console.log('Error: url handler', error);
 	}
-}
+};
 
 if (WS_SECURE === 'true') {
 	const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
@@ -161,6 +212,7 @@ wss.on('connection', (ws, req) => {
 	const user = getUserData(token);
 
 	ws._token = token;
+	ws._lastActivity = Date.now();
 
 	send(token, 'init', {
 		palette: COLORS,

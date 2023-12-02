@@ -1,5 +1,5 @@
 const { inRange } = require('./helpers');
-const { countdownRanges } = require('../const');
+const { countdownRanges } = require('../const.json');
 const { checkUserAuthByToken, checkIsAdmin } = require('../auth');
 
 const humanListToArray = (obj) => Object.entries(obj)

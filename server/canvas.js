@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { COLORS, videoSize } = require('./const');
+const { COLORS, videoSize } = require('./const.json');
 const log = require('./log');
 const ee = require('./lib/ee');
 const { getPixelsInfo, updateStats } = require('./tools/getPixelsInfo');
