@@ -14,6 +14,7 @@ import {
 	invertRgb,
 	getPixelColor,
 	formatDate,
+	formatTime,
 } from '../../helpers';
 import { getPixel } from '../../lib/api';
 
@@ -107,12 +108,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (isFinished) {
 			time = formatDate(Number(pixelData.time));
 		} else {
-			const sec = Math.floor(pixelData.time / 1000);
-			const min = Math.floor(sec / 60);
-			const hour = Math.floor(min / 60);
-			const day = Math.floor(hour / 24);
-			
-			time = `${day ? `${day} д. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+			time = formatTime(pixelData.time);
 		}
 
 		if (pixelData.x === x && pixelData.y === y) {

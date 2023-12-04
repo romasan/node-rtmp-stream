@@ -61,3 +61,17 @@ export const getPixel = async (x: number, y: number) => {
 
 	return await resp.json();
 };
+
+export const fetchTimelapse = async (name: string) => {
+	const resp = await fetch(`${APIhost}/timelapse/${name}/index.json`, {
+		credentials: 'include',
+	});
+
+	return await resp.json();
+};
+
+export const fetchTimelapsePartBin = (name: string, index: number) => {
+	return fetch(`${APIhost}/timelapse/${name}/${index}.bin`, {
+		credentials: 'include',
+	});
+};

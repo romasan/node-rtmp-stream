@@ -4,7 +4,7 @@ import { Block } from '../Block';
 
 import { get } from '../../helpers';
 
-import { formatNumber } from '../../../../helpers';
+import { formatNumber, formatTime } from '../../../../helpers';
 
 import * as s from './Stats.module.scss';
 
@@ -29,16 +29,6 @@ export const Stats: FC<Props> = ({ canvas }) => {
 
 		get('onlineList').then(setList)
 	}
-
-	const agoLabel = useMemo(() => {
-		const sec = Math.floor(stats.lastActivity / 1000);
-		const min = Math.floor(sec / 60);
-		const hour = Math.floor(min / 60);
-		const day = Math.floor(hour / 24);
-		const time = `${day ? `${day}d. ` : ''}${hour ? `${String(hour % 24).padStart(2, '0')}:` : ''}${String(min % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
-
-		return time;
-	}, [stats.lastActivity]);
 
 	const drawPixel = (event: React.MouseEvent) => {
 		event.preventDefault();
@@ -68,7 +58,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 				</div>
 			)}
 			<div>
-				Активность: {agoLabel} назад
+				Активность: {formatTime(stats.lastActivity)} назад
 			</div>
 			{Boolean(stats.coord) && (
 				<div>
@@ -79,9 +69,9 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			<div>
 				Всего пикселей: {formatNumber(stats.total)}
 			</div>
-			{/* <div>
-				Uptime: 999 д. 01:02:03
-			</div> */}
+			<div>
+				Uptime: {formatTime(stats.uptime)}
+			</div>
 		</Block>
 	);
 };

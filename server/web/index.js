@@ -291,6 +291,38 @@ const stats = (req, res) => {
 		leaderboard,
 	}));
 };
+const contentTypes = {
+	json: 'text/json',
+	bin: 'application/octet-stream',
+};
+
+const timelapse = (req, res) => {
+	if (req.url.startsWith('/timelapse/')) {
+		try {
+			const parts = req.url.split('/');
+			const [,, season, file] = parts;
+			const filePath = `${__dirname}/../../db/archive/${season}/timelapse/${file}`;
+			const ext = file?.split('.').pop();
+
+			if (!fs.existsSync(filePath)) {
+				throw new Error();
+			}
+			
+			res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
+			const readStream = fs.createReadStream(filePath);
+			readStream.pipe(res);
+		} catch (e) {
+			res.writeHead(404, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: get timelapse file');
+		}
+
+		return true;
+	}
+
+	return false;
+}
 
 const _default = async (req, res, callbacks) => {
 	if (req.url.startsWith('/qq/')) {
@@ -300,10 +332,11 @@ const _default = async (req, res, callbacks) => {
 	}
 
 	if (
-		!await twitchAuth(req, res)
+		!await twitchAuth(req, res) && 
 		// && !await vkPlayAuth(req, res)
 		// && !await discordAuth(req, res)
 		// && !await vkAuth(req, res)
+		!timelapse(req, res)
 	) {
 		getInfo(req, res);
 	} else {

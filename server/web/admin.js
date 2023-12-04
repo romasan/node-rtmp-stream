@@ -26,6 +26,8 @@ const {
 	mapLastPixelsFromStats,
 } = require('../tools');
 
+const startTime = Date.now();
+
 const admin = async (req, res, {
 	getInfo,
 	getOnlineCountRaw,
@@ -77,6 +79,7 @@ const admin = async (req, res, {
 					},
 					color: lastActivity.color,
 					total,
+					uptime: Date.now() - startTime,
 				};
 
 				res.writeHead(200, { 'Content-Type': 'text/json' });

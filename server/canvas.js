@@ -240,8 +240,6 @@ const drawPix = ({ x, y, color, nickname, uuid }) => {
 
 	log({x, y, color: rawColor, nickname, uuid});
 
-	// TODO update last activity for uuid (for check active online count)
-
 	ee.emit('spam', {
 		event: 'drawPix',
 		payload: {

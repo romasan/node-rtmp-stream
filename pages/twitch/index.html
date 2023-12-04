@@ -1,23 +1,26 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-	<title>video component</title>
 	<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
 	<style>
-		.redSquare {
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		#root {
 			display: block;
-			width: 100px;
-			height: 100px;
+			width: 100vw;
+			height: 100vw;
 			background: red;
 		}
 	</style>
 </head>
 
 <body>
-	<div>
-		VIDEO COMPONENT
-	</div>
-	<div class="redSquare"></div>
+	<div id="root">TEST</div>
 </body>
 
 </html>

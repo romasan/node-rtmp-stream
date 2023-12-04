@@ -1,8 +1,78 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 	<head>
-		<script>
-			// document.location.href = '/static';
-		</script>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<meta name="description" content="Cоздавайте свой pixel-арт на полотне вместе с другими игроками" />
+		<meta name="keywords" content="pixel battle,pixel,game,online,place,canvas,twitch,stream,8 bit,timelapse" />
+		<meta name="robots" content="index,follow" />
+		<link rel="icon" href="../../assets/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="76x76" href="../../assets/apple-touch-icon-76.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="../../assets/apple-touch-icon-120.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="../../assets/apple-touch-icon-152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="../../assets/apple-touch-icon-180.png">
+		<link rel="canonical" href="https://www.pixelbattle.online/" />
+		<title>PIXEL BATTLE - Timelapse</title>
+		<style>
+			@font-face {
+				font-family: 'Custom Font';
+				src: url('../../assets/fonts/CustomFont.ttf') format('truetype');
+				font-display: swap;
+			}
+			html {
+				padding: 0;
+				margin: 0;
+				overflow: hidden;
+			}
+			body {
+				overflow: hidden;
+				font-family: 'Custom Font', monospace;
+				margin: 0;
+				padding: 0px;
+				color: #ffffff;
+				background: radial-gradient(
+						farthest-side at top left,
+						#16161a,
+						transparent
+					),
+					radial-gradient(farthest-side at top right, #111111, transparent),
+					radial-gradient(farthest-side at bottom left, #1f1f23, transparent),
+					radial-gradient(farthest-side at bottom right, #262626, transparent),
+					#000000;
+			}
+			html, body {
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-o-user-select: none;
+				user-select: none;
+				-webkit-user-drag: none;
+				-ms-user-drag: none;
+				-moz-user-drag: none;
+			}
+			html, body, #root {
+				height: 100%;
+			}
+		</style>
+		<script src="../../src/containers/Timelapse/index.tsx" type="module"></script>
 	</head>
-	<body></body>
+	<body>
+		<div id="root"></div>
+	</body>
+	<!-- Yandex.Metrika counter -->
+	<script type="text/javascript" >
+		(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+		m[i].l=1*new Date();
+		for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+		k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+		(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+		ym(95616481, "init", {
+				clickmap:true,
+				trackLinks:true,
+				accurateTrackBounce:true
+		});
+	</script>
+	<noscript><div><img src="https://mc.yandex.ru/watch/95616481" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+	<!-- /Yandex.Metrika counter -->
 </html>
