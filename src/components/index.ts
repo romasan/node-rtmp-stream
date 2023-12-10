@@ -7,3 +7,4 @@ export * from './Palette';
 export * from './Tools';
 export * from './Info';
 export * from './Countdown';
+export * from './Header';

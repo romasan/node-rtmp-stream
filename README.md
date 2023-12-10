@@ -19,6 +19,9 @@
 - [x] reset countdown on login
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
+- [ ] buy pixel-battle.ru | pixelbattles.ru
+- [ ] use one countdown for every session with one authorization
+- [ ] use one countdown for active unauthorized users with one ip address
 
 # admin panel
 
@@ -75,6 +78,8 @@
 - [ ] scale with canvas instead of css (for safari?)
 - [ ] decomposite canvas component by hooks (useDrag, useWheel, useTouch)
 - [x] replace Bar panel to App
+- [ ] offline indicator
+- [ ] add react router and make SPA
 
 # page with infinity map
 

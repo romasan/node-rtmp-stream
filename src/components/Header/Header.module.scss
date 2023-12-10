@@ -1,0 +1,76 @@
+@import "../../styles/mixins";
+
+.root {
+  width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 10px;
+	position: absolute;
+	top: 0px;
+	padding: 10px;
+	z-index: 1;
+}
+
+.title {
+	display: flex;
+	flex-direction: column;
+}
+
+h1, h2 {
+	margin: 0;
+	color: #000;
+	text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.blinked {
+	animation: blinkAnimation 1s linear infinite;
+}
+
+.badge {
+	&:after {
+		@include size(8px);
+
+		content: '';
+		position: absolute;
+		border-radius: 50%;
+		left: 80%;
+		bottom: 80%;
+		background: red;
+		animation-name: circle-size-animation;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+	}
+}
+
+.userName {
+	color: #000;
+	text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+	font-family: 'Custom Font', monospace;
+	font-size: 20px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: calc(100vw - 252px);
+}
+
+.iconButton {
+	@include size(40px);
+
+	cursor: pointer;
+}
+
+.iconWrapper {
+	position: relative;
+}

@@ -190,11 +190,20 @@ h2 {
 	bottom: 70px;
 	left: 10px;
 	width: calc(100% - 20px);
+	color: #000;
 
 	& button {
 		font-family: math;
 		cursor: pointer;
 	}
+}
+
+.position {
+	position: absolute;
+	top: 0px;
+	height: 100%;
+	width: 1px;
+	background: #000;
 }
 
 :global(.mobile) {

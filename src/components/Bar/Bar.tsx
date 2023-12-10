@@ -25,7 +25,7 @@ export const Bar: FC<Props> = ({
 	centering,
 	isFinished,
 }) => {
-	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: 60});
+	const { anchorRef, draggableRef } = useDraggable({ x: 10, y: 80 });
 
 	const handleClickDraw = () => {
 		if (isFinished) {

@@ -4,3 +4,4 @@ export * from './color';
 export * from './formatNumber';
 export * from './formatDate';
 export * from './formatTime';
+export * from './gzipAB';

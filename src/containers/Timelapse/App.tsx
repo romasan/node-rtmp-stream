@@ -5,56 +5,43 @@ import mobile from 'is-mobile';
 
 import {
 	Canvas,
-	EMode,
+	Header,
 } from '../../components';
 
 import {
 	fetchTimelapse,
 	fetchTimelapsePartBin,
+	APIhost,
 } from '../../lib/api';
+
+import { gzipAB } from '../../helpers';
+import { useWsStore } from '../../hooks/useWsStore';
 
 import * as s from './App.module.scss';
 
-const gzipAB = async (input: ArrayBuffer, compress = false) => {
-	const cs = compress ? new CompressionStream("gzip") : new DecompressionStream("gzip");
-	const writer = cs.writable.getWriter();
-	const reader = cs.readable.getReader();
-	const output = [];
-	let totalSize = 0;
-
-	writer.write(input);
-	writer.close();
-
-	for (let item; (item = await reader.read()) && !item.done;) {
-		output.push(item.value);
-		totalSize += item.value.byteLength;
-	}
-
-	const concatenated = new Uint8Array(totalSize);
-	let offset = 0;
-
-	for (const array of output) {
-		concatenated.set(array, offset);
-		offset += array.byteLength;
-	}
-
-	return concatenated;
-};
+const PART_PIXELS_COUNT = 100_000;
 
 export const App: React.FC = () => {
-	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
-	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);
-	const [season, setSeason] = useState('s1e1');
+	const [selectedEpisode, setSelectedEpisode] = useState('s1e1');
 	const [size, setSize] = useState({ width: 0, height: 0 });
-	const [timelapse, setTimelapse] = useState({});
-	const [cursor, setCursor] = useState({
-		expand: 0,
-		block: 0,
-		pixel: 0,
-	});
+	const [timelapse, setTimelapse] = useState<any>({});
+	const [speed, setSpeed] = useState(500 * 30);
+	const canvasCTX = useRef({ fillRect: () => null });
+	const playState = useRef(false);
+	const timer = useRef(0);
+	const playCursor = useRef(0);
+	const [cursor, setCursor] = useState(0);
+	const parts = useRef<any>({});
+	const timelapseRef = useRef(null);
 
-	console.log('==== timelapse:', timelapse);
+	const {
+		wsStore,
+		isAuthorized,
+		isOnline,
+		hasNewMessage,
+		setHasNewMessage,
+	} = useWsStore();
 
 	const isMobile = mobile();
 
@@ -69,27 +56,17 @@ export const App: React.FC = () => {
 		}
 	}, [color, wsStore]);
 
-	const handleCanvasClick = (x: number, y: number) => {
-		// setCoord({ x, y });
-	};
-
-	const handleSelect = (from: { x: number; y: number }, to: { x: number; y: number }) => {
-		// setRange({ from, to });
-	};
-
 	const onInitCanvas = ({ image }: any) => {
 		setSize({
 			width: image.width,
 			height: image.height,
 		});
+
+		canvasCTX.current = image && image.getContext && image.getContext('2d');
 	};
 
-	const fetchSeason = async (season: string) => {
-		const data = await fetchTimelapse(season);
-
-		setTimelapse(data);
-
-		const resp = await fetchTimelapsePartBin(season, 0);
+	const fetchPart = async (episode: string, index: number) => {
+		const resp = await fetchTimelapsePartBin(episode, index);
 
 		const buf = await resp.arrayBuffer();
 
@@ -106,39 +83,157 @@ export const App: React.FC = () => {
 			}
 		});
 
-		console.log('==== bin:', buf.byteLength, list);
+		return list;
+	}
+
+	const fetchSelectedEpisode = async () => {
+		try {
+			const data = await fetchTimelapse(selectedEpisode);
+			
+			setTimelapse(data);
+		} catch (e) {}
+	};
+
+	const handleSelectEpisode = (e) => {
+		console.log('==== handleSelectEpisode', e);
+	};
+
+	const insert = async (partIndex: number) => {
+		if (!parts.current[partIndex]) {
+			parts.current[partIndex] = true;
+			parts.current[partIndex] = await fetchPart(selectedEpisode, partIndex);
+		}
+
+		play();
+
+		if (partIndex < timelapse.totalParts && !parts.current[partIndex + 1]) {
+			parts.current[partIndex + 1] = true;
+			parts.current[partIndex + 1] = await fetchPart(selectedEpisode, partIndex + 1);
+		}
 	};
 
 	useEffect(() => {
-		if (season) {
-			fetchSeason(season);
+		if (timelapse.total) {
+			const expandIndex = timelapse.expands.findIndex((item: any) => item.index.from <= cursor && item.index.to >= cursor);
+			const expand = timelapse.expands[expandIndex];
+			const partIndex = expand.part.from + Math.floor((cursor - expand.index.from) / PART_PIXELS_COUNT);
+
+			insert(partIndex);
 		}
-	}, [season]);
+	}, [timelapse, cursor]);
+
+	useEffect(() => {
+		if (selectedEpisode) {
+			fetchSelectedEpisode();
+		}
+	}, [selectedEpisode]);
+
+	const play = () => {
+		timer.current = Date.now();
+		playState.current = true;
+		frame();
+	};
+
+	const stop = () => {
+		playState.current = false;
+	};
+
+	const frame = () => {
+		if (!playState.current) {
+			return;
+		}
+
+		const frameTime = Date.now() - timer.current;
+		
+		if (frameTime) {
+			const pixelToFrame = Math.floor(speed / 1000 * frameTime);
+
+			if ((playCursor.current + pixelToFrame) > PART_PIXELS_COUNT) {
+				// debug
+				return;
+			}
+
+			// const parts = []
+
+			for (let i = 0; i < pixelToFrame; i++) {
+				const [colorIndex, x, y] = parts.current[0][playCursor.current + i];
+
+				canvasCTX.current.fillStyle = timelapse.colors[colorIndex];
+				canvasCTX.current.fillRect(x, y, 1, 1);
+			}
+			playCursor.current = playCursor.current + pixelToFrame;
+		}
+
+		timer.current = Date.now();
+
+		requestAnimationFrame(frame);
+	}
+
+	useEffect(() => {
+		frame();
+	});
+
+	const renderSteps = () => {
+		if (!timelapseRef.current && !timelapse.total) {
+			return null;
+		}
+
+		const { width } = timelapseRef.current.getBoundingClientRect();
+		
+		const pixel = width / timelapse.total;
+
+		return (
+			<>
+			{timelapse.expands && timelapse.expands.map((expand) => (
+				<>
+					{new Array(expand.part.to - expand.part.from + 1).fill(null).map((_, index) => (
+						<div
+							key={`${expand.index.from}-${expand.index.to}-${index}`}
+							className={s.position}
+							style={{ left: `${Math.floor((expand.index.from + index * PART_PIXELS_COUNT) * pixel)}px` }}
+						/>
+					))}
+					<div
+						key={`${expand.index.from}-${expand.index.to}`}
+						className={s.position}
+						style={{ background: 'red', height: '50%', left: `${Math.floor(expand.index.from * pixel)}px` }}
+					/>
+				</>
+			))}
+			</>
+		);
+	};
 
 	return (
 		<div className={cn(s.root, { mobile: isMobile })}>
+			<Header
+				isAuthorized={isAuthorized}
+				name={wsStore ? wsStore.name : ''}
+				isOnline={isOnline}
+				hasNewMessage={hasNewMessage}
+				setHasNewMessage={setHasNewMessage}
+			/>
 			<Canvas
-				// mode={canvasMode}
-				className={s.canvas}
 				color={wsStore.palette ? wsStore.palette[color] : ''}
-				isOnline={true}
-				onClick={handleCanvasClick}
-				onSelect={handleSelect}
+				isOnline={isOnline}
 				onInit={onInitCanvas}
-			>
-				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
-			</Canvas>
+				viewOnly
+				src={`${APIhost}/timelapse/s1e1/0.png`}
+			/>
 
 			<div className={s.controls}>
-				<select>
+				<select onChange={handleSelectEpisode}>
 					<option>S1E1</option>
 				</select>
 				<button>⏵ / ⏸</button>
 				<button>-</button>
 				<button>+</button>
+				speed: {speed} pix per sec
 			</div>
 
-			<div className={s.timelapse}></div>
+			<div className={s.timelapse} ref={timelapseRef}>
+				{renderSteps()}
+			</div>
 		</div>
 	);
 };

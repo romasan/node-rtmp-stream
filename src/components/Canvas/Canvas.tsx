@@ -37,10 +37,12 @@ interface Props {
 	isAuthorized?: boolean;
 	isFinished?: boolean;
 	isOnline?: boolean;
-	onClick(x: number, y: number): void;
-	onSelect?: (from: { x: number, y: number }, to: { x: number, y: number }) => void;
-	onInit?: (value: any) => void;
-	onScale?: ([scale, setScale]: [number, Function]) => null;
+	src?: string;
+	viewOnly?: boolean;
+	onClick?(x: number, y: number): void;
+	onSelect?(from: { x: number, y: number }, to: { x: number, y: number }): void;
+	onInit?(value: any): void;
+	onScale?([scale, setScale]: [number, Function]): null;
 }
 
 const defautSelected = {
@@ -64,7 +66,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	isFinished,
 	isOnline,
 	children,
-	onClick,
+	src,
+	viewOnly,
+	onClick = () => null,
 	onSelect,
 	onInit,
 }) => {
@@ -151,7 +155,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		if (onInit) {
 			onInit({
-				image,
+				image: canvasRef.current,
 				setScale,
 				centering,
 			});
@@ -292,7 +296,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			if (mode === EMode.SELECT && !cur.current.some((e) => e === -1)) {
 				selected.current = {
 					from: selected.current.from,
-					to: { x, y },
+					to: {
+						x: x + (x > selected.current.from.x ? 1 : 0),
+						y: y + (y > selected.current.from.y ? 1 : 0),
+					},
 				};
 			}
 
@@ -341,7 +348,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			if (mode === EMode.SELECT) {
 				if (onSelect) {
-					onSelect(selected.current.from, { x, y });
+					onSelect(selected.current.from, {
+						x: x + (x > selected.current.from.x ? 1 : 0),
+						y: y + (y > selected.current.from.y ? 1 : 0),
+					});
 				}
 				selected.current = defautSelected;
 			} else {
@@ -355,7 +365,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			scale < showPixelScale &&
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current) &&
-			mode === EMode.CLICK
+			mode === EMode.CLICK &&
+			!viewOnly
 		) {
 			setScale(showPixelScale);
 		}
@@ -446,7 +457,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const height = Math.max(from.y, to.y) - y;
 
 		if (!width && !height) {
-			return {};
+			return {
+				display: 'none',
+			};
 		}
 
 		return {
@@ -460,8 +473,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const renderCountdown = () => {
 		const sec = Math.ceil(countdown / 1000);
 		const min = Math.floor(sec / 60);
+		const text = `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
 
-		return `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+		return (
+			<span className={s.countdown}>{text}</span>
+		);
 	};
 
 	const onPix = (payload: string) => {
@@ -482,7 +498,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			const sourceProtocol = hash === '#secured' ? 'https:' : protocol;
 
-			image.src = `${sourceProtocol}//${WSHost}/canvas.png`;
+			image.src = src || `${sourceProtocol}//${WSHost}/canvas.png`;
 			image.setAttribute('crossOrigin', '');
 			image.onload = () => imageLoadHandler(image);
 			image.onerror = (err) => {
@@ -514,7 +530,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				document.removeEventListener('drag', dragCallback);
 			}
 		};
-	}, [rootRef.current, canvasRef.current, pixelRef.current, scale, color, mode]);
+	}, [
+		rootRef.current,
+		canvasRef.current,
+		pixelRef.current,
+		scale,
+		color,
+		mode,
+		src,
+		viewOnly,
+	]);
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -540,6 +565,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [isAuthorized]);
 
 	useEffect(() => {
+		if (viewOnly) {
+			return;
+		}
+
 		clearTimeout(timer.current);
 
 		if (scale >= showPixelScale && !coord.some((e) => e < 0)) {
@@ -547,7 +576,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				getPixel(...coord).then(setPixelData);
 			}, 1000);
 		}
-	}, [coord, scale]);
+	}, [coord, scale, viewOnly]);
 
 	return (
 		<>
@@ -570,7 +599,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 						<canvas
 							ref={canvasRef}
 							className={cn(s.canvas, {
-								[s.inactive]: scale < showPixelScale,
+								[s.inactive]: scale < showPixelScale && !viewOnly,
 							})}
 						/>
 						{children}
@@ -583,7 +612,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</div>
 					{error && <img className={s.image404} src={image404} alt="Полотно пиксель батла" />}
 				</div>
-				{!isMobile && isOnline && (
+				{!isMobile && isOnline && !viewOnly && (
 					<>
 						<div className={s.coordinates}>
 							{countdown > 0 && (

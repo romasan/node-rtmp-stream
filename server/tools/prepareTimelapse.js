@@ -177,6 +177,7 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 
 		timelapse.total = index - 1;
 		timelapse.totalParts = partIndex;
+		timelapse.partSize = PART_PIXELS_COUNT;
 
 		fs.writeFileSync(timelapseFile, JSON.stringify(timelapse, true, 2));
 	});

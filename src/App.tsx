@@ -7,8 +7,7 @@ import mobile from 'is-mobile';
 import {
 	Canvas,
 	Palette,
-	Chat,
-	Info,
+	Header,
 	Countdown,
 	Bar,
 } from './components/';
@@ -16,15 +15,13 @@ import {
 import { addPix } from './lib/api';
 import ee from './lib/ee';
 
+import { useWsStore } from './hooks/useWsStore';
+
 import TwitchIcon from '../assets/twitch.svg';
 import VkplayIcon from '../assets/vkplay.svg';
 import YoutubeIcon from '../assets/youtube.svg';
 import DiscordIcon from '../assets/discord.svg';
 import TelegramIcon from '../assets/telegram.svg';
-import ChatIcon from '../assets/chat.svg';
-import LoginIcon from '../assets/login.svg';
-import LogoutIcon from '../assets/logout.svg';
-import InfoIcon from '../assets/info.svg';
 
 import * as s from './App.module.scss';
 
@@ -34,31 +31,21 @@ const disableMouse = {
 };
 
 export const App: React.FC = () => {
-	const [wsStore, setWsStore] = useState<any>({
-		name: '',
-		palette: null,
-	});
 	const [color, setColor] = useState('');
-	const [chatIsShowed, setChatIsShowed] = useState(false);
-	const [infoIsShowed, setInfoIsShowed] = useState(false);
-	const [isAuthorized, setIsAuthorized] = useState(false);
-	const [expiration, setExpiration] = useState(0);
-	const [isOnline, setIsOnline] = useState(false);
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
-	const [finish, setFinish] = useState(0);
 	const [isFinished, setIsFinished] = useState(false);
-	const [hasNewMessage, setHasNewMessage] = useState(false);
 	const [canvas, setCanvas] = useState<any>({});
 	const blinkedTimer = useRef<number | NodeJS.Timeout>(-1);
 
-	const toggleChat = () => {
-		setHasNewMessage(false);
-		setChatIsShowed((value) => !value);
-	};
-
-	const toggleInfo = () => {
-		setInfoIsShowed((value) => !value);
-	};
+	const {
+		wsStore,
+		isAuthorized,
+		expiration,
+		isOnline,
+		finish,
+		hasNewMessage,
+		setHasNewMessage,
+	} = useWsStore();
 
 	const isMobile = mobile();
 
@@ -92,20 +79,6 @@ export const App: React.FC = () => {
 		addPix({ x, y, color });
 	};
 
-	const onWsInit = (payload: any) => {
-		setWsStore((store = {}) => ({ ...store, ...payload }));
-		setExpiration(Date.now() + payload.countdown);
-		setIsAuthorized(payload.isAuthorized);
-		if (payload.finish !== 'newer') {
-			setFinish(Date.now() + payload.finish);
-		}
-	};
-
-	const onWsCountdown = (countdown: number) => {
-		setWsStore((store = {}) => ({ ...store, countdown }));
-		setExpiration(Date.now() + countdown);
-	};
-
 	const onPix = (payload: string) => {
 		if (payload === 'await' && !isAuthorized) {
 			setBlinkedLoginAnimation(true);
@@ -116,59 +89,25 @@ export const App: React.FC = () => {
 		}
 	};
 
-	const onWsConnect = (payload: boolean) => {
-		setIsOnline(payload);
-	};
-
-	const handleChatMessage = (message: any) => {
-		if (wsStore.name && message.text.indexOf(`@${wsStore.name}`) >= 0) {
-			setHasNewMessage(true);
-		}
-	};
-
 	useEffect(() => {
-		ee.on('ws:init', onWsInit);
-		ee.on('ws:countdown', onWsCountdown);
 		ee.on('pix', onPix);
-		ee.on('ws:connect', onWsConnect);
-		ee.on('ws:chatMessage', handleChatMessage);
 
 		return () => {
-			ee.off('ws:init', onWsInit);
-			ee.off('ws:countdown', onWsCountdown);
 			ee.off('pix', onPix);
-			ee.off('ws:connect', onWsConnect);
 		};
 	}, [isAuthorized]);
 
 	return (
 		<div className={cn(s.root, { mobile: isMobile })}>
-			<div className={s.header} {...disableMouse}>
-				<div className={s.title}>
-					<h1>PIXEL BATTLE</h1>
-					<h2>Пиксель батл 2023 S1E2</h2>
-				</div>
-				<div className={s.controls}>
-					{isAuthorized ? (
-						<>
-							<div className={s.userName}>
-								{wsStore.name}
-							</div>
-							<a href="/logout" className={cn({ [s.disabled]: !isOnline })} aria-label="Выход">
-								<LogoutIcon />
-							</a>
-						</>
-					) : (
-						<a href="/login" className={cn({ [s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation })} aria-label="Авторизация">
-							<LoginIcon />
-						</a>
-					)}
-					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
-					</span>
-					<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
-				</div>
-			</div>
+			<Header
+				isAuthorized={isAuthorized}
+				name={wsStore ? wsStore.name : ''}
+				isOnline={isOnline}
+				hasNewMessage={hasNewMessage}
+				setHasNewMessage={setHasNewMessage}
+				blinkedLoginAnimation={blinkedLoginAnimation}
+				{...disableMouse}
+			/>
 			<Canvas
 				color={wsStore.palette ? wsStore.palette[color] : ''}
 				onClick={handleCanvasClick}
@@ -208,17 +147,6 @@ export const App: React.FC = () => {
 					<TelegramIcon />
 				</a>
 			</div>
-			{chatIsShowed && (
-				<Chat
-					isAuthorized={isAuthorized}
-					nickname={wsStore.name}
-					onClose={toggleChat}
-					{...disableMouse}
-				/>
-			)}
-			{infoIsShowed && (
-				<Info {...disableMouse} onClose={toggleInfo} />
-			)}
 		</div>
 	);
 };
