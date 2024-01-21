@@ -8,6 +8,7 @@ import { Info } from '../Info';
 import ChatIcon from '../../../assets/chat.svg';
 import LoginIcon from '../../../assets/login.svg';
 import LogoutIcon from '../../../assets/logout.svg';
+import TimelapseIcon from '../../../assets/timeline.svg';
 import InfoIcon from '../../../assets/info.svg';
 
 import * as s from './Header.module.scss';
@@ -46,10 +47,10 @@ export const Header: React.FC<Props> = ({
 	return (
 		<>
 			<div className={s.root} {...rest}>
-				<div className={s.title}>
+				<a href="/" className={s.title}>
 					<h1>PIXEL BATTLE</h1>
-					<h2>Пиксель батл 2023 S1E2</h2>
-				</div>
+					<h2>Пиксель батл 2024 S2E4</h2>
+				</a>
 				<div className={s.controls}>
 					{isAuthorized ? (
 						<>
@@ -69,6 +70,9 @@ export const Header: React.FC<Props> = ({
 						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
 					</span>
 					<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
+					<a href="/timelapse" aria-label="Таймлапс">
+						<TimelapseIcon />
+					</a>
 				</div>
 			</div>
 			{chatIsShowed && (

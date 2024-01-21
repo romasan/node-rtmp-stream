@@ -38,6 +38,19 @@ export const Stats: FC<Props> = ({ canvas }) => {
 		ctx.fillStyle = '#f658b8';
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+		ctx.fillStyle = '#000';
+		ctx.fillRect(stats.coord.x - 1, stats.coord.y - 1, 1, 1);
+		ctx.fillRect(stats.coord.x - 2, stats.coord.y - 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x - 1, stats.coord.y + 1, 1, 1);
+		ctx.fillRect(stats.coord.x - 2, stats.coord.y + 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x + 1, stats.coord.y - 1, 1, 1);
+		ctx.fillRect(stats.coord.x + 2, stats.coord.y - 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x + 1, stats.coord.y + 1, 1, 1);
+		ctx.fillRect(stats.coord.x + 2, stats.coord.y + 2, 1, 1);
+
 		ctx.fillStyle = stats.color;
 		ctx.fillRect(stats.coord.x, stats.coord.y, 1, 1);
 	};

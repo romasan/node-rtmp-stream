@@ -1,54 +1,21 @@
-const { time } = require('console');
 const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
 const { createCanvas, Image } = require('canvas');
-const { COLORS_1 } = require('../const.json')
+const CONST = require('../const.json');
 
 const PART_PIXELS_COUNT = 100_000;
 
-const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../../assets/426x240.png`) => {
+const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../../assets/426x240.png`, colors = 'COLORS') => {
+	const COLORS = CONST[colors];
 	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
 	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
 	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;
+	const dirName = `${__dirname}/../../db/archive/${season}/timelapse/`;
 
-	const dirname = path.dirname(`${__dirname}/../../db/archive/${season}/timelapse`);
-
-	if (!fs.existsSync(dirname)) {
-		fs.mkdirSync(dirname, { recursive: true });
+	if (!fs.existsSync(dirName)) {
+		fs.mkdirSync(dirName, { recursive: true });
 	}
-
-	let canvas = null;
-	let ctx = null;
-
-	if (backgroundImage) {
-		const imgBuf = fs.readFileSync(backgroundImage);
-		const image = new Image;
-		image.src = imgBuf;
-		canvas = createCanvas(image.width, image.height);
-		ctx = canvas.getContext('2d');
-		ctx.drawImage(image, 0, 0);
-	}
-
-	const colorsCache = Object.values(COLORS_1).reduce((list, color, index) => ({
-		...list,
-		[color]: index,
-	}), {});
-
-	const timelapse = {
-		colors: Object.values(COLORS_1),
-		expands: [],
-		days: {
-			// "01.01.2023": {
-			// 	from: 0,
-			// 	to: 9999
-			// },
-			// "01.02.2023": {
-			// 	from: 10000,
-			// 	to: 25000
-			// }
-		}
-	};
 
 	const expandsRaw = fs.readFileSync(expandsFile).toString();
 	const expands = expandsRaw.split('\n').filter(Boolean).map((item) => {
@@ -63,6 +30,41 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 			shiftY: Number(shiftY),
 		};
 	});
+
+	let canvas = createCanvas(expands[0].width, expands[0].height);
+	let ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#fff';
+	ctx.fillRect(0, 0, expands[0].width, expands[0].height);
+
+	if (backgroundImage && backgroundImage !== 'NOIMAGE') {
+		const imgBuf = fs.readFileSync(backgroundImage);
+		const image = new Image;
+
+		image.src = imgBuf;
+		ctx.drawImage(image, 0, 0);
+	}
+
+	const colorsCache = Object.values(COLORS).reduce((list, color, index) => ({
+		...list,
+		[color]: index,
+	}), {});
+
+	const timelapse = {
+		colors: Object.values(COLORS),
+		expands: [],
+		// days: {
+		// 	// "01.01.2023": {
+		// 	// 	from: 0,
+		// 	// 	to: 9999
+		// 	// },
+		// 	// "01.02.2023": {
+		// 	// 	from: 10000,
+		// 	// 	to: 25000
+		// 	// }
+		// }
+		episode: season,
+	};
 
 	// const _breakCount = 100_000;
 	let index = 0;
@@ -95,6 +97,8 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 				// expand canvas
 				canvas = createCanvas(expands[newExpandIndex].width, expands[newExpandIndex].height);
 				ctx = canvas.getContext('2d');
+				ctx.fillStyle = '#fff';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				// restore image
 				ctx.drawImage(backupCanvas, 0, 0); // shiftx, shiftY
 			}
@@ -122,10 +126,9 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 					`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
 				);
 				partPixels = [];
-			} else {
-				// save preview image expandIndex.png
-				savePreview = true;
 			}
+
+			savePreview = true;
 
 			partIndex++;
 		}
@@ -145,16 +148,6 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 
 		index++;
 
-		if (savePreview) {
-			const output = `${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.png`;
-			fs.writeFileSync(output, canvas.toBuffer());
-			savePreview = false;
-		}
-
-		// drawPixel
-		ctx.fillStyle = color;
-		ctx.fillRect(x, y, 1, 1);
-
 		if (partPixels.length >= PART_PIXELS_COUNT) {
 			packTimelapsePart(
 				partPixels,
@@ -165,6 +158,16 @@ const prepareTimelapse = (season = 's1e1', backgroundImage = `${__dirname}/../..
 			// create preview image
 			savePreview = true;
 		}
+
+		if (savePreview) {
+			const output = `${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.png`;
+			fs.writeFileSync(output, canvas.toBuffer());
+			savePreview = false;
+		}
+
+		// drawPixel
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, 1, 1);
 	});
 
 	rl.on('close', () => {

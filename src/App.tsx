@@ -12,7 +12,9 @@ import {
 	Bar,
 } from './components/';
 
-import { addPix } from './lib/api';
+import { doOnEnter, life } from './helpers';
+
+import { addPix, APIhost } from './lib/api';
 import ee from './lib/ee';
 
 import { useWsStore } from './hooks/useWsStore';
@@ -97,6 +99,14 @@ export const App: React.FC = () => {
 		};
 	}, [isAuthorized]);
 
+	useEffect(() => {
+		const breakDo = doOnEnter('life', () => {
+			life(canvas.image);
+		});
+
+		return breakDo;
+	}, [canvas])
+
 	return (
 		<div className={cn(s.root, { mobile: isMobile })}>
 			<Header
@@ -116,6 +126,7 @@ export const App: React.FC = () => {
 				isFinished={isFinished}
 				isOnline={isOnline}
 				onInit={setCanvas}
+				src={`${APIhost}/canvas.png`}
 			/>
 			{!isMobile && (
 				<Bar

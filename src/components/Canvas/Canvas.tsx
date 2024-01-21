@@ -73,7 +73,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	onInit,
 }) => {
 	const isMobile = mobile();
-	const firstRender = useRef(true);
+	const firstRender = useRef('');
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
 	const pixelRef = useRef<null | HTMLDivElement>(null);
@@ -151,13 +151,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			return;
 		}
 
-		ctx.drawImage(image, 0, 0);
+		const resetImage = () => {
+			ctx.drawImage(image, 0, 0);
+		};
+
+		resetImage();
 
 		if (onInit) {
 			onInit({
 				image: canvasRef.current,
 				setScale,
 				centering,
+				resetImage,
 			});
 		}
 
@@ -490,8 +495,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	useEffect(() => {
-		if (rootRef.current && canvasRef.current && firstRender.current) {
-			firstRender.current = false;
+		if (rootRef.current && canvasRef.current && src && firstRender.current !== src) {
+			firstRender.current = src as string;
 
 			const image = new Image();
 			const { protocol, hash } = document.location;

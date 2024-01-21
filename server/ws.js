@@ -5,7 +5,7 @@ const http = require('http');
 const ee = require('./lib/ee');
 const web = require('./web');
 const { getCountdown } = require('./web/countdown');
-const { checkFirstTime, checkSession } = require('./sessions');
+const { checkSession } = require('./sessions');
 const { COLORS } = require('./const.json');
 const { parseCookies } = require('./web/helpers');
 const { checkUserAuthByToken, getUserData } = require('./auth');
@@ -199,15 +199,14 @@ wss = new WebSocket.Server({ server: webServer });
 wss.on('connection', (ws, req) => {
 	const { token } = parseCookies(req.headers.cookie);
 
-	if (!checkSession(token, true, false)) {
+	if (!checkSession(token, true)) {
 		ws.close();
 
 		return;
 	}
 
 	const onlineCount = getOnlineCount();
-	const isFirstTime = checkFirstTime(token);
-	const countdown = getCountdown(token, onlineCount, isFirstTime) * 1000;
+	const countdown = getCountdown(token, onlineCount) * 1000;
 	const isAuthorized = checkUserAuthByToken(token);
 	const user = getUserData(token);
 

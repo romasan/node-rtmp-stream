@@ -24,3 +24,12 @@ export const getPixelColor = (canvas: any, x: number, y: number) => {
 
 	return rgbToHex(ctx.getImageData(x, y, 1, 1).data);
 };
+
+const colorChannelMixer = (a: number, b: number, amountToMix: number) =>
+	Math.ceil(a * amountToMix + b * (1 - amountToMix));
+
+export const colorBlendRGB = (rgbA: number[], rgbB: number[], amountToMix: number) => [
+	colorChannelMixer(rgbA[0], rgbB[0], amountToMix),
+	colorChannelMixer(rgbA[1], rgbB[1], amountToMix),
+	colorChannelMixer(rgbA[2], rgbB[2], amountToMix),
+];

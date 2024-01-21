@@ -45,15 +45,9 @@ const trimFailed = () => {
 	}
 }
 
-const tempFirstTime = {}
-
-const checkSession = (token, prevalidate = true, skipFirstTime = true) => {
+const checkSession = (token, prevalidate = true) => {
 	if (prevalidate && !validateToken(token)) {
 		return false;
-	}
-
-	if (skipFirstTime) {
-		delete tempFirstTime[token];
 	}
 
 	if (sessions[token]) {
@@ -79,8 +73,6 @@ const checkSession = (token, prevalidate = true, skipFirstTime = true) => {
 };
 
 const addSession = (token, data) => {
-	tempFirstTime[token] = true;
-
 	const filePath = getPathByToken(token, false);
 	const dirname = path.dirname(filePath);
 
@@ -105,10 +97,6 @@ const addSession = (token, data) => {
 	// trimSessions();
 }
 
-const checkFirstTime = (token) => {
-	return token in tempFirstTime;
-};
-
 const getSessionUserName = (token) => {
 	const guestIndex = sessions[token] || '';
 
@@ -118,6 +106,5 @@ const getSessionUserName = (token) => {
 module.exports = {
 	checkSession,
 	addSession,
-	checkFirstTime,
 	getSessionUserName,
 };
