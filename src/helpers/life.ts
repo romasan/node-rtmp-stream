@@ -35,11 +35,15 @@ const checkAround = (data: any, x: number, y: number, w: number, h: number) => {
 let raf = 0;
 
 export const life = (canvas: any, data: any) => {
+	if (!canvas) {
+		return;
+	}
+
 	cancelAnimationFrame(raf);
 
-	const ctx = canvas?.getContext('2d');
-	const w = canvas?.width;
-	const h = canvas?.height;
+	const ctx = canvas.getContext('2d');
+	const w = canvas.width;
+	const h = canvas.height;
 	
 	data = data || [...ctx.getImageData(0, 0, w, h).data];
 	const next = new Array(data.length).fill(255);

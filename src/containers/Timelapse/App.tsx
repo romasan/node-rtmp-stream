@@ -43,21 +43,27 @@ const getTimelapseIndexes = (timelapse: any, cursor: number) => {
 };
 
 const fetchAndUnzipPart = async (episode: string, index: number) => {
-	const resp = await fetchTimelapsePartBin(episode, index);
-	const buf = await resp.arrayBuffer();
-	const binary_8 = await gzipAB(buf);
-	const binary_16 = new Uint16Array(binary_8.buffer);
 	const list: number[][] = [];
-	let item: number[] = [];
 
-	binary_16.forEach((value) => {
-		item.push(value);
+	try {
+		const resp = await fetchTimelapsePartBin(episode, index);
+		const buf = await resp.arrayBuffer();
+		const binary_8 = await gzipAB(buf);
 
-		if (item.length === 3) {
-			list.push(item);
-			item = [];
-		}
-	});
+		const binary_16 = new Uint16Array(binary_8.buffer);
+		let item: number[] = [];
+
+		binary_16.forEach((value) => {
+			item.push(value);
+
+			if (item.length === 3) {
+				list.push(item);
+				item = [];
+			}
+		});
+	} catch (e) {
+		console.log('Error:', e);
+	}
 
 	return list;
 };
@@ -143,7 +149,7 @@ export const App: React.FC = () => {
 	};
 
 	const frame = () => {
-		if (!playState.current) {
+		if (!playState.current || !timelapse.expands) {
 			return;
 		}
 
@@ -165,7 +171,7 @@ export const App: React.FC = () => {
 			const partToIndex = Math.min(expand.index.to - 1, partFromIndex + timelapse.partSize - 1);
 
 			const prevExpand = timelapse.expands[expandIndex - 1];
-			const cursorInPart = (prevExpand?.index.to || 0) + partIndex * timelapse.partSize;
+			const cursorInPart = (prevExpand.index.to || 0) + partIndex * timelapse.partSize;
 
 			if (globalPartIndex <= timelapse.totalParts - 1 && !parts.current[globalPartIndex + 1]) {
 				preloadPart(globalPartIndex + 1);
@@ -274,6 +280,10 @@ export const App: React.FC = () => {
 	};
 
 	const drawPixelsFromPartStart = () => {
+		if (!timelapse.expands) {
+			return;
+		}
+
 		const {
 			partIndex,
 			globalPartIndex,
@@ -298,6 +308,10 @@ export const App: React.FC = () => {
 	};
 
 	const handleClickTimelapse = (event: React.MouseEvent) => {
+		if (!timelapse.expands) {
+			return;
+		}
+
 		const { width, left } = timelapseRef.current ? timelapseRef.current.getBoundingClientRect() : {};
 		const cursor = Math.floor((event.clientX - left) / width * timelapse.total);
 		const { globalPartIndex } = getTimelapseIndexes(timelapse, cursor);
@@ -323,7 +337,12 @@ export const App: React.FC = () => {
 	};
 
 	useEffect(() => {
-		if (timelapse && timelapse.episode === selectedEpisode && parts.current[startPart]?.length) {
+		if (
+			timelapse &&
+			timelapse.episode === selectedEpisode &&
+			parts.current[startPart] &&
+			parts.current[startPart].length
+		) {
 			drawPixelsFromPartStart();
 		}
 	}, [startPart, selectedEpisode, timelapse, loadedPart, clickedCursor])
