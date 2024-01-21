@@ -16,6 +16,7 @@ const libs = {
 		'topUUIDs',
 		'expand',
 		'debugStream',
+		'prepareTimelapse',
 
 		'getPixelsInfo',
 		'genMapByUsers',

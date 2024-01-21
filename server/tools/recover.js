@@ -18,6 +18,9 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(0, 0, width, height);
 
+	// let _break = false;
+	// let _breakTime = Date.now() - (1000 * 60 * 60 * 2) + (1000 * 60 * 30);
+
 	if (backgroundImage !== 'NOIMAGE') {
 		const imgBuf = fs.readFileSync(backgroundImage);
 		const image = new Image;
@@ -32,13 +35,24 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	});
 	
 	rl.on('line', (line) => {
-		const [,,x,y,color] = line.split(';');
+		// if (_break) {
+		// 	return
+		// }
+		const [time,,x,y,color] = line.split(';');
+		// if (time >= _breakTime) {
+		// 	console.log('====', time);
+		// 	_break = true;
+		// 	return;
+		// }
 
 		ctx.fillStyle = color;
 		ctx.fillRect(x, y, 1, 1);
 	});
 
 	rl.on('close', () => {
+		// if (_break) {
+		// 	return
+		// }
 		fs.writeFileSync(output, canvas.toBuffer());
 	});
 };

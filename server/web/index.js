@@ -34,7 +34,7 @@ const { addMessage, getMessages } = require('../chat');
 const admin = require('./admin');
 const { COLORS, tempBans } = require('../const.json');
 
-const { WS_SECURE, MAX_PIX_PER_SEC, WS_SERVER_ORIGIN } = process.env;
+const { WS_SECURE, WS_SERVER_ORIGIN, TIMELAPSE_CACHE_PERIOD } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -146,14 +146,17 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, upta
 
 		const user = getUserData(token);
 
+		const ip = req.socket.remoteAddress;
+
 		if (
 			tempBans.uuid[token] ||
-			tempBans.nick[user?.name]
+			tempBans.nick[user?.name] || 
+			tempBans.ip[ip]
 		) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (banned user)', token);
+			console.log('Error: failed on add pixel (banned user)', token, ip);
 
 			return;
 		}
@@ -291,6 +294,39 @@ const stats = (req, res) => {
 		leaderboard,
 	}));
 };
+const contentTypes = {
+	json: 'text/json',
+	bin: 'application/octet-stream',
+};
+
+const timelapse = (req, res) => {
+	if (req.url.startsWith('/timelapse/')) {
+		try {
+			const parts = req.url.split('/');
+			const [,, season, file] = parts;
+			const filePath = `${__dirname}/../../db/archive/${season}/timelapse/${file}`;
+			const ext = file?.split('.').pop();
+
+			if (!fs.existsSync(filePath)) {
+				throw new Error();
+			}
+			
+			res.setHeader('Cache-control', `public, max-age=${TIMELAPSE_CACHE_PERIOD}`);
+			res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
+			const readStream = fs.createReadStream(filePath);
+			readStream.pipe(res);
+		} catch (e) {
+			res.writeHead(404, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: get timelapse file', filePath);
+		}
+
+		return true;
+	}
+
+	return false;
+}
 
 const _default = async (req, res, callbacks) => {
 	if (req.url.startsWith('/qq/')) {
@@ -300,10 +336,11 @@ const _default = async (req, res, callbacks) => {
 	}
 
 	if (
-		!await twitchAuth(req, res)
+		!await twitchAuth(req, res) && 
 		// && !await vkPlayAuth(req, res)
 		// && !await discordAuth(req, res)
 		// && !await vkAuth(req, res)
+		!timelapse(req, res)
 	) {
 		getInfo(req, res);
 	} else {

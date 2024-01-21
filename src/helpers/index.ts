@@ -3,3 +3,7 @@ export * from './getInRange';
 export * from './color';
 export * from './formatNumber';
 export * from './formatDate';
+export * from './formatTime';
+export * from './gzipAB';
+export * from './doOnEnter';
+export * from './life';

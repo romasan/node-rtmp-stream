@@ -11,6 +11,7 @@ interface Props {
 
 export const Countdown: FC<Props> = ({ finish, text }) => {
 	const [countdown, setCountdown] = useState(0);
+
 	useEffect(() => {
 		setCountdown(finish - Date.now());
 

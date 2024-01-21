@@ -27,6 +27,7 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 		resetCountdownTemp(token);
 	}
 
+	// TODO
 	// const _token = getAuthID(token) || token;
 
 	if (expirationsList[token]) {

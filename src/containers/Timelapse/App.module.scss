@@ -1,0 +1,223 @@
+@import "../../styles/mixins";
+
+.root {
+	height: 100%;
+}
+
+.joinModalContent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	gap: 20px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.command {
+	background: #9594c0;
+	padding: 3px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.input {
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #b6b5eb;
+	border-bottom-color: #b6b5eb;
+	border-top-color: #2d2d3a;
+	border-left-color: #2d2d3a;
+	background: #bbbaf1;
+	font-family: 'Custom Font', monospace;
+	font-size: 20px;
+	font-weight: bold;
+	padding: 10px;
+	width: 400px;
+	text-align: center;
+	border-radius: 5px;
+
+	&:focus{
+		outline: none;
+		&::placeholder {
+			color: transparent;
+		}
+	}
+
+	&::placeholder {
+		text-transform: uppercase;
+	}
+}
+
+.button {
+	@include buttonLike();
+	@include size(30px);
+
+	font-family: 'Custom Font', monospace;
+	padding: 0px;
+
+	&:active {
+		padding: 0;
+	}
+}
+
+.vDelimiter {
+	display: block;
+	height: 100%;
+	width: 1px;
+	background: #6c6c81;
+}
+
+.header {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 10px;
+	position: absolute;
+	top: 0px;
+	padding: 10px;
+	z-index: 1;
+}
+
+.title {
+	display: flex;
+	flex-direction: column;
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	height: 30px;
+}
+
+.iconButton {
+	@include size(40px);
+
+	cursor: pointer;
+}
+
+.iconWrapper {
+	position: relative;
+}
+
+.badge {
+	&:after {
+		@include size(8px);
+
+		content: '';
+		position: absolute;
+		border-radius: 50%;
+		left: 80%;
+		bottom: 80%;
+		background: red;
+		animation-name: circle-size-animation;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+	}
+}
+
+@keyframes circle-size-animation {
+	0% { transform: scale(1); }
+	50% { transform: scale(2); }
+	100% { transform: scale(1); }
+}
+
+.userName {
+	color: #000;
+	text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+	font-family: 'Custom Font', monospace;
+	font-size: 20px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	max-width: calc(100vw - 252px);
+}
+
+.footer {
+	display: flex;
+	gap: 10px;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	padding: 10px;
+	user-select: none;
+}
+
+.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.blinked {
+	animation: blinkAnimation 1s linear infinite;
+}
+
+@keyframes blinkAnimation {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.5);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+.timelapse {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	width: calc(100% - 20px);
+	height: 10px;
+	background: rgba(108, 108, 128, 0.7);
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: #c1c0e6;
+	border-bottom-color: #c1c0e6;
+	border-top-color: #6c6c81;
+	border-left-color: #6c6c81;
+	cursor: pointer;
+}
+
+.controls {
+	position: absolute;
+	bottom: 30px;
+	left: 10px;
+	width: calc(100% - 20px);
+	color: #000;
+
+	& button {
+		font-family: math;
+		cursor: pointer;
+	}
+}
+
+.position {
+	position: absolute;
+	top: 0px;
+	height: 100%;
+	width: 1px;
+	background: #000;
+}
+
+.progress {
+	position: absolute;
+	top: 0px;
+	height: 100%;
+	width: 1px;
+	background: #0090f6;
+}
+
+.positionExpand {
+	background: #fff;
+}
+
+:global(.mobile) {
+	.footer {
+		display: none;
+	}
+}
