@@ -50,9 +50,9 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	});
 
 	rl.on('close', () => {
-		if (_break) {
-			return
-		}
+		// if (_break) {
+		// 	return
+		// }
 		fs.writeFileSync(output, canvas.toBuffer());
 	});
 };

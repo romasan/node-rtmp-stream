@@ -52,10 +52,21 @@
 
 .button {
 	@include buttonLike();
+	@include size(30px);
 
 	font-family: 'Custom Font', monospace;
-	font-size: 20px;
-	font-weight: bold;
+	padding: 0px;
+
+	&:active {
+		padding: 0;
+	}
+}
+
+.vDelimiter {
+	display: block;
+	height: 100%;
+	width: 1px;
+	background: #6c6c81;
 }
 
 .header {
@@ -80,6 +91,7 @@
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	height: 30px;
 }
 
 .iconButton {

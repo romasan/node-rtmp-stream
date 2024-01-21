@@ -171,7 +171,7 @@ export const App: React.FC = () => {
 			const partToIndex = Math.min(expand.index.to - 1, partFromIndex + timelapse.partSize - 1);
 
 			const prevExpand = timelapse.expands[expandIndex - 1];
-			const cursorInPart = (prevExpand.index.to || 0) + partIndex * timelapse.partSize;
+			const cursorInPart = ((prevExpand && prevExpand.index.to) || 0) + partIndex * timelapse.partSize;
 
 			if (globalPartIndex <= timelapse.totalParts - 1 && !parts.current[globalPartIndex + 1]) {
 				preloadPart(globalPartIndex + 1);
@@ -232,7 +232,6 @@ export const App: React.FC = () => {
 	};
 
 	const renderTimelapseSteps = () => {
-		console.log('====')
 		if (!timelapseRef.current && !timelapse.total) {
 			return null;
 		}
@@ -252,6 +251,7 @@ export const App: React.FC = () => {
 					</>
 				))}
 				<div
+					key="progress"
 					ref={cursorRef}
 					className={s.progress}
 				/>
@@ -280,7 +280,7 @@ export const App: React.FC = () => {
 	};
 
 	const drawPixelsFromPartStart = () => {
-		if (!timelapse.expands) {
+		if (!timelapse.expands || playState.current) {
 			return;
 		}
 
@@ -363,6 +363,20 @@ export const App: React.FC = () => {
 		speedRef.current = speed;
 	}, [speed]);
 
+	useEffect(() => {
+		const callback = (event: KeyboardEvent) => {
+			if (event.keyCode === 32) {
+				handleToggleClick();
+			}
+		};
+
+		document.body.addEventListener('keyup', callback);
+
+		return () => {
+			document.body.removeEventListener('keyup', callback);
+		};
+	}, [timelapse]);
+
 	return (
 		<div className={cn(s.root, { mobile: isMobile })}>
 			<Header
@@ -385,9 +399,10 @@ export const App: React.FC = () => {
 					<option value="s1e1">S1E1</option>
 					<option value="s1e2" selected>S1E2</option>
 				</select>
-				<button onClick={handleToggleClick}>{isPlayed ? '⏸' : '⏵'}</button>
-				<button onClick={handleSlowerClick}>–</button>
-				<button onClick={handleFasterClick}>+</button>
+				<button className={s.button} onClick={handleToggleClick}>{isPlayed ? '⏸' : '⏵'}</button>
+				<div className={s.vDelimiter}></div>
+				<button className={s.button} onClick={handleSlowerClick}>–</button>
+				<button className={s.button} onClick={handleFasterClick}>+</button>
 				speed: {speed} pix per sec
 			</div>
 
