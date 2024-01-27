@@ -53,7 +53,7 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 
 	let count = 0;
 
-	rl.on('line', (line) => {
+	rl.on('line', () => {
 		count++;
 	});
 

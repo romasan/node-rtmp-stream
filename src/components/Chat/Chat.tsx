@@ -87,13 +87,15 @@ export const Chat: React.FC<Props> = ({
 	};
 
 	useEffect(() => {
-		getChatMessages().then((messages) => {
-			setList(messages);
-			setTimeout(() => {
-				goToBottom();
-			}, 0);
-			ee.on('ws:chatMessage', handleChatMessage);
-		}).catch(() => {});
+		getChatMessages()
+			.then((messages) => {
+				setList(messages);
+				setTimeout(() => {
+					goToBottom();
+				}, 0);
+				ee.on('ws:chatMessage', handleChatMessage);
+			})
+			.catch(() => {});
 
 		return () => {
 			ee.off('ws:chatMessage', handleChatMessage);

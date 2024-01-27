@@ -8,7 +8,7 @@ const {
 	getTotalPixels,
 	getTopLeaderboard,
 } = require('../canvas');
-const package = require('../../package.json');
+const packageFile = require('../../package.json');
 const {
 	getPostPayload,
 	parseCookies,
@@ -38,7 +38,7 @@ const { WS_SECURE, WS_SERVER_ORIGIN, TIMELAPSE_CACHE_PERIOD } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
-	res.end(`Place RTMP server v. ${package.version}`);
+	res.end(`Place RTMP server v. ${packageFile.version}`);
 };
 
 const getCanvas = (req, res) => {
@@ -68,10 +68,8 @@ const checkAccessWrapper = (callback, checkAuth) => {
 			res.end('fail');
 
 			console.log('Error: failed check access');
-
-			return;
 		}
-	}
+	};
 };
 
 const getChatMessages = checkAccessWrapper((req, res) => {
@@ -213,7 +211,7 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, upta
 
 		const _time = finished
 			? time
-			: (Date.now() - time)
+			: (Date.now() - time);
 
 		if (isNumber(x) && isNumber(y)) {
 			res.writeHead(200, { 'Content-Type': 'text/json' });
@@ -319,14 +317,14 @@ const timelapse = (req, res) => {
 			res.writeHead(404, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: get timelapse file', filePath);
+			console.log('Error: get timelapse file', e);
 		}
 
 		return true;
 	}
 
 	return false;
-}
+};
 
 const _default = async (req, res, callbacks) => {
 	if (req.url.startsWith('/qq/')) {
@@ -346,9 +344,9 @@ const _default = async (req, res, callbacks) => {
 	} else {
 		const { token } = parseCookies(req.headers.cookie || '');
 
-		resetCountdownTemp(token)
+		resetCountdownTemp(token);
 	}
-}
+};
 
 module.exports = {
 	'/start': start,
@@ -360,4 +358,4 @@ module.exports = {
 	'/auth/logout': logout,
 	'/stats': stats,
 	default: _default,
-}
+};

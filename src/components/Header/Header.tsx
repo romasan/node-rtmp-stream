@@ -5,11 +5,14 @@ import cn from 'classnames';
 import { Chat } from '../Chat';
 import { Info } from '../Info';
 
+import { ERole } from '../../hooks/useWsStore';
+
 import ChatIcon from '../../../assets/chat.svg';
 import LoginIcon from '../../../assets/login.svg';
 import LogoutIcon from '../../../assets/logout.svg';
 import TimelapseIcon from '../../../assets/timeline.svg';
 import InfoIcon from '../../../assets/info.svg';
+import GearIcon from '../../../assets/gear.svg';
 
 import * as s from './Header.module.scss';
 
@@ -20,6 +23,7 @@ interface Props {
 	hasNewMessage: boolean;
 	blinkedLoginAnimation?: boolean;
 	setHasNewMessage: (value: boolean) => void;
+	role: ERole;
 	[key: string]: any;
 }
 
@@ -30,6 +34,7 @@ export const Header: React.FC<Props> = ({
 	hasNewMessage,
 	blinkedLoginAnimation,
 	setHasNewMessage,
+	role,
 	...rest
 }) => {
 	const [chatIsShowed, setChatIsShowed] = useState(false);
@@ -73,6 +78,11 @@ export const Header: React.FC<Props> = ({
 					<a href="/timelapse" aria-label="Таймлапс">
 						<TimelapseIcon />
 					</a>
+					{role === ERole.moderator && (
+						<a href="/qq">
+							<GearIcon />
+						</a>
+					)}
 				</div>
 			</div>
 			{chatIsShowed && (

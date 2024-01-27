@@ -1,8 +1,8 @@
 import ee from './ee';
 
-let ws: any = null;
+let ws: WebSocket | null = null;
 
-const reduceMessage = ({ data }: any) => {
+const reduceMessage = ({ data }: MessageEvent) => {
 	if (data === '3') {
 		return;
 	}
@@ -12,7 +12,7 @@ const reduceMessage = ({ data }: any) => {
 		json = JSON.parse(
 			data.toString()
 		);
-	} catch (e) {}
+	} catch (e) {/* */}
 
 	const { event, payload } = json;
 
@@ -27,23 +27,23 @@ const ping = () => {
 	}
 };
 
-let timer = -1;
+let timer: number = -1;
 
 const { hostname, protocol, hash } = document.location;
 const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
 export const WSHost = `${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}:8080`;
 const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
 
-export const connect = () => {
+export const connect = (status?: string) => {
 	ws = new WebSocket(`${WSProtocol}://${WSHost}`);
 
 	ws.onerror = console.error;
 
 	ws.onopen = () => {
 		clearInterval(timer);
-		timer = setInterval(ping, 10_000);
+		timer = Number(setInterval(ping, 10_000));
 
-		ee.emit('ws:connect', true);
+		ee.emit('ws:connect', status || true);
 	};
 
 	ws.onmessage = reduceMessage;

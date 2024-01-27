@@ -97,7 +97,7 @@ const mapByUsersFromStats = async (stats, output) => {
 		for (let y = 0; y <= height; y++) {
 			const key = `${x}:${y}`;
 			const [, uuid] = stats[key] || [];
-			if (uuid) {
+			if (typeof uuid !== 'undefined') {
 				ctx.fillStyle = colors[uuids[uuid]];
 				ctx.fillRect(x, y, 1, 1);
 			}

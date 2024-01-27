@@ -12,40 +12,42 @@ const messagesFile = __dirname + '/../db/messages.log';
 
 let messages = [];
 
-getFileLinesCount(messagesFile).then((count) => {
-	const rl = readline.createInterface({
-		input: fs.createReadStream(messagesFile),
-		crlfDelay: Infinity
-	});
+getFileLinesCount(messagesFile)
+	.then((count) => {
+		const rl = readline.createInterface({
+			input: fs.createReadStream(messagesFile),
+			crlfDelay: Infinity
+		});
 
-	let index = 0;
+		let index = 0;
 
-	rl.on('line', (line) => {
-		index++;
+		rl.on('line', (line) => {
+			index++;
 
-		if (index > count - LIST_LENGTH) {
+			if (index > count - LIST_LENGTH) {
 
-			const [
-				time,
-				name,
-				platform,
-				token,
-				id,
-				...rest
-			] = line.split(';');
-			const text = rest.join(';');
+				const [
+					time,
+					name,
+					platform,
+					token,
+					id,
+					...rest
+				] = line.split(';');
+				const text = rest.join(';');
 
-			const message = {
-				id,
-				time,
-				text,
-				name,
-			};
+				const message = {
+					id,
+					time,
+					text,
+					name,
+				};
 
-			messages.push(message);
-		}
-	});
-})
+				messages.push(message);
+			}
+		});
+	})
+	.catch(() => {/* */});
 
 const messagesLog = fs.createWriteStream(messagesFile, { flags : 'a' });
 

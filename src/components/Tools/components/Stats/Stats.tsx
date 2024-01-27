@@ -17,7 +17,9 @@ export const Stats: FC<Props> = ({ canvas }) => {
 	const [list, setList] = useState<{ name: string; active: boolean; }[]>([]);
 
 	const onOpen = () => {
-		get('stats').then(setStats);
+		get('stats')
+			.then(setStats)
+			.catch(() => {/* */});
 	};
 
 	const onClose = () => {
@@ -27,8 +29,10 @@ export const Stats: FC<Props> = ({ canvas }) => {
 	const getList = (event: React.MouseEvent) => {
 		event.preventDefault();
 
-		get('onlineList').then(setList)
-	}
+		get('onlineList')
+			.then(setList)
+			.catch(() => {/* */});
+	};
 
 	const drawPixel = (event: React.MouseEvent) => {
 		event.preventDefault();

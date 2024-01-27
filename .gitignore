@@ -16,3 +16,4 @@ _*
 *.json
 .eslintcache
 *.zip
+.idea/

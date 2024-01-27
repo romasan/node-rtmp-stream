@@ -86,7 +86,7 @@ const _parseUserData = (raw) => {
 	}
 
 	return null;
-}
+};
 
 const getUserData = (token) => {
 	const user = getUserByToken(token);
@@ -135,7 +135,7 @@ const removeUser = (token) => {
 
 const getAuthId = (token) => {
 	return users.sessions[token];
-}
+};
 
 module.exports = {
 	authorizeUser,

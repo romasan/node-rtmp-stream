@@ -46,6 +46,7 @@ export const App: React.FC = () => {
 		isOnline,
 		finish,
 		hasNewMessage,
+		role,
 		setHasNewMessage,
 	} = useWsStore();
 
@@ -105,7 +106,7 @@ export const App: React.FC = () => {
 		});
 
 		return breakDo;
-	}, [canvas])
+	}, [canvas]);
 
 	return (
 		<div className={cn(s.root, { mobile: isMobile })}>
@@ -116,6 +117,7 @@ export const App: React.FC = () => {
 				hasNewMessage={hasNewMessage}
 				setHasNewMessage={setHasNewMessage}
 				blinkedLoginAnimation={blinkedLoginAnimation}
+				role={role}
 				{...disableMouse}
 			/>
 			<Canvas

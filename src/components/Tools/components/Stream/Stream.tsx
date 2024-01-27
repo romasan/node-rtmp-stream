@@ -26,7 +26,9 @@ export const Stream: FC<Props> = ({}) => {
 	};
 
 	const onOpen = () => {
-		get('streamSettings').then(setCanvasConf);
+		get('streamSettings')
+			.then(setCanvasConf)
+			.catch(() => {/* */});
 	};
 
 	const checked = useMemo(() => {

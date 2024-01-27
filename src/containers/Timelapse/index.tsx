@@ -5,15 +5,17 @@ import { start } from '../../lib/api';
 import { connect as connectWS } from '../../lib/ws';
 
 const connectAPI = () => {
-	start().then((text) => {
-		if (text === 'fail') {
-			document.location.reload();
-	
-			return;
-		}
-	
-		connectWS();
-	}).catch(() => {});
+	start()
+		.then((text) => {
+			if (text === 'fail') {
+				document.location.reload();
+
+				return;
+			}
+
+			connectWS();
+		})
+		.catch(() => {/* */});
 };
 
 connectAPI();

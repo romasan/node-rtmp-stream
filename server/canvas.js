@@ -60,8 +60,8 @@ const getPixelAuthor = (x, y) => {
 const getPixelColor = (x, y) => {
 	const key = `${x}:${y}`;
 	const [
-		currentTime,
-		currentUuid,
+		,// currentTime,
+		,// currentUuid,
 		currentColor,
 		// prevColorUuid,
 		// prevColorColor,
@@ -91,19 +91,19 @@ const getTopLeaderboard = (count = 10, uuid) => {
 			},
 		], []);
 
-		if (uuid && !output.some((item) => item.uuid === uuid)) {
-			const place = sorted.findIndex(([id]) => id === (getAuthId(uuid) || uuid));
+	if (uuid && !output.some((item) => item.uuid === uuid)) {
+		const place = sorted.findIndex(([id]) => id === (getAuthId(uuid) || uuid));
 
-			if (place >= output.length) {
-				output.push({
-					id: uuid,
-					count: sorted[place][1],
-					place: place + 1,
-				});
-			}
+		if (place >= output.length) {
+			output.push({
+				id: uuid,
+				count: sorted[place][1],
+				place: place + 1,
+			});
 		}
+	}
 
-		return output;
+	return output;
 };
 
 const getLastActivity = () => {
@@ -204,7 +204,7 @@ const getImageBuffer = () => {
 			sec % 60
 		].map(e => String(e).padStart(2, '0')).join(':');
 	
-		_ctx.font = `bold 28px "Arial"`;
+		_ctx.font = 'bold 28px "Arial"';
 		_ctx.fillStyle = '#000';
 		_ctx.fillRect(10, 10, 120, 30);
 		_ctx.fillStyle = '#fff';

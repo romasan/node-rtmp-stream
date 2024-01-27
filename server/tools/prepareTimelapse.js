@@ -190,7 +190,7 @@ const prepareTimelapse = (
 };
 
 const gzipAB = async (input, compress = false) => {
-	const cs = compress ? new CompressionStream("gzip") : new DecompressionStream("gzip");
+	const cs = compress ? new CompressionStream('gzip') : new DecompressionStream("gzip");
 	const writer = cs.writable.getWriter();
 	const reader = cs.readable.getReader();
 	const output = [];

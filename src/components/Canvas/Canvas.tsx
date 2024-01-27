@@ -314,7 +314,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		}
 	};
 
-	const mouseUpCallback = ({ clientX, clientY, target, touches }: any) => {
+	const mouseUpCallback = ({ clientX, clientY, touches }: any) => {
 		if (
 			touches && 
 			new Array(touches.length || 0).fill(0).some(
@@ -577,9 +577,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		clearTimeout(timer.current);
 
 		if (scale >= showPixelScale && !coord.some((e) => e < 0)) {
-			timer.current = setTimeout(() => {
-				getPixel(...coord).then(setPixelData);
-			}, 1000);
+			timer.current = Number(setTimeout(() => {
+				getPixel(...coord)
+					.then(setPixelData)
+					.catch(() => {/* */});
+			}, 1000));
 		}
 	}, [coord, scale, viewOnly]);
 

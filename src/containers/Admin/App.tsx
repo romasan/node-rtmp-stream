@@ -9,6 +9,8 @@ import {
 	Tools,
 } from '../../components';
 
+import { APIhost } from '../../lib/api';
+
 import ee from '../../lib/ee';
 
 import * as s from './App.module.scss';
@@ -62,6 +64,7 @@ export const App: React.FC = () => {
 
 	return (
 		<div className={isMobile ? 'mobile' : ''}>
+			<a href="/" className={s.backButton}>←</a>
 			<Canvas
 				mode={canvasMode}
 				className={s.canvas}
@@ -70,6 +73,7 @@ export const App: React.FC = () => {
 				onClick={handleCanvasClick}
 				onSelect={handleSelect}
 				onInit={onInitCanvas}
+				src={`${APIhost}/canvas.png`}
 			>
 				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
 			</Canvas>

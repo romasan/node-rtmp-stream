@@ -17,6 +17,8 @@ import {
 import { gzipAB } from '../../helpers';
 import { useWsStore } from '../../hooks/useWsStore';
 
+import { ITimelapse } from './types';
+
 import * as s from './App.module.scss';
 
 const speedDegree = 1.1;
@@ -85,7 +87,7 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 
 export const App: React.FC = () => {
 	const [selectedEpisode, setSelectedEpisode] = useState('s1e2');
-	const [timelapse, setTimelapse] = useState<any>({});
+	const [timelapse, setTimelapse] = useState<ITimelapse>({});
 	const [speed, setSpeed] = useState(500 * 30);
 	const speedRef = useRef(speed);
 	const canvas = useRef(null);
@@ -95,7 +97,7 @@ export const App: React.FC = () => {
 	const timer = useRef(0);
 	const playCursor = useRef(0);
 	const [startPart, setStartPart] = useState(0);
-	const parts = useRef<any>({});
+	const parts = useRef<boolean[] | number[][][]>([]);
 	const timelapseRef = useRef(null);
 	const cursorRef = useRef(null);
 	const countRef = useRef(0);
@@ -106,7 +108,7 @@ export const App: React.FC = () => {
 	const [clickedCursor, setClickedCursor] = useState(-1);
 
 	const imageSrc = useMemo(() => {
-		return `${APIhost}/timelapse/${selectedEpisode}/${startPart}.png`
+		return `${APIhost}/timelapse/${selectedEpisode}/${startPart}.png`;
 	}, [selectedEpisode, startPart]);
 
 	const frameWidth = useMemo(() => {
@@ -148,6 +150,24 @@ export const App: React.FC = () => {
 		}
 	};
 
+	const moveTimelapseCursor = () => {
+		if (cursorRef.current) {
+			cursorRef.current.style.width = `${playCursor.current * frameWidth}px`;
+		}
+	};
+
+	const play = () => {
+		timer.current = Date.now();
+		playState.current = true;
+		setIsPlayed(true);
+		frame();
+	};
+
+	const stop = () => {
+		playState.current = false;
+		setIsPlayed(false);
+	};
+
 	const frame = () => {
 		if (!playState.current || !timelapse.expands) {
 			return;
@@ -174,7 +194,7 @@ export const App: React.FC = () => {
 			const cursorInPart = ((prevExpand && prevExpand.index.to) || 0) + partIndex * timelapse.partSize;
 
 			if (globalPartIndex <= timelapse.totalParts - 1 && !parts.current[globalPartIndex + 1]) {
-				preloadPart(globalPartIndex + 1);
+				void preloadPart(globalPartIndex + 1);
 			}
 
 			const pixelsToEndOfPart = partToIndex - playCursor.current;
@@ -193,7 +213,7 @@ export const App: React.FC = () => {
 			}
 
 			for (let i = 0; i < pixelToFrame; i++) {
-				let partCursor = playCursor.current - cursorInPart + i;
+				const partCursor = playCursor.current - cursorInPart + i;
 
 				try {
 					if (partCursor >= 0) {
@@ -225,12 +245,6 @@ export const App: React.FC = () => {
 		requestAnimationFrame(frame);
 	};
 
-	const moveTimelapseCursor = () => {
-		if (cursorRef.current) {
-			cursorRef.current.style.width = `${playCursor.current * frameWidth}px`;
-		}
-	};
-
 	const renderTimelapseSteps = () => {
 		if (!timelapseRef.current && !timelapse.total) {
 			return null;
@@ -257,26 +271,6 @@ export const App: React.FC = () => {
 				/>
 			</>
 		);
-	};
-
-	const play = () => {
-		timer.current = Date.now();
-		playState.current = true;
-		setIsPlayed(true);
-		frame();
-	};
-
-	const stop = () => {
-		playState.current = false;
-		setIsPlayed(false);
-	};
-
-	const handleToggleClick = () => {
-		if (playState.current) {
-			stop();
-		} else {
-			play();
-		}
 	};
 
 	const drawPixelsFromPartStart = () => {
@@ -307,6 +301,14 @@ export const App: React.FC = () => {
 		}
 	};
 
+	const handleToggleClick = () => {
+		if (playState.current) {
+			stop();
+		} else {
+			play();
+		}
+	};
+
 	const handleClickTimelapse = (event: React.MouseEvent) => {
 		if (!timelapse.expands) {
 			return;
@@ -321,7 +323,7 @@ export const App: React.FC = () => {
 		setClickedCursor(cursor);
 		moveTimelapseCursor();
 		setStartPart(globalPartIndex);
-		preloadPart(globalPartIndex);
+		void preloadPart(globalPartIndex);
 	};
 
 	const handleFasterClick = () => {
@@ -345,7 +347,7 @@ export const App: React.FC = () => {
 		) {
 			drawPixelsFromPartStart();
 		}
-	}, [startPart, selectedEpisode, timelapse, loadedPart, clickedCursor])
+	}, [startPart, selectedEpisode, timelapse, loadedPart, clickedCursor]);
 
 	useEffect(() => {
 		if (selectedEpisode) {
@@ -353,8 +355,8 @@ export const App: React.FC = () => {
 			playCursor.current = 0;
 			parts.current = [];
 			setStartPart(0);
-			preloadPart(0);
-			fetchSelectedEpisodeTimelapse();
+			void preloadPart(0);
+			void fetchSelectedEpisodeTimelapse();
 			moveTimelapseCursor();
 		}
 	}, [selectedEpisode]);

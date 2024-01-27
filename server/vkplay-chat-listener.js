@@ -72,7 +72,7 @@ const connect = (token, channel) => {
 	});
 
 	ws.on('message', (data) => reduceMessage(data, channel));
-}
+};
 
 const init = () => {
 	Promise.all([
@@ -82,13 +82,17 @@ const init = () => {
 			}
 		}),
 		fetch(`${VKPLAY_API_HOST}/v1/blog/${VKPLAY_USER_NAME}/public_video_stream?from=layer`),
-	]).then((resps) => {
-		Promise.all(resps.map((resp) => resp.json())).then(([{ token }, { wsChatChannel }]) => {
-			connect(token, wsChatChannel);
+	])
+		.then((resps) => {
+			Promise.all(resps.map((resp) => resp.json()))
+				.then(([{ token }, { wsChatChannel }]) => {
+					connect(token, wsChatChannel);
+				})
+				.catch(() => {/* */});
 		})
-	});
-}
+		.catch(() => {/* */});
+};
 
 module.exports = {
 	init,
-}
+};

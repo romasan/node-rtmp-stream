@@ -32,7 +32,9 @@ export const Info: FC<Props> = ({
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 280, y: 60});
 
 	useEffect(() => {
-		getStats().then(setStats).catch(() => {});
+		getStats()
+			.then(setStats)
+			.catch(() => {/* */});
 	}, []);
 
 	return (

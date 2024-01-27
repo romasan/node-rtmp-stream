@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 
 import ee from '../lib/ee';
 
+export enum ERole {
+	'user',
+	'moderator',
+}
+
 export const useWsStore = (): {
 	wsStore: any;
 	isAuthorized: boolean;
@@ -9,6 +14,7 @@ export const useWsStore = (): {
 	isOnline: boolean;
 	finish: number;
 	hasNewMessage: boolean;
+	role: ERole;
 	setHasNewMessage: (value: boolean) => void;
 } => {
 	const [wsStore, setWsStore] = useState<any>({
@@ -18,6 +24,7 @@ export const useWsStore = (): {
 	const [isAuthorized, setIsAuthorized] = useState(false);
 	const [expiration, setExpiration] = useState(0);
 	const [isOnline, setIsOnline] = useState(false);
+	const [role, setRole] = useState<ERole>(ERole.user);
 	const [finish, setFinish] = useState(0);
 	const [hasNewMessage, setHasNewMessage] = useState(false);
 
@@ -35,8 +42,9 @@ export const useWsStore = (): {
 		setExpiration(Date.now() + countdown);
 	};
 
-	const onWsConnect = (payload: boolean) => {
-		setIsOnline(payload);
+	const onWsConnect = (payload: boolean | string) => {
+		setIsOnline(Boolean(payload));
+		setRole(payload === 'qq' ? ERole.moderator : ERole.user);
 	};
 
 	const handleChatMessage = (message: any) => {
@@ -65,6 +73,7 @@ export const useWsStore = (): {
 		isOnline,
 		finish,
 		hasNewMessage,
+		role,
 		setHasNewMessage,
 	};
 };
