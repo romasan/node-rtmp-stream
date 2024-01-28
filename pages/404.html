@@ -21,7 +21,6 @@
 				font-family: 'Custom Font', monospace;
 				margin: 0;
 				padding: 0px;
-				color: #ffffff;
 				background: radial-gradient(
 						farthest-side at top left,
 						#16161a,
@@ -49,10 +48,17 @@
 				align-items: center;
 				justify-content: center;
 				font-size: 72pt;
+				text-decoration: unset;
+				&,
+				&:active,
+				&:hover,
+				&:visited {
+					color: #ffffff;
+				}
 			}
 		</style>
 	</head>
 	<body>
-		<div class="title">404</div>
+		<a href="/" class="title">404</a>
 	</body>
 </html>
