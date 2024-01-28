@@ -19,6 +19,7 @@ const {
 	FINISH_TIME_STAMP,
 	FINISH_TEXT,
 	ACTIVITY_DURATION,
+	MAX_CONNECTIONS_WITH_ONE_IP,
 } = process.env;
 
 let webServer = null;
@@ -150,6 +151,19 @@ const checkHasWSConnect = (token) => {
 	return has;
 };
 
+const checkIPRateLimit = (req) => {
+	const ip = req.socket.remoteAddress;
+	let count = 0;
+
+	wss.clients.forEach((ws) => {
+		if (ws._ip === ip) {
+			count++;
+		}
+	});
+
+	return count <= MAX_CONNECTIONS_WITH_ONE_IP ? false : count;
+};
+
 const callbacks = {
 	updateClientCountdown,
 	getOnlineCountRaw,
@@ -157,6 +171,7 @@ const callbacks = {
 	uptateActiveTime,
 	getOnlineCountList,
 	checkHasWSConnect,
+	checkIPRateLimit,
 };
 
 const webServerHandler = (req, res) => {
@@ -219,11 +234,13 @@ wss.on('connection', (ws, req) => {
 		return;
 	}
 
+	const ip = req.socket.remoteAddress;
 	const onlineCount = getOnlineCount();
 	const countdown = getCountdown(token, onlineCount) * 1000;
 	const isAuthorized = checkUserAuthByToken(token);
 	const user = getUserData(token);
 
+	ws._ip = ip;
 	ws._token = token;
 	ws._lastActivity = Date.now();
 

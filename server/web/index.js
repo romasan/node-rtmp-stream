@@ -115,7 +115,12 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	}
 }, true);
 
-const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, uptateActiveTime, checkHasWSConnect }) => {
+const addPix = checkAccessWrapper(async (req, res, {
+	updateClientCountdown,
+	uptateActiveTime,
+	checkHasWSConnect,
+	checkIPRateLimit,
+}) => {
 	if (req.method === 'PUT') {
 		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -132,6 +137,17 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, upta
 			res.end('fail');
 
 			console.log('Error: failed on add pixel (send command without WS connection)');
+
+			return;
+		}
+
+		const IPRateLimit = checkIPRateLimit(req);
+
+		if (IPRateLimit) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log(`Error: failed on add pixel (too many requests from one ip - ${IPRateLimit})`);
 
 			return;
 		}
