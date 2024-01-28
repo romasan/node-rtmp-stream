@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 	<url>
 		<loc>https://www.pixelbattle.online/</loc>
-		<lastmod>2024-01-27</lastmod>
+		<lastmod>2024-01-28</lastmod>
 		<priority>1.00</priority>
 	</url>
 	<url>
 		<loc>https://www.pixelbattle.online/timelapse/</loc>
-		<lastmod>2024-01-27</lastmod>
+		<lastmod>2024-01-28</lastmod>
 		<priority>2.00</priority>
 	</url>
 </urlset>
