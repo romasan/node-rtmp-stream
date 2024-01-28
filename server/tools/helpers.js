@@ -1,3 +1,6 @@
+const fs = require('fs');
+const readline = require('readline');
+
 const HSLToRGB = ([h, s, l]) => {
 	if (h < 0 || h > 360 || s < 0 || s > 100 || l < 0 || l > 100) {
 		return [0, 0, 0];
@@ -38,8 +41,8 @@ const HSLToRGB = ([h, s, l]) => {
 		Math.round((r + m) * 255),
 		Math.round((g + m) * 255),
 		Math.round((b + m) * 255),
-	]
-}
+	];
+};
 
 const RGBToHEX = ([r, g, b]) => '#' +
 	r.toString(16).padStart(2, '0') +
@@ -63,8 +66,26 @@ const readJSON = (file) => new Promise((resolve) => {
 	});
 });
 
+const fileLinesCount = (file) => new Promise((resolve) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+
+	let count = 0;
+
+	rl.on('line', () => {
+		count++;
+	});
+
+	rl.on('close', () => {
+		resolve(count);
+	});
+});
+
 module.exports = {
 	HSLToRGB,
 	RGBToHEX,
 	readJSON,
+	fileLinesCount,
 };

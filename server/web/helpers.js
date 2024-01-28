@@ -5,7 +5,7 @@ require('dotenv').config();
 const { FINISH_TIME_STAMP } = process.env;
 
 const validateToken = (token) => {
-	return typeof token === 'string' && token.match(/^[0-9a-f]{1}[0-9a-f\-]{35}$/);
+	return typeof token === 'string' && token.match(/^[0-9a-f][0-9a-f\-]{35}$/);
 };
 
 const getPathByToken = (token = '', prevalidate = true) => {

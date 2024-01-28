@@ -4,7 +4,7 @@ const BLACK = [0, 0, 0];
 import { colorBlendRGB, rgbToHex } from './color';
 
 const getPosByXY = (x: number, y: number, w: number) => y * w * 4 + x * 4;
-const getRGBByXY = (data: any, x: number, y: number, w: number, h?: number) => {
+const getRGBByXY = (data: any, x: number, y: number, w: number) => {
 	const pos = getPosByXY(x, y, w);
 
 	return data.slice(pos, pos + 3);
@@ -51,7 +51,7 @@ export const life = (canvas: any, data: any) => {
 	for (let y = 0; y < canvas.height; y++) {
 		for (let x = 0; x < canvas.width; x++) {
 			const pos = getPosByXY(x, y, w);
-			const color = getRGBByXY(data, x, y, w, h);
+			const color = getRGBByXY(data, x, y, w);
 			const [aroundCount, aroundColor] = checkAround(data, x, y, w, h);
 
 			if (eqA(color, WHITE)) {

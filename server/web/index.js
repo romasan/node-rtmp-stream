@@ -34,7 +34,7 @@ const { addMessage, getMessages } = require('../chat');
 const admin = require('./admin');
 const { COLORS, tempBans } = require('../const.json');
 
-const { WS_SECURE, WS_SERVER_ORIGIN, TIMELAPSE_CACHE_PERIOD } = process.env;
+const { WS_SECURE, WS_SERVER_HOST, TIMELAPSE_CACHE_PERIOD } = process.env;
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -115,7 +115,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	}
 }, true);
 
-const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, uptateActiveTime }) => {
+const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, uptateActiveTime, checkHasWSConnect }) => {
 	if (req.method === 'PUT') {
 		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -126,6 +126,15 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, upta
 
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
+
+		if (!checkHasWSConnect(token)) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: failed on add pixel (send command without WS connection)');
+
+			return;
+		}
 
 		let payload = {};
 
@@ -167,7 +176,7 @@ const addPix = checkAccessWrapper(async (req, res, { updateClientCountdown, upta
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (incorrect format of pixel)');
+			console.log('Error: failed on add pixel (incorrect format of pixel)', payload, token, ip);
 
 			return;
 		}
@@ -268,7 +277,7 @@ const logout = (req, res) => {
 
 	removeUser(token);
 
-	res.writeHead(302, { Location: WS_SERVER_ORIGIN });
+	res.writeHead(302, { Location: WS_SERVER_HOST });
 	res.end();
 };
 
@@ -317,7 +326,7 @@ const timelapse = (req, res) => {
 			res.writeHead(404, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: get timelapse file', e);
+			console.log('Error: get timelapse file', req.url, e);
 		}
 
 		return true;

@@ -121,11 +121,11 @@
 	position: absolute;
 	top: -2px;
 	right: 1px;
-	outline: 4px solid $color-window-bg;;
+	outline: 4px solid $color-window-bg;
 
 	&,
 	&:active {
-		padding: 0px 3px;
+		padding: 0 3px;
 	}
 }
 

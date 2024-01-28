@@ -10,7 +10,7 @@ const {
 	TWITCH_AUTH_CLIENT_ID,
 	TWITCH_AUTH_CLIENT_SECRET,
 	TWITCH_AUTH_REDIRECT_URI,
-	WS_SERVER_ORIGIN,
+	WS_SERVER_HOST,
 } = process.env;
 
 const twitch = async (req, res) => {
@@ -51,7 +51,7 @@ const twitch = async (req, res) => {
 					_authType: 'twitch',
 				});
 
-				res.writeHead(302, { Location: WS_SERVER_ORIGIN });
+				res.writeHead(302, { Location: WS_SERVER_HOST });
 				res.end();
 			} catch (error) {
 				console.log('Twitch auth error:', error);

@@ -17,6 +17,7 @@ const libs = {
 		'expand',
 		'debugStream',
 		'prepareTimelapse',
+		'collectIPAdresses',
 
 		'getPixelsInfo',
 		'genMapByUsers',

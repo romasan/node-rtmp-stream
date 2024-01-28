@@ -1,12 +1,12 @@
 export const gzipAB = async (input: ArrayBuffer, compress = false) => {
-	const cs = compress ? new CompressionStream("gzip") : new DecompressionStream("gzip");
+	const cs = compress ? new CompressionStream('gzip') : new DecompressionStream('gzip');
 	const writer = cs.writable.getWriter();
 	const reader = cs.readable.getReader();
 	const output = [];
 	let totalSize = 0;
 
-	writer.write(input);
-	writer.close();
+	void writer.write(input);
+	void writer.close();
 
 	for (let item; (item = await reader.read()) && !item.done;) {
 		output.push(item.value);

@@ -5,12 +5,12 @@ const http = require('http');
 const ee = require('./lib/ee');
 const web = require('./web');
 const { getCountdown } = require('./web/countdown');
-const { checkSession } = require('./sessions');
-const { COLORS } = require('./const.json');
 const { parseCookies } = require('./web/helpers');
+const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
-require('dotenv').config();
 const { getStatus } = require('./tools/getPixelsInfo');
+const { COLORS } = require('./const.json');
+require('dotenv').config();
 
 const {
 	WS_SERVER_PORT,
@@ -40,6 +40,7 @@ const updateClientCountdown = (token) => {
 };
 
 const spam = (data) => {
+	// if online > N use waveSpam
 	const message = JSON.stringify(data);
 
 	wss.clients.forEach((ws) => {
@@ -53,7 +54,7 @@ const delay = (t = 100) => new Promise((resolve) => setTimeout(resolve, t));
 
 const waveSpam = async (data) => {
 	const message = JSON.stringify(data);
-	const count = 0;
+	let count = 0;
 
 	for (const ws of wss.clients) {
 		if (ws.readyState === WebSocket.OPEN) {
@@ -134,7 +135,19 @@ const uptateActiveTime = (token) => {
 		if (ws._token === token) {
 			ws._lastActivity = Date.now();
 		}
-	})
+	});
+};
+
+const checkHasWSConnect = (token) => {
+	let has = false;
+
+	wss.clients.forEach((ws) => {
+		if (ws._token === token) {
+			has = true;
+		}
+	});
+
+	return has;
 };
 
 const callbacks = {
@@ -143,6 +156,7 @@ const callbacks = {
 	getOnlineCount,
 	uptateActiveTime,
 	getOnlineCountList,
+	checkHasWSConnect,
 };
 
 const webServerHandler = (req, res) => {
@@ -234,4 +248,4 @@ wss.on('connection', (ws, req) => {
 
 module.exports = {
 	spam,
-}
+};

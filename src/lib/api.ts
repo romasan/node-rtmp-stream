@@ -18,7 +18,7 @@ export const addPix = async ({ x, y, color }: { x: number; y: number; color: str
 		const text = await resp.text();
 
 		ee.emit('pix', text);
-	} catch (e) {}
+	} catch (e) {/* */}
 };
 
 export const start = async () => {

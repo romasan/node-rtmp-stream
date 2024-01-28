@@ -22,6 +22,7 @@
 - [ ] buy pixel-battle.ru | pixelbattles.ru
 - [ ] use one countdown for every session with one authorization
 - [ ] use one countdown for active unauthorized users with one ip address
+- [ ] do not allow more than one (or percentage of the number online) user with one IP address
 
 # admin panel
 
