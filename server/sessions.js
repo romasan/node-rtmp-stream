@@ -43,7 +43,7 @@ const trimFailed = () => {
 	if (Object.keys(failed).length > (maxLength + gap)) {
 		failed = trim(failed);
 	}
-}
+};
 
 const checkSession = (token, prevalidate = true) => {
 	if (prevalidate && !validateToken(token)) {
@@ -95,7 +95,7 @@ const addSession = (token, data) => {
 
 	delete failed[token];
 	// trimSessions();
-}
+};
 
 const getSessionUserName = (token) => {
 	const guestIndex = sessions[token] || '';

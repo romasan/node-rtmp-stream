@@ -1,3 +1,4 @@
+const fs = require('fs');
 const {
 	getCanvasConf,
 	updateCanvasConf,
@@ -5,11 +6,11 @@ const {
 	drawPix,
 	getLastActivity,
 	getStats,
-	getTotalPixels,
+	getTotalPixels, getPixelAuthor, getPixelColor,
 } = require('../canvas');
 const {
 	getPostPayload,
-	parseCookies,
+	parseCookies, getSearch, getPathByToken,
 } = require('./helpers');
 const {
 	checkSession,
@@ -46,7 +47,7 @@ const admin = async (req, res, {
 
 		try {
 			payload = JSON.parse(payloadRaw);
-		} catch (error) {}
+		} catch (error) {/* */}
 
 		const location = req.url.split(/(\/qq\/)|(\?)/);
 		const command = location[3];
@@ -167,6 +168,33 @@ const admin = async (req, res, {
 			});
 			res.writeHead(200, { 'Content-Type': 'text/json' });
 			res.end(JSON.stringify(list));
+			return;
+		case 'pixel':
+			const { x, y } = getSearch(req.url);
+			const { uuid, time } = getPixelAuthor(x, y);
+			const pixelUser = getUserData(uuid);
+			const name = pixelUser?.name || getSessionUserName(uuid);
+
+			const filePath = getPathByToken(uuid, false);
+			const file = fs.readFileSync(filePath).toString();
+
+			const table = file
+				.split('\n')
+				.filter(Boolean)
+				.map((line) => line.split(';'));
+
+			res.writeHead(200, { 'Content-Type': 'text/json' });
+			res.end(JSON.stringify({
+				x,
+				y,
+				uuid,
+				time,
+				color: getPixelColor(x, y),
+				name,
+				user: pixelUser,
+				logins: table,
+			}));
+
 			return;
 		}
 

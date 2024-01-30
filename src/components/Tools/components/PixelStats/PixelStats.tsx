@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import cn from 'classnames';
 
@@ -6,9 +6,10 @@ import { Block } from '../Block';
 
 import {
 	get,
-	put,
-	patch,
+	getQuery,
 } from '../../helpers';
+
+import { formatTime } from '../../../../helpers';
 
 // import * as s from './Stats.module.scss';
 
@@ -37,23 +38,37 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 		// get('stats').then(setStats);
 	};
 
+	const sortedLogins = stats.logins
+		? stats.logins.sort(([a], [b]) => a > b ? 1 : 0)
+		: [];
+
+	const ip = sortedLogins[sortedLogins.length - 1] && sortedLogins[sortedLogins.length - 1][1];
+	const time = sortedLogins[0] ? formatTime(Date.now() - sortedLogins[0][0]) : '...';
+
+	useEffect(() => {
+		if (typeof coord.x !== 'undefined') {
+			get(getQuery('pixel', coord))
+				.then(setStats)
+				.catch(() => {/* */});
+		}
+	}, [coord]);
+
 	return (
 		<Block title="Чей пиксель">
-			TODO
 			<div>
-				{x}:{y} #fff 00:05 назад
+				{x}:{y} {stats.color || '...'} {formatTime(Date.now() - stats.time)} назад
 			</div>
 			<div>
-				Первый вход: 5дн. 00:05 назад
+				Первый вход: {time} назад
 			</div>
 			<div>
-				Guest
+				{stats.name || '...'}
 			</div>
 			<div>
 				<button>Все сессии этого юзера</button>
 			</div>
 			<div>
-				TOKEN: 0000-000-0000000000
+				TOKEN: {stats.uuid || '...'}
 			</div>
 			<div>
 				<button>Все IP этой сессии</button>
@@ -62,7 +77,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				<button>Все IP этого юзера</button>
 			</div>
 			<div>
-				IP: 0.0.0.0 (City)
+				IP: {ip || '...'} (City)
 			</div>
 			<div>
 				<button>Сессии с этим IP</button>

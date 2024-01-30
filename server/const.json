@@ -63,15 +63,11 @@
 		"height": 720
 	},
 	"tempBans": {
-		"uuid": {
-			"0309fb36-a56a-4a42-8003-d8eafb8fbcf9": true
-		},
-		"nick": {
-			"hiki1kamaz1top": true,
-			"mayhemkidd": true
-		},
+		"uuid": {},
+		"nick": {},
 		"ip": {
-			"::ffff:5.165.213.196": true
+			"::ffff:5.165.213.196": true,
+			"::ffff:188.73.139.190": true
 		}
 	}
 }

@@ -67,7 +67,9 @@ const checkAccessWrapper = (callback, checkAuth) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed check access');
+			const ip = req.socket.remoteAddress;
+
+			console.log('Error: failed check access', token, ip);
 		}
 	};
 };
@@ -93,7 +95,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed add messagel (banned user)', token);
+			console.log('Error: failed add message (banned user)', token);
 
 			return;
 		}
@@ -136,7 +138,9 @@ const addPix = checkAccessWrapper(async (req, res, {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (send command without WS connection)');
+			const ip = req.socket.remoteAddress;
+
+			console.log('Error: failed on add pixel (send command without WS connection)', token, ip);
 
 			return;
 		}
