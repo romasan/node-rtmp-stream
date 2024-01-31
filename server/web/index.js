@@ -35,7 +35,7 @@ require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
 const admin = require('./admin');
-const { COLORS, tempBans } = require('../const.json');
+const { COLORS } = require('../const.json');
 
 const { WS_SECURE, WS_SERVER_HOST, TIMELAPSE_CACHE_PERIOD } = process.env;
 
