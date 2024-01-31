@@ -20,6 +20,7 @@ export const Maps: FC<Props> = ({
 }) => {
 	const [opened, setOpened] = useState(false);
 	const [lastPixelsValue, setLastPixelsValue] = useState(100);
+	const [clearOnExit, setClearOnExit] = useState(true);
 
 	const getMap = (name: string) => {
 		const ctx = canvas.getContext('2d');
@@ -52,15 +53,25 @@ export const Maps: FC<Props> = ({
 	};
 
 	useEffect(() => {
-		if (canvas) {
+		if (canvas && clearOnExit) {
 			canvas.width = canvas.width;
 		}
-	}, [canvas, opened]);
+	}, [canvas, opened, clearOnExit]);
 
 	return (
 		<Block title="Карты" onToggle={setOpened}>
 			<div>
 				<button onClick={getHeatmap}>heatmap</button>
+				<label>
+					очищать при выходе
+					<input
+						type="checkbox"
+						checked={clearOnExit}
+						onChange={(e) => {
+							setClearOnExit(e.target.checked);
+						}}
+					/>
+				</label>
 			</div>
 			<div>
 				<button onClick={getByUsersMap}>по юзеру</button>

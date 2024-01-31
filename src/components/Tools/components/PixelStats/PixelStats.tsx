@@ -21,22 +21,10 @@ interface Props {
 }
 
 export const PixelStats: FC<Props> = ({ coord }) => {
+	const [opened, setOpened] = useState(false);
 	const [stats, setStats] = useState<any>({});
 
 	const { x, y } = coord || {};
-
-	// const onChangeFreeze = (event: any) => {
-	// 	setCanvasConf((value: any) => ({ ...value, freezed: event.target.value === 'true' }));
-	// 	patch('streamSettings', JSON.stringify({ ...canvasConf, freezed: event.target.value === 'true' }), 'TEXT');
-	// };
-
-	// const updateFreezedFrame = () => {
-	// 	put('updateFreezedFrame', null, 'TEXT');
-	// };
-
-	const onOpen = () => {
-		// get('stats').then(setStats);
-	};
 
 	const sortedLogins = stats.logins
 		? stats.logins.sort(([a], [b]) => a > b ? 1 : 0)
@@ -46,15 +34,18 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	const time = sortedLogins[0] ? formatTime(Date.now() - sortedLogins[0][0]) : '...';
 
 	useEffect(() => {
-		if (typeof coord.x !== 'undefined') {
+		if (opened && typeof coord.x !== 'undefined') {
 			get(getQuery('pixel', coord))
 				.then(setStats)
 				.catch(() => {/* */});
 		}
-	}, [coord]);
+	}, [coord, opened]);
 
 	return (
-		<Block title="Чей пиксель">
+		<Block title="Чей пиксель" onToggle={setOpened}>
+			{stats.errors && stats.errors.lengtht && stats.errors.map((text: string) => (
+				<div key={text}>{text}</div>
+			))}
 			<div>
 				{x}:{y} {stats.color || '...'} {formatTime(Date.now() - stats.time)} назад
 			</div>
@@ -65,34 +56,34 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				{stats.name || '...'}
 			</div>
 			<div>
-				<button>Все сессии этого юзера</button>
-			</div>
-			<div>
 				TOKEN: {stats.uuid || '...'}
 			</div>
 			<div>
-				<button>Все IP этой сессии</button>
+				IP: {ip || '...'} (City TODO)
 			</div>
 			<div>
-				<button>Все IP этого юзера</button>
+				<button>Все сессии этого юзера TODO</button>
 			</div>
 			<div>
-				IP: {ip || '...'} (City)
+				<button>Все IP этой сессии TODO</button>
 			</div>
 			<div>
-				<button>Сессии с этим IP</button>
+				<button>Все IP этого юзера TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по сессии</button>
+				<button>Сессии с этим IP TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по нику</button>
+				<button>Заблокировать по сессии TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по IP</button>
+				<button>Заблокировать по нику TODO</button>
 			</div>
 			<div>
-				<button>Таймаут</button>
+				<button>Заблокировать по IP TODO</button>
+			</div>
+			<div>
+				<button>Таймаут TODO</button>
 				<select>
 					<option>полчаса</option>
 					<option>час</option>

@@ -2,7 +2,10 @@ const fs = require('fs');
 require('dotenv').config();
 const { validateToken } = require('./web/helpers');
 
-const { ADMIN_EMAIL } = process.env;
+const {
+	ADMIN_EMAIL,
+	MODERATOR_NICKS,
+} = process.env;
 
 const DBFileName = __dirname + '/../db/auth.json';
 
@@ -59,10 +62,19 @@ const checkUserAuthByToken = (token) => {
 	return token in users.sessions;
 };
 
+const _moderators = (MODERATOR_NICKS || '').split(',');
+
+// TODO roles
 const checkIsAdmin = (token) => {
 	const user = getUserByToken(token);
 
+	// admin
 	if (Boolean(user) && Boolean(ADMIN_EMAIL) && user?._authType === 'twitch' && user?.data?.[0]?.email === ADMIN_EMAIL) {
+		return true;
+	}
+
+	// moderator
+	if (Boolean(user) && _moderators.length && _moderators.includes(user?._authType === 'twitch' && user?.data?.[0]?.display_name)) {
 		return true;
 	}
 

@@ -26,6 +26,11 @@ const {
 	heatmapNewestFromStats,
 	mapLastPixelsFromStats,
 } = require('../tools');
+const {
+	ban,
+	unban,
+	getBans,
+} = require('./bans');
 
 const startTime = Date.now();
 
@@ -175,16 +180,23 @@ const admin = async (req, res, {
 			const pixelUser = getUserData(uuid);
 			const name = pixelUser?.name || getSessionUserName(uuid);
 
+			const errors = [];
+
 			const filePath = getPathByToken(uuid, false);
-			const file = fs.readFileSync(filePath).toString();
+			let table = [];
 
-			const table = file
-				.split('\n')
-				.filter(Boolean)
-				.map((line) => line.split(';'));
+			if (fs.existsSync(filePath)) {
+				const file = fs.readFileSync(filePath).toString();
 
-			res.writeHead(200, { 'Content-Type': 'text/json' });
-			res.end(JSON.stringify({
+				table = file
+					.split('\n')
+					.filter(Boolean)
+					.map((line) => line.split(';'));
+			} else {
+				errors.push(`Error read file: ${filePath}`);
+			}
+
+			const _payload = {
 				x,
 				y,
 				uuid,
@@ -193,7 +205,51 @@ const admin = async (req, res, {
 				name,
 				user: pixelUser,
 				logins: table,
-			}));
+			};
+
+			if (errors.length) {
+				_payload.errors = errors;
+			}
+
+			res.writeHead(200, { 'Content-Type': 'text/json' });
+			res.end(JSON.stringify(_payload));
+
+			return;
+		case 'getBans':
+			res.writeHead(200, { 'Content-Type': 'text/json' });
+			res.end(JSON.stringify(getBans()));
+
+			return;
+		case 'ban':
+			if (req.method === 'PUT') {
+				const { type, value, time } = payload;
+
+				ban(type, value, time && (Date.now() + time));
+
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('ok');
+
+				return;
+			}
+
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			return;
+		case 'unban':
+			if (req.method === 'PATCH') {
+				const { type, value } = payload;
+
+				unban(type, value);
+
+				res.writeHead(200, {'Content-Type': 'text/plain'});
+				res.end('ok');
+
+				return;
+			}
+
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
 
 			return;
 		}

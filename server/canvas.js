@@ -214,7 +214,7 @@ const getImageBuffer = () => {
 	return _canvas.toBuffer();
 };
 
-const drawPix = ({ x, y, color, nickname, uuid }) => {
+const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
 		return;
 	}
@@ -238,7 +238,7 @@ const drawPix = ({ x, y, color, nickname, uuid }) => {
 		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
 	}
 
-	log({x, y, color: rawColor, nickname, uuid});
+	log({ x, y, color: rawColor, nickname, uuid, ip });
 
 	ee.emit('spam', {
 		event: 'drawPix',

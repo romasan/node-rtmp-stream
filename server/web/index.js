@@ -28,6 +28,9 @@ const {
 	checkUserAuthByToken,
 	getUserData,
 } = require('../auth');
+const {
+	checkBan,
+} = require('./bans');
 require('dotenv').config();
 const twitchAuth = require('./twitchAuth');
 const { addMessage, getMessages } = require('../chat');
@@ -51,7 +54,16 @@ const checkAccessWrapper = (callback, checkAuth) => {
 		const { token } = parseCookies(req.headers.cookie || '');
 
 		if (checkSession(token)) {
-			// TODO check ban
+			const ip = req.socket.remoteAddress;
+
+			if (checkBan({ token, ip })) {
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('fail');
+
+				console.log('Error: user is banned');
+
+				return;
+			}
 
 			if (checkAuth && !checkUserAuthByToken(token)) {
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -88,10 +100,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 
 		const user = getUserData(token);
 
-		if (
-			tempBans.uuid[token] ||
-			tempBans.nick[user?.name]
-		) {
+		if (checkBan({ nick: user?.name })) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
@@ -175,11 +184,7 @@ const addPix = checkAccessWrapper(async (req, res, {
 
 		const ip = req.socket.remoteAddress;
 
-		if (
-			tempBans.uuid[token] ||
-			tempBans.nick[user?.name] || 
-			tempBans.ip[ip]
-		) {
+		if (checkBan({ nick: user?.name })) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
@@ -224,6 +229,7 @@ const addPix = checkAccessWrapper(async (req, res, {
 			y: Math.floor(payload.y),
 			nickname: '',
 			uuid: token,
+			ip,
 		});
 
 		updateClientCountdown(token);
@@ -259,10 +265,30 @@ const addPix = checkAccessWrapper(async (req, res, {
 	}
 });
 
-const start = (req, res) => {
+const start = (req, res, {
+	checkIPRateLimit,
+}) => {
 	const { token } = parseCookies(req.headers.cookie);
 	const ip = req.socket.remoteAddress;
 	// const userAgent = req.headers['user-agent'];
+
+	const IPRateLimit = checkIPRateLimit(req);
+
+	if (IPRateLimit) {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('fail');
+
+		console.log(`Error: failed start session (too many requests from one ip - ${IPRateLimit})`, token);
+
+		return;
+	}
+
+	if (checkBan({ ip, token })) {
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
+		res.end('ok');
+
+		return;
+	}
 
 	if (checkSession(token)) {
 		if (checkIsAdmin(token)) {
@@ -321,6 +347,7 @@ const stats = (req, res) => {
 		leaderboard,
 	}));
 };
+
 const contentTypes = {
 	json: 'text/json',
 	bin: 'application/octet-stream',

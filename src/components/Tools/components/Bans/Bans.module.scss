@@ -1,0 +1,13 @@
+.item {
+	display: flex;
+	justify-content: space-between;
+
+	& > span {
+		padding: 3px;
+		cursor: pointer;
+	}
+
+	&:hover {
+		background: rgba(255, 255, 255, 0.3);
+	}
+}

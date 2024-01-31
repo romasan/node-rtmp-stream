@@ -69,9 +69,9 @@ export const FillSquare: FC<Props> = ({
 					<div>[{range.from.x || -1}:{range.from.y || -1} - {range.to.x || -1}:{range.to.y || -1}] {color}</div>
 					<div>{Math.abs(range.from.x - range.to.x) * Math.abs(range.from.y - range.to.y)} pixels</div>
 				</>
-			) : 'Выбери область'}
+			) : 'Выбери область для предпросмотра'}
 			<div>
-				<button onClick={fillSquare}>готово</button>
+				<button onClick={fillSquare}>заливка области</button>
 			</div>
 		</Block>
 	);

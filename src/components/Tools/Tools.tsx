@@ -19,6 +19,7 @@ import {
 	PixelStats,
 	FillSquare,
 	Maps,
+	Bans,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -73,6 +74,8 @@ export const Tools: FC<Props> = ({
 								color={color}
 								setCanvasMode={setCanvasMode}
 							/>
+							<Bans />
+							{/*
 							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"
 								// onOpen={() => console.log('==== open #1')}
@@ -110,7 +113,7 @@ export const Tools: FC<Props> = ({
 									<input type="datetime-local" />
 								</div>
 							</Block>
-							<Block title="Управление банами">TODO</Block>
+							*/}
 						</>
 					)}
 				</div>

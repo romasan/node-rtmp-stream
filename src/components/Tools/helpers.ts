@@ -18,7 +18,7 @@ export const get = async (command: string, type = 'JSON') => {
 	return await resp.text();
 };
 
-export const push = async (command: string, payload?: any, method = 'POST', type = 'JSON') => {
+export const push = async (command: string, payload?: any, method = 'POST', type: string | boolean = 'JSON') => {
 	const resp = await fetch(`${APIhost}/qq/${command}`, {
 		method,
 		credentials: 'include',
@@ -35,14 +35,14 @@ export const push = async (command: string, payload?: any, method = 'POST', type
 	return await resp.text();
 };
 
-export const post = (command: string, payload?: any, type = 'JSON') => {
+export const post = (command: string, payload?: any, type: string | boolean = 'JSON') => {
 	return push(command, payload, 'POST', type);
 };
 
-export const put = (command: string, payload?: any, type = 'JSON') => {
+export const put = (command: string, payload?: any, type: string | boolean = 'JSON') => {
 	return push(command, payload, 'PUT', type);
 };
 
-export const patch = (command: string, payload?: any, type = 'JSON') => {
+export const patch = (command: string, payload?: any, type: string | boolean = 'JSON') => {
 	return push(command, payload, 'PATCH', type);
 };
