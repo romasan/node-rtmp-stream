@@ -13,14 +13,20 @@ jobs:
           persist-credentials: false
 
       - name: Install
+        with:
+          node-version: 18
         run: |
           npm install
 
       - name: Build
+        with:
+          node-version: 18
         run: |
           npm run build
 
       - name: Rect Snap
+        with:
+          node-version: 18
         run: |
           npm run render
 
