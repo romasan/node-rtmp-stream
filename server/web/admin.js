@@ -256,6 +256,10 @@ const admin = async (req, res, {
 		res.end('fail');
 
 		return;
+	case 'makeError':
+		throw new Error('DEBUG ERROR');
+
+		return;
 	}
 
 	res.writeHead(200, { 'Content-Type': 'text/json' });

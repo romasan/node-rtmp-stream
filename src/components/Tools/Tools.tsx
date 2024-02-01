@@ -6,10 +6,9 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import { EMode } from '../Canvas';
 
-// import { getToolsMessages, sendToolsMessage } from '../../lib/api';
-// import ee from '../../lib/ee';
-
 import { Block } from './components/Block';
+
+import { get } from './helpers';
 
 import { ToolsContext } from './context';
 
@@ -40,7 +39,6 @@ export const Tools: FC<Props> = ({
 	setCanvasMode,
 	...props
 }) => {
-
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 10});
 
 	const [opened, setOpened] = useState('');
@@ -48,6 +46,12 @@ export const Tools: FC<Props> = ({
 
 	const onToggle = () => {
 		setExpand((value) => !value);
+	};
+
+	const handleClickDebugButton = () => {
+		get('makeError')
+			.then(() => {/* */})
+			.catch(() => {/* */});
 	};
 
 	return (
@@ -75,6 +79,9 @@ export const Tools: FC<Props> = ({
 								setCanvasMode={setCanvasMode}
 							/>
 							<Bans />
+							<Block title="DEBUG">
+								<button onClick={handleClickDebugButton}>CLICK FOR ERROR</button>
+							</Block>
 							{/*
 							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"

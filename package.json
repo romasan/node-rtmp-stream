@@ -8,7 +8,7 @@
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
     "postbuild": "cp static/* dist/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
-    "serve": "cd ./server && node index.js",
+    "serve": "cd ./server && pm2 start node index.js",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
     "twitch:build": "zip pages/twitch/zip.zip pages/twitch/*"
@@ -51,6 +51,7 @@
     "eslint-plugin-react": "^7.33.2",
     "form-data": "^4.0.0",
     "parcel-plugin-static-files-copy": "^2.6.0",
+    "pm2": "^5.3.1",
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",
     "postcss-modules": "^4.3.1",
