@@ -20,6 +20,9 @@
       "--disable-setuid-sandbox"
     ]
   },
+  "engines" : {
+    "node" : ">=18.0.0"
+  },
   "author": "Roman Bauer",
   "license": "ISC",
   "dependencies": {

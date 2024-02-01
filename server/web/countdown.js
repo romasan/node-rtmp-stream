@@ -27,7 +27,7 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 		resetCountdownTemp(token);
 	}
 
-	// TODO
+	// TODO one countdown for all sessions with one login
 	// const _token = getAuthID(token) || token;
 
 	if (expirationsList[token]) {
@@ -53,9 +53,6 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 	const value = (isAuthorized ? _countdownRanges.authorized : _countdownRanges.guest)
 		.find((item) => inRange(onlineCount, item))?.[2] ?? 5;
 
-	// TODO
-	// get user name
-	// get other tokens for username
 	expirationsList[token] = Date.now() + (value * 1000);
 
 	// return Math.min(forceMin, value);

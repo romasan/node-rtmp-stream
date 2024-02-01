@@ -61,9 +61,7 @@ export const Maps: FC<Props> = ({
 	return (
 		<Block title="Карты" onToggle={setOpened}>
 			<div>
-				<button onClick={getHeatmap}>heatmap</button>
 				<label>
-					очищать при выходе
 					<input
 						type="checkbox"
 						checked={clearOnExit}
@@ -71,7 +69,11 @@ export const Maps: FC<Props> = ({
 							setClearOnExit(e.target.checked);
 						}}
 					/>
+					очищать при выходе из блока
 				</label>
+			</div>
+			<div>
+				<button onClick={getHeatmap}>heatmap</button>
 			</div>
 			<div>
 				<button onClick={getByUsersMap}>по юзеру</button>

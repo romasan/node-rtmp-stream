@@ -152,6 +152,7 @@ const checkHasWSConnect = (token) => {
 };
 
 const checkIPRateLimit = (req) => {
+	// TODO check without WS
 	const ip = req.socket.remoteAddress;
 	let count = 0;
 

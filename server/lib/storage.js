@@ -1,4 +1,4 @@
-// TODO
+// TODO database wrapper
 // composite pixels.log, sessions, auth.json, messages.log in database
 // auth and sessions in one entity
 
@@ -17,7 +17,7 @@ const sessions = {
 
 const chat = {
 
-}
+};
 
 module.exports = {
 	pixels,

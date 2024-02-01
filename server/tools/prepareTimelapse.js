@@ -141,7 +141,7 @@ const prepareTimelapse = (
 
 		const [time, nick, x, y, color, uuid] = line.split(';');
 
-		// TODO
+		// TODO date time in timelapse
 		// const _date = new Date(time);
 		// let [day, month, year] = ['getDate', 'getMonth', 'getFullYear'].map((key) => _date[key]());
 		// month = MONTHS[month + 1];

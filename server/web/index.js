@@ -60,7 +60,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
 				res.end('fail');
 
-				console.log('Error: user is banned');
+				console.log('Error: user is banned', token, ip);
 
 				return;
 			}

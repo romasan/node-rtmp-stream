@@ -1,4 +1,4 @@
-// TODO
+// TODO image paste
 document.addEventListener('paste', function (e) {
 	const clipboardData = e.clipboardData || window.clipboardData;
 	const items = clipboardData.items;

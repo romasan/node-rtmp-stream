@@ -62,10 +62,6 @@ export const Bar: FC<Props> = ({
 			<button className={s.button} onClick={handleClickPlace} aria-label="Показать всё полотно">
 				<ExpandIcon />
 			</button>
-			{/* TODO */}
-			{/* <button className={s.button}>
-				<img src={'data:image/svg+xml;utf8,' + clock} alt="Таймлапс" />
-			</button> */}
 		</div>
 	);
 };
