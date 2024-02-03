@@ -1,11 +1,11 @@
 require('dotenv').config();
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { COLORS, videoSize } = require('./const.json');
-const log = require('./log');
-const ee = require('./lib/ee');
-const { getPixelsInfo, updateStats } = require('./tools/getPixelsInfo');
-const { drawDefaultCanvas } = require('./tools');
+const { COLORS, videoSize } = require('../config.json');
+const { pixelsLog } = require('./log');
+const ee = require('../lib/ee');
+const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
+const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
 
 const { UPSCALE, STREAM_FREEZED_FRAME, STREAM_WITH_BG, STREAM_DEBUG_TIME } = process.env;
@@ -113,7 +113,7 @@ const getLastActivity = () => {
 const bg = drawDefaultCanvas('DATA', videoSize.width, videoSize.height, 'CHESS');
 const bgCTX = bg.getContext('2d');
 
-const imgBuf = fs.readFileSync(__dirname + '/../db/inout.png');
+const imgBuf = fs.readFileSync(__dirname + '/../../db/inout.png');
 const image = new Image;
 image.src = imgBuf;
 
@@ -238,7 +238,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
 	}
 
-	log({ x, y, color: rawColor, nickname, uuid, ip });
+	pixelsLog({ x, y, color: rawColor, nickname, uuid, ip });
 
 	ee.emit('spam', {
 		event: 'drawPix',
@@ -251,7 +251,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 };
 
 const saveCanvas = () => {
-	fs.writeFileSync(__dirname + '/../db/inout.png', canvas.toBuffer());
+	fs.writeFileSync(__dirname + '/../../db/inout.png', canvas.toBuffer());
 };
 
 module.exports = {

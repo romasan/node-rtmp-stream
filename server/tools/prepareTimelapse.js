@@ -1,7 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const CONST = require('../const.json');
+const CONST = require('../config.json');
 
 const PART_PIXELS_COUNT = 100_000;
 
@@ -216,8 +216,6 @@ const gzipAB = async (input, compress = false) => {
 };
 
 const packTimelapsePart = async (json, output) => {
-	// const json = require('../../db/archive/s1e1/timelapse/0.json');
-
 	const binary_16 = new Uint16Array(json.length * 3);
 
 	json.forEach((item, index) => {

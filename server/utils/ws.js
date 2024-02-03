@@ -2,14 +2,14 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
-const ee = require('./lib/ee');
-const web = require('./web');
-const { getCountdown } = require('./web/countdown');
-const { parseCookies } = require('./web/helpers');
+const ee = require('../lib/ee');
+const web = require('../api');
+const { getCountdown } = require('../helpers/countdown');
+const { parseCookies } = require('../helpers');
 const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
-const { getStatus } = require('./tools/getPixelsInfo');
-const { COLORS } = require('./const.json');
+const { getStatus } = require('../tools/getPixelsInfo');
+const { COLORS } = require('../config.json');
 require('dotenv').config();
 
 const {

@@ -6,9 +6,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import { EMode } from '../Canvas';
 
-import { Block } from './components/Block';
-
-import { get } from './helpers';
+// import { Block } from './components/Block';
 
 import { ToolsContext } from './context';
 
@@ -48,12 +46,6 @@ export const Tools: FC<Props> = ({
 		setExpand((value) => !value);
 	};
 
-	const handleClickDebugButton = () => {
-		get('makeError')
-			.then(() => {/* */})
-			.catch(() => {/* */});
-	};
-
 	return (
 		<ToolsContext.Provider value={{
 			opened,
@@ -79,9 +71,6 @@ export const Tools: FC<Props> = ({
 								setCanvasMode={setCanvasMode}
 							/>
 							<Bans />
-							<Block title="DEBUG">
-								<button onClick={handleClickDebugButton}>CLICK FOR ERROR</button>
-							</Block>
 							{/*
 							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"

@@ -5,7 +5,7 @@ const { fileLinesCount } = require('./helpers');
 // db/network/192/168/192.168.1.1
 // 2352345-325-2345-2354-234523
 const addSessionForIP = (ip, fileContent) => {
-	const list = ip.split('.')
+	const list = ip.split('.');
 	const filePath = `${__dirname}/../../db/sessions/network/${list[0]}/${list[1]}/${ip}`;
 	const dirname = path.dirname(filePath);
 

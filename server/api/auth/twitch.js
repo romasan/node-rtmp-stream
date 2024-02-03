@@ -2,9 +2,9 @@ const fetch = require("node-fetch");
 const url = require('url');
 require('dotenv').config();
 
-const { authorizeUser } = require('../auth');
+const { authorizeUser } = require('../../utils/auth');
 
-const { parseCookies } = require('./helpers');
+const { parseCookies } = require('../../helpers');
 
 const {
 	TWITCH_AUTH_CLIENT_ID,

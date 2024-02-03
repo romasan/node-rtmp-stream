@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { _parseUserData } = require('../auth');
+const { _parseUserData } = require('../utils/auth');
 
 const _fixSessionByNickName = () => {
 	const sessions = require('../../db/auth.json');

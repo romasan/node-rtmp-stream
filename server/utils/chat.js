@@ -2,13 +2,13 @@ const fs = require('fs');
 const readline = require('readline');
 const { v4: uuid } = require('uuid');
 const { getUserData } = require('./auth');
-const ee = require('./lib/ee');
-const { getFileLinesCount } = require('./web/helpers');
+const ee = require('../lib/ee');
+const { getFileLinesCount } = require('../helpers');
 
 const LIST_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 500;
 
-const messagesFile = __dirname + '/../db/messages.log';
+const messagesFile = __dirname + '/../../db/messages.log';
 
 let messages = [];
 

@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const readline = require('readline');
-const { getAuthId } = require('../auth');
+const { getAuthId } = require('../utils/auth');
 
 let uuidsCache = {};
 

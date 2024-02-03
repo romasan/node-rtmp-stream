@@ -1,15 +1,15 @@
 const fs = require('fs');
 require('dotenv').config();
-const { validateToken } = require('./web/helpers');
+const { validateToken } = require('../helpers');
 
 const {
 	ADMIN_EMAIL,
 	MODERATOR_NICKS,
 } = process.env;
 
-const DBFileName = __dirname + '/../db/auth.json';
+const DBFileName = __dirname + '/../../db/auth.json';
 
-const logoutLog = fs.createWriteStream(__dirname + '/../db/logout.log', { flags : 'a' });
+const logoutLog = fs.createWriteStream(__dirname + '/../../db/logout.log', { flags : 'a' });
 
 let users = {
 	sessions: {},

@@ -5,7 +5,7 @@ const path = require('path');
 const {
 	validateToken,
 	getPathByToken,
-} = require('./web/helpers');
+} = require('../helpers');
 
 let sessions = {};
 let failed = {};
@@ -16,7 +16,7 @@ const gap = 100;
 let index = 0;
 
 const rl = readline.createInterface({
-	input: fs.createReadStream(__dirname + '/../db/list'),
+	input: fs.createReadStream(__dirname + '/../../db/list'),
 	crlfDelay: Infinity
 });
 
@@ -24,7 +24,7 @@ rl.on('line', (uuid) => {
 	sessions[uuid] = ++index;
 });
 
-const file = fs.createWriteStream(__dirname + '/../db/list', { flags : 'a' });
+const file = fs.createWriteStream(__dirname + '/../../db/list', { flags : 'a' });
 
 const trim = (obj) => {
 	return Object.entries(obj)

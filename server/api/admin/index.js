@@ -7,34 +7,34 @@ const {
 	getLastActivity,
 	getStats,
 	getTotalPixels, getPixelAuthor, getPixelColor,
-} = require('../canvas');
+} = require('../../utils/canvas');
 const {
 	getPostPayload,
 	parseCookies, getSearch, getPathByToken,
-} = require('./helpers');
+} = require('../../helpers');
 const {
 	checkSession,
 	getSessionUserName,
-} = require('../sessions');
+} = require('../../utils/sessions');
 const {
 	checkIsAdmin,
 	getUserData,
-} = require('../auth');
+} = require('../../utils/auth');
 const {
 	heatmapFromStats,
 	mapByUsersFromStats,
 	heatmapNewestFromStats,
 	mapLastPixelsFromStats,
-} = require('../tools');
+} = require('../../tools');
 const {
 	ban,
 	unban,
 	getBans,
-} = require('./bans');
+} = require('../../utils/bans');
 
 const startTime = Date.now();
 
-const admin = async (req, res, {
+const index = async (req, res, {
 	getInfo,
 	getOnlineCountRaw,
 	getOnlineCount,
@@ -256,14 +256,10 @@ const admin = async (req, res, {
 		res.end('fail');
 
 		return;
-	case 'makeError':
-		throw new Error('DEBUG ERROR');
-
-		return;
 	}
 
 	res.writeHead(200, { 'Content-Type': 'text/json' });
 	res.end('{}');
 };
 
-module.exports = admin;
+module.exports = index;

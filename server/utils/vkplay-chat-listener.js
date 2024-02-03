@@ -1,5 +1,5 @@
 require('dotenv').config();
-const ee = require('./lib/ee');
+const ee = require('../lib/ee');
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
 

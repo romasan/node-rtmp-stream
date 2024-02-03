@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { getFileLinesCount } = require('../web/helpers');
+const { getFileLinesCount } = require('../helpers');
 
 const expand = async (input, output, width, height, shiftX = 0, shiftY = 0) => {
 	const countOfPixels = await getFileLinesCount(__dirname + '/../../db/pixels.log');

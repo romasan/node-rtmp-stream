@@ -1,6 +1,6 @@
-const { inRange } = require('./helpers');
-const { countdownRanges } = require('../const.json');
-const { checkUserAuthByToken, checkIsAdmin } = require('../auth');
+const { inRange } = require('./index');
+const { countdownRanges } = require('../config.json');
+const { checkUserAuthByToken, checkIsAdmin } = require('../utils/auth');
 
 const humanListToArray = (obj) => Object.entries(obj)
 	.reduce((list, [key, value]) => [...list, [Number(key), value]], [])

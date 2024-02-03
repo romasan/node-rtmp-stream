@@ -7,7 +7,7 @@ const {
 	getPixelAuthor,
 	getTotalPixels,
 	getTopLeaderboard,
-} = require('../canvas');
+} = require('../utils/canvas');
 const packageFile = require('../../package.json');
 const {
 	getPostPayload,
@@ -15,27 +15,27 @@ const {
 	getSearch,
 	isNumber,
 	checkStillTime,
-} = require('./helpers');
-const { getExpiration, resetCountdownTemp } = require('./countdown');
+} = require('../helpers');
+const { getExpiration, resetCountdownTemp } = require('../helpers/countdown');
 const {
 	checkSession,
 	addSession,
 	getSessionUserName,
-} = require('../sessions');
+} = require('../utils/sessions');
 const {
 	checkIsAdmin,
 	removeUser,
 	checkUserAuthByToken,
 	getUserData,
-} = require('../auth');
+} = require('../utils/auth');
 const {
 	checkBan,
-} = require('./bans');
+} = require('../utils/bans');
 require('dotenv').config();
-const twitchAuth = require('./twitchAuth');
-const { addMessage, getMessages } = require('../chat');
+const twitchAuth = require('./auth/twitch');
+const { addMessage, getMessages } = require('../utils/chat');
 const admin = require('./admin');
-const { COLORS } = require('../const.json');
+const { COLORS } = require('../config.json');
 
 const { WS_SECURE, WS_SERVER_HOST, TIMELAPSE_CACHE_PERIOD } = process.env;
 

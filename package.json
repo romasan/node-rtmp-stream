@@ -9,6 +9,7 @@
     "postbuild": "cp static/* dist/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
     "serve": "cd ./server && pm2 start node index.js",
+    "serve:debug": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
     "twitch:build": "zip pages/twitch/zip.zip pages/twitch/*"

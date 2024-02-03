@@ -1,8 +1,8 @@
 require('dotenv').config();
 const ee = require('./lib/ee');
-const { drawPix, saveCanvas, COLORS } = require('./canvas');
-const chat = require('./vkplay-chat-listener');
-require('./ws');
+const { drawPix, saveCanvas, COLORS } = require('./utils/canvas');
+const chat = require('./utils/vkplay-chat-listener');
+require('./utils/ws');
 const fs = require('fs');
 
 fs.writeFileSync(__dirname + '/../pid', process.pid.toString());
@@ -10,7 +10,7 @@ fs.writeFileSync(__dirname + '/../pid', process.pid.toString());
 const { STREAM_ENABLE, VKPLAY_CHAT_ENABLE } = process.env;
 
 if (STREAM_ENABLE == 'true') {
-	require('./stream');
+	require('./utils/stream');
 }
 
 const isCommand = (command) => (value) => value.toLowerCase() === command;

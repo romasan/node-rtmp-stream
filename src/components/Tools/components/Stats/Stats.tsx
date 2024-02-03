@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import React, { FC, useState } from 'react';
 
 import { Block } from '../Block';
 
@@ -26,12 +26,20 @@ export const Stats: FC<Props> = ({ canvas }) => {
 		canvas.width = canvas.width;
 	};
 
-	const getList = (event: React.MouseEvent) => {
-		event.preventDefault();
-
+	const getList = () => {
 		get('onlineList')
 			.then(setList)
 			.catch(() => {/* */});
+	};
+
+	const toggleList = (event: React.MouseEvent) => {
+		event.preventDefault();
+
+		if (list.length) {
+			setList([]);
+		} else {
+			getList();
+		}
 	};
 
 	const drawPixel = (event: React.MouseEvent) => {
@@ -65,7 +73,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 				<div>
 					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
 					<div className={s.users}>
-						<a href="#" onClick={getList}>Список</a>
+						<a href="#" onClick={toggleList}>Список</a>
 						{list.map((item) => (
 							<div key={String(item.name)}>
 								{item.name} {item.active ? '*' : ''}
@@ -79,7 +87,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			</div>
 			{Boolean(stats.coord) && (
 				<div>
-					{stats.lastUserName} ({stats.lastUserUUID})
+					{stats.lastUserName} ({stats.lastUserUUID} / {stats.lastUserIP || 'IP'})
 					<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
 				</div>
 			)}

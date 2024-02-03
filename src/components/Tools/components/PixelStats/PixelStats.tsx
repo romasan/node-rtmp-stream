@@ -62,6 +62,9 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				IP: {ip || '...'} (City TODO)
 			</div>
 			<div>
+				BANNED: ...
+			</div>
+			<div>
 				<button>Все сессии этого юзера TODO</button>
 			</div>
 			<div>
