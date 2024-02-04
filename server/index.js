@@ -1,15 +1,14 @@
-require('dotenv').config();
 const ee = require('./lib/ee');
 const { drawPix, saveCanvas, COLORS } = require('./utils/canvas');
-const chat = require('./utils/vkplay-chat-listener');
-require('./utils/ws');
+// const chat = require('./utils/vkplay-chat-listener');
 const fs = require('fs');
+require('./utils/ws');
 
 fs.writeFileSync(__dirname + '/../pid', process.pid.toString());
 
-const { STREAM_ENABLE, VKPLAY_CHAT_ENABLE } = process.env;
+const { stream } = require('./config.json');
 
-if (STREAM_ENABLE == 'true') {
+if (stream.enable) {
 	require('./utils/stream');
 }
 
@@ -41,9 +40,5 @@ const handleMessage = ({ from, text }) => {
 }
 
 setInterval(saveCanvas, 60 * 1000);
-
-if (VKPLAY_CHAT_ENABLE === 'true') {
-	chat.init();
-}
 
 ee.on('message', handleMessage);

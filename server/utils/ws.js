@@ -9,18 +9,18 @@ const { parseCookies } = require('../helpers');
 const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 const { getStatus } = require('../tools/getPixelsInfo');
-const { COLORS } = require('../config.json');
-require('dotenv').config();
-
 const {
-	WS_SERVER_PORT,
-	WS_SECURE,
-	WS_SERVER_ORIGIN,
-	FINISH_TIME_STAMP,
-	FINISH_TEXT,
-	ACTIVITY_DURATION,
-	MAX_CONNECTIONS_WITH_ONE_IP,
-} = process.env;
+	COLORS,
+	server: {
+		port,
+		secure,
+		origin,
+		activityDuration,
+		maxConnectionsWithOneIP,
+	},
+	finishTimeStamp,
+	finishText,
+} = require('../config.json');
 
 let webServer = null;
 let wss = null;
@@ -77,10 +77,12 @@ const getOnlineCountRaw = () => {
 
 	wss.clients.forEach((ws) => {
 		count++;
+
 		if (ws.readyState === WebSocket.OPEN) {
 			openedCount++;
 		}
-		if (ws._lastActivity && (Date.now() - ws._lastActivity) <= Number(ACTIVITY_DURATION)) {
+
+		if (ws._lastActivity && (Date.now() - ws._lastActivity) <= activityDuration) {
 			countByActivity++;
 		}
 	});
@@ -98,7 +100,7 @@ const getOnlineCountList = () => {
 
 			list.push({
 				uuid,
-				active: (Date.now() - lastActivity) <= Number(ACTIVITY_DURATION),
+				active: (Date.now() - lastActivity) <= Number(activityDuration),
 				lastActivity,
 			});
 		}
@@ -162,7 +164,7 @@ const checkIPRateLimit = (req) => {
 		}
 	});
 
-	return count <= MAX_CONNECTIONS_WITH_ONE_IP ? false : count;
+	return count <= maxConnectionsWithOneIP ? false : count;
 };
 
 const callbacks = {
@@ -176,7 +178,7 @@ const callbacks = {
 };
 
 const webServerHandler = (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', WS_SERVER_ORIGIN);
+	res.setHeader('Access-Control-Allow-Origin', origin);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -208,7 +210,7 @@ const webServerHandler = (req, res) => {
 	}
 };
 
-if (WS_SECURE === 'true') {
+if (secure) {
 	const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
 	const certificate = fs.readFileSync('../ssl-cert/fullchain.pem', 'utf8');
 	const credentials = { key: privateKey, cert: certificate };
@@ -222,7 +224,7 @@ webServer.on('error', error => {
 	console.error('Server error:', error);
 });
 
-webServer.listen(WS_SERVER_PORT);
+webServer.listen(port);
 
 wss = new WebSocket.Server({ server: webServer });
 
@@ -250,8 +252,8 @@ wss.on('connection', (ws, req) => {
 		isAuthorized,
 		...user,
 		countdown,
-		finish: FINISH_TIME_STAMP ? new Date(FINISH_TIME_STAMP).getTime() - Date.now() : 'newer',
-		finishText: FINISH_TEXT || 'TIMEOUT',
+		finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
+		finishText: finishText || 'TIMEOUT',
 	});
 
 	ws.on('message', (buf) => {

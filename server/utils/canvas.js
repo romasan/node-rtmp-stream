@@ -1,4 +1,3 @@
-require('dotenv').config();
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { COLORS, videoSize } = require('../config.json');
@@ -7,12 +6,11 @@ const ee = require('../lib/ee');
 const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
-
-const { UPSCALE, STREAM_FREEZED_FRAME, STREAM_WITH_BG, STREAM_DEBUG_TIME } = process.env;
+const { stream: { upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
 
 const conf = {
-	freezed: STREAM_FREEZED_FRAME === 'true',
-	withBg: STREAM_WITH_BG === 'true',
+	freezed: freezedFrame,
+	withBg: withBg,
 };
 
 const getCanvasConf = () => conf;
@@ -121,12 +119,14 @@ const canvas = createCanvas(image.width, image.height);
 const ctx = canvas.getContext('2d');
 ctx.drawImage(image, 0, 0);
 
-const scale = UPSCALE === 'true'
+const scale = (typeof upscale === 'boolean' && upscale)
 	? Math.min(
 		Math.floor(videoSize.width / canvas.width),
 		Math.floor(videoSize.height / canvas.height),
 	)
-	: (Number(UPSCALE) || 1);
+	: typeof upscale === 'number'
+		? upscale
+		: 1;
 
 let scaledCanvas = null;
 let scaledCTX = null;
@@ -191,7 +191,7 @@ const _start = Date.now();
 const getImageBuffer = () => {
 	const _canvas = getCanvas();
 
-	if (STREAM_DEBUG_TIME === 'true') {
+	if (debugTime) {
 		const _ctx = _canvas.getContext('2d');
 	
 		const sec = Math.floor((Date.now() - _start) / 1000);

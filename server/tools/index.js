@@ -23,6 +23,7 @@ const libs = {
 		'genMapByUsers',
 		'heatmap',
 		'fixSessionByNickName',
+		'convertEnvToConfig',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

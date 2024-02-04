@@ -1,17 +1,16 @@
 const fetch = require("node-fetch");
 const url = require('url');
-require('dotenv').config();
 
 const { authorizeUser } = require('../../utils/auth');
-
 const { parseCookies } = require('../../helpers');
-
 const {
-	TWITCH_AUTH_CLIENT_ID,
-	TWITCH_AUTH_CLIENT_SECRET,
-	TWITCH_AUTH_REDIRECT_URI,
-	WS_SERVER_HOST,
-} = process.env;
+	server: {
+		host,
+		auth: {
+			twitch: { clientId, clientSecret, redirectUri },
+		},
+	},
+} = require('../../config.json');
 
 const twitch = async (req, res) => {
 	if (req.url.startsWith('/auth/twitch')) {
@@ -21,11 +20,11 @@ const twitch = async (req, res) => {
 				const query = url.parse(req.url, true).query;
 
 				const urlEncoded = new URLSearchParams();
-				urlEncoded.append('client_id', TWITCH_AUTH_CLIENT_ID);
-				urlEncoded.append('client_secret', TWITCH_AUTH_CLIENT_SECRET);
+				urlEncoded.append('client_id', clientId);
+				urlEncoded.append('client_secret', clientSecret);
 				urlEncoded.append('code', query.code);
 				urlEncoded.append('grant_type', 'authorization_code');
-				urlEncoded.append('redirect_uri', TWITCH_AUTH_REDIRECT_URI);
+				urlEncoded.append('redirect_uri', redirectUri);
 
 				const respToken = await fetch(`https://id.twitch.tv/oauth2/token?${urlEncoded}`, {
 					method: 'POST',
@@ -35,7 +34,7 @@ const twitch = async (req, res) => {
 
 				const respUserInfo = await fetch('https://api.twitch.tv/helix/users', {
 					headers: {
-						'Client-ID': TWITCH_AUTH_CLIENT_ID,
+						'Client-ID': clientId,
 						'Authorization': `Bearer ${jsonToken.access_token}`,
 					}
 				});
@@ -51,7 +50,7 @@ const twitch = async (req, res) => {
 					_authType: 'twitch',
 				});
 
-				res.writeHead(302, { Location: WS_SERVER_HOST });
+				res.writeHead(302, { Location: host });
 				res.end();
 			} catch (error) {
 				console.log('Twitch auth error:', error);
@@ -64,8 +63,8 @@ const twitch = async (req, res) => {
 			const urlEncoded = new URLSearchParams();
 			urlEncoded.append('response_type', 'code');
 			urlEncoded.append('grant_type', 'authorization_code');
-			urlEncoded.append('client_id', TWITCH_AUTH_CLIENT_ID);
-			urlEncoded.append('redirect_uri', TWITCH_AUTH_REDIRECT_URI);
+			urlEncoded.append('client_id', clientId);
+			urlEncoded.append('redirect_uri', redirectUri);
 			urlEncoded.append('scope', 'user:read:email');
 
 			const url = `https://id.twitch.tv/oauth2/authorize?${urlEncoded}`;

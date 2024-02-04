@@ -61,5 +61,35 @@
 	"videoSize": {
 		"width": 1280,
 		"height": 720
-	}
+	},
+	"stream": {
+		"enable": true,
+		"rtmpHostKey": "",
+		"FFMPEGLog": false,
+		"inputAudio": "",
+		"upscale": true,
+		"freezedFrame": true,
+		"withBg": false,
+		"debugTime": false
+	},
+	"server": {
+		"host": "",
+		"port": 8080,
+		"secure": true,
+		"origin": "",
+		"activityDuration": 600000,
+		"timelapseCachePeriod": 22896000,
+		"maxConnectionsWithOneIP": 2,
+		"auth": {
+			"twitch": {
+				"clientId": "",
+				"clientSecret": "",
+				"redirectUri": ""
+			}
+		}
+	},
+	"adminEmail": "",
+	"finishTimeStamp": 0,
+	"finishText": "",
+	"moderatorNicks": ""
 }

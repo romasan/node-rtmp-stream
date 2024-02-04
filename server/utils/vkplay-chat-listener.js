@@ -1,11 +1,11 @@
-require('dotenv').config();
+// require('dotenv').config();
 const ee = require('../lib/ee');
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
 
 let ws = null;
 
-const { USER_AGENT, VKPLAY_API_HOST, VKPLAY_USER_NAME, VKPLAY_WS_HOST, VKPLAY_ORIGIN } = process.env;
+const { USER_AGENT, VKPLAY_API_HOST, VKPLAY_USER_NAME, VKPLAY_WS_HOST, VKPLAY_ORIGIN } = {}; // process.env;
 
 let id = 1;
 

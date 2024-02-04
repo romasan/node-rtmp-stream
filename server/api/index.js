@@ -31,13 +31,10 @@ const {
 const {
 	checkBan,
 } = require('../utils/bans');
-require('dotenv').config();
 const twitchAuth = require('./auth/twitch');
 const { addMessage, getMessages } = require('../utils/chat');
 const admin = require('./admin');
-const { COLORS } = require('../config.json');
-
-const { WS_SECURE, WS_SERVER_HOST, TIMELAPSE_CACHE_PERIOD } = process.env;
+const { COLORS, server: { secure, host, timelapseCachePeriod } } = require('../config.json');
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -300,7 +297,7 @@ const start = (req, res, {
 	} else {
 		const token = uuid();
 
-		if (WS_SECURE === 'true') {
+		if (secure) {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly; Secure`);
 		} else {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly`);
@@ -323,7 +320,7 @@ const logout = (req, res) => {
 
 	removeUser(token);
 
-	res.writeHead(302, { Location: WS_SERVER_HOST });
+	res.writeHead(302, { Location: host });
 	res.end();
 };
 
@@ -365,7 +362,7 @@ const timelapse = (req, res) => {
 				throw new Error();
 			}
 			
-			res.setHeader('Cache-control', `public, max-age=${TIMELAPSE_CACHE_PERIOD}`);
+			res.setHeader('Cache-control', `public, max-age=${timelapseCachePeriod}`);
 			res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
 			const readStream = fs.createReadStream(filePath);
 			readStream.pipe(res);

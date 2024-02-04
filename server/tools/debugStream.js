@@ -47,8 +47,6 @@ const debugStream = (INPUT_AUDIO, RTMP_HOST_KEY) => {
 	process.on('exit', function () {
 		ffmpeg.stdin.end();
 	});
-}
-
-
+};
 
 module.exports = debugStream;

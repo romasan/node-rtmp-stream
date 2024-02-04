@@ -1,9 +1,9 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
-require('dotenv').config();
+// require('dotenv').config();
 
-const { HOST } = process.env;
+const { HOST } = {}; // process.env;
 
 const shuffle = (array) => {
 	let currentIndex = array.length;
