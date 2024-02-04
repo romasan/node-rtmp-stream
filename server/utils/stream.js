@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 
-const { rtmpHostKey, inputAudio, FFMPEGLog } = require('../config.json');
+const { stream: { rtmpHostKey, inputAudio, FFMPEGLog } } = require('../config.json');
 
 const { getImageBuffer } = require('./canvas');
 
