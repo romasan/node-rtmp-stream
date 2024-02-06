@@ -1,12 +1,11 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { COLORS, videoSize } = require('../config.json');
 const { pixelsLog } = require('./log');
 const ee = require('../lib/ee');
 const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
-const { stream: { upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
+const { colorShemes: { COLORS }, videoSize, stream: { upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
 
 const conf = {
 	freezed: freezedFrame,
@@ -228,6 +227,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 		y,
 		rawColor,
 		uuid,
+		ip,
 	]);
 
 	ctx.fillStyle = rawColor;

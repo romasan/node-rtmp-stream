@@ -85,12 +85,16 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			<div>
 				Активность: {formatTime(stats.lastActivity)} назад
 			</div>
+			<div>
+				Первый пиксель: TODO
+			</div>
 			{Boolean(stats.coord) && (
 				<div>
 					{stats.lastUserName} ({stats.lastUserUUID} / {stats.lastUserIP || 'IP'})
 					<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
 				</div>
 			)}
+			<hr />
 			<div>
 				Всего пикселей: {formatNumber(stats.total)}
 			</div>

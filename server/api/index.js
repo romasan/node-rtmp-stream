@@ -32,9 +32,11 @@ const {
 	checkBan,
 } = require('../utils/bans');
 const twitchAuth = require('./auth/twitch');
+const steamAuth = require('./auth/steam');
+const discordAuth = require('./auth/discord');
 const { addMessage, getMessages } = require('../utils/chat');
 const admin = require('./admin');
-const { COLORS, server: { secure, host, timelapseCachePeriod } } = require('../config.json');
+const { colorShemes: { COLORS }, server: { secure, host, timelapseCachePeriod } } = require('../config.json');
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -292,6 +294,8 @@ const start = (req, res, {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('qq');
 
+			addSession(token, ip);
+
 			return;
 		}
 	} else {
@@ -302,9 +306,9 @@ const start = (req, res, {
 		} else {
 			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly`);
 		}
-
-		addSession(token, [ip]);
 	}
+
+	addSession(token, ip);
 
 	res.writeHead(200, { 'Content-Type': 'text/plain' });
 	res.end('ok');
@@ -387,7 +391,9 @@ const _default = async (req, res, callbacks) => {
 	}
 
 	if (
-		!await twitchAuth(req, res) && 
+		!await twitchAuth(req, res) &&
+		!await steamAuth(req, res) &&
+		!await discordAuth(req, res) &&
 		// && !await vkPlayAuth(req, res)
 		// && !await discordAuth(req, res)
 		// && !await vkAuth(req, res)

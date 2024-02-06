@@ -115,8 +115,11 @@ export const Maps: FC<Props> = ({
 				</select>
 			</div>
 			<div>
-				<button>by session</button>
-				<input placeholder="UUID"/>
+				<button onClick={getNewestMap}>по IP</button>
+			</div>
+			<div>
+				<button>для сессии</button>
+				<input placeholder="UUID" />
 			</div>
 		</Block>
 	);

@@ -1,8 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const CONST = require('../config.json');
-
+const { colorShemes } = require('../config.json');
 const PART_PIXELS_COUNT = 100_000;
 
 const prepareTimelapse = (
@@ -10,7 +9,7 @@ const prepareTimelapse = (
 	backgroundImage = `${__dirname}/../../assets/426x240.png`,
 	colors = 'COLORS'
 ) => {
-	const COLORS = CONST[colors];
+	const COLORS = colorShemes[colors];
 	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
 	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
 	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;

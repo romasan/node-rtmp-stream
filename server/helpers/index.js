@@ -11,9 +11,9 @@ const getPathByToken = (token = '', prevalidate = true) => {
 		return '';
 	}
 
-	const [a, b, c] = token.split('');
+	const prefix = token.slice(0, 2);
 
-	return `${__dirname}/../../db/sessions/${a}/${b}/${c}/${token}`;
+	return `${__dirname}/../../db/sessions/${prefix}/${token}`;
 };
 
 const getPostPayload = (req) => {
@@ -69,6 +69,7 @@ const isNumber = (number) => number && Number(number).toString() === number.toSt
 const checkStillTime = () => !finishTimeStamp || new Date(finishTimeStamp).getTime() > Date.now();
 
 module.exports = {
+	...require('./addSessionForIP'),
 	validateToken,
 	getPathByToken,
 	getPostPayload,

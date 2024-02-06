@@ -8,7 +8,7 @@ const { getAuthId } = require('../utils/auth');
 
 let uuidsCache = {};
 
-const updateStats = (stats, [time, nick, x, y, color, uuid]) => {
+const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 	const key = `${x}:${y}`;
 
 	// if (!stats.starttime) {
@@ -21,6 +21,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid]) => {
 		x,
 		y,
 		color,
+		ip,
 	};
 
 	let uuidIndex = uuidsCache[uuid];
@@ -38,6 +39,9 @@ const updateStats = (stats, [time, nick, x, y, color, uuid]) => {
 		colorIndex = stats.colors.length - 1;
 	}
 
+	// TODO add IP to hash list
+	// let ipIndex = ipCache[ip];
+
 	const [
 		currentTime,
 		currentUuid,
@@ -47,6 +51,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid]) => {
 		// prevUserUuid,
 		// prevUserColor,
 		count,
+		// 	ip,
 	] = stats[key] || [];
 
 	// const prevUser = prevUserUuid === currentUuid
@@ -110,9 +115,9 @@ const getPixelsInfo = (output) => {
 				return;
 			}
 
-			const [time, nick, x, y, color, uuid] = line.split(';');
+			const [time, nick, x, y, color, uuid, ip] = line.split(';');
 
-			updateStats(stats, [time, nick, x, y, color, uuid]);
+			updateStats(stats, [time, nick, x, y, color, uuid, ip]);
 		});
 	
 		rl.on('close', () => {

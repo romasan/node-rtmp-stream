@@ -83,6 +83,7 @@ const index = async (req, res, {
 			lastActivity: Date.now() - lastActivity?.time,
 			lastUserName: user?.name || getSessionUserName(lastActivity?.uuid),
 			lastUserUUID: lastActivity.uuid,
+			lastUserIP: lastActivity.ip,
 			coord: {
 				x: lastActivity.x,
 				y: lastActivity.y,

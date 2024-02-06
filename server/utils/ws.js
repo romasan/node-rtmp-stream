@@ -10,7 +10,7 @@ const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 const { getStatus } = require('../tools/getPixelsInfo');
 const {
-	COLORS,
+	colorShemes: { COLORS },
 	server: {
 		port,
 		secure,

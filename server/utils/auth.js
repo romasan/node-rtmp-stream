@@ -96,6 +96,24 @@ const _parseUserData = (raw) => {
 		};
 	}
 
+	if (raw?._authType === 'steam') {
+		return {
+			id: raw?.response?.players?.[0]?.steamid,
+			name: raw?.response?.players?.[0]?.personaname,
+			avatar: raw?.response?.players?.[0]?.avatar,
+			area: 'steam',
+		};
+	}
+
+	if (raw?._authType === 'discord') {
+		return {
+			id: raw?.id,
+			name: raw?.username,
+			avatar: `https://cdn.discordapp.com/avatars/${raw?.id}/${raw?.avatar}.webp?size=64`,
+			area: 'discord',
+		};
+	}
+
 	return null;
 };
 

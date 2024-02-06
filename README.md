@@ -45,6 +45,7 @@
 - [ ] auto restart on fail (fix ffmpeg problems)
 - [x] auto restart: write process.pid to file
 - [ ] auto restart: add servise with chatbot for notification
+- [x] auto restart (use PM2)
 - [ ] fit the canvas into the frame
 - [ ] write start datetime to file
 - [ ] freeze frame to stream from admin panel
@@ -53,10 +54,11 @@
 - [ ] binary ws messages?
 - [ ] move ssl handle to nginx? (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
 - [ ] merge token|uuid vars name?
-- [ ] const.js -> config.json
+- [x] const.js -> config.json
 - [x] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
 - [ ] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
 - [ ] replace server/tools/getPixelInfo -> server/
+- [ ] remove event emitter
 
 # web
 

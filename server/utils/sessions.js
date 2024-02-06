@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const path = require('path');
+const { addSessionForIP } = require('../helpers');
 
 const {
 	validateToken,
@@ -24,7 +25,8 @@ rl.on('line', (uuid) => {
 	sessions[uuid] = ++index;
 });
 
-const file = fs.createWriteStream(__dirname + '/../../db/list', { flags : 'a' });
+const tokensFile = fs.createWriteStream(__dirname + '/../../db/list', { flags : 'a' });
+// const ipFile = fs.createWriteStream(__dirname + '/../../db/iplist', { flags : 'a' });
 
 const trim = (obj) => {
 	return Object.entries(obj)
@@ -72,7 +74,7 @@ const checkSession = (token, prevalidate = true) => {
 	}
 };
 
-const addSession = (token, data) => {
+const addSession = (token, ip) => {
 	const filePath = getPathByToken(token, false);
 	const dirname = path.dirname(filePath);
 
@@ -80,18 +82,18 @@ const addSession = (token, data) => {
 		fs.mkdirSync(dirname, { recursive: true });
 	}
 
-	const fileContent = [
-		Date.now(),
-		...data,
-	].join(';') + '\n';
+	const fileContent = [Date.now(), ip].join(';') + '\n';
 
 	if (fs.existsSync(filePath)) {
 		fs.appendFileSync(filePath, fileContent);
 	} else {
-		file.write(token + '\n');
+		tokensFile.write(token + '\n');
+		// ipFile.write(ip + '\n');
 		fs.writeFileSync(filePath, fileContent);
 		sessions[token] = ++index;
 	}
+
+	addSessionForIP(ip, token);
 
 	delete failed[token];
 	// trimSessions();

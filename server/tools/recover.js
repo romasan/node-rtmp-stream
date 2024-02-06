@@ -57,4 +57,12 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 	});
 };
 
+// TODO use alternative canvas library
+// make perfomance test
+// 1) only read file, without canvas rendering
+// 2) with canvas
+// 3) canvaskit-wasm
+// 4) skia-canvas
+// 5) @napi-rs/canvas
+
 module.exports = recover;
