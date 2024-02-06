@@ -20,7 +20,7 @@ import { getPixel } from '../../lib/api';
 
 import { showPixelScale, scaleDegree, minScale, maxScale } from '../../const';
 
-import image404 from 'url:../../../assets/404.webp';
+import image404 from '../../../assets/404.webp';
 
 import * as s from './Canvas.module.scss';
 
