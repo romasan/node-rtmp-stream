@@ -10,7 +10,7 @@ import ee from '../../lib/ee';
 
 import TwitchIcon from '../../../assets/twitch_bw.svg';
 import DiscordIcon from '../../../assets/discord_bw.svg';
-import StreamIcon from '../../../assets/steam_bw.svg';
+import SteamIcon from '../../../assets/steam_bw.svg';
 
 import * as s from './Chat.module.scss';
 
@@ -43,7 +43,7 @@ interface IMessage {
 const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
-	stream: StreamIcon,
+	steam: SteamIcon,
 };
 
 const renderText = (raw: string, nickname?: string): string => {

@@ -8,7 +8,7 @@ import { formatNumber } from '../../helpers';
 
 import TwitchIcon from '../../../assets/twitch_bw.svg';
 import DiscordIcon from '../../../assets/discord_bw.svg';
-import StreamIcon from '../../../assets/steam_bw.svg';
+import SteamIcon from '../../../assets/steam_bw.svg';
 
 import * as s from './Info.module.scss';
 
@@ -27,7 +27,7 @@ interface IMessage {
 const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
-	stream: StreamIcon,
+	steam: SteamIcon,
 };
 
 export const Info: FC<Props> = ({
