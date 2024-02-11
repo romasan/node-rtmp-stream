@@ -68,7 +68,7 @@ export const Info: FC<Props> = ({
 									<span>
 										{item.place < 10 && <>&nbsp;</>}
 										{item.place}.
-										{icons[item.platform]?.() || <div className={s.space} />}
+										{icons[item.platform] ? icons[item.platform]() : <div className={s.space} />}
 										{item.name}
 									</span>
 									<span>

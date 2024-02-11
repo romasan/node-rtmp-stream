@@ -19,7 +19,7 @@ export const useModal = (props?: Props | React.ReactElement) => {
 	const [visible, setVisible] = useState(false);
 
 	const close = () => {
-		onClose?.();
+		onClose && onClose();
 		setVisible(false);
 	};
 
