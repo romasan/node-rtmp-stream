@@ -67,7 +67,7 @@ export const Message: React.FC<MessageProps> = ({
 				className={cn(s.message, { [s.clickable]: isAuthorized && message.name !== nickname })}
 				onClick={() => handleMention(message.name)}
 			>
-				{icons[message.platform]()}{message.name || '[EMPTY NICKNAME]'}:
+				{icons[message.platform] && icons[message.platform]()}{message.name || '[EMPTY NICKNAME]'}:
 			</div>
 			<div className={s.text} dangerouslySetInnerHTML={{ __html: html }} />
 		</div>
