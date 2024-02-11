@@ -24,7 +24,7 @@ interface MessageProps {
 	message: {
 		name: string;
 		text: string;
-		platform: string;
+		area: string;
 		time: number;
 	};
 	isAuthorized: boolean;
@@ -67,7 +67,7 @@ export const Message: React.FC<MessageProps> = ({
 				className={cn(s.message, { [s.clickable]: isAuthorized && message.name !== nickname })}
 				onClick={() => handleMention(message.name)}
 			>
-				{icons[message.platform] && icons[message.platform]()}{message.name || '[EMPTY NICKNAME]'}:
+				{icons[message.area] && icons[message.area]()}{message.name || '[EMPTY NICKNAME]'}:
 			</div>
 			<div className={s.text} dangerouslySetInnerHTML={{ __html: html }} />
 		</div>

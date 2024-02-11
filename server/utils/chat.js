@@ -29,7 +29,7 @@ getFileLinesCount(messagesFile)
 				const [
 					time,
 					name,
-					platform,
+					area,
 					token,
 					id,
 					...rest
@@ -41,7 +41,7 @@ getFileLinesCount(messagesFile)
 					time,
 					text,
 					name,
-					platform,
+					area,
 				};
 
 				messages.push(message);
