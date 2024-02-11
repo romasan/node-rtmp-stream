@@ -15,7 +15,7 @@ const MONTHS = [
 
 export const formatDate = (date: number) => {
 	const currentYear = new Date().getFullYear();
-	const _date = new Date(date);
+	const _date = new Date(Number(date));
 
 	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());

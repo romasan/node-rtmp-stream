@@ -5,7 +5,12 @@ import cn from 'classnames';
 import { useDraggable } from '../../hooks/useDraggable';
 
 import { getChatMessages, sendChatMessage } from '../../lib/api';
+import { formatDate } from '../../helpers';
 import ee from '../../lib/ee';
+
+import TwitchIcon from '../../../assets/twitch_bw.svg';
+import DiscordIcon from '../../../assets/discord_bw.svg';
+import StreamIcon from '../../../assets/steam_bw.svg';
 
 import * as s from './Chat.module.scss';
 
@@ -19,11 +24,13 @@ interface MessageProps {
 	message: {
 		name: string;
 		text: string;
+		platform: string;
+		time: number;
 	};
 	isAuthorized: boolean;
 	nickname?: string;
 	handleMention(name: string): void;
-};
+}
 
 interface IMessage {
 	id: string;
@@ -32,6 +39,12 @@ interface IMessage {
 	name: string;
 	avatar: string;
 }
+
+const icons = {
+	twitch: TwitchIcon,
+	discord: DiscordIcon,
+	stream: StreamIcon,
+};
 
 const renderText = (raw: string, nickname?: string): string => {
 	return raw
@@ -49,12 +62,12 @@ export const Message: React.FC<MessageProps> = ({
 	const html = useMemo(() => renderText(message.text, nickname), []);
 
 	return (
-		<div>
+		<div title={formatDate(message.time)}>
 			<div
-				className={cn({ [s.clickable]: isAuthorized && message.name !== nickname })}
+				className={cn(s.message, { [s.clickable]: isAuthorized && message.name !== nickname })}
 				onClick={() => handleMention(message.name)}
 			>
-				{message.name || '[EMPTY NICKNAME]'}:
+				{icons[message.platform]()}{message.name || '[EMPTY NICKNAME]'}:
 			</div>
 			<div className={s.text} dangerouslySetInnerHTML={{ __html: html }} />
 		</div>

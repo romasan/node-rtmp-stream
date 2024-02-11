@@ -132,3 +132,12 @@
 .clickable {
 	cursor: pointer;
 }
+
+.message {
+	& svg {
+		@include size(16px);
+
+		transform: translateY(4px);
+		margin-right: 4px;
+	}
+}

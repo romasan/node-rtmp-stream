@@ -294,21 +294,21 @@ const start = (req, res, {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('qq');
 
-			addSession(token, ip);
-
 			return;
 		}
+
+		addSession(token, ip);
 	} else {
-		const token = uuid();
+		const newToken = uuid();
 
 		if (secure) {
-			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly; Secure`);
+			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly; Secure`);
 		} else {
-			res.setHeader('Set-Cookie', `token=${token}; Max-Age=31536000; HttpOnly`);
+			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly`);
 		}
-	}
 
-	addSession(token, ip);
+		addSession(newToken, ip);
+	}
 
 	res.writeHead(200, { 'Content-Type': 'text/plain' });
 	res.end('ok');
@@ -339,6 +339,7 @@ const stats = (req, res) => {
 				name: user?.name || getSessionUserName(item.id),
 				count: item.count,
 				place: item.place,
+				platform: user?.area,
 			};
 		});
 
@@ -395,7 +396,6 @@ const _default = async (req, res, callbacks) => {
 		!await steamAuth(req, res) &&
 		!await discordAuth(req, res) &&
 		// && !await vkPlayAuth(req, res)
-		// && !await discordAuth(req, res)
 		// && !await vkAuth(req, res)
 		!timelapse(req, res)
 	) {

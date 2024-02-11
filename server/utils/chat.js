@@ -41,6 +41,7 @@ getFileLinesCount(messagesFile)
 					time,
 					text,
 					name,
+					platform,
 				};
 
 				messages.push(message);

@@ -6,6 +6,10 @@ import { getStats } from '../../lib/api';
 
 import { formatNumber } from '../../helpers';
 
+import TwitchIcon from '../../../assets/twitch_bw.svg';
+import DiscordIcon from '../../../assets/discord_bw.svg';
+import StreamIcon from '../../../assets/steam_bw.svg';
+
 import * as s from './Info.module.scss';
 
 interface Props {
@@ -20,16 +24,22 @@ interface IMessage {
 	avatar: string;
 }
 
+const icons = {
+	twitch: TwitchIcon,
+	discord: DiscordIcon,
+	stream: StreamIcon,
+};
+
 export const Info: FC<Props> = ({
 	onClose,
-	...props,
+	...props
 }) => {
 	const [stats, setStats] = useState({
 		loading: true,
 		leaderboard: [],
 		total: 0,
 	});
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 280, y: 60});
+	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 350, y: 60});
 
 	useEffect(() => {
 		getStats()
@@ -58,6 +68,7 @@ export const Info: FC<Props> = ({
 									<span>
 										{item.place < 10 && <>&nbsp;</>}
 										{item.place}.
+										{icons[item.platform]?.() || <div className={s.space} />}
 										{item.name}
 									</span>
 									<span>

@@ -4,8 +4,14 @@
 		<script>
 			const { hostname, protocol } = document.location;
 			const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}:8080`;
+			const query = location.search.slice(1);
+			const key = [
+				'twitch',
+				'steam',
+				'discord',
+			].includes(query) ? query : 'twitch';
 
-			document.location.href = `${APIhost}/auth/twitch`;
+			document.location.href = `${APIhost}/auth/${key}`;
 		</script>
 	</head>
 	<body>

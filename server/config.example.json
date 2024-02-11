@@ -45,6 +45,7 @@
 			"white": "#ffffff"
 		}
 	},
+	"guestCanPlay": true,
 	"countdownRanges": {
 		"authorized": {
 			"0": 3,
@@ -60,11 +61,11 @@
 			"500": 600
 		}
 	},
-	"videoSize": {
-		"width": 1280,
-		"height": 720
-	},
 	"stream": {
+		"videoSize": {
+			"width": 1280,
+			"height": 720
+		},
 		"enable": true,
 		"rtmpHostKey": "",
 		"FFMPEGLog": false,

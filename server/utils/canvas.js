@@ -5,7 +5,7 @@ const ee = require('../lib/ee');
 const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
-const { colorShemes: { COLORS }, videoSize, stream: { upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
+const { colorShemes: { COLORS }, stream: { videoSize, upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
 
 const conf = {
 	freezed: freezedFrame,
