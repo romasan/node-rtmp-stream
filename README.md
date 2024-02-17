@@ -96,14 +96,14 @@
 # how to configurate ssl certificate
 
 ```bash
-sudo certbot certonly --webroot -w /var/www/html -d api.pixelbattle.online
+sudo certbot certonly --webroot -w /var/www/html -d api.pixelbattles.ru
 ```
 
 OR
 
 ```bash
-sudo certbot certonly --standalone -d api.pixelbattle.online
-sudo cp /etc/letsencrypt/live/api.pixelbattle.online/* ./
+sudo certbot certonly --standalone -d api.pixelbattles.ru
+sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/* ./
 ```
 
 # how to render timelapse
@@ -171,7 +171,7 @@ sudo cp /etc/letsencrypt/live/w.nbauer.ru/privkey.pem /etc/nginx/ssl/server.key
 ```
 server {
 	listen 80;
-	server_name api.pixelbattle.online;
+	server_name api.pixelbattles.ru;
 
 	location / {
 		proxy_pass http://localhost:3000;
@@ -183,7 +183,7 @@ server {
 	}
 
 	listen 443;
-	server_name api.pixelbattle.online;
+	server_name api.pixelbattles.ru;
 	root /usr/share/nginx/www;
 	index index.html index.htm;
 	ssl on;

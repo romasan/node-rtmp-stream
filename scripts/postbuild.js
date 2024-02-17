@@ -22,7 +22,7 @@ replaceInFile(
 		"@type": "WebSite",
 		"name": "Pixel Battle",
 		"alternateName": ["Пиксель Батл"],
-		"url": "https://www.pixelbattle.online/"
+		"url": "https://www.pixelbattles.ru/"
 	}
 </script>`),
 );
