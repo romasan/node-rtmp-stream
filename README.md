@@ -24,6 +24,7 @@
 - [ ] use one countdown for active unauthorized users with one ip address
 - [ ] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
+- [ ] fix zoom on click on non canvas and "pixel" elements
 
 # admin panel
 
@@ -59,6 +60,7 @@
 - [ ] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
 - [ ] replace server/tools/getPixelInfo -> server/
 - [ ] remove event emitter
+- [ ] use nestjs?
 
 # web
 

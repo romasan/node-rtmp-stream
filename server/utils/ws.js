@@ -224,7 +224,7 @@ webServer.on('error', error => {
 	console.error('Server error:', error);
 });
 
-webServer.listen(port);
+webServer.listen(port, 'localhost');
 
 wss = new WebSocket.Server({ server: webServer });
 
