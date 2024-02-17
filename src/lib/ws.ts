@@ -31,7 +31,7 @@ let timer: number = -1;
 
 const { hostname, protocol, hash } = document.location;
 const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
-export const WSHost = `${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}:8080`;
+export const WSHost = `${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}`;
 const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws';
 
 export const connect = (status?: string) => {
