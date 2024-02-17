@@ -57,10 +57,10 @@ export const Header: React.FC<Props> = ({
 						<DiscordIcon />
 						Discord
 					</a>
-					<a href="/login/?steam">
-						<SteamIcon />
-						Steam
-					</a>
+					{/*<a href="/login/?steam">*/}
+					{/*	<SteamIcon />*/}
+					{/*	Steam*/}
+					{/*</a>*/}
 				</div>
 			</>
 		),
