@@ -1,6 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
-const { finishTimeStamp } = require('../config.json');
+const { finishTimeStamp, server: { proxyIp } } = require('../config.json');
 
 const validateToken = (token) => {
 	return typeof token === 'string' && token.match(/^[0-9a-f][0-9a-f\-]{35}$/);
@@ -32,6 +32,14 @@ const getPostPayload = (req) => {
 			reject();
 		});
 	});
+};
+
+const getIPAddress = (req) => {
+	if (proxyIp) {
+		return req.headers['x-forwarded-for'];
+	}
+
+	return req.socket.remoteAddress;
 };
 
 const inRange = (value, [from, to]) => value >= from && value <= to;
@@ -73,6 +81,7 @@ module.exports = {
 	validateToken,
 	getPathByToken,
 	getPostPayload,
+	getIPAddress,
 	inRange,
 	parseCookies,
 	getFileLinesCount,

@@ -5,7 +5,7 @@ const http = require('http');
 const ee = require('../lib/ee');
 const web = require('../api');
 const { getCountdown } = require('../helpers/countdown');
-const { parseCookies } = require('../helpers');
+const { parseCookies, getIPAddress } = require('../helpers');
 const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
 const { getStatus } = require('../tools/getPixelsInfo');
@@ -155,7 +155,7 @@ const checkHasWSConnect = (token) => {
 
 const checkIPRateLimit = (req) => {
 	// TODO check without WS
-	const ip = req.socket.remoteAddress;
+	const ip = getIPAddress(req);
 	let count = 0;
 
 	wss.clients.forEach((ws) => {
@@ -237,7 +237,7 @@ wss.on('connection', (ws, req) => {
 		return;
 	}
 
-	const ip = req.socket.remoteAddress;
+	const ip = getIPAddress(req);
 	const onlineCount = getOnlineCount();
 	const countdown = getCountdown(token, onlineCount) * 1000;
 	const isAuthorized = checkUserAuthByToken(token);

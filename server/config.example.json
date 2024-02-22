@@ -83,6 +83,7 @@
 		"activityDuration": 600000,
 		"timelapseCachePeriod": 22896000,
 		"maxConnectionsWithOneIP": 2,
+		"proxyIp": true,
 		"auth": {
 			"twitch": {
 				"clientId": "",

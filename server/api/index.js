@@ -15,6 +15,7 @@ const {
 	getSearch,
 	isNumber,
 	checkStillTime,
+	getIPAddress,
 } = require('../helpers');
 const { getExpiration, resetCountdownTemp } = require('../helpers/countdown');
 const {
@@ -53,7 +54,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 		const { token } = parseCookies(req.headers.cookie || '');
 
 		if (checkSession(token)) {
-			const ip = req.socket.remoteAddress;
+			const ip = getIPAddress(req);
 
 			if (checkBan({ token, ip })) {
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -78,7 +79,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			const ip = req.socket.remoteAddress;
+			const ip = getIPAddress(req);
 
 			console.log('Error: failed check access', token, ip);
 		}
@@ -146,7 +147,7 @@ const addPix = checkAccessWrapper(async (req, res, {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			const ip = req.socket.remoteAddress;
+			const ip = getIPAddress(req);
 
 			console.log('Error: failed on add pixel (send command without WS connection)', token, ip);
 
@@ -181,7 +182,7 @@ const addPix = checkAccessWrapper(async (req, res, {
 
 		const user = getUserData(token);
 
-		const ip = req.socket.remoteAddress;
+		const ip = getIPAddress(req);
 
 		if (checkBan({ nick: user?.name })) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -268,7 +269,7 @@ const start = (req, res, {
 	checkIPRateLimit,
 }) => {
 	const { token } = parseCookies(req.headers.cookie);
-	const ip = req.socket.remoteAddress;
+	const ip = getIPAddress(req);
 	// const userAgent = req.headers['user-agent'];
 
 	const IPRateLimit = checkIPRateLimit(req);
