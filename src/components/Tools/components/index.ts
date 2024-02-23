@@ -4,3 +4,4 @@ export * from './PixelStats';
 export * from './FillSquare';
 export * from './Maps';
 export * from './Bans';
+export * from './Metrics';
