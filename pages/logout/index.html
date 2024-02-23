@@ -3,7 +3,8 @@
 		<title>Выход</title>
 		<script>
 			const { hostname, protocol } = document.location;
-			const APIhost = `${protocol}//${hostname === 'localhost' ? '' : 'api.'}${hostname.replace('www.', '')}`;
+			const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
+			const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '')}${isLocalhost ? ':8080' : ''}`;
 
 			document.location.href = `${APIhost}/auth/logout`;
 		</script>

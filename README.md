@@ -162,8 +162,8 @@ sudo nginx -s reload
 ```
 
 ```bash
-sudo cp /etc/letsencrypt/live/w.nbauer.ru/fullchain.pem /etc/nginx/ssl/server.crt
-sudo cp /etc/letsencrypt/live/w.nbauer.ru/privkey.pem /etc/nginx/ssl/server.key
+sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/fullchain.pem /etc/nginx/ssl/server.crt
+sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/privkey.pem /etc/nginx/ssl/server.key
 ```
 
 /etc/nginx/sites-available/example
@@ -171,22 +171,22 @@ sudo cp /etc/letsencrypt/live/w.nbauer.ru/privkey.pem /etc/nginx/ssl/server.key
 ```
 server {
 	listen 80;
-	server_name api.pixelbattles.ru;
+	listen 443 ssl;
+	server_name pixelbattle.online;
 
-	location / {
-		proxy_pass http://localhost:3000;
-		proxy_http_version 1.1;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection 'upgrade';
-		proxy_set_header Host $host;
-		proxy_cache_bypass $http_upgrade;
-	}
+	rewrite ^/$ http://www.pixelbattles.ru redirect;
 
-	listen 443;
-	server_name api.pixelbattles.ru;
-	root /usr/share/nginx/www;
-	index index.html index.htm;
-	ssl on;
+	ssl_certificate /etc/nginx/ssl/server.crt;
+	ssl_certificate_key /etc/nginx/ssl/server.key;
+}
+
+server {
+	listen 80;
+	listen 443 ssl;
+	server_name www.pixelbattle.online;
+
+	rewrite ^/$ http://www.pixelbattles.ru redirect;
+
 	ssl_certificate /etc/nginx/ssl/server.crt;
 	ssl_certificate_key /etc/nginx/ssl/server.key;
 }
@@ -202,6 +202,7 @@ server {
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection 'upgrade';
 		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 		proxy_cache_bypass $http_upgrade;
 	}
 

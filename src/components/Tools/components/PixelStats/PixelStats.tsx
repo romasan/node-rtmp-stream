@@ -27,7 +27,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	const { x, y } = coord || {};
 
 	const sortedLogins = stats.logins
-		? stats.logins.sort(([a], [b]) => a > b ? 1 : 0)
+		? stats.logins.sort(([a]: [number], [b]: [number]) => a > b ? 1 : 0)
 		: [];
 
 	const ip = sortedLogins[sortedLogins.length - 1] && sortedLogins[sortedLogins.length - 1][1];

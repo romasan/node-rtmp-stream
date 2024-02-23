@@ -2,7 +2,7 @@ import ee from '../lib/ee';
 
 const { hostname, protocol } = document.location;
 const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
-export const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${isLocalhost ? 'localhost' : hostname.replace('www.', '')}`;
+export const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '')}${isLocalhost ? ':8080' : ''}`;
 
 export const addPix = async ({ x, y, color }: { x: number; y: number; color: string; }) => {
 	try {
