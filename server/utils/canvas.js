@@ -54,6 +54,19 @@ const getPixelAuthor = (x, y) => {
 	};
 };
 
+const getPixelAuthorIPAddress = (x, y) => {
+	const key = `${x}:${y}`;
+	const [
+		/* currentTime */,
+		/* currentUuid */,
+		/* currentColor */,
+		/* count */,
+		ip,
+	] = stats?.[key] || [];
+
+	return stats?.ips[ip];
+};
+
 const getPixelColor = (x, y) => {
 	const key = `${x}:${y}`;
 	const [
@@ -270,4 +283,5 @@ module.exports = {
 	getTotalPixels,
 	getTopLeaderboard,
 	getLastActivity,
+	getPixelAuthorIPAddress,
 };

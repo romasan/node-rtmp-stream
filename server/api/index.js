@@ -37,7 +37,7 @@ const steamAuth = require('./auth/steam');
 const discordAuth = require('./auth/discord');
 const { addMessage, getMessages } = require('../utils/chat');
 const admin = require('./admin');
-const { colorShemes: { COLORS }, server: { secure, host, timelapseCachePeriod } } = require('../config.json');
+const { colorShemes: { COLORS }, server: { secure, host, timelapseCachePeriod }, guestCanPlay } = require('../config.json');
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -142,6 +142,15 @@ const addPix = checkAccessWrapper(async (req, res, {
 
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload = await getPostPayload(req);
+
+		if (!guestCanPlay && !checkUserAuthByToken(token)) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('fail');
+
+			console.log('Error: failed check authorized');
+
+			return;
+		}
 
 		if (!checkHasWSConnect(token)) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });

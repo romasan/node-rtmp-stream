@@ -24,6 +24,7 @@ const libs = {
 		'heatmap',
 		'fixSessionByNickName',
 		'convertEnvToConfig',
+		'filterByIP',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

@@ -20,6 +20,7 @@ const {
 	},
 	finishTimeStamp,
 	finishText,
+	guestCanPlay,
 } = require('../config.json');
 
 let webServer = null;
@@ -239,7 +240,7 @@ wss.on('connection', (ws, req) => {
 
 	const ip = getIPAddress(req);
 	const onlineCount = getOnlineCount();
-	const countdown = getCountdown(token, onlineCount) * 1000;
+	const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
 	const isAuthorized = checkUserAuthByToken(token);
 	const user = getUserData(token);
 
@@ -254,6 +255,7 @@ wss.on('connection', (ws, req) => {
 		countdown,
 		finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
 		finishText: finishText || 'TIMEOUT',
+		needAuthorize: !guestCanPlay,
 	});
 
 	ws.on('message', (buf) => {

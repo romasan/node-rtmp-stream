@@ -6,11 +6,16 @@ const {
 	drawPix,
 	getLastActivity,
 	getStats,
-	getTotalPixels, getPixelAuthor, getPixelColor,
+	getTotalPixels,
+	getPixelAuthor,
+	getPixelColor,
+	getPixelAuthorIPAddress,
 } = require('../../utils/canvas');
 const {
 	getPostPayload,
-	parseCookies, getSearch, getPathByToken,
+	parseCookies,
+	getSearch,
+	getPathByToken,
 } = require('../../helpers');
 const {
 	checkSession,
@@ -184,6 +189,7 @@ const index = async (req, res, {
 		const { uuid, time } = getPixelAuthor(x, y);
 		const pixelUser = getUserData(uuid);
 		const name = pixelUser?.name || getSessionUserName(uuid);
+		const ip = getPixelAuthorIPAddress(x, y);
 
 		const errors = [];
 
@@ -210,6 +216,7 @@ const index = async (req, res, {
 			name,
 			user: pixelUser,
 			logins: table,
+			ip,
 		};
 
 		if (errors.length) {

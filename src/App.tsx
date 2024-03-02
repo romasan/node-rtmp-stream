@@ -26,6 +26,7 @@ import DiscordIcon from '../assets/discord.svg';
 import TelegramIcon from '../assets/telegram.svg';
 
 import * as s from './App.module.scss';
+import { useModal } from './hooks';
 
 const disableMouse = {
 	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
@@ -51,6 +52,29 @@ export const App: React.FC = () => {
 	} = useWsStore();
 
 	const isMobile = mobile();
+
+	const loginModal = useModal({
+		content: (
+			<>
+				<div className={s.loginTitle}>Войти с помощью</div>
+				<div className={s.loginList}>
+					<a href="/login/?twitch">
+						<TwitchIcon />
+						Twitch
+					</a>
+					<a href="/login/?discord">
+						<DiscordIcon />
+						Discord
+					</a>
+					{/*<a href="/login/?steam">*/}
+					{/*	<SteamIcon />*/}
+					{/*	Steam*/}
+					{/*</a>*/}
+				</div>
+			</>
+		),
+		width: '300px',
+	});
 
 	useEffect(() => {
 		if (!color && wsStore.palette && wsStore.palette) {
@@ -79,7 +103,11 @@ export const App: React.FC = () => {
 	}, [finish]);
 
 	const handleCanvasClick = (x: number, y: number) => {
-		addPix({ x, y, color });
+		if (wsStore.needAuthorize && !isAuthorized) {
+			loginModal.open();
+		} else {
+			addPix({ x, y, color });
+		}
 	};
 
 	const onPix = (payload: string) => {
@@ -109,57 +137,61 @@ export const App: React.FC = () => {
 	}, [canvas]);
 
 	return (
-		<div className={cn(s.root, { mobile: isMobile })}>
-			<Header
-				isAuthorized={isAuthorized}
-				name={wsStore ? wsStore.name : ''}
-				isOnline={isOnline}
-				hasNewMessage={hasNewMessage}
-				setHasNewMessage={setHasNewMessage}
-				blinkedLoginAnimation={blinkedLoginAnimation}
-				role={role}
-				{...disableMouse}
-			/>
-			<Canvas
-				color={wsStore.palette ? wsStore.palette[color] : ''}
-				onClick={handleCanvasClick}
-				expiration={expiration}
-				isAuthorized={isAuthorized}
-				isFinished={isFinished}
-				isOnline={isOnline}
-				onInit={setCanvas}
-				src={`${APIhost}/canvas.png`}
-			/>
-			{!isMobile && (
-				<Bar
-					centering={canvas.centering}
-					setScale={canvas.setScale}
-					isFinished={isFinished}
+		<>
+			<div className={cn(s.root, { mobile: isMobile })}>
+				<Header
+					isAuthorized={isAuthorized}
+					name={wsStore ? wsStore.name : ''}
+					isOnline={isOnline}
+					hasNewMessage={hasNewMessage}
+					setHasNewMessage={setHasNewMessage}
+					blinkedLoginAnimation={blinkedLoginAnimation}
+					role={role}
+					login={loginModal.open}
+					{...disableMouse}
 				/>
-			)}
-			{wsStore.palette && !isFinished && (
-				<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
-			)}
-			{Boolean(finish) && (
-				<Countdown finish={finish} text={wsStore.finishText}/>
-			)}
-			<div className={s.footer} {...disableMouse}>
-				<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">
-					<VkplayIcon />
-				</a>
-				<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
-					<TwitchIcon />
-				</a>
-				<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
-					<YoutubeIcon />
-				</a>
-				<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer" aria-label="Discord сервер пиксель батла">
-					<DiscordIcon />
-				</a>
-				<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer" aria-label="Telegram канал пиксель батла">
-					<TelegramIcon />
-				</a>
+				<Canvas
+					color={wsStore.palette ? wsStore.palette[color] : ''}
+					onClick={handleCanvasClick}
+					expiration={expiration}
+					isAuthorized={isAuthorized}
+					isFinished={isFinished}
+					isOnline={isOnline}
+					onInit={setCanvas}
+					src={`${APIhost}/canvas.png`}
+				/>
+				{!isMobile && (
+					<Bar
+						centering={canvas.centering}
+						setScale={canvas.setScale}
+						isFinished={isFinished}
+					/>
+				)}
+				{wsStore.palette && !isFinished && (
+					<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
+				)}
+				{Boolean(finish) && (
+					<Countdown finish={finish} text={wsStore.finishText}/>
+				)}
+				<div className={s.footer} {...disableMouse}>
+					<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">
+						<VkplayIcon />
+					</a>
+					<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
+						<TwitchIcon />
+					</a>
+					<a href="https://www.youtube.com/@Place-ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">
+						<YoutubeIcon />
+					</a>
+					<a href="https://discord.gg/FfVjurYrus" target="_blank" rel="noreferrer" aria-label="Discord сервер пиксель батла">
+						<DiscordIcon />
+					</a>
+					<a href="https://t.me/pixel_battle_online" target="_blank" rel="noreferrer" aria-label="Telegram канал пиксель батла">
+						<TelegramIcon />
+					</a>
+				</div>
 			</div>
-		</div>
+			{loginModal.render()}
+		</>
 	);
 };

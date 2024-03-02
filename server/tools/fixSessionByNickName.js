@@ -94,7 +94,7 @@ const mergeSessions = () => {
 	};
 
 	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
-}
+};
 
 // const fixSessionByNickName = () => {
 // 	clearEmpty();

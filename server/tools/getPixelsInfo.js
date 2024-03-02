@@ -7,6 +7,7 @@ const readline = require('readline');
 const { getAuthId } = require('../utils/auth');
 
 let uuidsCache = {};
+let ipsCache = {};
 
 const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 	const key = `${x}:${y}`;
@@ -32,6 +33,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		uuidsCache[uuid] = stats.uuids.length - 1;
 	}
 
+
 	let colorIndex = stats.colors.indexOf(color);
 
 	if (colorIndex < 0) {
@@ -39,19 +41,19 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		colorIndex = stats.colors.length - 1;
 	}
 
-	// TODO add IP to hash list
-	// let ipIndex = ipCache[ip];
+	let ipIndex = ipsCache[ip];
+
+	if (typeof ipIndex === 'undefined') {
+		stats.ips.push(ip);
+		ipIndex = stats.ips.length - 1;
+		ipsCache[ip] = stats.ips.length - 1;
+	}
 
 	const [
-		currentTime,
-		currentUuid,
-		currentColor,
-		// prevColorUuid,
-		// prevColorColor,
-		// prevUserUuid,
-		// prevUserColor,
+		/* currentTime */,
+		/* currentUuid */,
+		/* currentColor */,
 		count,
-		// 	ip,
 	] = stats[key] || [];
 
 	// const prevUser = prevUserUuid === currentUuid
@@ -65,9 +67,8 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		time,
 		uuidIndex,
 		colorIndex,
-		// ...prevColor,
-		// ...prevUser,
 		(count || 0) + 1,
+		ipIndex,
 	];
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
@@ -76,7 +77,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 
 		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
 	}
-}
+};
 
 let inited = false;
 
@@ -100,6 +101,10 @@ const getPixelsInfo = (output) => {
 
 		if (!stats.colors) {
 			stats.colors = [];
+		}
+
+		if (!stats.ips) {
+			stats.ips = [];
 		}
 
 		uuidsCache = stats?.uuids

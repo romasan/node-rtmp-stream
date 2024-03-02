@@ -11,3 +11,8 @@
 		background: rgba(255, 255, 255, 0.3);
 	}
 }
+
+.list {
+	max-height: 200px;
+	overflow: auto;
+}

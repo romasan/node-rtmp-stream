@@ -5,7 +5,7 @@ import cn from 'classnames';
 import { Chat } from '../Chat';
 import { Info } from '../Info';
 
-import { ERole, useModal } from '../../hooks';
+import { ERole } from '../../hooks';
 
 import ChatIcon from '../../../assets/chat.svg';
 import LoginIcon from '../../../assets/login.svg';
@@ -13,10 +13,6 @@ import LogoutIcon from '../../../assets/logout.svg';
 import TimelapseIcon from '../../../assets/timeline.svg';
 import InfoIcon from '../../../assets/info.svg';
 import GearIcon from '../../../assets/gear.svg';
-
-import TwitchIcon from '../../../assets/twitch.svg';
-import DiscordIcon from '../../../assets/discord.svg';
-import SteamIcon from '../../../assets/steam.svg';
 
 import * as s from './Header.module.scss';
 
@@ -28,6 +24,7 @@ interface Props {
 	blinkedLoginAnimation?: boolean;
 	setHasNewMessage: (value: boolean) => void;
 	role: ERole;
+	login: () => void;
 	[key: string]: any;
 }
 
@@ -39,37 +36,11 @@ export const Header: React.FC<Props> = ({
 	blinkedLoginAnimation,
 	setHasNewMessage,
 	role,
+	login,
 	...rest
 }) => {
 	const [chatIsShowed, setChatIsShowed] = useState(false);
 	const [infoIsShowed, setInfoIsShowed] = useState(false);
-
-	const loginModal = useModal({
-		content: (
-			<>
-				<div className={s.loginTitle}>Войти с помощью</div>
-				<div className={s.loginList}>
-					<a href="/login/?twitch">
-						<TwitchIcon />
-						Twitch
-					</a>
-					<a href="/login/?discord">
-						<DiscordIcon />
-						Discord
-					</a>
-					{/*<a href="/login/?steam">*/}
-					{/*	<SteamIcon />*/}
-					{/*	Steam*/}
-					{/*</a>*/}
-				</div>
-			</>
-		),
-		width: '300px',
-	});
-
-	const handleLogin = () => {
-		loginModal.open();
-	};
 
 	const toggleChat = () => {
 		setHasNewMessage(false);
@@ -98,7 +69,7 @@ export const Header: React.FC<Props> = ({
 							</a>
 						</>
 					) : (
-						<LoginIcon onClick={handleLogin} className={cn(s.iconButton, {[s.disabled]: !isOnline})} aria-label="Выход" />
+						<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline})} aria-label="Выход" />
 					)}
 					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
 						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
@@ -125,7 +96,6 @@ export const Header: React.FC<Props> = ({
 			{infoIsShowed && (
 				<Info onClose={toggleInfo} {...rest} />
 			)}
-			{loginModal.render()}
 		</>
 	);
 };

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
+import { createPortal } from 'react-dom';
 
 import * as s from './Modal.module.scss';
 
@@ -6,6 +7,7 @@ interface Props {
 	content: React.ReactElement;
 	width?: string;
 	height?: string;
+	portal?: boolean;
 	onClose?(): void;
 }
 
@@ -15,6 +17,7 @@ export const useModal = (props?: Props | React.ReactElement) => {
 		onClose,
 		width,
 		height,
+		portal,
 	} = props as Props || {};
 	const [visible, setVisible] = useState(false);
 
@@ -35,6 +38,19 @@ export const useModal = (props?: Props | React.ReactElement) => {
 			</div>
 		</div>
 	) : null;
+
+	useEffect(() => {
+		if (portal && visible) {
+			const container = document.createElement('div');
+
+			document.body.appendChild(container);
+			createPortal(render(), container);
+
+			return () => {
+				container.remove();
+			};
+		}
+	}, [portal, visible]);
 
 	return {
 		render,

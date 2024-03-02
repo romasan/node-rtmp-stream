@@ -59,8 +59,8 @@ export const Bans: FC = () => {
 
 	return (
 		<Block title="Управление банами" onOpen={handleOpen}>
-			<div>token:</div>
-			<div>
+			<div>token ({stats.token && Object.keys(stats.token).length}):</div>
+			<div className={s.list}>
 				{stats.token && Object.entries(stats.token).filter(([, v]) => v).map(([v]) => (
 					<div key={v} className={s.item}>
 						{v}
@@ -79,8 +79,8 @@ export const Bans: FC = () => {
 					<option value="0">месяц</option>
 				</select>
 			</div>
-			<div>ip:</div>
-			<div>
+			<div>ip ({stats.ip && Object.keys(stats.ip).length}):</div>
+			<div className={s.list}>
 				{stats.ip && Object.entries(stats.ip).filter(([, v]) => v).map(([v]) => (
 					<div key={v} className={s.item}>
 						{v}
@@ -92,8 +92,8 @@ export const Bans: FC = () => {
 				<input value={ip} onChange={({ target: { value }}) => setIp(value)}/>
 				<button onClick={handleClickBanByIp}>добавить</button>
 			</div>
-			<div>nick:</div>
-			<div>
+			<div>nick ({stats.nick && Object.keys(stats.nick).length}):</div>
+			<div className={s.list}>
 				{stats.nick && Object.entries(stats.nick).filter(([, v]) => v).map(([v]) => (
 					<div key={v} className={s.item}>
 						{v}

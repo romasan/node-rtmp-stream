@@ -6,17 +6,17 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import { EMode } from '../Canvas';
 
-// import { Block } from './components/Block';
-
 import { ToolsContext } from './context';
 
 import {
+	Block,
 	Stats,
 	Stream,
 	PixelStats,
 	FillSquare,
 	Maps,
 	Bans,
+	Metrics,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -71,7 +71,7 @@ export const Tools: FC<Props> = ({
 								setCanvasMode={setCanvasMode}
 							/>
 							<Bans />
-							{/*
+							<Metrics />
 							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"
 								// onOpen={() => console.log('==== open #1')}
@@ -109,7 +109,6 @@ export const Tools: FC<Props> = ({
 									<input type="datetime-local" />
 								</div>
 							</Block>
-							*/}
 						</>
 					)}
 				</div>
