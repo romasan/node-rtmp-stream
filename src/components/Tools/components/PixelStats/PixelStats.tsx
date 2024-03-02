@@ -30,7 +30,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 		? stats.logins.sort(([a]: [number], [b]: [number]) => a > b ? 1 : 0)
 		: [];
 
-	const ip = stats?.ip;
+	const ip = stats && stats.ip;
 	const time = sortedLogins[0] ? formatTime(Date.now() - sortedLogins[0][0]) : '...';
 
 	useEffect(() => {
