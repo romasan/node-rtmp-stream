@@ -3,12 +3,10 @@ const fs = require('fs');
 const https = require('https');
 const http = require('http');
 const ee = require('../lib/ee');
-const web = require('../api');
 const { getCountdown } = require('../helpers/countdown');
 const { parseCookies, getIPAddress } = require('../helpers');
 const { checkSession } = require('./sessions');
 const { checkUserAuthByToken, getUserData } = require('./auth');
-const { getStatus } = require('../tools/getPixelsInfo');
 const {
 	colorShemes: { COLORS },
 	server: {
@@ -34,13 +32,6 @@ const send = (token, event, payload) => {
 	});
 };
 
-const updateClientCountdown = (token) => {
-	const onlineCount = getOnlineCount();
-	const countdown = getCountdown(token, onlineCount, false, true) * 1000;
-
-	send(token, 'countdown', countdown);
-};
-
 const spam = (data) => {
 	// if online > N use waveSpam
 	const message = JSON.stringify(data);
@@ -52,24 +43,31 @@ const spam = (data) => {
 	});
 };
 
-const delay = (t = 100) => new Promise((resolve) => setTimeout(resolve, t));
+// const delay = (t = 100) => new Promise((resolve) => setTimeout(resolve, t));
 
-const waveSpam = async (data) => {
-	const message = JSON.stringify(data);
-	let count = 0;
-
-	for (const ws of wss.clients) {
-		if (ws.readyState === WebSocket.OPEN) {
-			count++;
-			if (count % 100 === 0) {
-				await delay();
-			}
-			ws.send(message);
-		}
-	}
-};
+// const waveSpam = async (data) => {
+// 	const message = JSON.stringify(data);
+// 	let count = 0;
+//
+// 	for (const ws of wss.clients) {
+// 		if (ws.readyState === WebSocket.OPEN) {
+// 			count++;
+// 			if (count % 100 === 0) {
+// 				await delay();
+// 			}
+// 			ws.send(message);
+// 		}
+// 	}
+// };
 
 ee.on('spam', spam);
+
+const updateClientCountdown = (token) => {
+	const onlineCount = getOnlineCount();
+	const countdown = getCountdown(token, onlineCount, false, true) * 1000;
+
+	send(token, 'countdown', countdown);
+};
 
 const getOnlineCountRaw = () => {
 	let count = 0;
@@ -89,25 +87,6 @@ const getOnlineCountRaw = () => {
 	});
 
 	return [openedCount, count, countByActivity];
-};
-
-const getOnlineCountList = () => {
-	const list = [];
-
-	wss.clients.forEach((ws) => {
-		if (ws.readyState === WebSocket.OPEN) {
-			const uuid = ws._token;
-			const lastActivity = ws._lastActivity;
-
-			list.push({
-				uuid,
-				active: (Date.now() - lastActivity) <= Number(activityDuration),
-				lastActivity,
-			});
-		}
-	});
-
-	return list;
 };
 
 let updatedCacheTime = 0;
@@ -132,6 +111,25 @@ const getOnlineCount = () => {
 	cachedOnline = list.length;
 
 	return cachedOnline;
+};
+
+const getOnlineCountList = () => {
+	const list = [];
+
+	wss.clients.forEach((ws) => {
+		if (ws.readyState === WebSocket.OPEN) {
+			const uuid = ws._token;
+			const lastActivity = ws._lastActivity;
+
+			list.push({
+				uuid,
+				active: (Date.now() - lastActivity) <= Number(activityDuration),
+				lastActivity,
+			});
+		}
+	});
+
+	return list;
 };
 
 const uptateActiveTime = (token) => {
@@ -168,48 +166,12 @@ const checkIPRateLimit = (req) => {
 	return count <= maxConnectionsWithOneIP ? false : count;
 };
 
-const callbacks = {
-	updateClientCountdown,
-	getOnlineCountRaw,
-	getOnlineCount,
-	uptateActiveTime,
-	getOnlineCountList,
-	checkHasWSConnect,
-	checkIPRateLimit,
+let webServerHandler = (req, res) => {
+	res.writeHead(200);
+	res.end('waiting');
 };
 
-const webServerHandler = (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', origin);
-	res.setHeader('Access-Control-Allow-Credentials', 'true');
-	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-	if (!getStatus()) {
-		res.writeHead(200);
-		res.end('init');
-
-		return;
-	}
-
-	if (req.method === 'OPTIONS') {
-		res.writeHead(200);
-		res.end();
-
-		return;
-	}
-
-	try {
-		const reqUrl = req.url.split('?')[0];
-		const key = web[reqUrl] ? reqUrl : 'default';
-
-		web[key](req, res, callbacks);
-	} catch (error) {
-		res.writeHead(200);
-		res.end('fail');
-
-		console.log('Error: url handler', error);
-	}
-};
+const onCreateServer = (req, res) => webServerHandler(req, res);
 
 if (secure) {
 	const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
@@ -218,7 +180,7 @@ if (secure) {
 
 	webServer = https.createServer(credentials, webServerHandler);
 } else {
-	webServer = http.createServer(webServerHandler);
+	webServer = http.createServer(onCreateServer);
 }
 
 webServer.on('error', error => {
@@ -249,10 +211,10 @@ wss.on('connection', (ws, req) => {
 	ws._lastActivity = Date.now();
 
 	send(token, 'init', {
-		palette: COLORS,
-		isAuthorized,
 		...user,
 		countdown,
+		isAuthorized,
+		palette: COLORS,
 		finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
 		finishText: finishText || 'TIMEOUT',
 		needAuthorize: !guestCanPlay,
@@ -263,11 +225,21 @@ wss.on('connection', (ws, req) => {
 
 		if (raw === '2') {
 			ws.send(3);
+
 			return;
 		}
 	});
 });
 
 module.exports = {
+	wss,
 	spam,
+	updateClientCountdown,
+	getOnlineCountRaw,
+	getOnlineCount,
+	getOnlineCountList,
+	uptateActiveTime,
+	checkHasWSConnect,
+	checkIPRateLimit,
+	onConnect: (callback) => webServerHandler = callback,
 };

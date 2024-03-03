@@ -26,7 +26,7 @@ export const Maps: FC<Props> = ({
 		const ctx = canvas.getContext('2d');
 
 		const image = new Image();
-		image.src = `${APIhost}/qq/${name}`;
+		image.src = `${APIhost}/admin/${name}`;
 		image.onload = () => {
 			ctx.drawImage(image, 0, 0);
 		};

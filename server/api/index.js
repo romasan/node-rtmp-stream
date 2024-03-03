@@ -37,7 +37,23 @@ const steamAuth = require('./auth/steam');
 const discordAuth = require('./auth/discord');
 const { addMessage, getMessages } = require('../utils/chat');
 const admin = require('./admin');
-const { colorShemes: { COLORS }, server: { secure, host, timelapseCachePeriod }, guestCanPlay } = require('../config.json');
+const {
+	colorShemes: { COLORS },
+	server: {
+		secure,
+		host,
+		timelapseCachePeriod,
+		origin,
+	},
+	guestCanPlay,
+} = require('../config.json');
+const { getStatus } = require('../tools/getPixelsInfo');
+const {
+	checkIPRateLimit,
+	updateClientCountdown,
+	uptateActiveTime,
+	checkHasWSConnect,
+} = require('../utils/ws');
 
 const getInfo = (req, res) => {
 	res.writeHead(200, {'Content-Type': 'text/html'});
@@ -50,7 +66,7 @@ const getCanvas = (req, res) => {
 };
 
 const checkAccessWrapper = (callback, checkAuth) => {
-	return async (req, res, callbacks) => {
+	return async (req, res) => {
 		const { token } = parseCookies(req.headers.cookie || '');
 
 		if (checkSession(token)) {
@@ -78,7 +94,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 				return;
 			}
 
-			callback(req, res, callbacks);
+			callback(req, res);
 		} else {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
@@ -130,12 +146,7 @@ const sendChatMessage = checkAccessWrapper(async (req, res) => {
 	}
 }, true);
 
-const addPix = checkAccessWrapper(async (req, res, {
-	updateClientCountdown,
-	uptateActiveTime,
-	checkHasWSConnect,
-	checkIPRateLimit,
-}) => {
+const addPix = checkAccessWrapper(async (req, res) => {
 	if (req.method === 'PUT') {
 		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -278,9 +289,7 @@ const addPix = checkAccessWrapper(async (req, res, {
 	}
 });
 
-const start = (req, res, {
-	checkIPRateLimit,
-}) => {
+const start = (req, res) => {
 	const { token } = parseCookies(req.headers.cookie);
 	const ip = getIPAddress(req);
 	// const userAgent = req.headers['user-agent'];
@@ -398,9 +407,9 @@ const timelapse = (req, res) => {
 	return false;
 };
 
-const _default = async (req, res, callbacks) => {
-	if (req.url.startsWith('/qq/')) {
-		admin(req, res, { getInfo, ...callbacks });
+const _default = async (req, res) => {
+	if (req.url.startsWith('/admin/')) {
+		admin(req, res, { getInfo });
 
 		return;
 	}
@@ -421,7 +430,7 @@ const _default = async (req, res, callbacks) => {
 	}
 };
 
-module.exports = {
+const web = {
 	'/start': start,
 	'/pix': addPix,
 	'/canvas.png': getCanvas,
@@ -431,4 +440,41 @@ module.exports = {
 	'/auth/logout': logout,
 	'/stats': stats,
 	default: _default,
+};
+
+const webServerHandler = (req, res) => {
+	res.setHeader('Access-Control-Allow-Origin', origin);
+	res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+	if (!getStatus()) {
+		res.writeHead(200);
+		res.end('init');
+
+		return;
+	}
+
+	if (req.method === 'OPTIONS') {
+		res.writeHead(200);
+		res.end();
+
+		return;
+	}
+
+	try {
+		const reqUrl = req.url.split('?')[0];
+		const key = web[reqUrl] ? reqUrl : 'default';
+
+		web[key](req, res);
+	} catch (error) {
+		res.writeHead(200);
+		res.end('fail');
+
+		console.log('Error: url handler', error);
+	}
+};
+
+module.exports = {
+	webServerHandler,
 };

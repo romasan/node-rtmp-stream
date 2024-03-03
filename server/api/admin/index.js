@@ -36,14 +36,16 @@ const {
 	unban,
 	getBans,
 } = require('../../utils/bans');
+const {
+	getOnlineCountRaw,
+	getOnlineCount,
+	getOnlineCountList,
+} = require('../../utils/ws');
 
 const startTime = Date.now();
 
 const index = async (req, res, {
 	getInfo,
-	getOnlineCountRaw,
-	getOnlineCount,
-	getOnlineCountList,
 }) => {
 	const { token } = parseCookies(req.headers.cookie || '');
 
@@ -63,7 +65,7 @@ const index = async (req, res, {
 		payload = JSON.parse(payloadRaw);
 	} catch (error) {/* */}
 
-	const location = req.url.split(/(\/qq\/)|(\?)/);
+	const location = req.url.split(/(\/admin\/)|(\?)/);
 	const command = location[3];
 	const query = location[6]
 		?.split('&')

@@ -7,7 +7,7 @@ export const getQuery = (url: string, query: Record<string, string | number>) =>
 	.join('&');
 
 export const get = async (command: string, type = 'JSON') => {
-	const resp = await fetch(`${APIhost}/qq/${command}`, {
+	const resp = await fetch(`${APIhost}/admin/${command}`, {
 		credentials: 'include',
 	});
 
@@ -19,7 +19,7 @@ export const get = async (command: string, type = 'JSON') => {
 };
 
 export const push = async (command: string, payload?: any, method = 'POST', type: string | boolean = 'JSON') => {
-	const resp = await fetch(`${APIhost}/qq/${command}`, {
+	const resp = await fetch(`${APIhost}/admin/${command}`, {
 		method,
 		credentials: 'include',
 		headers: {
