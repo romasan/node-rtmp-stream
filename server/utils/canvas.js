@@ -1,11 +1,11 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { pixelsLog } = require('./log');
-const ee = require('../lib/ee');
 const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
 const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
 const { colorShemes: { COLORS }, stream: { videoSize, upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
+const { spam } = require('../utils/ws');
 
 const conf = {
 	freezed: freezedFrame,
@@ -253,7 +253,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 
 	pixelsLog({ x, y, color: rawColor, nickname, uuid, ip });
 
-	ee.emit('spam', {
+	spam({
 		event: 'drawPix',
 		payload: {
 			x,

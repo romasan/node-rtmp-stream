@@ -2,8 +2,8 @@ const fs = require('fs');
 const readline = require('readline');
 const { v4: uuid } = require('uuid');
 const { getUserData } = require('./auth');
-const ee = require('../lib/ee');
 const { getFileLinesCount } = require('../helpers');
+const { spam } = require('../utils/ws');
 
 const LIST_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 500;
@@ -80,7 +80,7 @@ const addMessage = (
 		message,
 	];
 
-	ee.emit('spam', {
+	spam({
 		event: 'chatMessage',
 		payload: message,
 	});

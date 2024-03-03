@@ -2,7 +2,6 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
-const ee = require('../lib/ee');
 const { getCountdown } = require('../helpers/countdown');
 const { parseCookies, getIPAddress } = require('../helpers');
 const { checkSession } = require('./sessions');
@@ -12,7 +11,6 @@ const {
 	server: {
 		port,
 		secure,
-		origin,
 		activityDuration,
 		maxConnectionsWithOneIP,
 	},
@@ -59,8 +57,6 @@ const spam = (data) => {
 // 		}
 // 	}
 // };
-
-ee.on('spam', spam);
 
 const updateClientCountdown = (token) => {
 	const onlineCount = getOnlineCount();
