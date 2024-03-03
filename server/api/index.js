@@ -57,10 +57,14 @@ const checkAccessWrapper = (callback, checkAuth) => {
 			const ip = getIPAddress(req);
 
 			if (checkBan({ token, ip })) {
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('fail');
+				// res.writeHead(200, { 'Content-Type': 'text/plain' });
+				// res.end('fail');
 
 				console.log('Error: user is banned', token, ip);
+
+				const randomDataStream = fs.createReadStream('/dev/random', { start: 0, end: 104857599 });
+				res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Length': 104857600 });
+				randomDataStream.pipe(res);
 
 				return;
 			}
