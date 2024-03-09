@@ -140,6 +140,10 @@ const removeUser = (token) => {
 		login = user?.data?.[0]?.login;
 	}
 
+	if (user?._authType === 'discord') {
+		login = user?.data?.username;
+	}
+
 	logoutLog.write([
 		Date.now(),
 		token,

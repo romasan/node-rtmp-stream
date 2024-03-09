@@ -16,7 +16,7 @@ const getPathByToken = (token = '', prevalidate = true) => {
 	return `${__dirname}/../../db/sessions/${prefix}/${token}`;
 };
 
-const getPostPayload = (req) => {
+const getPostPayload = (req, type = 'text') => {
 	return new Promise((resolve, reject) => {
 		let body = '';
 
@@ -25,6 +25,18 @@ const getPostPayload = (req) => {
 		});
 
 		req.on('end', () => {
+			if (type === 'json') {
+				let json = {};
+
+				try {
+					json = JSON.parse(body);
+				} catch (ignore) {/* */}
+
+				resolve(json);
+
+				return;
+			}
+
 			resolve(body);
 		});
 

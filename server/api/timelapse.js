@@ -24,7 +24,9 @@ const timelapse = (req, res) => {
 
 			res.setHeader('Cache-control', `public, max-age=${timelapseCachePeriod}`);
 			res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
+
 			const readStream = fs.createReadStream(filePath);
+
 			readStream.pipe(res);
 		} catch (e) {
 			res.writeHead(404, { 'Content-Type': 'text/plain' });

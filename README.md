@@ -25,6 +25,7 @@
 - [ ] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
 - [ ] fix zoom on click on non canvas and "pixel" elements
+- [ ] webassembly + canvas =)
 
 # admin panel
 
