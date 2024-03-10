@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import { FC, useRef, useMemo, useState, useEffect } from 'preact/compat';
 
 import cn from 'classnames';
 import mobile from 'is-mobile';
@@ -85,7 +85,7 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 	ctx.drawImage(backup, 0, 0);
 };
 
-export const App: React.FC = () => {
+export const App: FC = () => {
 	const [selectedEpisode, setSelectedEpisode] = useState('s1e2');
 	const [timelapse, setTimelapse] = useState<ITimelapse>({});
 	const [speed, setSpeed] = useState(500 * 30);
@@ -309,7 +309,7 @@ export const App: React.FC = () => {
 		}
 	};
 
-	const handleClickTimelapse = (event: React.MouseEvent) => {
+	const handleClickTimelapse = (event: MouseEvent) => {
 		if (!timelapse.expands) {
 			return;
 		}

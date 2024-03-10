@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import { FC, useState, useMemo } from 'preact/compat';
 
 import { Block } from '../Block';
 

@@ -1,5 +1,4 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { h, render } from 'preact';
 import { App } from './App';
 import { start } from '../../lib/api';
 import { connect as connectWS } from '../../lib/ws';
@@ -20,4 +19,6 @@ const connectAPI = () => {
 
 connectAPI();
 
-createRoot(document.getElementById('root') as HTMLElement).render(<App />);
+const container = document.getElementById('root');
+
+render(<App />, container!);

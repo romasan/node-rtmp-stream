@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { FC, useRef, useState, useEffect } from 'preact/compat';
 
 import cn from 'classnames';
 
@@ -33,7 +33,7 @@ const disableMouse = {
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
 
-export const App: React.FC = () => {
+export const App: FC = () => {
 	const [color, setColor] = useState('');
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const [isFinished, setIsFinished] = useState(false);
@@ -59,11 +59,11 @@ export const App: React.FC = () => {
 				<div className={s.loginTitle}>Войти с помощью</div>
 				<div className={s.loginList}>
 					<a href="/login/?twitch">
-						<TwitchIcon />
+						{/*<TwitchIcon />*/}
 						Twitch
 					</a>
 					<a href="/login/?discord">
-						<DiscordIcon />
+						{/*<DiscordIcon />*/}
 						Discord
 					</a>
 					{/*<a href="/login/?steam">*/}

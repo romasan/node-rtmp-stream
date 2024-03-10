@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useRef, useMemo, useContext, useEffect } from 'react';
+import { FC, PropsWithChildren, useRef, useMemo, useContext, useEffect } from 'preact/compat';
 
 import { v4 as uuid } from 'uuid';
 

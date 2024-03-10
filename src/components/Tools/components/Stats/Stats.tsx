@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'preact/compat';
 
 import { Block } from '../Block';
 
@@ -32,7 +32,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			.catch(() => {/* */});
 	};
 
-	const toggleList = (event: React.MouseEvent) => {
+	const toggleList = (event: MouseEvent) => {
 		event.preventDefault();
 
 		if (list.length) {
@@ -42,7 +42,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 		}
 	};
 
-	const drawPixel = (event: React.MouseEvent) => {
+	const drawPixel = (event: MouseEvent) => {
 		event.preventDefault();
 
 		const ctx = canvas.getContext('2d');

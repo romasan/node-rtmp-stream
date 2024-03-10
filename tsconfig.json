@@ -9,8 +9,8 @@
       "ESNext",
       "DOM"
     ],
-    /* Specify JSX code generation */
-    "jsx": "react",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     /* Generate corresponding .map files */
     "sourceMap": true,
     /* Enable all strict type-checking options */
@@ -27,8 +27,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    /* allow import React instead of import * as React */
-    "allowSyntheticDefaultImports": true,
     /*  Emit interop between CommonJS and ES modules */
     "esModuleInterop": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }]

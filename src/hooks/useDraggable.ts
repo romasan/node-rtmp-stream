@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'preact/compat';
 
 interface Props {
 	x: number;
@@ -6,7 +6,7 @@ interface Props {
 	ready?: boolean;
 }
 
-export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: React.RefObject<HTMLDivElement>, draggableRef: React.RefObject<HTMLDivElement> } => {
+export const useDraggable = ({ x, y, ready = true }: Props): { anchorRef: any, draggableRef: any } => {
 	const pos = useRef({ x, y });
 	const cur = useRef([-1, -1]);
 	const anchorRef = useRef<HTMLDivElement>(null);

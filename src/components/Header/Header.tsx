@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { FC, useState } from 'preact/compat';
 
 import cn from 'classnames';
 
@@ -28,7 +28,7 @@ interface Props {
 	[key: string]: any;
 }
 
-export const Header: React.FC<Props> = ({
+export const Header: FC<Props> = ({
 	isAuthorized,
 	name,
 	isOnline,

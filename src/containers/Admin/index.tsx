@@ -1,5 +1,4 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { h, render } from 'preact';
 import { App } from './App';
 import { start } from '../../lib/api';
 import { connect } from '../../lib/ws';
@@ -14,6 +13,8 @@ start()
 
 		connect();
 
-		createRoot(document.getElementById('root') as HTMLElement).render(<App />);
+		const container = document.getElementById('root');
+
+		render(<App />, container!);
 	})
 	.catch(() => {/* */});
