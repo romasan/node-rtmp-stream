@@ -1,9 +1,10 @@
-const {parseCookies, getIPAddress} = require('../helpers');
-const {checkIPRateLimit} = require('../utils/ws');
-const {checkBan} = require('../utils/bans');
-const {checkSession, addSession} = require('../utils/sessions');
-const {checkIsAdmin} = require('../utils/auth');
-const {v4: uuid} = require('uuid');
+const { v4: uuid } = require('uuid');
+const { parseCookies, getIPAddress } = require('../helpers');
+const { checkIPRateLimit } = require('../utils/ws');
+const { checkBan } = require('../utils/bans');
+const { checkSession, addSession } = require('../utils/sessions');
+const { checkIsAdmin } = require('../utils/auth');
+const { server: { secure } } = require('../config.json');
 
 const start = (req, res) => {
 	const { token } = parseCookies(req.headers.cookie);
