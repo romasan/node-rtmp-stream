@@ -25,6 +25,7 @@ const libs = {
 		'fixSessionByNickName',
 		'convertEnvToConfig',
 		'filterByIP',
+		'calcSessionsWithOneIP',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

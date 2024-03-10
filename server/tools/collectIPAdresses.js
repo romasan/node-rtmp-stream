@@ -1,6 +1,5 @@
 const fs = require('fs');
 const Progress = require('cli-progress');
-// const { fileLinesCount } = require('./helpers');
 const { addSessionForIP } = require('../helpers');
 const path = require('path');
 const readline = require('readline');
