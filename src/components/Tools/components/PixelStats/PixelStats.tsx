@@ -1,6 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
-
-import cn from 'classnames';
+import { FC, useState, useEffect } from 'preact/compat';
 
 import { Block } from '../Block';
 
@@ -10,8 +8,6 @@ import {
 } from '../../helpers';
 
 import { formatTime } from '../../../../helpers';
-
-// import * as s from './Stats.module.scss';
 
 interface Props {
 	coord: {

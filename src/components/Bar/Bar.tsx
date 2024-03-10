@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'preact/compat';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
@@ -10,7 +10,6 @@ import PenIcon from '../../../assets/pen.svg';
 import PlusIcon from '../../../assets/plus.svg';
 import MinusIcon from '../../../assets/minus.svg';
 import ExpandIcon from '../../../assets/expand.svg';
-// import clock from '../../../assets/clock.svg';
 
 import * as s from './Bar.module.scss';
 

@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'react';
+import { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'preact/compat';
 
 import mobile from 'is-mobile';
 

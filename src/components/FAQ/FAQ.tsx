@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { FC } from 'preact/compat';
 
 import * as s from './FAQ.module.scss';
 

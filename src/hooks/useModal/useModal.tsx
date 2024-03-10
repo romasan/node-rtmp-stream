@@ -1,17 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useState, createPortal } from 'preact/compat';
 
 import * as s from './Modal.module.scss';
 
 interface Props {
-	content: React.ReactElement;
+	content: any;
 	width?: string;
 	height?: string;
 	portal?: boolean;
 	onClose?(): void;
 }
 
-export const useModal = (props?: Props | React.ReactElement) => {
+export const useModal = (props?: Props) => {
 	const {
 		content,
 		onClose,
@@ -44,7 +43,7 @@ export const useModal = (props?: Props | React.ReactElement) => {
 			const container = document.createElement('div');
 
 			document.body.appendChild(container);
-			createPortal(render(), container);
+			createPortal(render(), container!);
 
 			return () => {
 				container.remove();

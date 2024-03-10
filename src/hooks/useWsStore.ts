@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'preact/compat';
 
 import ee from '../lib/ee';
 

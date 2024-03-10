@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { h } from 'preact';
+import { FC, useRef, useState, useEffect } from 'preact/compat';
 
 import mobile from 'is-mobile';
 
@@ -20,7 +21,7 @@ const disableMouse = {
 	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
 };
 
-export const App: React.FC = () => {
+export const App: FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
 	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);

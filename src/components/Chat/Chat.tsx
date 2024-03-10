@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react';
+import { FC, useRef, useState, useMemo, useCallback, useEffect } from 'preact/compat';
 
 import cn from 'classnames';
 
@@ -53,7 +53,7 @@ const renderText = (raw: string, nickname?: string): string => {
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 };
 
-export const Message: React.FC<MessageProps> = ({
+export const Message: FC<MessageProps> = ({
 	message,
 	nickname,
 	isAuthorized,
@@ -74,7 +74,7 @@ export const Message: React.FC<MessageProps> = ({
 	);
 };
 
-export const Chat: React.FC<Props> = ({
+export const Chat: FC<Props> = ({
 	isAuthorized,
 	nickname,
 	onClose,
