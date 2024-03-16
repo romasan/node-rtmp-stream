@@ -49,4 +49,62 @@ const debugStream = (INPUT_AUDIO, RTMP_HOST_KEY) => {
 	});
 };
 
-module.exports = debugStream;
+const streamToFile = (OUTPUT, TEMPFILE) => {
+	const width = 1280;
+	const height = 720;
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#0000ff';
+	ctx.fillRect(0, 0, width, height);
+
+	let count = 0;
+
+	const textX = 150;
+	const textY = 150;
+	const textLineHeight = 70;
+
+	const fframe = () => {
+		const color = [
+			'#ffffff',
+			'#000000',
+			'#ff0000',
+			'#00ff00',
+			'#000080',
+			'#ff00ff',
+			'#ffff00',
+			'#00ffff',
+		][Math.floor(Math.random() * 8)];
+		ctx.fillStyle = color;
+		ctx.fillRect(100, 100, 100, 100);
+
+		const text = ++count;
+		ctx.fillStyle = '#000';
+		ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
+		ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
+		ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
+		ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
+		ctx.fillStyle = '#fff';
+		ctx.fillText(text, textX, textY + textLineHeight);
+
+		fs.writeFileSync(OUTPUT, canvas.toBuffer());
+		// fs.renameSync(TEMPFILE, OUTPUT);
+	};
+
+	fframe();
+
+	setInterval(fframe, 500);
+};
+
+// mkdir /mnt/ramdisk
+// dd if=/dev/zero of=/tmp/ramdisk bs=1024 count=2048
+// mount -o loop /tmp/ramdisk /mnt/ramdisk
+
+// AUDIO_PATH=$(grep -Po '"inputAudio": "\K[^"]+' ./server/config.json)
+// OUTPUT_RTMP=$(grep -Po '"rtmpHostKey": "\K[^"]+' ./server/config.json)
+// ffmpeg -framerate 15 -re -stream_loop -1 -f image2 -i /mnt/ramdisk/output.png -i $AUDIO_PATH -vcodec libx264 -pix_fmt yuv420p -preset slow -r 15 -g 30 -f flv $OUTPUT_RTMP
+
+module.exports = {
+	debugStream,
+	streamToFile,
+};
