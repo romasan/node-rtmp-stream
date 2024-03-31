@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'react';
+import React, { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren, forwardRef } from 'react';
 
 import mobile from 'is-mobile';
 
@@ -19,6 +19,12 @@ import {
 import { getPixel } from '../../lib/api';
 
 import { showPixelScale, scaleDegree, minScale, maxScale } from '../../const';
+
+import {
+	useScale,
+	useDraggable,
+	useHover,
+} from './hooks';
 
 import image404 from '../../../assets/404.webp';
 
@@ -57,7 +63,7 @@ const defaultPixelData = {
 	y: -1,
 };
 
-export const Canvas: FC<PropsWithChildren<Props>> = ({
+export const Canvas: FC<PropsWithChildren<Props>> = forwardRef(({
 	color,
 	mode = EMode.CLICK,
 	className,
@@ -71,7 +77,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	onClick = () => null,
 	onSelect,
 	onInit,
-}) => {
+}, ref) => {
+	/*
 	const isMobile = mobile();
 	const firstRender = useRef('');
 	const rootRef = useRef<null | HTMLDivElement>(null);
@@ -88,6 +95,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const selected = useRef(defautSelected);
 	const timer = useRef(0);
 	const [pixelData, setPixelData] = useState(defaultPixelData);
+	 */
+
+	const { scale } = useScale({ element: ref.current });
+	const { centering } = useDraggable({ element: ref.current });
+	const { x, y } = useHover({ element: ref.current });
+
+	/*
 
 	// ===========================================================================
 	const [showDebug, setShowDebug] = useState(false);
@@ -580,10 +594,20 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			timer.current = Number(setTimeout(() => {
 				getPixel(...coord)
 					.then(setPixelData)
-					.catch(() => {/* */});
+					.catch(() => {});
 			}, 1000));
 		}
 	}, [coord, scale, viewOnly]);
+
+	*/
+
+	return (
+		<>
+			<div className={s.root}>
+				<canvas className={s.canvas} ref={ref} />
+			</div>
+		</>
+	);
 
 	return (
 		<>
@@ -653,4 +677,4 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			)}
 		</>
 	);
-};
+});

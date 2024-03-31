@@ -102,13 +102,13 @@ export const App: React.FC = () => {
 
 	}, [finish]);
 
-	const handleCanvasClick = (x: number, y: number) => {
-		if (wsStore.needAuthorize && !isAuthorized) {
-			loginModal.open();
-		} else {
-			addPix({ x, y, color });
-		}
-	};
+	// const handleCanvasClick = (x: number, y: number) => {
+	// 	if (wsStore.needAuthorize && !isAuthorized) {
+	// 		loginModal.open();
+	// 	} else {
+	// 		addPix({ x, y, color });
+	// 	}
+	// };
 
 	const onPix = (payload: string) => {
 		if (payload === 'await' && !isAuthorized) {
@@ -160,6 +160,7 @@ export const App: React.FC = () => {
 					onInit={setCanvas}
 					src={`${APIhost}/canvas.png`}
 				/>
+				<canvas ref={canvasRef} />
 				{!isMobile && (
 					<Bar
 						centering={canvas.centering}
