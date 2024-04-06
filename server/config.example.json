@@ -67,6 +67,8 @@
 			"height": 720
 		},
 		"enable": true,
+		"streamFile": "/mnt/ramdisk/output.png",
+		"interval": 1000,
 		"rtmpHostKey": "",
 		"FFMPEGLog": false,
 		"inputAudio": "",

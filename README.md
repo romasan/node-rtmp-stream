@@ -33,6 +33,7 @@
 - [x] update stream frame
 - [x] cover up area
 - [ ] change countdown in runtime
+- [ ] change coundfown for uuid/nick/ip
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
 - [ ] preview last changes, heatmap, changes by user
