@@ -33,7 +33,6 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		uuidsCache[uuid] = stats.uuids.length - 1;
 	}
 
-
 	let colorIndex = stats.colors.indexOf(color);
 
 	if (colorIndex < 0) {
@@ -77,6 +76,8 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 
 		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
 	}
+
+	stats.history[_day] = (stats.history[_day] || 0) + 1;
 };
 
 let inited = false;
@@ -90,6 +91,18 @@ const getPixelsInfo = (output) => {
 		});
 
 		const stats = {}; // require(__dirname + '/../stats.json');
+
+		stats.history = {
+			days: {
+				// '2024-12-31': 999,
+			},
+			hours: {
+				// '2024-12-31-23': 999,
+			},
+			hour: {
+				// '2024-12-31-23-59': 999,
+			},
+		};
 
 		if (!stats.leaderboard) {
 			stats.leaderboard = {};

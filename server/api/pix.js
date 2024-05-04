@@ -14,7 +14,7 @@ const {
 	updateClientCountdown,
 } = require('../utils/ws');
 const { checkBan } = require('../utils/bans');
-const { getExpiration } = require('../helpers/countdown');
+const { getExpiration } = require('../utils/countdown');
 const {
 	getPixelColor,
 	drawPix,

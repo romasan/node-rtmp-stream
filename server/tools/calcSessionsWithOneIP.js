@@ -2,14 +2,14 @@ const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
 const { getPathByToken } = require('../helpers');
-const { fileLinesCount } = require('./helpers');
+const { getFileLinesCount } = require('../helpers');
 
 const calcSessionsWithOneIP = async () => {
 	const path = __dirname + '/../../db/list';
 	const cache = {};
 	// const errors = [];
 
-	const length = await fileLinesCount(path);
+	const length = await getFileLinesCount(path);
 	let count = 0;
 
 	const rl = readline.createInterface({

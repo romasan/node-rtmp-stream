@@ -66,26 +66,9 @@ const readJSON = (file) => new Promise((resolve) => {
 	});
 });
 
-const fileLinesCount = (file) => new Promise((resolve) => {
-	const rl = readline.createInterface({
-		input: fs.createReadStream(file),
-		crlfDelay: Infinity
-	});
-
-	let count = 0;
-
-	rl.on('line', () => {
-		count++;
-	});
-
-	rl.on('close', () => {
-		resolve(count);
-	});
-});
-
 module.exports = {
 	HSLToRGB,
 	RGBToHEX,
+
 	readJSON,
-	fileLinesCount,
 };

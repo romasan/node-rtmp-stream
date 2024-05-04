@@ -19,7 +19,6 @@ const libs = {
 		'prepareTimelapse',
 		'collectIPAdresses',
 
-		'getPixelsInfo',
 		'genMapByUsers',
 		'heatmap',
 		'fixSessionByNickName',

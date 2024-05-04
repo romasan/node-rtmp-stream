@@ -1,4 +1,4 @@
-const { inRange } = require('./index');
+const { inRange } = require('../helpers');
 const { countdownRanges } = require('../config.json');
 const { checkUserAuthByToken, checkIsAdmin } = require('../utils/auth');
 

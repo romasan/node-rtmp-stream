@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { pixelsLog } = require('./log');
-const { getPixelsInfo, updateStats } = require('../tools/getPixelsInfo');
+const { getPixelsInfo, updateStats } = require('../utils/stats');
 const { drawDefaultCanvas } = require('../tools');
 const { getAuthId } = require('./auth');
 const { colorShemes: { COLORS }, stream: { videoSize, upscale, freezedFrame, withBg, debugTime } } = require('../config.json');

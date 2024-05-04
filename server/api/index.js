@@ -5,7 +5,7 @@ const {
 	parseCookies,
 	getIPAddress,
 } = require('../helpers');
-const { resetCountdownTemp } = require('../helpers/countdown');
+const { resetCountdownTemp } = require('../utils/countdown');
 const { checkSession } = require('../utils/sessions');
 const { checkUserAuthByToken } = require('../utils/auth');
 const { checkBan } = require('../utils/bans');
@@ -13,7 +13,7 @@ const twitchAuth = require('./auth/twitch');
 const steamAuth = require('./auth/steam');
 const discordAuth = require('./auth/discord');
 const admin = require('./admin');
-const { getStatus } = require('../tools/getPixelsInfo');
+const { getStatus } = require('../utils/stats');
 const { start } = require('./start');
 const { pix } = require('./pix');
 const { chat } = require('./chat');
