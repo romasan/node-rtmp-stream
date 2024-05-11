@@ -20,7 +20,7 @@ export const formatDate = (date: number) => {
 	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());
 
-	month = MONTHS[month + 1];
+	month = MONTHS[month];
 
 	return `${day} ${month}${currentYear === year ? '' : ` ${year}`} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 };

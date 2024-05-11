@@ -10,7 +10,7 @@ import { ERole } from '../../hooks';
 import ChatIcon from '../../../assets/chat.svg';
 import LoginIcon from '../../../assets/login.svg';
 import LogoutIcon from '../../../assets/logout.svg';
-import TimelapseIcon from '../../../assets/timeline.svg';
+import TimelapseIcon from '../../../assets/clock.svg';
 import InfoIcon from '../../../assets/info.svg';
 import GearIcon from '../../../assets/gear.svg';
 
@@ -65,7 +65,7 @@ export const Header: React.FC<Props> = ({
 								{name}
 							</div>
 							<a href="/logout" className={cn({[s.disabled]: !isOnline})} aria-label="Выход">
-								<LogoutIcon/>
+								<LogoutIcon />
 							</a>
 						</>
 					) : (

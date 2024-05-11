@@ -11,7 +11,7 @@ const onlineList = (req, res) => {
 			name: user?.name || getSessionUserName(item.uuid),
 		};
 	});
-	res.writeHead(200, { 'Content-Type': 'text/json' });
+	res.writeHead(200, { 'Content-Type': 'application/json' });
 	res.end(JSON.stringify(list));
 };
 

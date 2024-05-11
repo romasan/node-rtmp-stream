@@ -25,12 +25,20 @@
 .button {
 	@include buttonLike();
 	@include size(30px);
-
+	
+	border: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	font-family: 'Custom Font', monospace;
 	padding: 0;
 
 	&:active {
 		padding: 0;
+	}
+
+	& svg {
+		@include size(15px);
 	}
 }
 
@@ -139,11 +147,18 @@
 	}
 }
 
-.timelapse {
+.bar {
+	@include windowLike();
+
+	padding: 10px;
 	position: absolute;
-	bottom: 10px;
-	left: 10px;
-	width: calc(100% - 20px);
+	bottom: 5px;
+	left: 5px;
+	width: calc(100% - 10px);
+}
+
+.timelapse {
+	width: calc(100% - 5px);
 	height: 10px;
 	background: rgba(108, 108, 128, 0.7);
 	border-style: solid;
@@ -152,20 +167,26 @@
 	border-bottom-color: #c1c0e6;
 	border-top-color: #6c6c81;
 	border-left-color: #6c6c81;
+	position: relative;
 	cursor: pointer;
 }
 
 .controls {
-	position: absolute;
-	bottom: 30px;
-	left: 10px;
-	width: calc(100% - 20px);
+	display: flex;
+	justify-content: space-between;
 	color: #000;
+	margin-top: 10px;
 
 	& button {
 		font-family: math;
 		cursor: pointer;
 	}
+}
+
+.leftControls {
+	display: flex;
+	gap: 10px;
+	align-items: center;
 }
 
 .position {

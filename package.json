@@ -33,6 +33,7 @@
     "parcel-bundler": "^1.12.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-portal-tooltip-upgraded": "^2.4.8",
     "res": "^0.4.0",
     "src": "^1.1.2",
     "typescript": "^5.0.2",

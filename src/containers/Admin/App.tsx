@@ -27,6 +27,7 @@ export const App: React.FC = () => {
 	const [coord, setCoord] = useState({});
 	const [range, setRange] = useState({});
 	const [size, setSize] = useState({ width: 0, height: 0 });
+	// const [isFinished, setIsFinished] = useState(false); TODO
 
 	const isMobile = mobile();
 

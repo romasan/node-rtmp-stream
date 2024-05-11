@@ -9,6 +9,23 @@ const { getAuthId } = require('../utils/auth');
 let uuidsCache = {};
 let ipsCache = {};
 
+const formatDate = (date, format) => {
+	const _date = new Date(Number(date));
+
+	let [hour, day, month, year] = ['getHours', 'getDate', 'getMonth', 'getFullYear']
+		.map((key) => _date[key]());
+
+	month += 1;
+
+	return format
+		.replace('yyyy', year)
+		.replace('MM', String(month).padStart(2, '0'))
+		.replace('dd', String(day).padStart(2, '0'))
+		.replace('hh', String(hour).padStart(2, '0'));
+};
+
+const uniqSessions = new Set();
+
 const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 	const key = `${x}:${y}`;
 
@@ -69,6 +86,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		(count || 0) + 1,
 		ipIndex,
 	];
+
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
 	if (typeof uuidIndex === 'number') {
@@ -77,7 +95,34 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
 	}
 
-	stats.history[_day] = (stats.history[_day] || 0) + 1;
+	const date = formatDate(time, 'yyyy-MM-dd-hh');
+	const day = date.slice(0, -3);
+	const hour = date.slice(-2);
+
+	if (!stats.history.firstDay) {
+		stats.history.firstDay = day;
+	}
+
+	if (!stats.history.days[day]) {
+		stats.history.days[day] = {
+			totalPixels: 0,
+			pixByHours: {},
+			uniqSessions: 0,
+		};
+	}
+
+	stats.history.days[day].totalPixels = stats.history.days[day].totalPixels + 1;
+	stats.history.days[day].pixByHours[hour] = (stats.history.days[day].pixByHours[hour] || 0) + 1;
+
+	uniqSessions.add(uuid);
+
+	stats.history.days[stats.history.lastDay || day].uniqSessions = uniqSessions.size;
+
+	if (stats.history.lastDay && stats.history.lastDay !== day) {
+		uniqSessions.clear();
+	}
+
+	stats.history.lastDay = day;
 };
 
 let inited = false;
@@ -93,15 +138,9 @@ const getPixelsInfo = (output) => {
 		const stats = {}; // require(__dirname + '/../stats.json');
 
 		stats.history = {
-			days: {
-				// '2024-12-31': 999,
-			},
-			hours: {
-				// '2024-12-31-23': 999,
-			},
-			hour: {
-				// '2024-12-31-23-59': 999,
-			},
+			days: {},
+			firstDay: '',
+			lastDay: '',
 		};
 
 		if (!stats.leaderboard) {

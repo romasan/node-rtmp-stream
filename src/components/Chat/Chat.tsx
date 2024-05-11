@@ -51,6 +51,7 @@ const renderText = (raw: string, nickname?: string): string => {
 		.replace(nickname ? new RegExp(`@(${nickname})`, "ig") : '\n', '<b>$1</b>')
 		.replace(/(https\:\/\/www\.youtube\.com\/watch\?v\=[A-Za-z0-9_]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
+		.replace(/(https\:\/\/pixelbattles\.ru\/[A-Za-z0-9_\-\/]+)/ig, '<a href="$1">$1</a>')
 };
 
 export const Message: React.FC<MessageProps> = ({
@@ -62,9 +63,9 @@ export const Message: React.FC<MessageProps> = ({
 	const html = useMemo(() => renderText(message.text, nickname), []);
 
 	return (
-		<div title={formatDate(message.time)}>
+		<div title={formatDate(message.time)} className={s.message}>
 			<div
-				className={cn(s.message, { [s.clickable]: isAuthorized && message.name !== nickname })}
+				className={cn(s.title, { [s.clickable]: isAuthorized && message.name !== nickname })}
 				onClick={() => handleMention(message.name)}
 			>
 				{icons[message.area] && icons[message.area]()}{message.name || '[EMPTY NICKNAME]'}:
@@ -168,8 +169,7 @@ export const Chat: React.FC<Props> = ({
 					onChange={onChange}
 					onKeyUp={onKeyUp}
 					disabled={!isAuthorized}
-					placeholder={isAuthorized ? 'Enter message' : 'Login for enter message'}
-					title={'Press Enter for send message'}
+					placeholder={isAuthorized ? 'Написать сообщение' : 'Авторизуйтесь, чтобы написать сообщение'}
 				/>
 				<button className={s.button} onClick={sendMessage} disabled={!isAuthorized} />
 			</div>

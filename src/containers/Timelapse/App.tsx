@@ -6,6 +6,7 @@ import mobile from 'is-mobile';
 import {
 	Canvas,
 	Header,
+	Login,
 } from '../../components';
 
 import {
@@ -19,9 +20,17 @@ import { useWsStore } from '../../hooks/useWsStore';
 
 import { ITimelapse } from './types';
 
+import { useModal } from '../../hooks';
+
+import PlayIcon from '../../../assets/play.svg';
+import PauseIcon from '../../../assets/pause.svg';
+import FasterIcon from '../../../assets/faster.svg';
+import SlowerIcon from '../../../assets/slower.svg';
+
 import * as s from './App.module.scss';
 
 const speedDegree = 1.1;
+const defaultSpeed = 15_000;
 
 const getTimelapseIndexes = (timelapse: any, cursor: number) => {
 	const expandIndex = timelapse.expands
@@ -88,7 +97,7 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 export const App: React.FC = () => {
 	const [selectedEpisode, setSelectedEpisode] = useState('s1e2');
 	const [timelapse, setTimelapse] = useState<ITimelapse>({});
-	const [speed, setSpeed] = useState(500 * 30);
+	const [speed, setSpeed] = useState(defaultSpeed);
 	const speedRef = useRef(speed);
 	const canvas = useRef(null);
 	const canvasCTX = useRef({ fillRect: () => null });
@@ -114,7 +123,7 @@ export const App: React.FC = () => {
 	const frameWidth = useMemo(() => {
 		const { width } = timelapseRef.current ? timelapseRef.current.getBoundingClientRect() : {};
 
-		return width / timelapse.total;
+		return (width - 3) / timelapse.total;
 	}, [timelapse]);
 
 	const {
@@ -126,6 +135,13 @@ export const App: React.FC = () => {
 	} = useWsStore();
 
 	const isMobile = mobile();
+
+	const loginModal = useModal({
+		content: (
+			<Login />
+		),
+		width: '300px',
+	});
 
 	const onInitCanvas = ({ image, centering, resetImage }: any) => {
 		canvas.current = image;
@@ -255,7 +271,12 @@ export const App: React.FC = () => {
 
 		return (
 			<>
-				{timelapse.expands && timelapse.expands.map((expand) => (
+				<div
+					key="progress"
+					ref={cursorRef}
+					className={s.progress}
+				/>
+				{timelapse.expands && timelapse.expands.slice(1).map((expand) => (
 					<>
 						<div
 							key={`${expand.index.from}-${expand.index.to}`}
@@ -264,11 +285,6 @@ export const App: React.FC = () => {
 						/>
 					</>
 				))}
-				<div
-					key="progress"
-					ref={cursorRef}
-					className={s.progress}
-				/>
 			</>
 		);
 	};
@@ -380,37 +396,49 @@ export const App: React.FC = () => {
 	}, [timelapse]);
 
 	return (
-		<div className={cn(s.root, { mobile: isMobile })}>
-			<Header
-				isAuthorized={isAuthorized}
-				name={wsStore ? wsStore.name : ''}
-				isOnline={isOnline}
-				hasNewMessage={hasNewMessage}
-				setHasNewMessage={setHasNewMessage}
-			/>
-			<Canvas
-				color={''}
-				isOnline={isOnline}
-				onInit={onInitCanvas}
-				viewOnly
-				src={imageSrc}
-			/>
+		<>
+			<div className={cn(s.root, { mobile: isMobile })}>
+				<Header
+					isAuthorized={isAuthorized}
+					name={wsStore ? wsStore.name : ''}
+					isOnline={isOnline}
+					hasNewMessage={hasNewMessage}
+					setHasNewMessage={setHasNewMessage}
+					login={loginModal.open}
+				/>
+				<Canvas
+					color={''}
+					isOnline={isOnline}
+					onInit={onInitCanvas}
+					viewOnly
+					src={imageSrc}
+				/>
 
-			<div className={s.controls}>
-				<select onChange={handleSelectEpisode}>
-					<option value="s1e1">S1E1</option>
-					<option value="s1e2" selected>S1E2</option>
-				</select>
-				<button className={s.button} onClick={handleToggleClick}>{isPlayed ? '⏸' : '⏵'}</button>
-				<div className={s.vDelimiter}></div>
-				<button className={s.button} onClick={handleSlowerClick}>–</button>
-				<button className={s.button} onClick={handleFasterClick}>+</button>
-				speed: {speed} pix per sec
-			</div>
+				<div className={s.bar}>
+					<div className={s.timelapse} ref={timelapseRef} onClick={handleClickTimelapse}>
+						{renderTimelapseSteps()}
+					</div>
 
-			<div className={s.timelapse} ref={timelapseRef} onClick={handleClickTimelapse}>
-				{renderTimelapseSteps()}
+					<div className={s.controls}>
+						<div className={s.leftControls}>
+							<button className={s.button} onClick={handleToggleClick}>{isPlayed ? <PauseIcon /> : <PlayIcon />}</button>
+							<div className={s.vDelimiter}></div>
+							<button className={s.button} onClick={handleSlowerClick}><SlowerIcon /></button>
+							<button className={s.button} onClick={handleFasterClick}><FasterIcon /></button>
+							{Number((speed / defaultSpeed).toFixed(2))}X
+						</div>
+						<div>
+							Сезон:
+							<select onChange={handleSelectEpisode}>
+								<option value="s1e1">S1E1</option>
+								<option value="s1e2" selected>S1E2</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
 			</div>
-		</div>
+			{loginModal.render()}
+		</>
 	);
 };

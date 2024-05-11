@@ -18,7 +18,7 @@ const stats = (req, res) => {
 			};
 		});
 
-	res.writeHead(200, { 'Content-Type': 'text/json' });
+	res.writeHead(200, { 'Content-Type': 'application/json' });
 	res.end(JSON.stringify({
 		total,
 		leaderboard,

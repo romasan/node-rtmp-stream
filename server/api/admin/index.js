@@ -1,14 +1,7 @@
-const url = require('url');
 const { getStats } = require('../../utils/canvas');
 const { parseCookies } = require('../../helpers');
 const { checkSession } = require('../../utils/sessions');
 const { checkIsAdmin } = require('../../utils/auth');
-const {
-	heatmapFromStats,
-	mapByUsersFromStats,
-	heatmapNewestFromStats,
-	mapLastPixelsFromStats,
-} = require('../../tools');
 const { stats } = require('./stats');
 const { streamSettings } = require('./streamSettings');
 const { updateFreezedFrame } = require('./updateFreezedFrame');
@@ -18,17 +11,35 @@ const { pixel } = require('./pixel');
 const { ban } = require('./ban');
 const { unban } = require('./unban');
 const { getBans } = require('./getBans');
+const {
+	heatmap,
+	newestmap,
+	usersmap,
+	lastPixels,
+} = require('./maps');
+
+const getHistory = (req, res) => {
+	res.writeHead(200, { 'Content-Type': 'application/json' });
+	res.end(JSON.stringify(getStats().history));
+};
+
+const prefix = '/admin';
 
 const routes = {
-	'/admin/stats': stats,
-	'/admin/streamSettings': streamSettings,
-	'/admin/updateFreezedFrame': updateFreezedFrame,
-	'/admin/fillSquare': fillSquare,
-	'/admin/onlineList': onlineList,
-	'/admin/pixel': pixel,
-	'/admin/ban': ban,
-	'/admin/unban': unban,
-	'/admin/getBans': getBans,
+	[`${prefix}/stats`]: stats,
+	[`${prefix}/streamSettings`]: streamSettings,
+	[`${prefix}/updateFreezedFrame`]: updateFreezedFrame,
+	[`${prefix}/fillSquare`]: fillSquare,
+	[`${prefix}/onlineList`]: onlineList,
+	[`${prefix}/pixel`]: pixel,
+	[`${prefix}/ban`]: ban,
+	[`${prefix}/unban`]: unban,
+	[`${prefix}/getBans`]: getBans,
+	[`${prefix}/heatmap.png`]: heatmap,
+	[`${prefix}/newestmap.png`]: newestmap,
+	[`${prefix}/usersmap.png`]: usersmap,
+	[`${prefix}/lastPixels.png`]: lastPixels,
+	[`${prefix}/history`]: getHistory,
 };
 
 const index = async (req, res, {
@@ -46,7 +57,6 @@ const index = async (req, res, {
 	}
 
 	const reqUrl = req.url.split('?')[0];
-	const query = url.parse(req.url, true).query;
 
 	if (routes[reqUrl]) {
 		routes[reqUrl](req, res);
@@ -54,34 +64,7 @@ const index = async (req, res, {
 		return;
 	}
 
-	switch (reqUrl) {
-	case '/admin/heatmap.png':
-		const heatmapCanvas = await heatmapFromStats(getStats());
-
-		res.writeHead(200, { 'Content-Type': 'image/png' });
-		res.end(heatmapCanvas.toBuffer());
-		return;
-	case '/admin/newestmap.png':
-		const newestCanvas = await heatmapNewestFromStats(getStats());
-
-		res.writeHead(200, { 'Content-Type': 'image/png' });
-		res.end(newestCanvas.toBuffer());
-		return;
-	case '/admin/usersmap.png':
-		const usersCanvas = await mapByUsersFromStats(getStats());
-
-		res.writeHead(200, { 'Content-Type': 'image/png' });
-		res.end(usersCanvas.toBuffer());
-		return;
-	case '/admin/lastPixels.png':
-		const lastPixelsCanvas = await mapLastPixelsFromStats(getStats(), query.count);
-
-		res.writeHead(200, { 'Content-Type': 'image/png' });
-		res.end(lastPixelsCanvas.toBuffer());
-		return;
-	}
-
-	res.writeHead(200, { 'Content-Type': 'text/json' });
+	res.writeHead(200, { 'Content-Type': 'application/json' });
 	res.end('{}');
 };
 

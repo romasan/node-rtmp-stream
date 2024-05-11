@@ -10,6 +10,7 @@ import {
 	Header,
 	Countdown,
 	Bar,
+	Login,
 } from './components/';
 
 import { doOnEnter, life } from './helpers';
@@ -25,8 +26,9 @@ import YoutubeIcon from '../assets/youtube.svg';
 import DiscordIcon from '../assets/discord.svg';
 import TelegramIcon from '../assets/telegram.svg';
 
-import * as s from './App.module.scss';
 import { useModal } from './hooks';
+
+import * as s from './App.module.scss';
 
 const disableMouse = {
 	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
@@ -55,23 +57,7 @@ export const App: React.FC = () => {
 
 	const loginModal = useModal({
 		content: (
-			<>
-				<div className={s.loginTitle}>Войти с помощью</div>
-				<div className={s.loginList}>
-					<a href="/login/?twitch">
-						<TwitchIcon />
-						Twitch
-					</a>
-					<a href="/login/?discord">
-						<DiscordIcon />
-						Discord
-					</a>
-					{/*<a href="/login/?steam">*/}
-					{/*	<SteamIcon />*/}
-					{/*	Steam*/}
-					{/*</a>*/}
-				</div>
-			</>
+			<Login />
 		),
 		width: '300px',
 	});

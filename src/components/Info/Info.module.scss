@@ -22,7 +22,6 @@
 
 .content {
 	width: 300px;
-	height: 260px;
 	overflow-y: auto;
 	overflow: overlay;
 	border-style: solid;
@@ -62,6 +61,13 @@
 .leaderBoardItem {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+	margin: 0 -10px;
+	padding: 0 10px 3px;
+
+	&:hover {
+		background-color: #c9cade;
+	}
 
 	& svg {
 		@include size(16px);

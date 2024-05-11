@@ -60,9 +60,30 @@
 	}
 }
 
-.text {
-	margin-bottom: 10px;
+.message {
+	padding: 5px 0;
 
+	&:hover {
+		background-color: #c9cade;
+	}
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.title {
+	letter-spacing: 1px;
+
+	& svg {
+		@include size(16px);
+
+		transform: translateY(4px);
+		margin-right: 4px;
+	}
+}
+
+.text {
 	& b {
 		background: #000;
 		color: #fff;
@@ -126,18 +147,5 @@
 	&,
 	&:active {
 		padding: 0 3px;
-	}
-}
-
-.clickable {
-	cursor: pointer;
-}
-
-.message {
-	& svg {
-		@include size(16px);
-
-		transform: translateY(4px);
-		margin-right: 4px;
 	}
 }

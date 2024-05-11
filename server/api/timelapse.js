@@ -6,7 +6,7 @@ const {
 } = require('../config.json');
 
 const contentTypes = {
-	json: 'text/json',
+	json: 'application/json',
 	bin: 'application/octet-stream',
 };
 

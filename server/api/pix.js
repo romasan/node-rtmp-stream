@@ -153,7 +153,7 @@ const pix = async (req, res) => {
 			: (Date.now() - time);
 
 		if (isNumber(x) && isNumber(y)) {
-			res.writeHead(200, { 'Content-Type': 'text/json' });
+			res.writeHead(200, { 'Content-Type': 'application/json' });
 			res.end(JSON.stringify({
 				x: Number(x),
 				y: Number(y),
