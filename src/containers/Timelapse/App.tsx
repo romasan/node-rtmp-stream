@@ -15,7 +15,7 @@ import {
 	APIhost,
 } from '../../lib/api';
 
-import { gzipAB } from '../../helpers';
+import { gzipAB, formatNumber } from '../../helpers';
 import { useWsStore } from '../../hooks/useWsStore';
 
 import { ITimelapse } from './types';
@@ -115,6 +115,7 @@ export const App: React.FC = () => {
 	const resetRef = useRef(() => {});
 	const [loadedPart, setLoadedPart] = useState(-1);
 	const [clickedCursor, setClickedCursor] = useState(-1);
+	const [cursorDisplay, setCursorDisplay] = useState('');
 
 	const imageSrc = useMemo(() => {
 		return `${APIhost}/timelapse/${selectedEpisode}/${startPart}.png`;
@@ -395,6 +396,16 @@ export const App: React.FC = () => {
 		};
 	}, [timelapse]);
 
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total) : 0}`);
+		}, 300);
+
+		return () => {
+			clearInterval(timer);
+		};
+	}, [timelapse]);
+
 	return (
 		<>
 			<div className={cn(s.root, { mobile: isMobile })}>
@@ -422,10 +433,16 @@ export const App: React.FC = () => {
 					<div className={s.controls}>
 						<div className={s.leftControls}>
 							<button className={s.button} onClick={handleToggleClick}>{isPlayed ? <PauseIcon /> : <PlayIcon />}</button>
+
 							<div className={s.vDelimiter}></div>
+
 							<button className={s.button} onClick={handleSlowerClick}><SlowerIcon /></button>
 							<button className={s.button} onClick={handleFasterClick}><FasterIcon /></button>
 							{Number((speed / defaultSpeed).toFixed(2))}X
+
+							<div className={s.vDelimiter}></div>
+
+							{cursorDisplay} pix
 						</div>
 						<div>
 							Сезон:
