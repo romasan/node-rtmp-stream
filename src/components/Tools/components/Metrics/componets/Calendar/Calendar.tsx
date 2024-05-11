@@ -81,47 +81,45 @@ export const Calendar: FC = () => {
 		<div>
 			<div>Calendar</div>
 			<div className={s.scrollable}>
-				<div className={s.year}>
-					{tree.map((month) => (
-						<div className={s.month} key={month.title}>
-							<div>{month.title}</div>
-							<div>
-								{month.weeks.map((week, weekIndex) => (
-									<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
-										{week.map((day, dayIndex) => (
-											<div className={s.day} key={`${month.title}-${dayIndex}`}>
-												{day ? (
-													<>
-														<StatefulToolTip parent={(
-															<>
-																<div>{day.day}</div>
-																<div>{day.uniqSessions || <>&nbsp;</>}</div>
-																<div>{day.totalPixels || <>&nbsp;</>}</div>
-															</>
-														)}>
-															<div className={s.tooltip}>
-																<div className={s.hours}>
-																	{prepareHours(day.pixByHours)
-																		.map(([key, value]) => (
-																			<div key={key}>{key}-00: {value}</div>
-																		))
-																	}
-																</div>
-																<div>
-																	{getChart(prepareHours(day.pixByHours), 300, 100)}
-																</div>
+				{tree.map((month) => (
+					<div className={s.month} key={month.title}>
+						<div>{month.title}</div>
+						<div>
+							{month.weeks.map((week, weekIndex) => (
+								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
+									{week.map((day, dayIndex) => (
+										<div className={s.day} key={`${month.title}-${dayIndex}`}>
+											{day ? (
+												<>
+													<StatefulToolTip parent={(
+														<>
+															<div>{day.day}</div>
+															<div>{day.uniqSessions || <>&nbsp;</>}</div>
+															<div>{day.totalPixels || <>&nbsp;</>}</div>
+														</>
+													)}>
+														<div className={s.tooltip}>
+															<div className={s.hours}>
+																{prepareHours(day.pixByHours)
+																	.map(([key, value]) => (
+																		<div key={key}>{key}-00: {value}</div>
+																	))
+																}
 															</div>
-														</StatefulToolTip>
-													</>
-												) : null}
-											</div>
-										))}
-									</div>
-								))}
-							</div>
+															<div>
+																{getChart(prepareHours(day.pixByHours), 300, 100)}
+															</div>
+														</div>
+													</StatefulToolTip>
+												</>
+											) : null}
+										</div>
+									))}
+								</div>
+							))}
 						</div>
-					))}
-				</div>
+					</div>
+				))}
 			</div>
 		</div>
 	);
