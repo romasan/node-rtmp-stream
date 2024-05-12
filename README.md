@@ -19,7 +19,7 @@
 - [x] reset countdown on login
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
-- [ ] buy pixel-battle.ru | pixelbattles.ru
+- [x] buy pixel-battle.ru | pixelbattles.ru
 - [ ] use one countdown for every session with one authorization
 - [ ] use one countdown for active unauthorized users with one ip address
 - [ ] do not allow more than one (or percentage of the number online) user with one IP address
@@ -59,9 +59,9 @@
 - [ ] merge token|uuid vars name?
 - [x] const.js -> config.json
 - [x] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
-- [ ] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
-- [ ] replace server/tools/getPixelInfo -> server/
-- [ ] remove event emitter
+- [x] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
+- [x] replace server/tools/getPixelInfo -> server/
+- [x] remove event emitter
 - [ ] use nestjs?
 
 # web
@@ -78,7 +78,7 @@
 - [x] link to stream
 - [x] contrast border for pixel placeholder
 - [ ] FAQ page
-- [ ] timelapse page
+- [x] timelapse page
 - [ ] leaderboard page
 - [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
 - [ ] fix layout after resize

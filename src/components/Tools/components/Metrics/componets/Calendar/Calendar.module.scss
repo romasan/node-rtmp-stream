@@ -24,11 +24,13 @@
 	align-items: end;
 	outline: 1px solid #cfcfcf;
 	padding: 3px;
+	white-space: nowrap;
 
 	& div {
 		font-size: 1.3vh; 
 		text-align: right;
 		white-space: nowrap;
+		cursor: default;
 
 		&:first-child {
 			font-weight: bold;
@@ -49,5 +51,14 @@
 	& > div {
 		border: 1px solid #ccc;
 		padding: 0 4px;
+	}
+}
+
+.chart {
+	display: flex;
+	justify-content: center;
+
+	& svg {
+		outline: 1px solid #e1dfdf;
 	}
 }

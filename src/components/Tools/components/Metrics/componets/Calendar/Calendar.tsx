@@ -1,6 +1,7 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 
-import { StatefulToolTip } from 'react-portal-tooltip-upgraded';
+// import { StatefulToolTip } from 'react-portal-tooltip-upgraded';
+import Tooltip from 'antd/es/tooltip';
 
 import { get } from '../../../../helpers';
 
@@ -14,9 +15,10 @@ import * as s from './Calendar.module.scss';
 
 export const getChart = (data: number[][], width: number, height: number) => {
 	const max = data.reduce((current, [key, value]) => Math.max(current, value), 0);
-	const path = `M0 ${height}L${data.map(([_, value], index) => {
+	const startY = height - data[0][1] / max * height;
+	const path = `M0 ${startY}L${data.slice(1).map(([_, value], index) => {
 		const y =  height - value / max * height;
-		const x =  width / data.length * index;
+		const x =  width / data.length * (index + 1);
 
 		return `${x} ${y}`;
 	}).join(' ')}`;
@@ -88,32 +90,32 @@ export const Calendar: FC = () => {
 							{month.weeks.map((week, weekIndex) => (
 								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
 									{week.map((day, dayIndex) => (
-										<div className={s.day} key={`${month.title}-${dayIndex}`}>
-											{day ? (
-												<>
-													<StatefulToolTip parent={(
-														<>
-															<div>{day.day}</div>
-															<div>{day.uniqSessions || <>&nbsp;</>}</div>
-															<div>{day.totalPixels || <>&nbsp;</>}</div>
-														</>
-													)}>
-														<div className={s.tooltip}>
-															<div className={s.hours}>
-																{prepareHours(day.pixByHours)
-																	.map(([key, value]) => (
-																		<div key={key}>{key}-00: {value}</div>
-																	))
-																}
-															</div>
-															<div>
-																{getChart(prepareHours(day.pixByHours), 300, 100)}
-															</div>
+										day ? (
+											<Tooltip title={
+												<div className={s.tooltip}>
+													<div className={s.tooltip}>
+														<div className={s.hours}>
+															{prepareHours(day.pixByHours)
+																.map(([key, value]) => (
+																	<div key={key}>{key}-00: {value}</div>
+																))
+															}
 														</div>
-													</StatefulToolTip>
-												</>
-											) : null}
-										</div>
+														<div className={s.chart}>
+															{getChart(prepareHours(day.pixByHours), 300, 100)}
+														</div>
+													</div>
+												</div>
+											} color="#fff">
+												<div className={s.day} key={`${month.title}-${dayIndex}`}>
+													<div>{day.day}</div>
+													<div>{day.uniqSessions || <>&nbsp;</>}</div>
+													<div>{day.totalPixels || <>&nbsp;</>}</div>
+												</div>
+											</Tooltip>
+										) : (
+											<div className={s.day} key={`${month.title}-${dayIndex}`}>&nbsp;</div>
+										)
 									))}
 								</div>
 							))}

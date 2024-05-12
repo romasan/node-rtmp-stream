@@ -1,5 +1,3 @@
 #!/bin/bash
 
-mkdir /mnt/ramdisk
-dd if=/dev/zero of=/tmp/ramdisk bs=1024 count=2048
-mount -o loop /tmp/ramdisk /mnt/ramdisk
+mount -t tmpfs -o size=2M tmpfs /mnt/ramdisk

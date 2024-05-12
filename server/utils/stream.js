@@ -1,13 +1,16 @@
 const { spawn } = require('child_process');
+const fs = require('fs');
 
-const { stream: { rtmpHostKey, inputAudio, FFMPEGLog } } = require('../config.json');
+const { stream: { rtmpHostKey, inputAudio, FFMPEGLog, streamFile, interval } } = require('../config.json');
+
+console.log('====', { rtmpHostKey, inputAudio, FFMPEGLog, streamFile, interval });
 
 const { getImageBuffer } = require('./canvas');
 
 const args = `-thread_queue_size 1024 -i ${inputAudio} -f image2pipe -framerate 2 -i - -f flv -vcodec libx264 -pix_fmt yuv420p -preset slow -r 25 -g 30 -movflags +faststart ${rtmpHostKey}`;
-const ffmpeg = spawn('ffmpeg', args.split(' '));
+const ffmpeg = streamFile ? null : spawn('ffmpeg', args.split(' '));
 
-if (FFMPEGLog) {
+if (FFMPEGLog && !streamFile) {
 	try {
 		ffmpeg.stderr.pipe(process.stdout);
 	} catch (error) {
@@ -16,18 +19,22 @@ if (FFMPEGLog) {
 }
 
 const writeCanvas = () => {
-	ffmpeg.stdin.write(getImageBuffer());
+	if (streamFile) {
+		fs.writeFileSync(streamFile, getImageBuffer());
+	} else {
+		ffmpeg.stdin.write(getImageBuffer());
+	}
 };
 
 writeCanvas();
 
 const frame = () => {
-	// check has changes
+	// TODO check has changes
 	writeCanvas();
 };
 
-setInterval(frame, 500);
+setInterval(frame, interval ? Number(interval) : 500);
 
 process.on('exit', function () {
-	ffmpeg.stdin.end();
+	ffmpeg?.stdin.end();
 });
