@@ -10,6 +10,11 @@ interface Props {
 	text: string;
 }
 
+const renderText = (raw: string, nickname?: string): string => {
+	return raw
+		.replace(/\(([a-zA-Zа-яА-Я0-9\ ]+)\)\[(http[s]{0,1}\:\/\/[a-zA-Z0-9\-\/\.]+)\]/ig, '<a href="$2">$1</a>')
+};
+
 export const Countdown: FC<Props> = ({ finish, text }) => {
 	const [countdown, setCountdown] = useState(0);
 
@@ -33,9 +38,7 @@ export const Countdown: FC<Props> = ({ finish, text }) => {
 
 	if (countdown < 0) {
 		return (
-			<div className={cn(s.root, s.timeout)}>
-				{text || 'TIMEOUT'}
-			</div>
+			<div className={cn(s.root, s.timeout)} dangerouslySetInnerHTML={{ __html: text ? renderText(text) : 'TIMEOUT' }}></div>
 		);
 	}
 

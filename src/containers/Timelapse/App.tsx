@@ -95,7 +95,7 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 };
 
 export const App: React.FC = () => {
-	const [selectedEpisode, setSelectedEpisode] = useState('s1e2');
+	const [selectedEpisode, setSelectedEpisode] = useState('s2e1');
 	const [timelapse, setTimelapse] = useState<ITimelapse>({});
 	const [speed, setSpeed] = useState(defaultSpeed);
 	const speedRef = useRef(speed);
@@ -448,7 +448,9 @@ export const App: React.FC = () => {
 							Сезон:
 							<select onChange={handleSelectEpisode}>
 								<option value="s1e1">S1E1</option>
-								<option value="s1e2" selected>S1E2</option>
+								<option value="s1e2">S1E2</option>
+								<hr />
+								<option value="s2e1" selected>S2E1</option>
 							</select>
 						</div>
 					</div>

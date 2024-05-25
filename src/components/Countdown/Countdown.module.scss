@@ -12,4 +12,15 @@
 
 .timeout {
 	background: #000;
+	top: 50px;
+
+	a,
+	a:visited,
+	a:active {
+		color: #fff;
+	}
+
+	a:hover {
+		color: rgb(152, 226, 255);
+	}
 }

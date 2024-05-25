@@ -9,6 +9,9 @@ const onlineList = (req, res) => {
 		return {
 			...item,
 			name: user?.name || getSessionUserName(item.uuid),
+			// ip
+			// cooldown
+			// address from ip?
 		};
 	});
 	res.writeHead(200, { 'Content-Type': 'application/json' });

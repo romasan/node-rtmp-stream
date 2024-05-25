@@ -147,6 +147,7 @@ export const Chat: React.FC<Props> = ({
 			<div className={s.draggable} ref={anchorRef}>
 				<button className={s.close} onClick={onClose}>&times;</button>
 			</div>
+			{/* <div>Online (0)</div> */}
 			<div className={s.content} ref={contentRef} {...props}>
 				{list.map((message) => (
 					<Message
