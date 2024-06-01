@@ -50,8 +50,9 @@ const renderText = (raw: string, nickname?: string): string => {
 	return raw
 		.replace(nickname ? new RegExp(`@(${nickname})`, "ig") : '\n', '<b>$1</b>')
 		.replace(/(https\:\/\/www\.youtube\.com\/watch\?v\=[A-Za-z0-9_]+)/ig, '<a href="$1" target="_blank">$1</a>')
+		.replace(/(https\:\/\/www\.youtube\.com\/@[A-Za-z0-9_-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
-		.replace(/(https\:\/\/pixelbattles\.ru\/[A-Za-z0-9_\-\/]+)/ig, '<a href="$1">$1</a>')
+		.replace(/(https\:\/\/pixelbattles\.ru[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1">$1</a>')
 };
 
 export const Message: React.FC<MessageProps> = ({

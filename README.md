@@ -26,6 +26,7 @@
 - [ ] integration tests
 - [ ] fix zoom on click on non canvas and "pixel" elements
 - [ ] webassembly + canvas =)
+- [ ] add to telegram web app (add qr to stream)
 
 # admin panel
 
