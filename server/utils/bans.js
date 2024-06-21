@@ -60,21 +60,34 @@ const checkBan = ({ token, nick, ip }) => {
 		return true;
 	}
 
-	if (ip && bans.ip[ip]) {
-		if (typeof bans.ip[ip] === 'number' && Date.now() >= bans.ip[ip]) {
-			unban('ip', ip);
+	if (ip) {
+		const IPs = ip.split(', ');
 
-			return false;
-		}
+		return IPs.some((_ip) => bans.ip[_ip]);
+		// if (typeof bans.ip[ip] === 'number' && Date.now() >= bans.ip[ip]) {
+		// 	unban('ip', ip);
 
-		return true;
+		// 	return false;
+		// }
+
+		// return true;
 	}
 
 	return false;
 };
 
 const ban = (type, value, datetime) => {
-	bans[type][value] = datetime ? Number(datetime) : true;
+	if (type === 'ip') {
+		const IPs = value.split(/\n|\,\ /g)
+			.filter(Boolean)
+			.map((item) => item.trim());
+
+		IPs.forEach((_ip) => {
+			bans.ip[_ip] = datetime ? Number(datetime) : true;
+		});
+	} else {
+		bans[type][value] = datetime ? Number(datetime) : true;
+	}
 	saveBans();
 };
 

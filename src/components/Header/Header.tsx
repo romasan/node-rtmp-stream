@@ -7,12 +7,12 @@ import { Info } from '../Info';
 
 import { ERole } from '../../hooks';
 
-import ChatIcon from '../../../assets/chat.svg';
-import LoginIcon from '../../../assets/login.svg';
-import LogoutIcon from '../../../assets/logout.svg';
-import TimelapseIcon from '../../../assets/clock.svg';
-import InfoIcon from '../../../assets/info.svg';
-import GearIcon from '../../../assets/gear.svg';
+import ChatIcon from '/assets/chat.svg';
+import LoginIcon from '/assets/login.svg';
+import LogoutIcon from '/assets/logout.svg';
+import TimelapseIcon from '/assets/clock.svg';
+import InfoIcon from '/assets/info.svg';
+import GearIcon from '/assets/gear.svg';
 
 import * as s from './Header.module.scss';
 
@@ -79,7 +79,7 @@ export const Header: React.FC<Props> = ({
 						<TimelapseIcon />
 					</a>
 					{role === ERole.moderator && (
-						<a href="/qq">
+						<a href="/qq" aria-label="tools">
 							<GearIcon />
 						</a>
 					)}

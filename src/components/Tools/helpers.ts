@@ -46,3 +46,7 @@ export const put = (command: string, payload?: any, type: string | boolean = 'JS
 export const patch = (command: string, payload?: any, type: string | boolean = 'JSON') => {
 	return push(command, payload, 'PATCH', type);
 };
+
+export const drop = (command: string, payload?: any, type: string | boolean = 'JSON') => {
+	return push(command, payload, 'DELETE', type);
+};

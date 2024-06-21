@@ -26,6 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "antd": "^5.17.0",
+    "bad-words-next": "^2.3.1",
     "canvas": "^2.11.0",
     "classnames": "^2.3.2",
     "event-emitter": "^0.3.5",
@@ -36,6 +37,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "res": "^0.4.0",
+    "sqlite3": "^5.1.7",
     "src": "^1.1.2",
     "typescript": "^5.0.2",
     "uuid": "^9.0.0",

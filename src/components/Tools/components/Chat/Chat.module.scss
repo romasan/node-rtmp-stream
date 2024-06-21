@@ -1,0 +1,39 @@
+.list {
+	max-height: 300px;
+	overflow: auto;
+	background: white;
+	color: #333;
+}
+
+.item {
+	position: relative;
+
+	&:nth-child(odd)  {
+		background-color: #d2d2d2;
+	}
+
+	&:hover {
+		background-color: #a7a7ff;
+
+		& .controls {
+			display: flex;
+		}
+	}
+}
+
+.controls {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: none;
+
+	button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: unset;
+		width: 24px;
+		height: 24px;
+	}
+}
+

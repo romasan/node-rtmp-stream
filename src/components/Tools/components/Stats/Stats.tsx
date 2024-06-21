@@ -4,7 +4,7 @@ import { Block } from '../Block';
 
 import { get } from '../../helpers';
 
-import { formatNumber, formatTime } from '../../../../helpers';
+import { formatNumber, formatTime } from '/src/helpers';
 
 import * as s from './Stats.module.scss';
 
@@ -67,6 +67,8 @@ export const Stats: FC<Props> = ({ canvas }) => {
 		ctx.fillRect(stats.coord.x, stats.coord.y, 1, 1);
 	};
 
+	console.log('==== list:', list); // TODO open user controls popup
+
 	return (
 		<Block title="Общее" onOpen={onOpen} onClose={onClose}>
 			{Boolean(stats.online) && (
@@ -74,11 +76,13 @@ export const Stats: FC<Props> = ({ canvas }) => {
 					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
 					<div className={s.users}>
 						<a href="#" onClick={toggleList}>Список</a>
-						{list.map((item) => (
-							<div key={String(item.name)}>
-								{item.name} {item.active ? '*' : ''}
-							</div>
-						))}
+						<div className={s.list}>
+							{list.map((item) => (
+								<div key={String(item.name)}>
+									{item.name} {item.active ? '*' : ''}
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 			)}

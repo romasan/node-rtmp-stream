@@ -25,6 +25,7 @@ const libs = {
 		'convertEnvToConfig',
 		'filterByIP',
 		'calcSessionsWithOneIP',
+		'prepareDatabase',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

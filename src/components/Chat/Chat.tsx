@@ -8,9 +8,10 @@ import { getChatMessages, sendChatMessage } from '../../lib/api';
 import { formatDate } from '../../helpers';
 import ee from '../../lib/ee';
 
-import TwitchIcon from '../../../assets/twitch_bw.svg';
-import DiscordIcon from '../../../assets/discord_bw.svg';
-import SteamIcon from '../../../assets/steam_bw.svg';
+import TwitchIcon from '/assets/twitch_bw.svg';
+import DiscordIcon from '/assets/discord_bw.svg';
+import SteamIcon from '/assets/steam_bw.svg';
+import StarIcon from '/assets/star.svg';
 
 import * as s from './Chat.module.scss';
 
@@ -44,6 +45,7 @@ const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
 	steam: SteamIcon,
+	system: StarIcon,
 };
 
 const renderText = (raw: string, nickname?: string): string => {
@@ -52,7 +54,7 @@ const renderText = (raw: string, nickname?: string): string => {
 		.replace(/(https\:\/\/www\.youtube\.com\/watch\?v\=[A-Za-z0-9_]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/www\.youtube\.com\/@[A-Za-z0-9_-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
-		.replace(/(https\:\/\/pixelbattles\.ru[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1">$1</a>')
+		.replace(/(https\:\/\/pixelbattles\.ru[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1">$1</a>');
 };
 
 export const Message: React.FC<MessageProps> = ({
@@ -64,12 +66,17 @@ export const Message: React.FC<MessageProps> = ({
 	const html = useMemo(() => renderText(message.text, nickname), []);
 
 	return (
-		<div title={formatDate(message.time)} className={s.message}>
+		<div className={s.message}>
 			<div
 				className={cn(s.title, { [s.clickable]: isAuthorized && message.name !== nickname })}
 				onClick={() => handleMention(message.name)}
 			>
-				{icons[message.area] && icons[message.area]()}{message.name || '[EMPTY NICKNAME]'}:
+				<div>
+					{icons[message.area] && icons[message.area]()}{message.name || '[EMPTY NICKNAME]'}
+				</div>
+				<div>
+					{formatDate(message.time, 'hh:mm')}
+				</div>
 			</div>
 			<div className={s.text} dangerouslySetInnerHTML={{ __html: html }} />
 		</div>
@@ -88,6 +95,25 @@ export const Chat: React.FC<Props> = ({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
 	
+	const groupedList = useMemo(() => {
+		let month = null;
+
+		return list.reduce((a, item) => {
+			const newMonth = formatDate(item.time, 'D MMMM Y?');
+
+			if (month !== newMonth) {
+				month = newMonth;
+
+				return a.concat([
+					{ delimiter: month },
+					item,
+				])
+			}
+
+			return a.concat(item);
+		}, []);
+	}, [list]);
+
 	const goToBottom = () => {
 		if (contentRef.current) {
 			contentRef.current.scrollTo(0, contentRef.current.scrollHeight);
@@ -150,15 +176,21 @@ export const Chat: React.FC<Props> = ({
 			</div>
 			{/* <div>Online (0)</div> */}
 			<div className={s.content} ref={contentRef} {...props}>
-				{list.map((message) => (
-					<Message
-						key={message.id}
-						message={message}
-						isAuthorized={isAuthorized}
-						nickname={nickname}
-						handleMention={handleMention}
-					/>
-				))}
+				{groupedList.map((message) => 
+					message.delimiter ? (
+						<div key={message.delimiter} className={s.delimiter}>
+							{message.delimiter}
+						</div>
+					) : (
+						<Message
+							key={message.id}
+							message={message}
+							isAuthorized={isAuthorized}
+							nickname={nickname}
+							handleMention={handleMention}
+						/>
+					)
+				)}
 				{list.length === 0 && (
 					<div>пока никто не писал</div>
 				)}

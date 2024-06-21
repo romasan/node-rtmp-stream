@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { Block } from '../Block';
-import { useModal } from '../../../../hooks';
+import { useModal } from '/src/hooks';
 import { Calendar } from './componets';
 
 export const Metrics: FC = () => {

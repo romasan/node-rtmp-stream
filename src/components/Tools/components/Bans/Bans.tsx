@@ -1,5 +1,7 @@
 import React, { FC, useState } from 'react';
 
+import { useModal } from '/src/hooks';
+
 import { Block } from '../Block';
 
 import { get, put, patch } from '../../helpers';
@@ -11,6 +13,7 @@ export const Bans: FC = () => {
 	const [ip, setIp] = useState('');
 	const [token, setToken] = useState('');
 	const [nick, setNick] = useState('');
+	const [ipsText, setIpsText] = useState('');
 
 	const handleOpen = () => {
 		get('getBans')
@@ -57,6 +60,27 @@ export const Bans: FC = () => {
 			.catch(() => {/* */});
 	};
 
+	const addIps = () => {
+		put('ban', JSON.stringify({ type: 'ip', value: ipsText }), false)
+			.then(() => handleOpen())
+			.catch(() => {/* */});
+	};
+
+	const ipsModal = useModal({
+		content: (
+			<div>
+				<div>Add IPs</div>
+				<div>
+					<textarea rows={10} cols={60} onChange={({ target }) => setIpsText(target.value)}></textarea>
+				</div>
+				<div>
+					<button disabled={!ipsText} onClick={addIps}>add</button>
+				</div>
+			</div>
+		),
+		portal: true,
+	});
+
 	return (
 		<Block title="Управление банами" onOpen={handleOpen}>
 			<div>token ({stats.token && Object.keys(stats.token).length}):</div>
@@ -69,7 +93,7 @@ export const Bans: FC = () => {
 				))}
 			</div>
 			<div>
-				<input value={token} onChange={({target: {value}}) => setToken(value)}/>
+				<input value={token} onChange={({target: {value}}) => setToken(value)} placeholder="TOKEN" />
 				<button onClick={handleClickBanByToken}>добавить</button>
 				<select>
 					<option value="0">навсегда TODO</option>
@@ -89,8 +113,9 @@ export const Bans: FC = () => {
 				))}
 			</div>
 			<div>
-				<input value={ip} onChange={({ target: { value }}) => setIp(value)}/>
+				<input value={ip} onChange={({ target: { value }}) => setIp(value)} placeholder="IP ADDRESS" />
 				<button onClick={handleClickBanByIp}>добавить</button>
+				<button onClick={ipsModal.open}>списком</button>
 			</div>
 			<div>nick ({stats.nick && Object.keys(stats.nick).length}):</div>
 			<div className={s.list}>
@@ -102,9 +127,10 @@ export const Bans: FC = () => {
 				))}
 			</div>
 			<div>
-				<input value={nick} onChange={({ target: { value }}) => setNick(value)}/>
+				<input value={nick} onChange={({ target: { value }}) => setNick(value)} placeholder="NICKNAME" />
 				<button onClick={handleClickBanByNick}>добавить</button>
 			</div>
+			{ipsModal.render()}
 		</Block>
 	);
 };

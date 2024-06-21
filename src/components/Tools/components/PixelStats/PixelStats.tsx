@@ -9,7 +9,7 @@ import {
 	getQuery,
 } from '../../helpers';
 
-import { formatTime } from '../../../../helpers';
+import { formatTime } from '/src/helpers';
 
 // import * as s from './Stats.module.scss';
 

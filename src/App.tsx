@@ -20,11 +20,11 @@ import ee from './lib/ee';
 
 import { useWsStore } from './hooks/useWsStore';
 
-import TwitchIcon from '../assets/twitch.svg';
-import VkplayIcon from '../assets/vkplay.svg';
-import YoutubeIcon from '../assets/youtube.svg';
-import DiscordIcon from '../assets/discord.svg';
-import TelegramIcon from '../assets/telegram.svg';
+import TwitchIcon from '/assets/twitch.svg';
+import VkplayIcon from '/assets/vkplay.svg';
+import YoutubeIcon from '/assets/youtube.svg';
+import DiscordIcon from '/assets/discord.svg';
+import TelegramIcon from '/assets/telegram.svg';
 
 import { useModal } from './hooks';
 

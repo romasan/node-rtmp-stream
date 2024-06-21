@@ -17,6 +17,7 @@ const {
 	usersmap,
 	lastPixels,
 } = require('./maps');
+const { chat } = require('./chat');
 
 const getHistory = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -40,6 +41,7 @@ const routes = {
 	[`${prefix}/usersmap.png`]: usersmap,
 	[`${prefix}/lastPixels.png`]: lastPixels,
 	[`${prefix}/history`]: getHistory,
+	[`${prefix}/chat`]: chat,
 };
 
 const index = async (req, res, {

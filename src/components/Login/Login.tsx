@@ -1,7 +1,7 @@
 import React from 'react';
 
-import TwitchIcon from '../../../assets/twitch.svg';
-import DiscordIcon from '../../../assets/discord.svg';
+import TwitchIcon from '/assets/twitch.svg';
+import DiscordIcon from '/assets/discord.svg';
 
 import * as s from './Login.module.scss';
 

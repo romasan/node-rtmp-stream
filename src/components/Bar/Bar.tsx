@@ -6,11 +6,11 @@ import { getInRange } from '../../helpers';
 
 import { showPixelScale, minScale, maxScale } from '../../const';
 
-import PenIcon from '../../../assets/pen.svg';
-import PlusIcon from '../../../assets/plus.svg';
-import MinusIcon from '../../../assets/minus.svg';
-import ExpandIcon from '../../../assets/expand.svg';
-// import clock from '../../../assets/clock.svg';
+import PenIcon from '/assets/pen.svg';
+import PlusIcon from '/assets/plus.svg';
+import MinusIcon from '/assets/minus.svg';
+import ExpandIcon from '/assets/expand.svg';
+// import clock from '/assets/clock.svg';
 
 import * as s from './Bar.module.scss';
 

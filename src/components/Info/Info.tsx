@@ -6,9 +6,9 @@ import { getStats } from '../../lib/api';
 
 import { formatNumber } from '../../helpers';
 
-import TwitchIcon from '../../../assets/twitch_bw.svg';
-import DiscordIcon from '../../../assets/discord_bw.svg';
-import SteamIcon from '../../../assets/steam_bw.svg';
+import TwitchIcon from '/assets/twitch_bw.svg';
+import DiscordIcon from '/assets/discord_bw.svg';
+import SteamIcon from '/assets/steam_bw.svg';
 
 import * as s from './Info.module.scss';
 
@@ -39,7 +39,7 @@ export const Info: FC<Props> = ({
 		leaderboard: [],
 		total: 0,
 	});
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 350, y: 60});
+	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 350, y: 55});
 
 	useEffect(() => {
 		getStats()
@@ -57,7 +57,6 @@ export const Info: FC<Props> = ({
 					<div>Загрузка...</div>
 				) : (
 					<div>
-						{/* <div>Online: 0</div> */}
 						<div>Всего пикселей: {formatNumber(stats.total)}</div>
 						<div>&nbsp;</div>
 						<div>
@@ -77,6 +76,23 @@ export const Info: FC<Props> = ({
 								</div>
 							))}
 						</div>
+						{/* <div>
+							<div>Онлайн: </div>
+							<div>&nbsp;</div>
+							{(stats.leaderboard || []).map((item) => (
+								<div key={String(item.place)} className={s.leaderBoardItem}>
+									<span>
+										{item.place < 10 && <>&nbsp;</>}
+										{item.place}.
+										{icons[item.platform] ? icons[item.platform]() : <div className={s.space} />}
+										{item.name}
+									</span>
+									<span>
+										{formatNumber(item.count)}
+									</span>
+								</div>
+							))}
+						</div> */}
 					</div>
 				)}
 			</div>

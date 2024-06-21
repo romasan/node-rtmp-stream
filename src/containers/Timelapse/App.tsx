@@ -22,10 +22,10 @@ import { ITimelapse } from './types';
 
 import { useModal } from '../../hooks';
 
-import PlayIcon from '../../../assets/play.svg';
-import PauseIcon from '../../../assets/pause.svg';
-import FasterIcon from '../../../assets/faster.svg';
-import SlowerIcon from '../../../assets/slower.svg';
+import PlayIcon from '/assets/play.svg';
+import PauseIcon from '/assets/pause.svg';
+import FasterIcon from '/assets/faster.svg';
+import SlowerIcon from '/assets/slower.svg';
 
 import * as s from './App.module.scss';
 

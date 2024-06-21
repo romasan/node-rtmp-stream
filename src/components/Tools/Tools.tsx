@@ -17,6 +17,7 @@ import {
 	Maps,
 	Bans,
 	Metrics,
+	Chat,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -72,6 +73,7 @@ export const Tools: FC<Props> = ({
 							/>
 							<Bans />
 							<Metrics />
+							<Chat />
 							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
 							<Block title="Обновление констант"
 								// onOpen={() => console.log('==== open #1')}

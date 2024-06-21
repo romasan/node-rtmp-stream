@@ -31,8 +31,9 @@ const filterByBlocked = (input, output) => {
 
 	rl.on('line', (line) => {
 		const [,,,,,,ip] = line.split(';');
+		const IPs = ip.split(', ');
 
-		if (bansJSON.ip[ip]) {
+		if (IPs.some((_ip) => bansJSON.ip[_ip])) {
 			return;
 		}
 
