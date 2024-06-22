@@ -90,7 +90,7 @@ export const Countdown: FC = () => {
 					<div>count</div>
 					<div>sec.</div>
 				</div>
-				{ranges?.authorized?.map(([key,, value], index) => (
+				{ranges && ranges.authorized && ranges.authorized.map(([key,, value], index) => (
 					<div className={s.row} key={`authorized-${index}`}>
 						<input value={key} onChange={({ target }) => onChangeKey('authorized', index, target.value)} onBlur={() => setChanged(true)} />
 						<input value={value} onChange={({ target }) => onChangeValue('authorized', index, target.value)} />
@@ -105,7 +105,7 @@ export const Countdown: FC = () => {
 					<div>count</div>
 					<div>sec.</div>
 				</div>
-				{ranges?.guest?.map(([key,, value], index) => (
+				{ranges && ranges.guest && ranges.guest.map(([key,, value], index) => (
 					<div className={s.row} key={`guest-${index}`}>
 						<input value={key} onChange={({ target }) => onChangeKey('guest', index, target.value)} onBlur={() => setChanged(true)} />
 						<input value={value} onChange={({ target }) => onChangeValue('guest', index, target.value)} />
