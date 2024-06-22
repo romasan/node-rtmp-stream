@@ -120,6 +120,9 @@ export const Maps: FC<Props> = ({
 				<button disabled>для сессии</button>
 				<input placeholder="UUID" />
 			</div>
+			<div>
+				<button disabled>без учёта заблокированных</button>
+			</div>
 		</Block>
 	);
 };

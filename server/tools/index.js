@@ -4,7 +4,6 @@ const argv = yargs(hideBin(process.argv)).argv?._ || [];
 
 const libs = {
 	...[
-		'drawDefaultCanvas',
 		'recover',
 		'upscale',
 		'drawDiffMask',
@@ -12,22 +11,15 @@ const libs = {
 		'drawSteps',
 		'filterByUUID',
 		'getDirectoriesRecursive',
-		'filterByXY',
-		'topUUIDs',
 		'expand',
 		'debugStream',
 		'prepareTimelapse',
 		'collectIPAdresses',
 
-		'genMapByUsers',
-		'heatmap',
 		'fixSessionByNickName',
-		'convertEnvToConfig',
 		'filterByIP',
 		'calcSessionsWithOneIP',
 		'prepareDatabase',
-		'prepareAccounts',
-		'preparePixelsLog',
 		'filterByBlocked',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);

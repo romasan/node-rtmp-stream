@@ -5,7 +5,7 @@ const {
 	mapByUsersFromStats,
 	heatmapNewestFromStats,
 	mapLastPixelsFromStats,
-} = require('../../tools');
+} = require('../../utils/maps');
 
 const heatmap = async (req, res) => {
 	const heatmapCanvas = await heatmapFromStats(getStats());

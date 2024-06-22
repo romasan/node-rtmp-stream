@@ -5,7 +5,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image, registerFont } = require('canvas');
-const drawDefaultCanvas = require('./drawDefaultCanvas');
+const { drawBGCanvas } = require('../utils/canvas');
 
 registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
@@ -33,7 +33,7 @@ const videoHeight = 720; // 1080;
 const scale = 2;
 
 const drawDayBG = (ctx, day) => {
-	const bg = drawDefaultCanvas('DATA', videoWidth, videoHeight);
+	const bg = drawBGCanvas(videoWidth, videoHeight);
 	ctx.drawImage(bg, 0, 0);
 
 	// const text = `Day #${day}`;

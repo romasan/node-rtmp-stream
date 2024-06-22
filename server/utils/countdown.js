@@ -12,7 +12,14 @@ const personalCD = {
 	// "00000000-0000-0000-0000-000000000000": 10 (sec.)
 };
 
-const expirationsList = {};
+const expirationsList = {
+	authorized: [
+		[0, null, 3],
+	],
+	guest: [
+		[0, null, 30],
+	],
+};
 
 let countdownRanges = {};
 
@@ -20,7 +27,9 @@ const DBFileName = __dirname + '/../../db/countdown.json';
 
 const preloadCountdownRanges = () => {
 	// TODO use database
-	countdownRanges = require(DBFileName);
+	if (fs.existsSync(DBFileName)) {
+		countdownRanges = require(DBFileName);
+	}
 };
 
 preloadCountdownRanges();

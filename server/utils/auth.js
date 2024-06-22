@@ -18,7 +18,9 @@ let users = {
 
 const getAllUsers = () => {
 	// TODO use database
-	users = require(DBFileName);
+	if (fs.existsSync(DBFileName)) {
+		users = require(DBFileName);
+	}
 
 	if (!users.sessions) {
 		users.sessions = {};
@@ -26,6 +28,10 @@ const getAllUsers = () => {
 
 	if (!users.authorized) {
 		users.authorized = {};
+	}
+
+	if (!users.accounts) {
+		users.accounts = {};
 	}
 };
 
