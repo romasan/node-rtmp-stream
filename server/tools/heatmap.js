@@ -33,7 +33,7 @@ const heatmapCLI = (file, output, mode = 'COUNT') => { // COUNT, NEWEST
 	// let max = 0;
 
 	rl.on('line', (line) => {
-		const [time, nick, x, y, color, uuid] = line.split(';');
+		const [time, area, x, y, color, uuid] = line.split(';');
 
 		if (!list[x]) {
 			list[x] = [];

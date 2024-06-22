@@ -75,7 +75,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 				<div>
 					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
 					<div className={s.users}>
-						<a href="#" onClick={toggleList}>Список</a>
+						<a href="#" onClick={toggleList}>Список онлайн [{list.length ? '-' : '+'}] {list.length > 0 && `(${list.length})`}</a>
 						<div className={s.list}>
 							{list.map((item) => (
 								<div key={String(item.name)}>
@@ -86,18 +86,19 @@ export const Stats: FC<Props> = ({ canvas }) => {
 					</div>
 				</div>
 			)}
+			<hr />
 			<div>
 				Активность: {formatTime(stats.lastActivity)} назад
 			</div>
-			<div>
-				Первый пиксель: TODO
-			</div>
 			{Boolean(stats.coord) && (
 				<div>
-					{stats.lastUserName} ({stats.lastUserUUID} / {stats.lastUserIP || 'IP'})
+					{stats.lastUserName} ({stats.lastUserUUID} / {stats.lastUserIP || 'IP'})&nbsp;
 					<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
 				</div>
 			)}
+			<div>
+				Первый пиксель: TODO
+			</div>
 			<hr />
 			<div>
 				Всего пикселей: {formatNumber(stats.total)}

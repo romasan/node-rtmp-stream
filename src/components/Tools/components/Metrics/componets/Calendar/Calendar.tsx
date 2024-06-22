@@ -81,7 +81,7 @@ export const Calendar: FC = () => {
 
 	return (
 		<div>
-			<div>Calendar</div>
+			<div>Календарь</div>
 			<div className={s.scrollable}>
 				{tree.map((month) => (
 					<div className={s.month} key={month.title}>

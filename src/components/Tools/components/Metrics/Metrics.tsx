@@ -9,14 +9,12 @@ export const Metrics: FC = () => {
 		content: (
 			<Calendar />
 		),
-		width: 'calc(100% - 100px)',
-		height: 'calc(100% - 100px)',
 		portal: true,
 	});
 	return (
 		<Block title="Метрики">
 			<button onClick={modalCalendar.toggle}>календарь</button>
-			<button>графики</button>
+			<button disabled>графики</button>
 			<>{modalCalendar.render()}</>
 		</Block>
 	);

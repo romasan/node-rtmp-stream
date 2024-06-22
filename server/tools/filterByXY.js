@@ -14,7 +14,7 @@ const filterByXY = (input, output, x, y) => {
 	const file = fs.createWriteStream(output);
 
 	rl.on('line', (line) => {
-		const [time, nick, _x, _y, color, uuid] = line.split(';');
+		const [time, area, _x, _y, color, uuid] = line.split(';');
 
 		if (x === _x && y === _y) {
 			file.write(line + '\n');

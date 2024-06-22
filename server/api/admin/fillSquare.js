@@ -17,7 +17,8 @@ const fillSquare = async (req, res) => {
 						color: color,
 						x: Math.floor(x),
 						y: Math.floor(y),
-						nickname: '',
+						nickname: 'Admin',
+						area: '',
 						uuid: token,
 					});
 				}

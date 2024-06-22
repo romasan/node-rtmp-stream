@@ -62,7 +62,10 @@ export const Bans: FC = () => {
 
 	const addIps = () => {
 		put('ban', JSON.stringify({ type: 'ip', value: ipsText }), false)
-			.then(() => handleOpen())
+			.then(() => {
+				handleOpen();
+				ipsModal.close();
+			})
 			.catch(() => {/* */});
 	};
 

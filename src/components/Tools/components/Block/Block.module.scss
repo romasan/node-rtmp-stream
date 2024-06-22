@@ -40,6 +40,9 @@
 		padding: 3px;
 		margin: 1px
 	}
+	button:disabled {
+		opacity: 0.5;
+	}
 	input {
 		background: #323233;
 		border: 1px solid #797979;

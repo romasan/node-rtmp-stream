@@ -138,7 +138,7 @@ const prepareTimelapse = (
 		timelapse.expands[expandIndex].index.to = index;
 		timelapse.expands[expandIndex].part.to = partIndex;
 
-		const [time, nick, x, y, color, uuid] = line.split(';');
+		const [time, area, x, y, color, uuid] = line.split(';');
 
 		// TODO date time in timelapse
 		// const _date = new Date(time);

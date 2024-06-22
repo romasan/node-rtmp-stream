@@ -36,7 +36,7 @@ const checkLog = (file, input, output) => {
 	
 	rl.on('line', (line) => {
 		n++;
-		const [time, nick, x, y, color] = line.split(';');
+		const [time, area, x, y, color] = line.split(';');
 
 		if (Number(time) >= breakTime) {
 			rl.pause();

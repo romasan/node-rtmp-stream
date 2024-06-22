@@ -5,7 +5,11 @@ const http = require('http');
 const { getCountdown } = require('../utils/countdown');
 const { parseCookies, getIPAddress } = require('../helpers');
 const { checkSession } = require('./sessions');
-const { checkUserAuthByToken, getUserData } = require('./auth');
+const {
+	checkUserAuthByToken,
+	getUserData,
+	getAccoutntTokens,
+} = require('./auth');
 const {
 	colorShemes: { COLORS },
 	server: {
@@ -62,7 +66,11 @@ const updateClientCountdown = (token) => {
 	const onlineCount = getOnlineCount();
 	const countdown = getCountdown(token, onlineCount, false, true) * 1000;
 
-	send(token, 'countdown', countdown);
+	const tokens = getAccoutntTokens(token);
+
+	tokens.forEach((_token) => {
+		send(_token, 'countdown', countdown);
+	});
 };
 
 const getOnlineCountRaw = () => {

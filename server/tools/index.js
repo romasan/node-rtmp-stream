@@ -26,6 +26,9 @@ const libs = {
 		'filterByIP',
 		'calcSessionsWithOneIP',
 		'prepareDatabase',
+		'prepareAccounts',
+		'preparePixelsLog',
+		'filterByBlocked',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 

@@ -59,7 +59,7 @@ export const Maps: FC<Props> = ({
 	}, [canvas, opened, clearOnExit]);
 
 	return (
-		<Block title="Карты" onToggle={setOpened}>
+		<Block title="Карты активности" onToggle={setOpened}>
 			<div>
 				<label>
 					<input
@@ -76,7 +76,7 @@ export const Maps: FC<Props> = ({
 				<button onClick={getHeatmap}>heatmap</button>
 			</div>
 			<div>
-				<button onClick={getByUsersMap}>по юзеру</button>
+				<button onClick={getByUsersMap}>по сессиям</button>
 			</div>
 			<div>
 				<button onClick={getNewestMap}>по давности</button>
@@ -97,9 +97,8 @@ export const Maps: FC<Props> = ({
 					<option value="100000">100 000</option>
 				</select>
 			</div>
-			<div>TODO</div>
 			<div>
-				<button>за последний</button>
+				<button disabled>за последний</button>
 				<select>
 					<option value={min}>1 минута</option>
 					<option value={5 * min}>5 минут</option>
@@ -115,10 +114,10 @@ export const Maps: FC<Props> = ({
 				</select>
 			</div>
 			<div>
-				<button onClick={getNewestMap}>по IP</button>
+				<button disabled>по IP</button>
 			</div>
 			<div>
-				<button>для сессии</button>
+				<button disabled>для сессии</button>
 				<input placeholder="UUID" />
 			</div>
 		</Block>

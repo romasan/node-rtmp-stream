@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const readline = require('readline');
-const { getAuthId } = require('../utils/auth');
+const { getAuthID } = require('../utils/auth');
 
 let uuidsCache = {};
 let ipsCache = {};
@@ -26,7 +26,7 @@ const formatDate = (date, format) => {
 
 const uniqSessions = new Set();
 
-const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
+const updateStats = (stats, [time, area, x, y, color, uuid, ip, nickname]) => {
 	const key = `${x}:${y}`;
 
 	// if (!stats.starttime) {
@@ -90,7 +90,7 @@ const updateStats = (stats, [time, nick, x, y, color, uuid, ip]) => {
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
 	if (typeof uuidIndex === 'number') {
-		const _id = getAuthId(uuid) || uuid;
+		const _id = getAuthID(uuid) || uuid;
 
 		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
 	}
@@ -172,9 +172,18 @@ const getPixelsInfo = (output) => {
 				return;
 			}
 
-			const [time, nick, x, y, color, uuid, ip] = line.split(';');
+			const [time, area, x, y, color, uuid, ip, nickname] = line.split(';');
 
-			updateStats(stats, [time, nick, x, y, color, uuid, ip]);
+			updateStats(stats, [
+				time,
+				area,
+				x,
+				y,
+				color,
+				uuid,
+				ip,
+				nickname,
+			]);
 		});
 	
 		rl.on('close', () => {

@@ -12,6 +12,7 @@ const logoutLog = fs.createWriteStream(__dirname + '/../../db/logout.log', { fla
 
 let users = {
 	sessions: {},
+	accounts: {},
 	authorized: {},
 };
 
@@ -53,6 +54,10 @@ const authorizeUser = (token, data) => {
 	
 	users.authorized[authId] = data;
 	users.sessions[token] = authId;
+	users.accounts[authId] = [
+		...(users.accounts[authId]?.filter((value) => value !== token) || []),
+		token,
+	];
 
 	saveUsers();
 };
@@ -161,14 +166,26 @@ const removeUser = (token) => {
 		if (!hasMoreSessions) {
 			delete users.authorized[authId];
 		}
+
+		users.accounts[authId] = users.accounts[authId]?.filter((value) => value !== token);
+
+		if (!users.accounts[authId]?.length) {
+			delete users.accounts[authId];
+		}
 	}
 
 	saveUsers();
 };
 
-const getAuthId = (token) => {
+const getAuthID = (token) => {
 	return users.sessions[token];
 };
+
+const getAccoutntTokens = (token) => {
+	const authId = getAuthID(token);
+
+	return users.accounts[authId] || [token];
+}
 
 module.exports = {
 	authorizeUser,
@@ -177,6 +194,7 @@ module.exports = {
 	getUserData,
 	removeUser,
 	checkIsAdmin,
-	getAuthId,
+	getAuthID,
+	getAccoutntTokens,
 	_parseUserData,
 };

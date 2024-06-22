@@ -104,7 +104,7 @@ const updatePixelsWithoutIP = (INPUT, OUTPUT) => {
 	});
 
 	rl.on('line', (line) => {
-		let [time, nick, x, y, color, token, ip] = line.split(';');
+		let [time, area, x, y, color, token, ip] = line.split(';');
 
 		if (!ip) {
 			ip = uuidsIP[token] || '';

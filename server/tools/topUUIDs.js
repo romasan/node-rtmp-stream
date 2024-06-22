@@ -16,7 +16,7 @@ const topUUIDs = (input, output) => {
 	const UUIDs = {};
 
 	rl.on('line', (line) => {
-		const [time, nick, _x, _y, color, uuid] = line.split(';');
+		const [time, area, _x, _y, color, uuid] = line.split(';');
 
 		UUIDs[uuid] = (UUIDs[uuid] || 0) + 1;
 	});

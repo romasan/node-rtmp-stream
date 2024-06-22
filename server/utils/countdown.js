@@ -1,25 +1,40 @@
+const fs = require('fs');
 const { inRange } = require('../helpers');
-const { countdownRanges } = require('../config.json');
-const { checkUserAuthByToken, checkIsAdmin } = require('../utils/auth');
+const {
+	checkUserAuthByToken,
+	checkIsAdmin,
+	getAuthID,
+} = require('./auth');
 
-const humanListToArray = (obj) => Object.entries(obj)
-	.reduce((list, [key, value]) => [...list, [Number(key), value]], [])
-	.map(([key, value], index, list) => [key, (list[index + 1]?.[0] || Infinity) - 1, value]);
-
-let _countdownRanges = Object.entries(countdownRanges)
-	.reduce((list, [key, value]) => ({
-		...list,
-		[key]: humanListToArray(value),
-	}), {});
+// TODO add personal countdown
+const personalCD = {
+	// session ID or auth ID?
+	// "00000000-0000-0000-0000-000000000000": 10 (sec.)
+};
 
 const expirationsList = {};
 
+let countdownRanges = {};
+
+const DBFileName = __dirname + '/../../db/countdown.json';
+
+const preloadCountdownRanges = () => {
+	// TODO use database
+	countdownRanges = require(DBFileName);
+};
+
+preloadCountdownRanges();
+
 const resetCountdownTemp = (token) => {
-	delete expirationsList[token];
+	const _token = getAuthID(token) || token;
+
+	delete expirationsList[_token];
 };
 
 const getExpiration = (token) => {
-	return expirationsList[token] || 0;
+	const _token = getAuthID(token) || token;
+
+	return expirationsList[_token] || 0;
 };
 
 const getCountdown = (token, onlineCount, isFirstTime, reset) => {
@@ -27,12 +42,11 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 		resetCountdownTemp(token);
 	}
 
-	// TODO one countdown for all sessions with one login
-	// const _token = getAuthID(token) || token;
+	const _token = getAuthID(token) || token;
 
-	if (expirationsList[token]) {
-		if (expirationsList[token] > Date.now()) {
-			return Math.ceil((expirationsList[token] - Date.now()) / 1000);
+	if (expirationsList[_token]) {
+		if (expirationsList[_token] > Date.now()) {
+			return Math.ceil((expirationsList[_token] - Date.now()) / 1000);
 		} else {
 			return 0;
 		}
@@ -50,17 +64,36 @@ const getCountdown = (token, onlineCount, isFirstTime, reset) => {
 	// 	return forceMin;
 	// }
 
-	const value = (isAuthorized ? _countdownRanges.authorized : _countdownRanges.guest)
-		.find((item) => inRange(onlineCount, item))?.[2] ?? 5;
+	const value = personalCD[token]
+		?? (isAuthorized ? countdownRanges.authorized : countdownRanges.guest)
+			.find((item) => inRange(onlineCount, item))?.[2]
+		?? 5;
 
-	expirationsList[token] = Date.now() + (value * 1000);
+	expirationsList[_token] = Date.now() + (value * 1000);
 
 	// return Math.min(forceMin, value);
 	return value;
+};
+
+const getCountdownRanges = () => {
+	return countdownRanges;
+};
+
+const updateCountdownRanges = (ranges) => {
+	countdownRanges = ranges;
+
+	saveCountdownRanges();
+};
+
+const saveCountdownRanges = () => {
+	fs.writeFileSync(DBFileName, JSON.stringify(countdownRanges));
 };
 
 module.exports = {
 	getExpiration,
 	getCountdown,
 	resetCountdownTemp,
+	getCountdownRanges,
+	updateCountdownRanges,
+	saveCountdownRanges,
 };

@@ -3,7 +3,7 @@ const { createCanvas, Image } = require('canvas');
 const { pixelsLog } = require('./log');
 const { getPixelsInfo, updateStats } = require('../utils/stats');
 const { drawDefaultCanvas } = require('../tools');
-const { getAuthId } = require('./auth');
+const { getAuthID } = require('./auth');
 const { colorShemes: { COLORS }, stream: { videoSize, upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
 const { spam } = require('../utils/ws');
 
@@ -102,7 +102,7 @@ const getTopLeaderboard = (count = 10, uuid) => {
 		], []);
 
 	if (uuid && !output.some((item) => item.uuid === uuid)) {
-		const place = sorted.findIndex(([id]) => id === (getAuthId(uuid) || uuid));
+		const place = sorted.findIndex(([id]) => id === (getAuthID(uuid) || uuid));
 
 		if (place >= output.length) {
 			output.push({
@@ -226,7 +226,7 @@ const getImageBuffer = () => {
 	return _canvas.toBuffer();
 };
 
-const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
+const drawPix = ({ x, y, color, nickname, uuid, ip, area }) => {
 	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
 		return;
 	}
@@ -235,12 +235,13 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 
 	updateStats(stats, [
 		Date.now(),
-		nickname,
+		area,
 		x,
 		y,
 		rawColor,
 		uuid,
 		ip,
+		nickname,
 	]);
 
 	ctx.fillStyle = rawColor;
@@ -251,7 +252,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip }) => {
 		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
 	}
 
-	pixelsLog({ x, y, color: rawColor, nickname, uuid, ip });
+	pixelsLog({ x, y, color: rawColor, area, nickname, uuid, ip });
 
 	spam({
 		event: 'drawPix',

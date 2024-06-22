@@ -1,0 +1,10 @@
+.row {
+	display: grid;
+	grid-template-columns: 50px 1fr 26px;
+	gap: 1px;
+	padding: 1px;
+}
+
+.addButton {
+	width: 100%;
+}

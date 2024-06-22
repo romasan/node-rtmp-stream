@@ -84,7 +84,7 @@ export const Chat: FC = () => {
 	};
 
 	return (
-		<Block title="Чат" onOpen={handleOpen}>
+		<Block title="Модерация чата" onOpen={handleOpen}>
 			<div>
 				<div>
 					<input value={count} onChange={({ target: { value }}) => setCount(value)} size={7} placeholder="COUNT" />

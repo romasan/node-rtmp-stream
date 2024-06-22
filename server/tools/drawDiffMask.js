@@ -24,7 +24,7 @@ const drawDiffMask = (file, output, uuid) => {
 	});
 	
 	rl.on('line', (line) => {
-		const [time, nick, x, y, color, _uuid] = line.split(';');
+		const [time, area, x, y, color, _uuid] = line.split(';');
 
 		if (uuid) {
 			if (_uuid === uuid) {

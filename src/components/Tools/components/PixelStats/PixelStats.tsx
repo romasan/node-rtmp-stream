@@ -47,46 +47,49 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				<div key={text}>{text}</div>
 			))}
 			<div>
-				{x}:{y} {stats.color || '...'} {formatTime(Date.now() - stats.time)} назад
+				Пиксель: {x}:{y} {stats.color || '...'}
 			</div>
 			<div>
-				Первый вход: {time} назад
+				{formatTime(Date.now() - stats.time)} назад
 			</div>
 			<div>
-				{stats.name || '...'}
+				Ник: {stats.name || '...'}
 			</div>
 			<div>
 				TOKEN: {stats.uuid || '...'}
 			</div>
 			<div>
+				Первый вход: {time} назад
+			</div>
+			<div>
 				IP: {ip || '...'} (City TODO)
 			</div>
 			<div>
-				BANNED: ...
+				Забанен: ...
 			</div>
 			<div>
-				<button>Все сессии этого юзера TODO</button>
+				<button disabled>Все сессии этого юзера TODO</button>
 			</div>
 			<div>
-				<button>Все IP этой сессии TODO</button>
+				<button disabled>Все IP этой сессии TODO</button>
 			</div>
 			<div>
-				<button>Все IP этого юзера TODO</button>
+				<button disabled>Все IP этого юзера TODO</button>
 			</div>
 			<div>
-				<button>Сессии с этим IP TODO</button>
+				<button disabled>Сессии с этим IP TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по сессии TODO</button>
+				<button disabled>Заблокировать по сессии TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по нику TODO</button>
+				<button disabled>Заблокировать по нику TODO</button>
 			</div>
 			<div>
-				<button>Заблокировать по IP TODO</button>
+				<button disabled>Заблокировать по IP TODO</button>
 			</div>
 			<div>
-				<button>Таймаут TODO</button>
+				<button disabled>Таймаут TODO</button>
 				<select>
 					<option>полчаса</option>
 					<option>час</option>
@@ -94,6 +97,10 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 					<option>сутки</option>
 					<option>неделя</option>
 				</select>
+			</div>
+			<div>
+				<button disabled>Выставить КД</button>
+				<input size={6} />
 			</div>
 		</Block>
 	);

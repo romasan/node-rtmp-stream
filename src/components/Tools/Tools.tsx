@@ -18,6 +18,7 @@ import {
 	Bans,
 	Metrics,
 	Chat,
+	Countdown,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -74,12 +75,20 @@ export const Tools: FC<Props> = ({
 							<Bans />
 							<Metrics />
 							<Chat />
-							<Block title="Откат области без пикселей конкретного юзера?">TODO</Block>
-							<Block title="Обновление констант"
-								// onOpen={() => console.log('==== open #1')}
-								// onClose={() => console.log('==== close #1')}
-							>TODO</Block>
-							<Block title="Увеличить размер полотна"
+							<Countdown />
+							<Block title="* Откат полотна к состоянию">
+								<div>TODO</div>
+								<div>
+									<button>Предпросмотр без забаненных</button>
+								</div>
+								<div>
+									<button>PAUSE</button>
+								</div>
+								<div>
+									<button>RELOAD ALL (WAWE)</button>
+								</div>
+							</Block>
+							<Block title="* Увеличить размер полотна"
 								// onOpen={() => console.log('==== open #2')}
 								// onClose={() => console.log('==== close #2')}
 							>
@@ -105,10 +114,16 @@ export const Tools: FC<Props> = ({
 									<button>update</button>
 								</div>
 							</Block>
-							<Block title="Выставить окончание пиксельбаттла">
+							<Block title="* Выставить окончание пиксельбаттла">
 								<div>TODO</div>
 								<div>
 									<input type="datetime-local" />
+								</div>
+								<div>
+									<input placeholder="MESSAGE" />
+								</div>
+								<div>
+									<button>save</button>
 								</div>
 							</Block>
 						</>

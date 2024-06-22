@@ -131,7 +131,8 @@ const pix = async (req, res) => {
 			color: payload.color,
 			x: Math.floor(payload.x),
 			y: Math.floor(payload.y),
-			nickname: '',
+			nickname: user?.name || '',
+			area: user?.area || '',
 			uuid: token,
 			ip,
 		});

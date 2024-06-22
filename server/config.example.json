@@ -46,21 +46,6 @@
 		}
 	},
 	"guestCanPlay": true,
-	"countdownRanges": {
-		"authorized": {
-			"0": 3,
-			"30": 4,
-			"50": 5,
-			"100": 15,
-			"1000": 60
-		},
-		"guest": {
-			"0": 60,
-			"50": 180,
-			"100": 300,
-			"500": 600
-		}
-	},
 	"stream": {
 		"videoSize": {
 			"width": 1280,

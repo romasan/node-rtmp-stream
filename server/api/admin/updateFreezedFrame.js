@@ -1,4 +1,5 @@
 const { updateFreezedFrame: updateFreezedFrameTool } = require('../../utils/canvas');
+
 const updateFreezedFrame = (req, res) => {
 	updateFreezedFrameTool();
 
