@@ -1,3 +1,7 @@
+/**
+ * управление задержкой для выставления пикселя
+ */
+
 const fs = require('fs');
 const { inRange } = require('../helpers');
 const {

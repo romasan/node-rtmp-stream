@@ -1,3 +1,7 @@
+/**
+ * работа с базой данных
+ */
+
 const sqlite3 = require('sqlite3').verbose();
 
 const dbFile = __dirname + '/../../db/db.sqlite3';

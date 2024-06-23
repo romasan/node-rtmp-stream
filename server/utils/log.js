@@ -1,3 +1,7 @@
+/**
+ * сохраниение поставленных пикселей
+ */
+
 const fs = require('fs');
 
 const pixelsFile = fs.createWriteStream(__dirname + '/../../db/pixels.log', { flags : 'a' });

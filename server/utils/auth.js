@@ -1,3 +1,7 @@
+/**
+ * управление авторизированными пользователми
+ */
+
 const fs = require('fs');
 const { validateToken } = require('../helpers');
 

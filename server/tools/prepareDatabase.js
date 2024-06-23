@@ -4,6 +4,7 @@ const { v4: uuid } = require('uuid');
 const sqlite3 = require('sqlite3').verbose();
 const BadWordsNext = require('bad-words-next');
 const ru = require('bad-words-next/data/ru.json');
+// const loki = require('lokijs');
 
 const badwords = new BadWordsNext({ data: ru });
 
@@ -75,4 +76,41 @@ const prepareDatabase = () => {
 	});
 };
 
-module.exports = prepareDatabase;
+const debugDB = () => {
+	// const db = new loki(__dirname + '/../../db/db.loki');
+
+	// db.loadDatabase();
+
+	// const users = db.addCollection('users');
+
+	// // db.throttledSaveDrain
+
+	// // users.insert({
+	// // 	name: 'Odin',
+	// // 	age: 50,
+	// // 	address: 'Asgard'
+	// // });
+
+	// // users.insert([
+	// // 	{ name: 'Thor', age: 35},
+	// // 	{ name: 'Loki', age: 30},
+	// // ]);
+
+	// var results = users.find({ age: {'$gte': 35} });
+
+	// var odin = users.findOne({ name:'Odin' });
+
+	// console.log('====', {
+	// 	results,
+	// 	odin,
+	// });
+
+	// // db.save();
+	// db.close();
+	console.log('==== debugDB');
+};
+
+module.exports = {
+	prepareDatabase,
+	debugDB,
+};

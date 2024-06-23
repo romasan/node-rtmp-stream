@@ -1,3 +1,7 @@
+/**
+ * чат
+ */
+
 const { v4: uuid } = require('uuid');
 const { getUserData } = require('./auth');
 const { spam } = require('../utils/ws');

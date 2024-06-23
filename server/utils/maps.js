@@ -1,3 +1,7 @@
+/**
+ * карты активности
+ */
+
 const { createCanvas } = require('canvas');
 const { HSLToRGB, RGBToHEX } = require('../helpers/colors');
 

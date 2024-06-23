@@ -1,15 +1,38 @@
+/**
+ * canvas полотно
+ */
+
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { pixelsLog } = require('./log');
 const { getPixelsInfo, updateStats } = require('../utils/stats');
 const { getAuthID } = require('./auth');
-const { colorShemes: { COLORS }, stream: { videoSize, upscale, freezedFrame, withBg, debugTime } } = require('../config.json');
+const {
+	colorShemes: { COLORS },
+	stream: { videoSize, upscale, freezedFrame, withBg, debugTime },
+} = require('../config.json');
 const { spam } = require('../utils/ws');
 
 const conf = {
 	freezed: freezedFrame,
 	withBg: withBg,
 };
+
+let stats = {};
+
+let scale = 1;
+let canvas,
+	ctx,
+	freezedCanvas,
+	freezedCanvasCtx,
+	scaledCanvas,
+	scaledCTX,
+	bg,
+	bgCTX;
+
+const _start = Date.now();
+
+const getCanvas = () => canvas;
 
 const getCanvasConf = () => conf;
 
@@ -18,19 +41,15 @@ const updateCanvasConf = (value) => {
 	conf.withBg = value.withBg ?? conf.withBg;
 };
 
-let stats = {};
-
-console.log('init canvas');
-
 const initStats = async () => {
+	console.log('init stats');
+
 	const _start = Date.now();
 
 	stats = await getPixelsInfo();
 
 	console.log(`\nstats inited at ${((Date.now() - _start) / 1000).toFixed(1)}s.\n`);
 };
-
-initStats();
 
 const getStats = () => stats;
 
@@ -161,68 +180,67 @@ const drawBGCanvas = (width, height, mode = 'RANDOM') => { // WHITE, RANDOM, CHE
 	return canvas;
 };
 
-const bg = drawBGCanvas(videoSize.width, videoSize.height, 'CHESS');
-const bgCTX = bg.getContext('2d');
+const initStreamCanvas = () => {
+	bg = drawBGCanvas(videoSize.width, videoSize.height, 'CHESS');
+	bgCTX = bg.getContext('2d');
 
-const imgBuf = fs.readFileSync(__dirname + '/../../db/inout.png');
-const image = new Image;
-image.src = imgBuf;
+	const imgBuf = fs.readFileSync(__dirname + '/../../db/inout.png');
+	const image = new Image;
+	image.src = imgBuf;
 
-const canvas = createCanvas(image.width, image.height);
-const ctx = canvas.getContext('2d');
-ctx.drawImage(image, 0, 0);
+	canvas = createCanvas(image.width, image.height);
+	ctx = canvas.getContext('2d');
+	ctx.drawImage(image, 0, 0);
 
-const scale = (typeof upscale === 'boolean' && upscale)
-	? Math.min(
-		Math.floor(videoSize.width / canvas.width),
-		Math.floor(videoSize.height / canvas.height),
-	)
-	: typeof upscale === 'number'
-		? upscale
-		: 1;
+	scale = (typeof upscale === 'boolean' && upscale)
+		? Math.min(
+			Math.floor(videoSize.width / canvas.width),
+			Math.floor(videoSize.height / canvas.height),
+		)
+		: typeof upscale === 'number'
+			? upscale
+			: 1;
 
-let scaledCanvas = null;
-let scaledCTX = null;
+	if (scale > 1) {
+		scaledCanvas = createCanvas(image.width * scale, image.height * scale);
+		scaledCTX = scaledCanvas.getContext('2d');
+		scaledCTX.imageSmoothingEnabled = false;
+		scaledCTX.drawImage(image, 0, 0, image.width * scale, image.height * scale);
+	}
 
-if (scale > 1) {
-	scaledCanvas = createCanvas(image.width * scale, image.height * scale);
-	scaledCTX = scaledCanvas.getContext('2d');
-	scaledCTX.imageSmoothingEnabled = false;
-	scaledCTX.drawImage(image, 0, 0, image.width * scale, image.height * scale);
-}
+	freezedCanvas = (scale > 1 && scaledCanvas)
+		? createCanvas(image.width * scale, image.height * scale)
+		: createCanvas(image.width, image.height);
+	freezedCanvasCtx = freezedCanvas.getContext('2d');
 
-const freezedCanvas = (scale > 1 && scaledCanvas)
-	? createCanvas(image.width * scale, image.height * scale)
-	: createCanvas(image.width, image.height);
-const freezedCanvasCtx = freezedCanvas.getContext('2d');
+	updateFreezedFrame();
+};
 
 const updateFreezedFrame = () => {
 	if (scale > 1 && scaledCanvas) {
-		freezedCanvasCtx.drawImage(scaledCanvas, 0, 0);
+		freezedCanvasCtx?.drawImage(scaledCanvas, 0, 0);
 	} else {
-		freezedCanvasCtx.drawImage(canvas, 0, 0);
+		freezedCanvasCtx?.drawImage(canvas, 0, 0);
 	}
 };
 
-updateFreezedFrame();
-
-const getCanvas = () => {
+const getStreamFrame = () => {
 	if (conf.withBg) {
 		if (conf.freezed) {
-			const x = Math.floor(videoSize.width / 2 - freezedCanvas.width / 2);
-			const y = Math.floor(videoSize.height / 2 - freezedCanvas.height / 2);
+			const x = Math.floor(videoSize.width / 2 - freezedCanvas?.width / 2);
+			const y = Math.floor(videoSize.height / 2 - freezedCanvas?.height / 2);
 
-			bgCTX.drawImage(freezedCanvas, x, y);
+			bgCTX?.drawImage(freezedCanvas, x, y);
 		} else if (scale > 1) {
 			const x = Math.floor(videoSize.width / 2 - scaledCanvas.width / 2);
 			const y = Math.floor(videoSize.height / 2 - scaledCanvas.height / 2);
 
-			bgCTX.drawImage(scaledCanvas, x, y);
+			bgCTX?.drawImage(scaledCanvas, x, y);
 		} else {
 			const x = Math.floor(videoSize.width / 2 - canvas.width / 2);
 			const y = Math.floor(videoSize.height / 2 - canvas.height / 2);
 
-			bgCTX.drawImage(canvas, x, y);
+			bgCTX?.drawImage(canvas, x, y);
 		}
 
 		return bg;
@@ -239,10 +257,8 @@ const getCanvas = () => {
 	return canvas;
 };
 
-const _start = Date.now();
-
 const getImageBuffer = () => {
-	const _canvas = getCanvas();
+	const _canvas = getStreamFrame();
 
 	if (debugTime) {
 		const _ctx = _canvas.getContext('2d');
@@ -310,9 +326,9 @@ const saveCanvas = () => {
 };
 
 module.exports = {
-	canvas,
-	COLORS,
-	conf,
+	initStreamCanvas,
+	initStats,
+	getCanvas,
 	getCanvasConf,
 	updateCanvasConf,
 	updateFreezedFrame,

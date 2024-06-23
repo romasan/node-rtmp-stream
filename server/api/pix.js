@@ -141,34 +141,38 @@ const pix = async (req, res) => {
 
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('ok');
-	} else {
-		const { x, y } = getSearch(req.url);
-		const { uuid, time } = getPixelAuthor(x, y);
-		const user = getUserData(uuid);
-		const color = getPixelColor(x, y);
 
-		const finished = !checkStillTime();
-
-		const _time = finished
-			? time
-			: (Date.now() - time);
-
-		if (isNumber(x) && isNumber(y)) {
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.end(JSON.stringify({
-				x: Number(x),
-				y: Number(y),
-				time: time ? _time : -1,
-				...(color && {
-					color,
-					name: user?.name || getSessionUserName(uuid),
-				}),
-			}));
-		} else {
-			res.writeHead(200, { 'Content-Type': 'text/plain' });
-			res.end('fail');
-		}
+		return;
 	}
+
+	const { x, y } = getSearch(req.url);
+	const { uuid, time } = getPixelAuthor(x, y);
+	const user = getUserData(uuid);
+	const color = getPixelColor(x, y);
+
+	const finished = !checkStillTime();
+
+	const _time = finished
+		? time
+		: (Date.now() - time);
+
+	if (isNumber(x) && isNumber(y)) {
+		res.writeHead(200, { 'Content-Type': 'application/json' });
+		res.end(JSON.stringify({
+			x: Number(x),
+			y: Number(y),
+			time: time ? _time : -1,
+			...(color && {
+				color,
+				name: user?.name || getSessionUserName(uuid),
+			}),
+		}));
+
+		return;
+	}
+
+	res.writeHead(200, { 'Content-Type': 'text/plain' });
+	res.end('fail');
 };
 
 module.exports = {

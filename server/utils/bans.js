@@ -1,3 +1,7 @@
+/**
+ * управление банами
+ */
+
 const fs = require('fs');
 
 const DBFileName = __dirname + '/../../db/bans.json';

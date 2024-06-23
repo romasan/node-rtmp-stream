@@ -1,3 +1,7 @@
+/**
+ * веб / вебсокет сервер
+ */
+
 const WebSocket = require('ws');
 const fs = require('fs');
 const https = require('https');
@@ -170,73 +174,68 @@ const checkIPRateLimit = (req) => {
 	return count <= maxConnectionsWithOneIP ? false : count;
 };
 
-let webServerHandler = (req, res) => {
-	res.writeHead(200);
-	res.end('waiting');
-};
+const initServer = (callback) => {
+	if (secure) {
+		const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
+		const certificate = fs.readFileSync('../ssl-cert/fullchain.pem', 'utf8');
+		const credentials = { key: privateKey, cert: certificate };
 
-const onCreateServer = (req, res) => webServerHandler(req, res);
-
-if (secure) {
-	const privateKey = fs.readFileSync('../ssl-cert/privkey.pem', 'utf8');
-	const certificate = fs.readFileSync('../ssl-cert/fullchain.pem', 'utf8');
-	const credentials = { key: privateKey, cert: certificate };
-
-	webServer = https.createServer(credentials, webServerHandler);
-} else {
-	webServer = http.createServer(onCreateServer);
-}
-
-webServer.on('error', error => {
-	console.error('Server error:', error);
-});
-
-webServer.listen(port, 'localhost');
-
-wss = new WebSocket.Server({ server: webServer });
-
-wss.on('connection', (ws, req) => {
-	const { token } = parseCookies(req.headers.cookie);
-
-	if (!checkSession(token, true)) {
-		ws.close();
-
-		return;
+		webServer = https.createServer(credentials, callback);
+	} else {
+		webServer = http.createServer(callback);
 	}
 
-	const ip = getIPAddress(req);
-	const onlineCount = getOnlineCount();
-	const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
-	const isAuthorized = checkUserAuthByToken(token);
-	const user = getUserData(token);
-
-	ws._ip = ip;
-	ws._token = token;
-	ws._lastActivity = Date.now();
-
-	send(token, 'init', {
-		...user,
-		countdown,
-		isAuthorized,
-		palette: COLORS,
-		finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
-		finishText: finishText || 'TIMEOUT',
-		needAuthorize: !guestCanPlay,
+	webServer.on('error', error => {
+		console.error('Server error:', error);
 	});
 
-	ws.on('message', (buf) => {
-		const raw = buf.toString();
+	webServer.listen(port, 'localhost');
 
-		if (raw === '2') {
-			ws.send(3);
+	wss = new WebSocket.Server({ server: webServer });
+
+	wss.on('connection', (ws, req) => {
+		const { token } = parseCookies(req.headers.cookie);
+
+		if (!checkSession(token, true)) {
+			ws.close();
 
 			return;
 		}
+
+		const ip = getIPAddress(req);
+		const onlineCount = getOnlineCount();
+		const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
+		const isAuthorized = checkUserAuthByToken(token);
+		const user = getUserData(token);
+
+		ws._ip = ip;
+		ws._token = token;
+		ws._lastActivity = Date.now();
+
+		send(token, 'init', {
+			...user,
+			countdown,
+			isAuthorized,
+			palette: COLORS,
+			finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
+			finishText: finishText || 'TIMEOUT',
+			needAuthorize: !guestCanPlay,
+		});
+
+		ws.on('message', (buf) => {
+			const raw = buf.toString();
+
+			if (raw === '2') {
+				ws.send(3);
+
+				return;
+			}
+		});
 	});
-});
+};
 
 module.exports = {
-	wss,
+	initServer,
 	spam,
 	updateClientCountdown,
 	getOnlineCountRaw,
@@ -245,5 +244,4 @@ module.exports = {
 	uptateActiveTime,
 	checkHasWSConnect,
 	checkIPRateLimit,
-	onConnect: (callback) => webServerHandler = callback,
 };

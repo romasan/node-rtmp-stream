@@ -1,5 +1,5 @@
 /**
- * сохраняет карту последних пикселей json
+ * генерирует статистику поставленных пикселей
  */
 
 const fs = require('fs');
@@ -8,6 +8,10 @@ const { getAuthID } = require('../utils/auth');
 
 let uuidsCache = {};
 let ipsCache = {};
+
+const uniqSessions = new Set();
+
+let inited = false;
 
 const formatDate = (date, format) => {
 	const _date = new Date(Number(date));
@@ -23,8 +27,6 @@ const formatDate = (date, format) => {
 		.replace('dd', String(day).padStart(2, '0'))
 		.replace('hh', String(hour).padStart(2, '0'));
 };
-
-const uniqSessions = new Set();
 
 const updateStats = (stats, [time, area, x, y, color, uuid, ip, nickname]) => {
 	const key = `${x}:${y}`;
@@ -124,8 +126,6 @@ const updateStats = (stats, [time, area, x, y, color, uuid, ip, nickname]) => {
 
 	stats.history.lastDay = day;
 };
-
-let inited = false;
 
 const getPixelsInfo = (output) => {
 	return new Promise((resolve) => {

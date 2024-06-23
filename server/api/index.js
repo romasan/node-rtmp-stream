@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { canvas } = require('../utils/canvas');
+const { getCanvas } = require('../utils/canvas');
 const packageFile = require('../../package.json');
 const {
 	parseCookies,
@@ -64,9 +64,9 @@ const checkAccessWrapper = (callback, checkAuth) => {
 	};
 };
 
-const getCanvas = (req, res) => {
+const getCanvasImage = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'image/png' });
-	res.end(canvas.toBuffer());
+	res.end(getCanvas().toBuffer());
 };
 
 const getFavicon = (req, res) => {
@@ -86,7 +86,7 @@ const routes = {
 	'/messages': checkAccessWrapper(messages),
 	'/stats': stats,
 	'/auth/logout': logout,
-	'/canvas.png': getCanvas,
+	'/canvas.png': getCanvasImage,
 	'/favicon.ico': getFavicon,
 };
 
