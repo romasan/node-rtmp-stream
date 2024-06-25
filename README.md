@@ -20,12 +20,12 @@
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
 - [x] buy pixel-battle.ru | pixelbattles.ru
-- [ ] use one countdown for every session with one authorization
+- [x] use one countdown for every session with one authorization
 - [ ] use one countdown for active unauthorized users with one ip address
 - [ ] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
 - [ ] fix zoom on click on non canvas and "pixel" elements
-- [ ] webassembly + canvas =)
+- [ ] webassembly + canvas =) rust?
 - [ ] add to telegram web app (add qr to stream)
 
 # admin panel
@@ -33,8 +33,8 @@
 - [x] add admin route
 - [x] update stream frame
 - [x] cover up area
-- [ ] change countdown in runtime
-- [ ] change coundfown for uuid/nick/ip
+- [x] change countdown in runtime
+- [ ] change countdown for uuid/nick/ip
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
 - [ ] preview last changes, heatmap, changes by user
@@ -46,7 +46,7 @@
 # server
 
 - [x] backup frames / pixels for timelapse
-- [ ] auto restart on fail (fix ffmpeg problems)
+- [x] auto restart on fail (fix ffmpeg problems)
 - [x] auto restart: write process.pid to file
 - [ ] auto restart: add servise with chatbot for notification
 - [x] auto restart (use PM2)
@@ -56,7 +56,7 @@
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages?
-- [ ] move ssl handle to nginx? (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
+- [x] move ssl handle to nginx? (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
 - [ ] merge token|uuid vars name?
 - [x] const.js -> config.json
 - [x] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
@@ -81,7 +81,7 @@
 - [ ] FAQ page
 - [x] timelapse page
 - [ ] leaderboard page
-- [ ] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
+- [x] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
 - [ ] fix layout after resize
 - [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
 - [ ] scale with canvas instead of css (for safari?)
