@@ -171,7 +171,7 @@ const checkIPRateLimit = (req) => {
 		}
 	});
 
-	return count <= maxConnectionsWithOneIP ? false : `${ip (${count})}`;
+	return count <= maxConnectionsWithOneIP ? false : `${ip} (${count})`;
 };
 
 const initServer = (callback) => {
