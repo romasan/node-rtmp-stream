@@ -16,6 +16,8 @@ const {
 	newestmap,
 	usersmap,
 	lastPixels,
+	byIP,
+	byTime,
 } = require('./maps');
 const { chat } = require('./chat');
 const { countdown } = require('./countdown');
@@ -25,26 +27,31 @@ const getHistory = (req, res) => {
 	res.end(JSON.stringify(getStats().history));
 };
 
-const prefix = '/admin';
-
-const routes = {
-	[`${prefix}/stats`]: stats,
-	[`${prefix}/streamSettings`]: streamSettings,
-	[`${prefix}/updateFreezedFrame`]: updateFreezedFrame,
-	[`${prefix}/fillSquare`]: fillSquare,
-	[`${prefix}/onlineList`]: onlineList,
-	[`${prefix}/pixel`]: pixel,
-	[`${prefix}/ban`]: ban,
-	[`${prefix}/unban`]: unban,
-	[`${prefix}/getBans`]: getBans,
-	[`${prefix}/heatmap.png`]: heatmap,
-	[`${prefix}/newestmap.png`]: newestmap,
-	[`${prefix}/usersmap.png`]: usersmap,
-	[`${prefix}/lastPixels.png`]: lastPixels,
-	[`${prefix}/history`]: getHistory,
-	[`${prefix}/chat`]: chat,
-	[`${prefix}/countdown`]: countdown,
+let routes = {
+	'stats': stats,
+	'streamSettings': streamSettings,
+	'updateFreezedFrame': updateFreezedFrame,
+	'fillSquare': fillSquare,
+	'onlineList': onlineList,
+	'pixel': pixel,
+	'ban': ban,
+	'unban': unban,
+	'getBans': getBans,
+	'heatmap.png': heatmap,
+	'newestmap.png': newestmap,
+	'usersmap.png': usersmap,
+	'lastPixels.png': lastPixels,
+	'byIP.png': byIP,
+	'byTime.png': byTime,
+	'history': getHistory,
+	'chat': chat,
+	'countdown': countdown,
 };
+
+routes = Object.entries(routes).reduce((list, [key, callback]) => ({
+	...list,
+	[`/admin/${key}`]: callback,
+}), {});
 
 const index = async (req, res, {
 	getInfo,

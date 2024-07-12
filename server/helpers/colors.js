@@ -28,7 +28,7 @@ const HSLToRGB = ([h, s, l]) => {
 		rgb = [0, x, c];
 	} else if (h >= 240 && h < 300) {
 		rgb = [x, 0, c];
-	} else if (h >= 300 && h < 360) {
+	} else if (h >= 300 && h <= 360) {
 		rgb = [c, 0, x];
 	}
 

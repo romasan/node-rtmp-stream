@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { Log } = require('../utils/log');
 const {
 	server: {
 		timelapseCachePeriod,
@@ -32,7 +33,7 @@ const timelapse = (req, res) => {
 			res.writeHead(404, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: get timelapse file', req.url, e);
+			Log('Error: get timelapse file', req.url, e);
 		}
 
 		return true;

@@ -36,7 +36,7 @@ export const Stream: FC<Props> = ({}) => {
 	}, [canvasConf]);
 
 	return (
-		<Block title="Трансляция" onOpen={onOpen}>
+		<Block title="🎦 Трансляция" onOpen={onOpen}>
 			<div>
 				<input type="radio" id="realTime" name="stream" checked={!checked} value="false" onChange={onChangeFreeze} />
 				<label htmlFor="realTime">В реальном времени</label>

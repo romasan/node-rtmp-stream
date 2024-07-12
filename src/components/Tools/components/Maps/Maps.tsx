@@ -20,6 +20,9 @@ export const Maps: FC<Props> = ({
 }) => {
 	const [opened, setOpened] = useState(false);
 	const [lastPixelsValue, setLastPixelsValue] = useState(100);
+	const [timeValue, setTimeValue] = useState(min);
+	const [ipValue, setIpValue] = useState('');
+	const [uuidValue, setUUIDValue] = useState('');
 	const [clearOnExit, setClearOnExit] = useState(true);
 
 	const getMap = (name: string) => {
@@ -37,7 +40,7 @@ export const Maps: FC<Props> = ({
 	};
 
 	const getByUsersMap = () => {
-		getMap('usersmap.png');
+		getMap(`usersmap.png?uuid=${uuidValue}`);
 	};
 
 	const getNewestMap = () => {
@@ -48,8 +51,32 @@ export const Maps: FC<Props> = ({
 		getMap(`lastPixels.png?count=${lastPixelsValue}`);
 	};
 
-	const handleSelect = (event: any) => {
+	const getByIP = () => {
+		getMap(`byIP.png?ip=${ipValue}`);
+	};
+
+	const getByTime = () => {
+		getMap(`byTime.png?time=${timeValue}`);
+	};
+
+	const handleChangeLastPixels = (event: any) => {
+		if (isNaN(Number(event.target.value))) {
+			return;
+		}
+
 		setLastPixelsValue(Number(event.target.value));
+	};
+
+	const handleChangeTime = (event: any) => {
+		setTimeValue(Number(event.target.value));
+	};
+
+	const handleChangeIP = (event: any) => {
+		setIpValue(event.target.value);
+	};
+
+	const handleChangeUUID = (event: any) => {
+		setUUIDValue(event.target.value);
 	};
 
 	useEffect(() => {
@@ -59,7 +86,7 @@ export const Maps: FC<Props> = ({
 	}, [canvas, opened, clearOnExit]);
 
 	return (
-		<Block title="Карты активности" onToggle={setOpened}>
+		<Block title="🗺️ Карты активности" onToggle={setOpened}>
 			<div>
 				<label>
 					<input
@@ -77,13 +104,14 @@ export const Maps: FC<Props> = ({
 			</div>
 			<div>
 				<button onClick={getByUsersMap}>по сессиям</button>
+				<input placeholder="UUID" onChange={handleChangeUUID}/>
 			</div>
 			<div>
 				<button onClick={getNewestMap}>по давности</button>
 			</div>
 			<div>
 				<button onClick={getLastPixels}>последние</button>
-				<select onChange={handleSelect}>
+				<select onChange={handleChangeLastPixels}>
 					<option value="100">100</option>
 					<option value="300">300</option>
 					<option value="500">500</option>
@@ -96,10 +124,11 @@ export const Maps: FC<Props> = ({
 					<option value="50000">50 000</option>
 					<option value="100000">100 000</option>
 				</select>
+				<input size={10} value={lastPixelsValue} onChange={handleChangeLastPixels} />
 			</div>
 			<div>
-				<button disabled>за последний</button>
-				<select>
+				<button onClick={getByTime}>за последний</button>
+				<select onChange={handleChangeTime}>
 					<option value={min}>1 минута</option>
 					<option value={5 * min}>5 минут</option>
 					<option value={10 * min}>10 минут</option>
@@ -111,14 +140,16 @@ export const Maps: FC<Props> = ({
 					<option value={5 * hour}>5 часов</option>
 					<option value={10 * hour}>10 часов</option>
 					<option value={day}>сутки</option>
+					<option value={2 * day}>2 дня</option>
+					<option value={3 * day}>3 дня</option>
+					<option value={5 * day}>5 дней</option>
+					<option value={7 * day}>неделя</option>
 				</select>
+				#{timeValue}#
 			</div>
 			<div>
-				<button disabled>по IP</button>
-			</div>
-			<div>
-				<button disabled>для сессии</button>
-				<input placeholder="UUID" />
+				<button onClick={getByIP}>по IP</button>
+				<input placeholder="IP" onChange={handleChangeIP}/>
 			</div>
 			<div>
 				<button disabled>без учёта заблокированных</button>

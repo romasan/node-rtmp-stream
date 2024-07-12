@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 
 const { authorizeUser } = require('../../utils/auth');
+const { Log } = require('../../utils/log');
 const { parseCookies } = require('../../helpers');
 const {
 	server: {
@@ -37,7 +38,7 @@ const steam = async (req, res) => {
 				res.writeHead(302, { Location: host });
 				res.end();
 			} catch (error) {
-				console.log('Steam auth error:', error);
+				Log('Steam auth error:', error);
 
 				res.writeHead(200, {'Content-Type': 'text/html'});
 				res.end('Ошибка, <a href="/auth/steam">попробуйте ещё раз</a>');

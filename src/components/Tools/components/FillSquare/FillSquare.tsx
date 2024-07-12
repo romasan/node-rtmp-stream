@@ -59,7 +59,7 @@ export const FillSquare: FC<Props> = ({
 	}, [canvas, range, color, opened]);
 
 	return (
-		<Block title="Заполнение области цветом"
+		<Block title="🖌️ Заполнение области цветом"
 			onOpen={onOpen}
 			onClose={onClose}
 			onToggle={setOpened}

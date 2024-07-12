@@ -1,15 +1,12 @@
-/**
- * сохраниение поставленных пикселей
- */
+const { formatDate } = require('../helpers/formatDate');
+const { Log } = require('./log');
 
-const fs = require('fs');
+const Log = (...attrs) => {
+	const datetime = formatDate(Date.now(), 'YYYY-MM-DD, hh:mm:ss:');
 
-const pixelsFile = fs.createWriteStream(__dirname + '/../../db/pixels.log', { flags : 'a' });
-
-const pixelsLog = ({ x, y, color, area, uuid, ip, nickname }) => {
-	pixelsFile.write([Date.now(), area, x, y, color, uuid, ip, nickname].join(';') + '\n');
+	Log(datetime, ...attrs);
 };
 
 module.exports = {
-	pixelsLog,
+	Log,
 };

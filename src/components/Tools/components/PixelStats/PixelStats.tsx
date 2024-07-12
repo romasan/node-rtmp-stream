@@ -42,7 +42,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	}, [coord, opened]);
 
 	return (
-		<Block title="Чей пиксель" onToggle={setOpened}>
+		<Block title="❓ Чей пиксель" onToggle={setOpened}>
 			{stats.errors && stats.errors.lengtht && stats.errors.map((text: string) => (
 				<div key={text}>{text}</div>
 			))}

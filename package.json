@@ -13,7 +13,8 @@
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
     "twitch:build": "zip pages/twitch/zip.zip pages/twitch/*",
-    "stop-server": "pm2 stop index"
+    "stop-server": "pm2 stop index",
+    "logs": "pm2 log"
   },
   "reactSnap": {
     "source": "dist",

@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const url = require('url');
 
 const { authorizeUser } = require('../../utils/auth');
+const { Log } = require('../../utils/log');
 const { parseCookies } = require('../../helpers');
 const {
 	server: {
@@ -50,7 +51,7 @@ const twitch = async (req, res) => {
 				res.writeHead(302, { Location: host });
 				res.end();
 			} catch (error) {
-				console.log('Twitch auth error:', error);
+				Log('Twitch auth error:', error);
 
 				res.writeHead(200, {'Content-Type': 'text/html'});
 				res.end('Ошибка, <a href="/auth/twitch">попробуйте ещё раз</a>');

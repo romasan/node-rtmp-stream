@@ -3,7 +3,7 @@
  */
 
 const sqlite3 = require('sqlite3').verbose();
-
+const { Log } = require('./log');
 const dbFile = __dirname + '/../../db/db.sqlite3';
 const db = new sqlite3.Database(dbFile);
 
@@ -34,7 +34,7 @@ const insert = (table, values) => {
 	const valid = tables[table] && Object.keys(values).every((key) => key in tables[table]);
 
 	if (!valid) {
-		console.log(`Error: insert to table "${table}"`, values);
+		Log(`Error: insert to table "${table}"`, values);
 
 		return;
 	}

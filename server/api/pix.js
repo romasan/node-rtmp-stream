@@ -21,6 +21,7 @@ const {
 	getPixelAuthor,
 } = require('../utils/canvas');
 const { getSessionUserName } = require('../utils/sessions');
+const { Log } = require('../utils/log');
 const {
 	colorShemes: { COLORS },
 	guestCanPlay,
@@ -42,7 +43,7 @@ const pix = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed check authorized');
+			Log('Error: failed check authorized');
 
 			return;
 		}
@@ -53,7 +54,7 @@ const pix = async (req, res) => {
 
 			const ip = getIPAddress(req);
 
-			console.log('Error: failed on add pixel (send command without WS connection)', token, ip);
+			Log('Error: failed on add pixel (send command without WS connection)', token, ip);
 
 			return;
 		}
@@ -64,7 +65,7 @@ const pix = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log(`Error: failed on add pixel (too many requests from one ip - ${IPRateLimit})`);
+			Log(`Error: failed on add pixel (too many requests from one ip - ${IPRateLimit})`);
 
 			return;
 		}
@@ -79,7 +80,7 @@ const pix = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (read payload)');
+			Log('Error: failed on add pixel (read payload)');
 
 			return;
 		}
@@ -92,7 +93,7 @@ const pix = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (banned user)', token, ip);
+			Log('Error: failed on add pixel (banned user)', token, ip);
 
 			return;
 		}
@@ -105,7 +106,7 @@ const pix = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed on add pixel (incorrect format of pixel)', payload, token, ip);
+			Log('Error: failed on add pixel (incorrect format of pixel)', payload, token, ip);
 
 			return;
 		}

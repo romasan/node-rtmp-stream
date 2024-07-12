@@ -4,6 +4,7 @@
 
 const { spawn } = require('child_process');
 const fs = require('fs');
+const { Log } = require('./log');
 
 const { stream: { rtmpHostKey, inputAudio, FFMPEGLog, streamFile, interval } } = require('../config.json');
 
@@ -16,7 +17,7 @@ if (FFMPEGLog && !streamFile) {
 	try {
 		ffmpeg.stderr.pipe(process.stdout);
 	} catch (error) {
-		console.log('Error:', error);
+		Log('Error:', error);
 	}
 }
 

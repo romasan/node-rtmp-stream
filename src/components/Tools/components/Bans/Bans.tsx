@@ -85,7 +85,7 @@ export const Bans: FC = () => {
 	});
 
 	return (
-		<Block title="Управление банами" onOpen={handleOpen}>
+		<Block title="🔨 Управление банами" onOpen={handleOpen}>
 			<div>token ({stats.token && Object.keys(stats.token).length}):</div>
 			<div className={s.list}>
 				{stats.token && Object.entries(stats.token).filter(([, v]) => v).map(([v]) => (

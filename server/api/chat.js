@@ -2,6 +2,8 @@ const { parseCookies, getPostPayload } = require('../helpers');
 const { getUserData } = require('../utils/auth');
 const { checkBan } = require('../utils/bans');
 const { addMessage } = require('../utils/chat');
+const { Log } = require('../utils/log');
+
 const chat = async (req, res) => {
 	if (req.method === 'PUT') {
 		const { token } = parseCookies(req.headers.cookie);
@@ -13,7 +15,7 @@ const chat = async (req, res) => {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			console.log('Error: failed add message (banned user)', token);
+			Log('Error: failed add message (banned user)', token);
 
 			return;
 		}
@@ -21,7 +23,7 @@ const chat = async (req, res) => {
 		if (typeof postPayload === 'string') {
 			addMessage(token, postPayload);
 
-			console.log('Chat new message:', postPayload);
+			Log('Chat new message:', postPayload);
 
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('ok');

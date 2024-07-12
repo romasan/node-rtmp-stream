@@ -1,4 +1,5 @@
 const { drawPix } = require('../../utils/canvas');
+const { Log } = require('../utils/log');
 const { getPostPayload, parseCookies } = require('../../helpers');
 
 const fillSquare = async (req, res) => {
@@ -28,7 +29,7 @@ const fillSquare = async (req, res) => {
 			res.end('ok');
 			return;
 		} catch (error) {
-			console.log('Error: fill square failed.', error);
+			Log('Error: fill square failed.', error);
 		}
 	}
 

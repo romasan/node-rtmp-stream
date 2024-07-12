@@ -4,6 +4,7 @@ const { checkIPRateLimit } = require('../utils/ws');
 const { checkBan } = require('../utils/bans');
 const { checkSession, addSession } = require('../utils/sessions');
 const { checkIsAdmin } = require('../utils/auth');
+const { Log } = require('../utils/log');
 const { server: { secure } } = require('../config.json');
 
 const start = (req, res) => {
@@ -17,7 +18,7 @@ const start = (req, res) => {
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('fail');
 
-		console.log(`Error: failed start session (too many requests from one ip - ${IPRateLimit})`, token);
+		Log(`Error: failed start session (too many requests from one ip - ${IPRateLimit})`, token);
 
 		return;
 	}

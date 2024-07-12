@@ -1,15 +1,14 @@
 # basic
 
-- [ ] auth by chat command?
 - [x] auth by twitch
 - [ ] auth by vkplay
-- [ ] auth by discord
+- [x] auth by discord
 - [ ] auth by vk
 - [ ] auth by steam
 - [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
-- [ ] read chat from stream?
+- [ ] read chat from stream(s)?
 - [ ] support for multiple colors
 - [x] bot protection
 - [x] session caching
@@ -27,6 +26,18 @@
 - [ ] fix zoom on click on non canvas and "pixel" elements
 - [ ] webassembly + canvas =) rust?
 - [ ] add to telegram web app (add qr to stream)
+- [ ] chat rate limit
+- [ ] check has new banned users/IP in pixels.log
+- [ ] groups/tags
+- [ ] achievements!
+использовал все цвета;
+вступил в группу;
+поставил 100, 1к, 10к, 100к пикселей;
+ставил точки не уходя 8, 24 часа;
+учавствовал каждый день в течении недели;
+- [ ] chat slow mode
+- [ ] add datetime for logs
+- [ ] chat modeation (delete all by user, delete all banned, messages for user)
 
 # admin panel
 
@@ -64,6 +75,8 @@
 - [x] replace server/tools/getPixelInfo -> server/
 - [x] remove event emitter
 - [ ] use nestjs?
+- [ ] stress testing
+- [ ] DDoS protection
 
 # web
 

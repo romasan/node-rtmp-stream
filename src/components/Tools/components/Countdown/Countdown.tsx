@@ -83,11 +83,11 @@ export const Countdown: FC = () => {
 	};
 
 	return (
-		<Block title="Управление КД" onOpen={handleOpen}>
+		<Block title="⏲️ Управление КД" onOpen={handleOpen}>
 			<div>
 				<div>Авторизованные</div>
 				<div className={s.row}>
-					<div>count</div>
+					<div>online</div>
 					<div>sec.</div>
 				</div>
 				{ranges && ranges.authorized && ranges.authorized.map(([key,, value], index) => (

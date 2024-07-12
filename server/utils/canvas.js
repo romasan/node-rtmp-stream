@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { pixelsLog } = require('./log');
+const { pixelsLog } = require('./pixels');
 const { getPixelsInfo, updateStats } = require('../utils/stats');
 const { getAuthID } = require('./auth');
 const {
@@ -12,6 +12,7 @@ const {
 	stream: { videoSize, upscale, freezedFrame, withBg, debugTime },
 } = require('../config.json');
 const { spam } = require('../utils/ws');
+const { Log } = require('./log');
 
 const conf = {
 	freezed: freezedFrame,
@@ -42,13 +43,13 @@ const updateCanvasConf = (value) => {
 };
 
 const initStats = async () => {
-	console.log('init stats');
+	Log('Init stats...');
 
 	const _start = Date.now();
 
 	stats = await getPixelsInfo();
 
-	console.log(`\nstats inited at ${((Date.now() - _start) / 1000).toFixed(1)}s.\n`);
+	Log(`Stats inited at ${((Date.now() - _start) / 1000).toFixed(1)}s.\n`);
 };
 
 const getStats = () => stats;

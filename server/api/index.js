@@ -22,6 +22,7 @@ const { logout } = require('./logout');
 const { stats } = require('./stats');
 const { timelapse } = require('./timelapse');
 const { server: { origin } } = require('../config.json');
+const { Log } = require('../utils/log');
 
 const checkAccessWrapper = (callback, checkAuth) => {
 	return async (req, res) => {
@@ -34,7 +35,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 				// res.writeHead(200, { 'Content-Type': 'text/plain' });
 				// res.end('fail');
 
-				console.log('Error: user is banned', token, ip);
+				Log('Error: user is banned', token, ip);
 
 				const randomDataStream = fs.createReadStream('/dev/random', { start: 0, end: 104857599 });
 				res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Length': 104857600 });
@@ -47,7 +48,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 				res.writeHead(200, { 'Content-Type': 'text/plain' });
 				res.end('fail');
 
-				console.log('Error: failed check authorized');
+				Log('Error: failed check authorized');
 
 				return;
 			}
@@ -59,7 +60,7 @@ const checkAccessWrapper = (callback, checkAuth) => {
 
 			const ip = getIPAddress(req);
 
-			console.log('Error: failed check access', token, ip);
+			Log('Error: failed check access', token, ip);
 		}
 	};
 };
@@ -143,7 +144,7 @@ const webServerHandler = async (req, res) => {
 		res.writeHead(200);
 		res.end('fail');
 
-		console.log('Error: url handler', error);
+		Log('Error: url handler', error);
 	}
 };
 
