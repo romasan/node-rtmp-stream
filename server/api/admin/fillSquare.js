@@ -1,5 +1,5 @@
 const { drawPix } = require('../../utils/canvas');
-const { Log } = require('../utils/log');
+const { Log } = require('../../utils/log');
 const { getPostPayload, parseCookies } = require('../../helpers');
 
 const fillSquare = async (req, res) => {

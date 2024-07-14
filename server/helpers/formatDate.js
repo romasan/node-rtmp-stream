@@ -16,12 +16,11 @@ const MONTHS = [
 const formatDate = (date, template) => {
 	const currentYear = new Date().getFullYear();
 	const _date = new Date(Number(date));
-
 	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());
 
 	return template
-		.replace('Y?',currentYear === year ? '' : year)
+		.replace('Y?', currentYear === year ? '' : year)
 		.replace(/[Y]+/, year)
 		.replace('MMMM', MONTHS[month])
 		.replace('MM', String(month + 1).padStart(2, '0'))

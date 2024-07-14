@@ -1,5 +1,5 @@
 const url = require('url');
-const { getStats } = require('../../utils/canvas');
+const { getStats } = require('../../utils/stats');
 const {
 	heatmapFromStats,
 	mapByUsersFromStats,

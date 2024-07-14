@@ -1,6 +1,10 @@
 const fs = require('fs');
 const { getSearch, getPathByToken } = require('../../helpers');
-const { getPixelAuthor, getPixelAuthorIPAddress, getPixelColor } = require('../../utils/canvas');
+const {
+	getPixelAuthor,
+	getPixelAuthorIPAddress,
+	getPixelColor,
+} = require('../../utils/stats');
 const { getUserData } = require('../../utils/auth');
 const { getSessionUserName } = require('../../utils/sessions');
 

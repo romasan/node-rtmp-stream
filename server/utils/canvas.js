@@ -5,21 +5,17 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 const { pixelsLog } = require('./pixels');
-const { getPixelsInfo, updateStats } = require('../utils/stats');
-const { getAuthID } = require('./auth');
+const { updateStats } = require('./stats');
 const {
 	colorShemes: { COLORS },
 	stream: { videoSize, upscale, freezedFrame, withBg, debugTime },
 } = require('../config.json');
 const { spam } = require('../utils/ws');
-const { Log } = require('./log');
 
 const conf = {
 	freezed: freezedFrame,
 	withBg: withBg,
 };
-
-let stats = {};
 
 let scale = 1;
 let canvas,
@@ -40,103 +36,6 @@ const getCanvasConf = () => conf;
 const updateCanvasConf = (value) => {
 	conf.freezed = value.freezed ?? conf.freezed;
 	conf.withBg = value.withBg ?? conf.withBg;
-};
-
-const initStats = async () => {
-	Log('Init stats...');
-
-	const _start = Date.now();
-
-	stats = await getPixelsInfo();
-
-	Log(`Stats inited at ${((Date.now() - _start) / 1000).toFixed(1)}s.\n`);
-};
-
-const getStats = () => stats;
-
-const getPixelAuthor = (x, y) => {
-	const key = `${x}:${y}`;
-	const [
-		currentTime,
-		currentUuid,
-		// currentColor,
-		// prevColorUuid,
-		// prevColorColor,
-		// prevUserUuid,
-		// prevUserColor,
-		// count,
-	] = stats?.[key] || [];
-
-	return {
-		uuid: stats?.uuids?.[currentUuid],
-		time: currentTime,
-	};
-};
-
-const getPixelAuthorIPAddress = (x, y) => {
-	const key = `${x}:${y}`;
-	const [
-		/* currentTime */,
-		/* currentUuid */,
-		/* currentColor */,
-		/* count */,
-		ip,
-	] = stats?.[key] || [];
-
-	return stats?.ips[ip];
-};
-
-const getPixelColor = (x, y) => {
-	const key = `${x}:${y}`;
-	const [
-		,// currentTime,
-		,// currentUuid,
-		currentColor,
-		// prevColorUuid,
-		// prevColorColor,
-		// prevUserUuid,
-		// prevUserColor,
-		// count,
-	] = stats?.[key] || [];
-
-	return stats?.colors?.[currentColor];
-};
-
-const getTotalPixels = () => {
-	return stats?.totalCount || 0;
-};
-
-const getTopLeaderboard = (count = 10, uuid) => {
-	const sorted = Object.entries(stats?.leaderboard || {})
-		.sort(([, a], [, b]) => a < b ? 1 : -1);
-	const output = sorted
-		.slice(0, count)
-		.reduce((list, [id, value], index) => [
-			...list,
-			{
-				id,
-				count: value,
-				place: index + 1,
-			},
-		], []);
-
-	if (uuid && !output.some((item) => item.uuid === uuid)) {
-		const place = sorted.findIndex(([id]) => id === (getAuthID(uuid) || uuid));
-
-		if (place >= output.length) {
-			output.push({
-				id: uuid,
-				count: sorted[place][1],
-				place: place + 1,
-			});
-		}
-	}
-
-	return output;
-};
-
-const getLastActivity = () => {
-	return stats?.lastActivity || 0;
 };
 
 const drawBGCanvas = (width, height, mode = 'RANDOM') => { // WHITE, RANDOM, CHESS, CHESSX, TEXT
@@ -291,7 +190,7 @@ const drawPix = ({ x, y, color, nickname, uuid, ip, area }) => {
 
 	const rawColor = COLORS[color];
 
-	updateStats(stats, [
+	updateStats([
 		Date.now(),
 		area,
 		x,
@@ -328,7 +227,6 @@ const saveCanvas = () => {
 
 module.exports = {
 	initStreamCanvas,
-	initStats,
 	getCanvas,
 	getCanvasConf,
 	updateCanvasConf,
@@ -336,12 +234,5 @@ module.exports = {
 	drawPix,
 	saveCanvas,
 	getImageBuffer,
-	getStats,
-	getPixelColor,
-	getPixelAuthor,
-	getTotalPixels,
-	getTopLeaderboard,
-	getLastActivity,
-	getPixelAuthorIPAddress,
 	drawBGCanvas,
 };

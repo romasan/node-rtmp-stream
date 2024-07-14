@@ -1,10 +1,12 @@
 const fs = require('fs');
-const { initStreamCanvas, initStats, saveCanvas, getImageBuffer } = require('./utils/canvas');
+const { initStreamCanvas, saveCanvas, getImageBuffer } = require('./utils/canvas');
+const { initStats } = require('./utils/stats');
 const { initServer } = require('./utils/ws');
 const { webServerHandler } = require('./api');
 const { stream } = require('./config.json');
 
 initStreamCanvas();
+
 initStats();
 
 if (stream.enable) {

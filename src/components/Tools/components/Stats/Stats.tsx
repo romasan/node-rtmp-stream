@@ -70,12 +70,27 @@ export const Stats: FC<Props> = ({ canvas }) => {
 	console.log('==== list:', list); // TODO open user controls popup
 
 	return (
-		<Block title="Общее" onOpen={onOpen} onClose={onClose}>
+		<Block title="👤 Общее" onOpen={onOpen} onClose={onClose}>
 			{Boolean(stats.online) && (
 				<div>
-					Сессии: A {stats.online.countByActivity} / U {stats.online.uniq} / O {stats.online.open} / {stats.online.all}
+					<div>
+						Сессии:
+						A {stats.online.countByActivity} /
+						U {stats.online.uniq} /
+						O {stats.online.open} /
+						{stats.online.all}
+					</div>
+					<div>
+						Пикселей за
+						минуту {stats.perMin},
+						час {stats.perHour}
+					</div>
 					<div className={s.users}>
-						<a href="#" onClick={toggleList}>Список онлайн [{list.length ? '-' : '+'}] {list.length > 0 && `(${list.length})`}</a>
+						<a href="#" onClick={toggleList}>
+							Список онлайн 
+							[{list.length ? '-' : '+'}] 
+							{list.length > 0 && `(${list.length})`}
+						</a>
 						<div className={s.list}>
 							{list.map((item) => (
 								<div key={String(item.name)}>

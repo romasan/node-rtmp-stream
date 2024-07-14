@@ -1,4 +1,4 @@
-const { getStats } = require('../../utils/canvas');
+const { getStats } = require('../../utils/stats');
 const { parseCookies } = require('../../helpers');
 const { checkSession } = require('../../utils/sessions');
 const { checkIsAdmin } = require('../../utils/auth');

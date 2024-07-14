@@ -1,5 +1,5 @@
 const { parseCookies } = require('../helpers');
-const { getTotalPixels, getTopLeaderboard } = require('../utils/canvas');
+const { getTotalPixels, getTopLeaderboard } = require('../utils/stats');
 const { getUserData } = require('../utils/auth');
 const { getSessionUserName } = require('../utils/sessions');
 

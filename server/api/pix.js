@@ -15,11 +15,11 @@ const {
 } = require('../utils/ws');
 const { checkBan } = require('../utils/bans');
 const { getExpiration } = require('../utils/countdown');
+const { drawPix } = require('../utils/canvas');
 const {
 	getPixelColor,
-	drawPix,
 	getPixelAuthor,
-} = require('../utils/canvas');
+} = require('../utils/stats');
 const { getSessionUserName } = require('../utils/sessions');
 const { Log } = require('../utils/log');
 const {
