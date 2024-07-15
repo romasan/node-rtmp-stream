@@ -27,7 +27,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 				<div>UUID: {uuid || 'EMPTY'}</div>
 				<div>UUIDs:</div>
 				<div className={s.uuids}>
-					{user?.uuids.map((uuid: string) => (
+					{user && user.uuids && user.uuids.map((uuid: string) => (
 						<div key={uuid}>{uuid}</div>
 					))}
 				</div>
