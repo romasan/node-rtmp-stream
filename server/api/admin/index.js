@@ -21,6 +21,7 @@ const {
 } = require('./maps');
 const { chat } = require('./chat');
 const { countdown } = require('./countdown');
+const { user } = require('./user');
 
 const getHistory = (req, res) => {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -46,6 +47,7 @@ let routes = {
 	'history': getHistory,
 	'chat': chat,
 	'countdown': countdown,
+	'user': user,
 };
 
 routes = Object.entries(routes).reduce((list, [key, callback]) => ({

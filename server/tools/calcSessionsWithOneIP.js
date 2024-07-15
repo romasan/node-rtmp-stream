@@ -28,14 +28,27 @@ const calcSessionsWithOneIP = async () => {
 		const filePath = getPathByToken(token, false);
 
 		if (fs.existsSync(filePath)) {
-			const ip = fs.readFileSync(filePath)
+			const lines = fs.readFileSync(filePath)
 				.toString()
-				.split('\n')[0]
-				.split(';')[1]
-				.split(':')
-				.pop();
+				.split('\n')
+				.filter(Boolean);
+			const ips = {};
 
-			cache[ip] = (cache[ip] || []).concat(token);
+			lines.forEach((line) => {
+				const _ips = line.split(';')[1]
+					.split(':')
+					.pop()
+					.split(', ');
+				_ips.forEach((ip) => {
+					ips[ip] = true;
+				});
+			});
+
+			Object.keys(ips).forEach((ip) => {
+				if (ip.length > 1) {
+					cache[ip] = (cache[ip] || []).concat(token);
+				}
+			});
 		} else {
 			// console.log('Fail on open:', filePath);
 			// errors.push(token);
@@ -46,17 +59,27 @@ const calcSessionsWithOneIP = async () => {
 	rl.on('close', () => {
 		bar.stop();
 		// JSON.stringify(sortMyObj, Object.keys(sortMyObj).sort())
+		const _keys = Object.entries(cache)
+			.sort(([,a], [,b]) => a.length < b.length ? 1 : -1)
+			.map(([key]) => key);
+		const _cache = {};
+
+		Object.entries(cache).forEach(([key, value]) => {
+			_cache[key] = value.length;
+		});
+
 		fs.writeFileSync(
 			__dirname + '/ip-tokens.json',
-			JSON.stringify(
-				cache,
-				Object.entries(cache)
-					.sort(([,a], [,b]) => a.length < b.length ? 1 : -1)
-					.map(([key]) => key),
-				2,
-			),
+			JSON.stringify(cache, _keys, 2),
 		);
+
+		fs.writeFileSync(
+			__dirname + '/ip-count.json',
+			JSON.stringify(_cache, _keys, 2),
+		);
+
 		// fs.writeFileSync(__dirname + '/failed-tokens.json', JSON.stringify(errors, true, 2));
+		console.log('IPs count:', Object.keys(_cache).length);
 		console.log('Errors count:', errorsCount);
 	});
 };

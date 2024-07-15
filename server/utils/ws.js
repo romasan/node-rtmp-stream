@@ -162,6 +162,7 @@ const checkHasWSConnect = (token) => {
 
 const checkIPRateLimit = (req) => {
 	// TODO check without WS
+	// and/or cache 1-5 sec?
 	const ip = getIPAddress(req);
 	let count = 0;
 

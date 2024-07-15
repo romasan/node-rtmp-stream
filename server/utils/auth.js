@@ -18,6 +18,11 @@ let users = {
 	sessions: {},
 	accounts: {},
 	authorized: {},
+	nicknames: {
+		discord: {},
+		twitch: {},
+		steam: {},
+	},
 };
 
 const getAllUsers = () => {
@@ -68,6 +73,7 @@ const authorizeUser = (token, data) => {
 		...(users.accounts[authId]?.filter((value) => value !== token) || []),
 		token,
 	];
+	users.nicknames[user.area][user.name] = authId;
 
 	saveUsers();
 };
@@ -149,21 +155,13 @@ const removeUser = (token) => {
 		return;
 	}
 
-	let login = '';
-
-	if (user?._authType === 'twitch') {
-		login = user?.data?.[0]?.login;
-	}
-
-	if (user?._authType === 'discord') {
-		login = user?.data?.username;
-	}
+	const data = _parseUserData(user);
 
 	logoutLog.write([
 		Date.now(),
 		token,
 		user?._authType,
-		login,
+		data.name,
 	].join(';') + '\n');
 
 	const authId = users.sessions[token];
@@ -181,6 +179,7 @@ const removeUser = (token) => {
 
 		if (!users.accounts[authId]?.length) {
 			delete users.accounts[authId];
+			delete users.nicknames[data.area][data.name];
 		}
 	}
 
@@ -195,6 +194,19 @@ const getAccoutntTokens = (token) => {
 	const authId = getAuthID(token);
 
 	return users.accounts[authId] || [token];
+};
+
+const getSessionsByNick = (nick) => {
+	const authIDs = [
+		users.nicknames.steam[nick],
+		users.nicknames.discord[nick],
+		users.nicknames.twitch[nick],
+	].filter(Boolean);
+
+	return authIDs.reduce((list, authId) => [
+		...list,
+		...users.accounts[authId],
+	], []);
 }
 
 module.exports = {
@@ -207,4 +219,5 @@ module.exports = {
 	getAuthID,
 	getAccoutntTokens,
 	_parseUserData,
+	getSessionsByNick,
 };

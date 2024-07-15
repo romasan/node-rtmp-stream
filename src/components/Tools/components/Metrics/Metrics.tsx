@@ -15,7 +15,7 @@ export const Metrics: FC = () => {
 		<Block title="📊 Метрики">
 			<button onClick={modalCalendar.toggle}>календарь</button>
 			<button disabled>графики</button>
-			<>{modalCalendar.render()}</>
+			{modalCalendar.render()}
 		</Block>
 	);
 };

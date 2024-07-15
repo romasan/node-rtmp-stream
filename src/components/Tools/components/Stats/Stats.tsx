@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { Block } from '../Block';
 
 import { get } from '../../helpers';
-
+import { useModal } from '/src/hooks';
 import { formatNumber, formatTime } from '/src/helpers';
 
 import * as s from './Stats.module.scss';
@@ -15,10 +15,36 @@ interface Props {
 export const Stats: FC<Props> = ({ canvas }) => {
 	const [stats, setStats] = useState<any>({});
 	const [list, setList] = useState<{ name: string; active: boolean; }[]>([]);
+	const [uuid, setUuid] = useState('');
+	const [nick, setNick] = useState('');
+	const [user, setUser] = useState<any>(null);
+
+	const modalUser = useModal({
+		content: (
+			<div>
+				<div>User</div>
+				<div>Nick: {nick || 'EMPTY'}</div>
+				<div>UUID: {uuid || 'EMPTY'}</div>
+				<div>UUIDs:</div>
+				<div className={s.uuids}>
+					{user?.uuids.map((uuid: string) => (
+						<div key={uuid}>{uuid}</div>
+					))}
+				</div>
+			</div>
+		),
+		portal: true,
+	});
 
 	const onOpen = () => {
 		get('stats')
 			.then(setStats)
+			.catch(() => {/* */});
+	};
+
+	const getUserSessions = () => {
+		get(`user?nick=${nick}`)
+			.then(setUser)
 			.catch(() => {/* */});
 	};
 
@@ -65,6 +91,19 @@ export const Stats: FC<Props> = ({ canvas }) => {
 
 		ctx.fillStyle = stats.color;
 		ctx.fillRect(stats.coord.x, stats.coord.y, 1, 1);
+	};
+
+	const onChangeUuid = (event: any) => {
+		setUuid(event.target.value);
+	};
+
+	const onChangeNick = (event: any) => {
+		setNick(event.target.value);
+	};
+
+	const onShowUserByNick = () => {
+		getUserSessions();
+		modalUser.open();
 	};
 
 	console.log('==== list:', list); // TODO open user controls popup
@@ -116,11 +155,21 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			</div>
 			<hr />
 			<div>
+				<input placeholder="UUID" onChange={onChangeUuid} disabled/>
+				<button onClick={modalUser.open} disabled>Open by UUID</button>
+			</div>
+			<div>
+				<input placeholder="NICKNAME" onChange={onChangeNick} />
+				<button onClick={onShowUserByNick}>Open by Nick</button>
+			</div>
+			<hr />
+			<div>
 				Всего пикселей: {formatNumber(stats.total)}
 			</div>
 			<div>
 				Uptime: {formatTime(stats.uptime)}
 			</div>
+			{modalUser.render()}
 		</Block>
 	);
 };

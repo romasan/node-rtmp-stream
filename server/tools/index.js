@@ -21,6 +21,8 @@ const libs = {
 		'calcSessionsWithOneIP',
 		'prepareDatabase',
 		'filterByBlocked',
+		'prepareSessions',
+		'geoip',
 	].reduce((list, key) => {
 		const lib = require(`./${key}`);
 
