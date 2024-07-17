@@ -103,10 +103,16 @@ const deleteMessage = (id) => {
 	updated = true;
 };
 
+const deleteMessagesByNick = (nick) => {
+	db.run('DELETE FROM chat WHERE name=?', nick);
+	updated = true;
+};
+
 module.exports = {
 	addMessage,
 	getMessages,
 	updateMessage,
 	deleteMessage,
 	addSystemMessage,
+	deleteMessagesByNick,
 };

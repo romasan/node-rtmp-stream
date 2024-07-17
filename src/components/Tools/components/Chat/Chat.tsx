@@ -6,7 +6,7 @@ import { formatDate } from '/src/helpers';
 
 import { useModal } from '/src/hooks';
 
-import { get, post, patch, drop } from '../../helpers';
+import { get, post, put, patch, drop } from '../../helpers';
 
 import * as s from './Chat.module.scss';
 
@@ -15,6 +15,7 @@ export const Chat: FC = () => {
 	const [count, setCount] = useState('100');
 	const [id, setId] = useState<null | string>(null);
 	const [newText, setNewText] = useState('');
+	const [nick, setNick] = useState('');
 
 	const selectedMessage = useMemo(() => {
 		return messages.find((message) => message.id === id) || {};
@@ -36,6 +37,23 @@ export const Chat: FC = () => {
 			return message;
 		}));
 		editModal.close();
+	};
+
+	const onChangeNick = (event: any) => {
+		setNick(event.target.value);
+	};
+
+	const muteByNick = () => {
+		put('ban', JSON.stringify({ type: 'mute', value: nick }), false)
+			.then(() => handleOpen())
+			.catch(() => {/* */})
+			.finally(() => setNick(''));
+	};
+
+	const deleteAllByNick = () => {
+		drop('chat', JSON.stringify({ nick }));
+		setMessages((messages) => messages.filter((message) => message.name !== nick));
+		setNick('');
 	};
 
 	const editModal = useModal({
@@ -92,9 +110,10 @@ export const Chat: FC = () => {
 					loaded: {messages.length}
 				</div>
 				<div>
-					Admin:
-					<input size={25} placeholder="MESSAGE" onChange={({ target }) => setNewText(target.value)}/>
-					<button onClick={addMessage}>add</button>
+					<input placeholder="NICKNAME" onChange={onChangeNick} />
+					<button onClick={muteByNick}>mute</button>
+					<button onClick={deleteAllByNick}>delete all</button>
+					<button disabled>filter</button>
 				</div>
 			</div>
 			<div className={s.list}>
@@ -112,6 +131,11 @@ export const Chat: FC = () => {
 						</div>
 					</div>
 				))}
+			</div>
+			<div>
+				Admin:
+				<input size={25} placeholder="MESSAGE" onChange={({ target }) => setNewText(target.value)}/>
+				<button onClick={addMessage}>add</button>
 			</div>
 			{editModal.render()}
 		</Block>

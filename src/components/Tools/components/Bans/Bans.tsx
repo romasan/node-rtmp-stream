@@ -13,7 +13,13 @@ export const Bans: FC = () => {
 	const [ip, setIp] = useState('');
 	const [token, setToken] = useState('');
 	const [nick, setNick] = useState('');
+	const [mute, setMute] = useState('');
 	const [ipsText, setIpsText] = useState('');
+	const [opened, setOpened] = useState('');
+
+	const toggleOpened = (value: string) => {
+		setOpened(value === opened ? '' : value);
+	};
 
 	const handleOpen = () => {
 		get('getBans')
@@ -60,6 +66,19 @@ export const Bans: FC = () => {
 			.catch(() => {/* */});
 	};
 
+	const handleClickUnmuteByNick = (value: string) => {
+		patch('unban', JSON.stringify({ type: 'mute', value }), false)
+			.then(() => handleOpen())
+			.catch(() => {/* */});
+	};
+
+	const handleClickMuteByNick = () => {
+		put('ban', JSON.stringify({ type: 'mute', value: mute }), false)
+			.then(() => handleOpen())
+			.catch(() => {/* */})
+			.finally(() => setMute(''));
+	};
+
 	const addIps = () => {
 		put('ban', JSON.stringify({ type: 'ip', value: ipsText }), false)
 			.then(() => {
@@ -86,53 +105,82 @@ export const Bans: FC = () => {
 
 	return (
 		<Block title="🔨 Управление банами" onOpen={handleOpen}>
-			<div>token ({stats.token && Object.keys(stats.token).length}):</div>
-			<div className={s.list}>
-				{stats.token && Object.entries(stats.token).filter(([, v]) => v).map(([v]) => (
-					<div key={v} className={s.item}>
-						{v}
-						<span onClick={() => handleClickUnbanByToken(v)}>&times;</span>
+			<div onClick={() => toggleOpened('token')} className={s.toggleButton}>token ({stats.token && Object.keys(stats.token).length}):</div>
+			{opened === 'token' && (
+				<>
+					<div className={s.list}>
+						{stats.token && Object.entries(stats.token).filter(([, v]) => v).map(([v]) => (
+							<div key={v} className={s.item}>
+								{v}
+								<span onClick={() => handleClickUnbanByToken(v)}>&times;</span>
+							</div>
+						))}
 					</div>
-				))}
-			</div>
-			<div>
-				<input value={token} onChange={({target: {value}}) => setToken(value)} placeholder="TOKEN" />
-				<button onClick={handleClickBanByToken}>добавить</button>
-				<select>
-					<option value="0">навсегда TODO</option>
-					<option value="0">1 час</option>
-					<option value="0">сутки</option>
-					<option value="0">неделя</option>
-					<option value="0">месяц</option>
-				</select>
-			</div>
-			<div>ip ({stats.ip && Object.keys(stats.ip).length}):</div>
-			<div className={s.list}>
-				{stats.ip && Object.entries(stats.ip).filter(([, v]) => v).map(([v]) => (
-					<div key={v} className={s.item}>
-						{v}
-						<span onClick={() => handleClickUnbanByIp(v)}>&times;</span>
+					<div>
+						<input value={token} onChange={({target: {value}}) => setToken(value)} placeholder="TOKEN" />
+						<button onClick={handleClickBanByToken}>добавить</button>
+						<select>
+							<option value="0">навсегда TODO</option>
+							<option value="0">1 час</option>
+							<option value="0">сутки</option>
+							<option value="0">неделя</option>
+							<option value="0">месяц</option>
+						</select>
 					</div>
-				))}
-			</div>
-			<div>
-				<input value={ip} onChange={({ target: { value }}) => setIp(value)} placeholder="IP ADDRESS" />
-				<button onClick={handleClickBanByIp}>добавить</button>
-				<button onClick={ipsModal.open}>списком</button>
-			</div>
-			<div>nick ({stats.nick && Object.keys(stats.nick).length}):</div>
-			<div className={s.list}>
-				{stats.nick && Object.entries(stats.nick).filter(([, v]) => v).map(([v]) => (
-					<div key={v} className={s.item}>
-						{v}
-						<span onClick={() => handleClickUnbanByNick(v)}>&times;</span>
+				</>
+			)}
+			<div onClick={() => toggleOpened('ip')} className={s.toggleButton}>ip ({stats.ip && Object.keys(stats.ip).length}):</div>
+			{opened === 'ip' && (
+				<>
+					<div className={s.list}>
+						{stats.ip && Object.entries(stats.ip).filter(([, v]) => v).map(([v]) => (
+							<div key={v} className={s.item}>
+								{v}
+								<span onClick={() => handleClickUnbanByIp(v)}>&times;</span>
+							</div>
+						))}
 					</div>
-				))}
-			</div>
-			<div>
-				<input value={nick} onChange={({ target: { value }}) => setNick(value)} placeholder="NICKNAME" />
-				<button onClick={handleClickBanByNick}>добавить</button>
-			</div>
+					<div>
+						<input value={ip} onChange={({ target: { value }}) => setIp(value)} placeholder="IP ADDRESS" />
+						<button onClick={handleClickBanByIp}>добавить</button>
+						<button onClick={ipsModal.open}>списком</button>
+					</div>
+				</>
+			)}
+			<div onClick={() => toggleOpened('nick')} className={s.toggleButton}>nick ({stats.nick && Object.keys(stats.nick).length}):</div>
+			{opened === 'nick' && (
+				<>
+					<div className={s.list}>
+						{stats.nick && Object.entries(stats.nick).filter(([, v]) => v).map(([v]) => (
+							<div key={v} className={s.item}>
+								{v}
+								<span onClick={() => handleClickUnbanByNick(v)}>&times;</span>
+							</div>
+						))}
+					</div>
+					<div>
+						<input value={nick} onChange={({ target: { value }}) => setNick(value)} placeholder="NICKNAME" />
+						<button onClick={handleClickBanByNick}>добавить</button>
+					</div>
+				</>
+			)}
+			<div onClick={() => toggleOpened('mute')} className={s.toggleButton}>muted ({stats.mute && Object.keys(stats.mute).length}):</div>
+			{opened === 'mute' && (
+				<>
+					<div className={s.list}>
+						{stats.mute && Object.entries(stats.mute).filter(([, v]) => v).map(([v]) => (
+							<div key={v} className={s.item}>
+								{v}
+								<span onClick={() => handleClickUnmuteByNick(v)}>&times;</span>
+							</div>
+						))}
+					</div>
+					<div>
+						<input value={mute} onChange={({ target: { value }}) => setMute(value)} placeholder="MUTE BY NICKNAME" />
+						<button onClick={handleClickMuteByNick}>замьютить</button>
+					</div>
+				</>
+			)}
 			{ipsModal.render()}
 		</Block>
 	);

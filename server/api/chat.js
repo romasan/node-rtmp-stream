@@ -11,11 +11,11 @@ const chat = async (req, res) => {
 
 		const user = getUserData(token);
 
-		if (checkBan({ nick: user?.name })) {
+		if (checkBan({ nick: user?.name, mute: true })) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 
-			Log('Error: failed add message (banned user)', token);
+			Log('Error: failed add message (banned/muted user)', token);
 
 			return;
 		}

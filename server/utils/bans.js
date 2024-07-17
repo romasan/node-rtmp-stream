@@ -10,6 +10,7 @@ let bans = {
 	token: {},
 	ip: {},
 	nick: {},
+	mute: {},
 };
 
 // TODO use database
@@ -31,6 +32,10 @@ const getAllBans = () => {
 	if (!bans.nick) {
 		bans.nick = {};
 	}
+
+	if (!bans.mute) {
+		bans.mute = {};
+	}
 };
 
 getAllBans();
@@ -43,7 +48,11 @@ const saveBans = () => {
 	);
 };
 
-const checkBan = ({ token, nick, ip }) => {
+const checkBan = ({ token, nick, ip, mute }) => {
+	if (mute && bans.mute[nick]) {
+		return true;
+	}
+
 	if (token && bans.token[token]) {
 		if (typeof bans.token[token] === 'number' && Date.now() >= bans.token[token]) {
 			unban('token', token);
@@ -96,7 +105,7 @@ const ban = (type, value, datetime) => {
 };
 
 const unban = (type, value) => {
-	bans[type][value] = false;
+	delete bans[type][value];
 	saveBans();
 };
 

@@ -5,6 +5,7 @@ const {
 	getMessages,
 	updateMessage,
 	deleteMessage,
+	deleteMessagesByNick,
 } = require('../../utils/chat');
 
 const chat = async (req, res) => {
@@ -31,7 +32,16 @@ const chat = async (req, res) => {
 	}
 
 	if (req.method === 'DELETE') {
-		const { id } = await getPostPayload(req, 'json');
+		const { id, nick } = await getPostPayload(req, 'json');
+
+		if (nick) {
+			deleteMessagesByNick(nick);
+
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('ok');
+
+			return;
+		}
 
 		deleteMessage(id);
 

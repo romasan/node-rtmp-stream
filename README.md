@@ -36,8 +36,11 @@
 ставил точки не уходя 8, 24 часа;
 учавствовал каждый день в течении недели;
 - [ ] chat slow mode
+- [x] chat mute user
 - [ ] add datetime for logs
-- [ ] chat modeation (delete all by user, delete all banned, messages for user)
+- [x] chat moderation (delete all by user)
+- [ ] chat messages from user
+- [ ] chat delete all for banned
 
 # admin panel
 

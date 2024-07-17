@@ -73,8 +73,8 @@ export const Tools: FC<Props> = ({
 								setCanvasMode={setCanvasMode}
 							/>
 							<Bans />
-							<Metrics />
 							<Chat />
+							<Metrics />
 							<Countdown />
 							<Block title="* Откат полотна к состоянию">
 								<div>TODO</div>
