@@ -47,6 +47,10 @@ export const Maps: FC<Props> = ({
 		getMap('newestmap.png');
 	};
 
+	const getNewestMapByIndex = () => {
+		getMap('newestmapByIndex.png');
+	};
+
 	const getLastPixels = () => {
 		getMap(`lastPixels.png?count=${lastPixelsValue}`);
 	};
@@ -107,7 +111,8 @@ export const Maps: FC<Props> = ({
 				<input placeholder="UUID" onChange={handleChangeUUID}/>
 			</div>
 			<div>
-				<button onClick={getNewestMap}>по давности</button>
+				<button onClick={getNewestMap}>по давности (время)</button>
+				<button onClick={getNewestMapByIndex}>по давности (порядок)</button>
 			</div>
 			<div>
 				<button onClick={getLastPixels}>последние</button>

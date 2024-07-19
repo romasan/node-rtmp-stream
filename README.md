@@ -5,6 +5,7 @@
 - [x] auth by discord
 - [ ] auth by vk
 - [ ] auth by steam
+- [ ] auth by telegram
 - [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
@@ -105,6 +106,7 @@
 - [x] replace Bar panel to App
 - [ ] offline indicator
 - [ ] add react router and make SPA
+- [ ] play button in center of timelapse canvas
 
 # page with infinity map
 

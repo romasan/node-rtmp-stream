@@ -14,6 +14,7 @@ const { getBans } = require('./getBans');
 const {
 	heatmap,
 	newestmap,
+	newestmapByIndex,
 	usersmap,
 	lastPixels,
 	byIP,
@@ -40,6 +41,7 @@ let routes = {
 	'getBans': getBans,
 	'heatmap.png': heatmap,
 	'newestmap.png': newestmap,
+	'newestmapByIndex.png': newestmapByIndex,
 	'usersmap.png': usersmap,
 	'lastPixels.png': lastPixels,
 	'byIP.png': byIP,

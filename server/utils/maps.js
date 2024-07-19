@@ -114,6 +114,54 @@ const heatmapNewestFromStats = (stats) => {
 	return canvas;
 };
 
+const heatmapNewestByIndex = (stats) => {
+	let width = 0;
+	let height = 0;
+	let max = 0;
+	let min = 0;
+
+	Object.keys(stats).forEach((key) => {
+		if (key.indexOf(':') > 0) {
+			const [x, y] = key.split(':');
+			const [,,,,, index] = stats[key];
+
+			width = Math.max(Number(x), width);
+			height = Math.max(Number(y), height);
+			max = Math.max(max, index);
+		}
+	});
+
+	width++;
+	height++;
+
+	const canvas = createCanvas(width, height);
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(0, 0, width, height);
+
+	// const med = Math.floor(max / 2);
+
+	for (let x = 0; x < width; x++) {
+		for (let y = 0; y < height; y++) {
+			const key = `${x}:${y}`;
+
+			if (stats[key]) {
+				const [,,,,, index] = stats[key];
+				const h = (1.0 - (Math.min(index / max, 1))) * 360;
+				const hsl = [h, 100, 50];
+				const rgb = HSLToRGB(hsl);
+				const color = RGBToHEX(rgb);
+	
+				ctx.fillStyle = color;
+				ctx.fillRect(x, y, 1, 1);
+			}
+		}
+	}
+
+	return canvas;
+};
+
 const mapLastPixelsFromStats = (stats, count) => {
 	let width = 0;
 	let height = 0;
@@ -294,6 +342,7 @@ const mapByTime = (stats, TIME) => {
 module.exports = {
 	heatmapFromStats,
 	heatmapNewestFromStats,
+	heatmapNewestByIndex,
 	mapLastPixelsFromStats,
 	mapByUsersFromStats,
 	mapByIP,

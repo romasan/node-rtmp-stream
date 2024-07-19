@@ -76,6 +76,7 @@ const updateStats = ([time, area, x, y, color, uuid, ip, nickname]) => {
 		colorIndex,
 		(count || 0) + 1,
 		ipIndex,
+		stats.totalCount || 0,
 	];
 
 	stats.totalCount = (stats.totalCount || 0) + 1;

@@ -41,8 +41,8 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 		}
 	}, [coord, opened]);
 
-	return (
-		<Block title="❓ Чей пиксель" onToggle={setOpened}>
+	const content = (typeof x === 'undefined') ? 'Не выбран пиксель' : (
+		<>
 			{stats.errors && stats.errors.lengtht && stats.errors.map((text: string) => (
 				<div key={text}>{text}</div>
 			))}
@@ -102,6 +102,12 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				<button disabled>Выставить КД</button>
 				<input size={6} />
 			</div>
+		</>
+	);
+
+	return (
+		<Block title="❓ Чей пиксель" onToggle={setOpened}>
+			{content}
 		</Block>
 	);
 };

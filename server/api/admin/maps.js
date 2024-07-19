@@ -3,6 +3,7 @@ const { getStats } = require('../../utils/stats');
 const {
 	heatmapFromStats,
 	mapByUsersFromStats,
+	heatmapNewestByIndex,
 	heatmapNewestFromStats,
 	mapLastPixelsFromStats,
 	mapByIP,
@@ -18,6 +19,13 @@ const heatmap = (req, res) => {
 
 const newestmap = (req, res) => {
 	const newestCanvas = heatmapNewestFromStats(getStats());
+
+	res.writeHead(200, { 'Content-Type': 'image/png' });
+	res.end(newestCanvas.toBuffer());
+};
+
+const newestmapByIndex = (req, res) => {
+	const newestCanvas = heatmapNewestByIndex(getStats());
 
 	res.writeHead(200, { 'Content-Type': 'image/png' });
 	res.end(newestCanvas.toBuffer());
@@ -58,6 +66,7 @@ const byTime = (req, res) => {
 module.exports = {
 	heatmap,
 	newestmap,
+	newestmapByIndex,
 	usersmap,
 	lastPixels,
 	byIP,
