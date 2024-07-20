@@ -247,9 +247,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				height / 2,
 			];
 
-			const leftFrontier = center[0] - canvasW / scale;
+			const leftFrontier = center[0] - canvasW / scale + 1;
 			const rightFrontier = center[0];
-			const topFrontier = center[1] - canvasH / scale;
+			const topFrontier = center[1] - canvasH / scale + 1;
 			const bottomFrontier = center[1];
 
 			setPos((pos) => {
@@ -289,8 +289,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				const center = [width / scale / 2, height / scale / 2];
 
 				setCoord([
-					Math.abs(Math.round(center[0] - pos.x)),
-					Math.abs(Math.round(center[1] - pos.y)),
+					getInRange(Math.abs(Math.round(center[0] - pos.x)), [0, canvasRef.current.width - 1]),
+					getInRange(Math.abs(Math.round(center[1] - pos.y)), [0, canvasRef.current.height - 1]),
 				]);
 
 				return;
