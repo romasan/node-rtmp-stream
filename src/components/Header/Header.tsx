@@ -57,31 +57,33 @@ export const Header: React.FC<Props> = ({
 					<h1>PIXEL BATTLE</h1>
 					<h2>Пиксель батл 2024 S2E2</h2>
 				</a>
-				<div className={s.controls}>
-					{isAuthorized ? (
-						<>
-							<div className={s.userName}>
-								{name}
-							</div>
+				<div className={s.controlsWrapper}>
+					{isAuthorized && (
+						<div className={s.userName}>
+							{name}
+						</div>
+					)}
+					<div className={s.controls}>
+						{isAuthorized ? (
 							<a href="/logout" className={cn({[s.disabled]: !isOnline})} aria-label="Выход">
 								<LogoutIcon />
 							</a>
-						</>
-					) : (
-						<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} aria-label="Выход" />
-					)}
-					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
-					</span>
-					<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
-					<a href="/timelapse" aria-label="Таймлапс">
-						<TimelapseIcon />
-					</a>
-					{role === ERole.moderator && (
-						<a href="/qq" aria-label="tools">
-							<GearIcon />
+						) : (
+							<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} aria-label="Выход" />
+						)}
+						<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
+							<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
+						</span>
+						<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
+						<a href="/timelapse" aria-label="Таймлапс">
+							<TimelapseIcon />
 						</a>
-					)}
+						{role === ERole.moderator && (
+							<a href="/qq" aria-label="tools">
+								<GearIcon />
+							</a>
+						)}
+					</div>
 				</div>
 			</div>
 			{chatIsShowed && (

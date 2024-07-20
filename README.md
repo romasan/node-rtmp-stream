@@ -38,7 +38,7 @@
 учавствовал каждый день в течении недели;
 - [ ] chat slow mode
 - [x] chat mute user
-- [ ] add datetime for logs
+- [x] add datetime for logs
 - [x] chat moderation (delete all by user)
 - [ ] chat messages from user
 - [ ] chat delete all for banned
@@ -52,7 +52,7 @@
 - [ ] change countdown for uuid/nick/ip
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
-- [ ] preview last changes, heatmap, changes by user
+- [x] preview last changes, heatmap, changes by user
 - [ ] get pixel author (uuid, IP, nickname, auth service)
 - [ ] get users on IP address
 - [ ] ban by uuid (shadow)
@@ -66,8 +66,7 @@
 - [ ] auto restart: add servise with chatbot for notification
 - [x] auto restart (use PM2)
 - [ ] fit the canvas into the frame
-- [ ] write start datetime to file
-- [ ] freeze frame to stream from admin panel
+- [x] freeze frame to stream from admin panel
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages?
@@ -91,7 +90,7 @@
 - [x] zooming at mobile
 - [x] fix pixel cursor position
 - [ ] go to position on click
-- [ ] mobile layout
+- [x] mobile layout
 - [ ] check is offline
 - [x] link to stream
 - [x] contrast border for pixel placeholder

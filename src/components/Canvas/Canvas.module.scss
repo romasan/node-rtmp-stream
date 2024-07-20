@@ -161,18 +161,6 @@
 	box-sizing: border-box;
 }
 
-:global(.mobile) {
-	.root {
-		@include size(100%);
-
-		margin: 0;
-	}
-
-	.coordinates {
-		bottom: 70px;
-	}
-}
-
 .debugLog {
 	position: fixed;
 	top: 0;
@@ -193,4 +181,16 @@
 	top: 0;
 	left: 0;
 	background: orange;
+}
+
+:global(.mobile) {
+	.root {
+		@include size(100%);
+
+		margin: 0;
+	}
+
+	.coordinates {
+		bottom: 70px;
+	}
 }
