@@ -30,11 +30,6 @@ import { useModal } from './hooks';
 
 import * as s from './App.module.scss';
 
-const disableMouse = {
-	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
-	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
-};
-
 export const App: React.FC = () => {
 	const [color, setColor] = useState('');
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
@@ -134,7 +129,6 @@ export const App: React.FC = () => {
 					blinkedLoginAnimation={blinkedLoginAnimation}
 					role={role}
 					login={loginModal.open}
-					{...disableMouse}
 				/>
 				<Canvas
 					color={wsStore.palette ? wsStore.palette[color] : ''}
@@ -159,7 +153,7 @@ export const App: React.FC = () => {
 				{Boolean(finish) && (
 					<Countdown finish={finish} text={wsStore.finishText}/>
 				)}
-				<div className={s.footer} {...disableMouse}>
+				<div className={s.footer}>
 					<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">
 						<VkplayIcon />
 					</a>

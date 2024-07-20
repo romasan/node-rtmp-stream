@@ -18,7 +18,7 @@ import {
 } from '../../helpers';
 import { getPixel } from '../../lib/api';
 
-import { showPixelScale, scaleDegree, minScale, maxScale } from '../../const';
+import { showPixelScale, showPixelScaleMobile, scaleDegree, minScale, maxScale } from '../../const';
 
 import image404 from '/assets/404.webp';
 
@@ -27,6 +27,11 @@ import * as s from './Canvas.module.scss';
 export enum EMode {
 	CLICK = 'CLICK',
 	SELECT = 'SELECT',
+}
+
+export enum ETouchMode {
+	MOVE = 'MOVE',
+	SCALE = 'SCALE',
 }
 
 interface Props {
@@ -88,27 +93,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const selected = useRef(defautSelected);
 	const timer = useRef(0);
 	const [pixelData, setPixelData] = useState(defaultPixelData);
-
-	// ===========================================================================
-	const [showDebug, setShowDebug] = useState(false);
-	const [debugLogList, setDebugLogList] = useState<string[]>([]);
-	const debugRef = useRef(null);
-
-	const debugLog = (message: string) => {
-		setDebugLogList((list) => [...list, message]);
-	};
-
-	useEffect(() => {
-		if (document.location.hash === '#debug') {
-			setShowDebug(true);
-		}
-	}, []);
-	// ===========================================================================
+	const touchMode = useRef<ETouchMode | null>(null);
+	const showCoordinates = isOnline && !viewOnly;
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
-
 		let time = '';
+
 		if (isFinished) {
 			time = formatDate(Number(pixelData.time));
 		} else {
@@ -118,8 +109,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (pixelData.x === x && pixelData.y === y) {
 			if (pixelData.time >= 0) {
 				return isFinished
-					? `${pixelData.name}, ${time} `
-					: `${pixelData.name}, ${time} назад`;
+					? `${pixelData.name}\n${time} `
+					: `${pixelData.name}\n${time} назад`;
 			}
 
 			return isFinished
@@ -129,6 +120,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		return null;
 	}, [coord, pixelData, isFinished]);
+
+	const resetImage = (image: any) => {
+		const ctx = canvasRef.current && canvasRef.current.getContext('2d');
+
+		if (!ctx || !image) {
+			return;
+		}
+
+		ctx.drawImage(image, 0, 0);
+	};
 
 	const imageLoadHandler = useCallback((image: HTMLImageElement) => {
 		if (canvasRef.current) {
@@ -151,22 +152,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			return;
 		}
 
-		const resetImage = () => {
-			ctx.drawImage(image, 0, 0);
-		};
-
-		resetImage();
-
-		if (onInit) {
-			onInit({
-				image: canvasRef.current,
-				setScale,
-				centering,
-				resetImage,
-			});
-		}
-
-		ee.on('ws:drawPix', ({ x, y, color }) => {
+		ee.on('ws:drawPix', ({ x, y, color }: any) => {
 			if (ctx) {
 				ctx.fillStyle = color;
 				ctx.fillRect(x, y, 1, 1);
@@ -187,23 +173,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
-		if (
-			touches && 
-			new Array(touches.length || 0).fill(0).some(
-				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
-			)
-		) {
-			return;
-		}
-		debugLog(`mouseDownCallback, touches: ${touches ? touches.length : 0} (${
-			touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
-		})`);
-		if (touches && touches.length === 1) {
+		if (touches && touches.length) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
+
+			touchMode.current = touches.length === 1
+				? ETouchMode.MOVE
+				: ETouchMode.SCALE;
 		}
 
-		if (touches && touches.length === 2) {
+		if (touches && touches.length >= 2) {
 			return;
 		}
 
@@ -229,17 +208,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseMoveCallback = ({ clientX, clientY, touches }: any) => {
-		if (
-			touches && 
-			new Array(touches.length || 0).fill(0).some(
-				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
-			)
-		) {
-			return;
-		}
-		debugLog(`mouseMoveCallback, touches: ${touches ? touches.length : 0} (${
-			touches && touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
-		})`);
 		if (touches) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
@@ -254,19 +222,19 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			if (!initialDistance.current) {
 				initialDistance.current = currentDistance;
-				debugLog(`set initialDistance: ${currentDistance}`);
 			} else {
-				const delta = currentDistance - initialDistance.current;
-				debugLog(`update initialDistance: ${initialDistance.current} -> ${currentDistance}, delte: ${delta}`);
+				const scaleFactor = currentDistance / initialDistance.current;
+				setScale((scale) => getInRange(scale * scaleFactor, [minScale, maxScale]));
 				initialDistance.current = currentDistance;
-
-				setScale((scale) => getInRange(scale + delta, [minScale, maxScale]));
 			}
 
 			return;
 		}
 
-		if (!cur.current.some((e) => e === -1) && mode === EMode.CLICK) {
+		const efp = document.elementFromPoint(clientX, clientY);
+		const isOverChild = rootRef.current && rootRef.current.contains(efp);
+
+		if (!cur.current.some((e) => e === -1) && mode === EMode.CLICK && isOverChild) {
 			const moveX = (clientX - cur.current[0]) / scale;
 			const moveY = (clientY - cur.current[1]) / scale;
 
@@ -294,6 +262,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		}
 
 		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
+			if (!isOverChild) {
+				if (mode === EMode.CLICK) {
+					setCoord([-1, -1]);
+				}
+
+				return;
+			}
+
 			const { top, left } = canvasRef.current.getBoundingClientRect();
 			const x = Math.floor((clientX - left) / scale);
 			const y = Math.floor((clientY - top) / scale);
@@ -308,6 +284,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				};
 			}
 
+			if (isMobile) {
+				const { width, height } = (canvasRef.current as any).parentNode.parentNode.getBoundingClientRect();
+				const center = [width / scale / 2, height / scale / 2];
+
+				setCoord([
+					Math.abs(Math.round(center[0] - pos.x)),
+					Math.abs(Math.round(center[1] - pos.y)),
+				]);
+
+				return;
+			}
+
 			setCoord([x, y]);
 		} else {
 			setCoord([-1, -1]);
@@ -315,29 +303,40 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseUpCallback = ({ clientX, clientY, touches }: any) => {
-		if (
-			touches && 
-			new Array(touches.length || 0).fill(0).some(
-				(_, index) => document.elementsFromPoint(touches[index].clientX, touches[index].clientY).includes(debugRef.current as any)
-			)
-		) {
-			return;
-		}
-		debugLog(`mouseUpCallback, touches: ${touches ? touches.length : 0} (${
-			touches && new Array(touches.length || 0).fill(0).map((_, index) => `${touches[index].clientX}:${touches[index].clientY}`).join(', ')
-		})`);
-		if (touches) {
-			clientX = cur.current[0];
-			clientY = cur.current[1];
-		}
+		if (touches && touches.length) {
+			clientX = cur.current[0] || clientX;
+			clientY = cur.current[1] || clientY;
 
-		if (touches && touches.length === 2) {
 			initialDistance.current = null;
-
-			return;
 		}
 
 		const [,, moved] = cur.current;
+
+		if (typeof clientX === 'undefined' || typeof clientY === 'undefined') {
+			if (
+				isMobile &&
+				touchMode.current === ETouchMode.MOVE &&
+				canvasRef.current &&
+				!moved
+			) {
+				if (scale < showPixelScale) {
+					const { width, height } = (canvasRef.current as any).parentNode.parentNode.getBoundingClientRect();
+					const center = [width / scale / 2, height / scale / 2];
+					const x = Math.abs(Math.round(center[0] - pos.x));
+					const y = Math.abs(Math.round(center[1] - pos.y));
+
+					setCoord([x, y]);
+					setScale(showPixelScaleMobile);
+				} else {
+					onClick(...coord);
+				}
+			}
+
+			return;
+		}
+
+		const efp = document.elementFromPoint(clientX, clientY);
+		const isOverChild = rootRef.current && rootRef.current.contains(efp);
 
 		if (
 			!moved &&
@@ -345,7 +344,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			document.elementsFromPoint(clientX, clientY).includes(canvasRef.current as HTMLCanvasElement) &&
 			(scale >= showPixelScale || mode === EMode.SELECT) &&
 			canvasRef.current &&
-			posIsAbove([clientX, clientY], canvasRef.current)
+			posIsAbove([clientX, clientY], canvasRef.current) &&
+			isOverChild &&
+			(!isMobile || touchMode.current === ETouchMode.MOVE)
 		) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
 			const x = Math.floor((clientX - left) / scale);
@@ -371,7 +372,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			canvasRef.current &&
 			posIsAbove([clientX, clientY], canvasRef.current) &&
 			mode === EMode.CLICK &&
-			!viewOnly
+			!viewOnly &&
+			isOverChild &&
+			(!isMobile || touchMode.current === ETouchMode.MOVE)
 		) {
 			setScale(showPixelScale);
 		}
@@ -402,8 +405,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const cursorShiftX = x - relativeCenterX;
 			const cursorShiftY = y - relativeCenterY;
 
-			const shiftX = relativeCenterX - x + cursorShiftX / scaleDegree;
-			const shiftY = relativeCenterY - y + cursorShiftY / scaleDegree;
+			const shiftX = relativeCenterX - x + cursorShiftX;
+			const shiftY = relativeCenterY - y + cursorShiftY;
 
 			const center = [
 				width / 2,
@@ -443,7 +446,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		const _color = isFinished ? getPixelColor(canvasRef.current, x, y) : color;
 
-		return {
+		const style: any = {
 			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
 			left: `${left + x * scale}px`,
 			top: `${top + y * scale}px`,
@@ -452,6 +455,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			'--bg-color': _color,
 			'--border-color': _color && rgbToHex(invertRgb(hexToRgb(_color))),
 		};
+
+		if (isMobile) {
+			style.top = '50%';
+			style.left = '50%';
+			style.transform = 'translate(-50%, -50%)';
+		}
+
+		return style;
 	};
 
 	const getSelectedStyle = () => {
@@ -505,10 +516,29 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 			image.src = src || `${sourceProtocol}//${WSHost}/canvas.png`;
 			image.setAttribute('crossOrigin', '');
-			image.onload = () => imageLoadHandler(image);
+			image.onload = () => {
+				imageLoadHandler(image);
+				resetImage(image);
+				if (onInit) {
+					onInit({
+						image: canvasRef.current,
+						setScale,
+						centering,
+						resetImage: () => resetImage(image),
+					});
+				}
+			}
 			image.onerror = (err) => {
 				setError(err.toString());
 				setScale(1);
+				if (onInit) {
+					onInit({
+						image: canvasRef.current,
+						setScale,
+						centering,
+						resetImage: () => resetImage(image),
+					});
+				}
 			};
 		}
 
@@ -540,6 +570,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		canvasRef.current,
 		pixelRef.current,
 		scale,
+		coord,
+		pos,
 		color,
 		mode,
 		src,
@@ -619,7 +651,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</div>
 					{error && <img className={s.image404} src={image404} alt="Полотно пиксель батла" />}
 				</div>
-				{!isMobile && isOnline && !viewOnly && (
+				{showCoordinates && (
 					<>
 						<div className={s.coordinates}>
 							{countdown > 0 && (
@@ -639,18 +671,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					</>
 				)}
 			</div>
-
-			{showDebug && (
-				<div className={s.debugLog} ref={debugRef}>
-					{debugLogList.map((item) => (
-						<div key={item}>{item}</div>
-					))}
-					{debugLogList.length === 0 && (
-						<div>EMPTY</div>
-					)}
-					<div className={s.debugLogCount}>{debugLogList.length}</div>
-				</div>
-			)}
 		</>
 	);
 };

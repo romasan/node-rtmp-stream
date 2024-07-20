@@ -15,11 +15,6 @@ import ee from '../../lib/ee';
 
 import * as s from './App.module.scss';
 
-const disableMouse = {
-	onMouseDown: (e: MouseEvent) => e.stopPropagation(),
-	onMouseUp: (e: MouseEvent) => e.stopPropagation(),
-};
-
 export const App: React.FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
@@ -91,7 +86,6 @@ export const App: React.FC = () => {
 				range={range}
 				color={color}
 				setCanvasMode={setCanvasMode}
-				{...disableMouse}
 			/>
 		</div>
 	);

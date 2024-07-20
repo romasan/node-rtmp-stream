@@ -37,7 +37,6 @@ export const Header: React.FC<Props> = ({
 	setHasNewMessage,
 	role,
 	login,
-	...rest
 }) => {
 	const [chatIsShowed, setChatIsShowed] = useState(false);
 	const [infoIsShowed, setInfoIsShowed] = useState(false);
@@ -53,7 +52,7 @@ export const Header: React.FC<Props> = ({
 
 	return (
 		<>
-			<div className={s.root} {...rest}>
+			<div className={s.root}>
 				<a href="/" className={s.title}>
 					<h1>PIXEL BATTLE</h1>
 					<h2>Пиксель батл 2024 S2E2</h2>
@@ -69,7 +68,7 @@ export const Header: React.FC<Props> = ({
 							</a>
 						</>
 					) : (
-						<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline})} aria-label="Выход" />
+						<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} aria-label="Выход" />
 					)}
 					<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
 						<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
@@ -90,11 +89,10 @@ export const Header: React.FC<Props> = ({
 					isAuthorized={isAuthorized}
 					nickname={name}
 					onClose={toggleChat}
-					{...rest}
 				/>
 			)}
 			{infoIsShowed && (
-				<Info onClose={toggleInfo} {...rest} />
+				<Info onClose={toggleInfo} />
 			)}
 		</>
 	);
