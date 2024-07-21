@@ -405,8 +405,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const cursorShiftX = x - relativeCenterX;
 			const cursorShiftY = y - relativeCenterY;
 
-			const shiftX = relativeCenterX - x + cursorShiftX;
-			const shiftY = relativeCenterY - y + cursorShiftY;
+			const shiftX = relativeCenterX - x + cursorShiftX / scaleDegree;
+			const shiftY = relativeCenterY - y + cursorShiftY / scaleDegree;
 
 			const center = [
 				width / 2,
