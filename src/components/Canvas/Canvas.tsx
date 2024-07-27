@@ -252,6 +252,19 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const topFrontier = center[1] - canvasH / scale + 1;
 			const bottomFrontier = center[1];
 
+			console.log('====', {
+				scale,
+				leftFrontier,
+				rightFrontier,
+				topFrontier,
+				bottomFrontier,
+				_posX: pos.x,
+				_posY: pos.y,
+				moveX,
+				moveY,
+				_cur: cur.current,
+			});
+
 			setPos((pos) => {
 				return {
 					x: getInRange(pos.x + moveX, [leftFrontier, rightFrontier]),
