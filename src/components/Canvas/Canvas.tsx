@@ -247,10 +247,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				height / 2,
 			];
 
-			const leftFrontier = center[0] - canvasW / scale + 1;
-			const rightFrontier = center[0];
-			const topFrontier = center[1] - canvasH / scale + 1;
-			const bottomFrontier = center[1];
+			const leftFrontier = Math.floor(center[0] - canvasW / scale + 1);
+			const rightFrontier = Math.floor(center[0]);
+			const topFrontier = Math.floor(center[1] - canvasH / scale + 1);
+			const bottomFrontier = Math.floor(center[1]);
 
 			setPos((pos) => {
 				return {
@@ -626,13 +626,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			>
 				<div
 					className={s.workbench}
-					style={{ transform: `scale(${scale})` }}
+					style={{
+						transform: `scale(${scale})`,
+					}}
 				>
 					<div
 						className={s.draggable}
 						style={{
-							left: `${Math.floor(pos.x)}px`,
-							top: `${Math.floor(pos.y)}px`,
+							transform: `translate(${Math.floor(pos.x)}px, ${Math.floor(pos.y)}px)`,
 						}}
 					>
 						<canvas

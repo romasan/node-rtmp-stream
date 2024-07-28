@@ -3,6 +3,10 @@ const fs = require('fs');
 const { Log } = require('../utils/log');
 
 const addSessionForIP = (ip, token, time = Date.now()) => {
+	if (ip === '::1') {
+		ip = '127.0.0.1';
+	}
+
 	const _ip = ip.split(':').pop();
 	const [a, b] = _ip.split('.');
 
