@@ -457,8 +457,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		};
 
 		if (isMobile) {
-			style.top = `calc(50% - ${Math.floor(scale / (screen.width / 50)) - 1}px)`;
-			style.left = `calc(50% - ${Math.floor(scale / (screen.height / 50)) - 1}px)`;
+			style.top = `calc(50% - ${Math.floor(scale / (screen.width / 50)) + 1}px)`;
+			style.left = `calc(50% - ${Math.floor(scale / (screen.height / 50)) + 1}px)`;
 			style.transform = 'translate(-50%, -50%)';
 		}
 
