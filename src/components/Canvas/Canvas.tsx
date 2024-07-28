@@ -457,14 +457,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		};
 
 		if (isMobile) {
-			// style.top = `calc(50% - ${Math.floor(scale / (screen.width / 50)) + 1}px)`;
-			// style.left = `calc(50% - ${Math.floor(scale / (screen.height / 50)) + 1}px)`;
-			// style.top = `calc(50% - ${Math.floor(scale / (screen.width * screen.width / screen.height))}px)`;
-			// style.left = `calc(50% - ${Math.floor(scale / (screen.height / screen.height * screen.width))}px)`;
-			style.top = `${Math.floor((screen.height % scale / 2) + Math.round(screen.height / scale) * scale)}px`;
-			style.left = `${Math.floor((screen.width % scale / 2) + Math.round(screen.width / scale) * scale)}px`;
-			// style.left = `calc(50% - ${Math.floor(scale / (screen.height / 50)) + 1}px)`;
-			// style.transform = 'translate(-50%, -50%)';
+			style.transform = `translate(${Math.floor(window.innerWidth / 2 - scale / 2)}, ${Math.floor(window.innerHeight / 2 - scale / 2)})`;
 		}
 
 		return style;
