@@ -4,8 +4,10 @@
 
 const fs = require('fs');
 const readline = require('readline');
+const Progress = require('cli-progress');
 const { createCanvas, Image, registerFont } = require('canvas');
 const { drawBGCanvas } = require('../utils/canvas');
+const { getFileLinesCount } = require('../helpers');
 
 registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
@@ -14,7 +16,7 @@ const {
 	HEIGHT,
 } = require('./constants.json');
 
-const PPF = 100; // 333
+const PPF = 333;
 const FPS = 30;
 const PPS = PPF * FPS;
 
@@ -30,7 +32,11 @@ const textLineHeight = 70;
 const videoWidth = 1080; // 1920;
 const videoHeight = 720; // 1080;
 
+// ffmpeg -r 25 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
+
 const scale = 2;
+
+const breakLine = Infinity;
 
 const drawDayBG = (ctx, day) => {
 	const bg = drawBGCanvas(videoWidth, videoHeight);
@@ -44,22 +50,6 @@ const drawDayBG = (ctx, day) => {
 	// ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
 	// ctx.fillStyle = '#fff';
 	// ctx.fillText(text, textX, textY + textLineHeight);
-};
-
-const backupFixelsFrame = (canvas) => {
-	const backupCanvas = createCanvas(WIDTH * scale, HEIGHT * scale);
-	const backupCtx = backupCanvas.getContext('2d');
-
-	const frameX = videoWidth / 2 - WIDTH * scale / 2;
-	const frameY = videoHeight / 2 - HEIGHT * scale / 2;
-
-	backupCtx.drawImage(
-		canvas,
-		frameX, frameY, WIDTH * scale, HEIGHT * scale,
-		0, 0, WIDTH * scale, HEIGHT * scale
-	);
-
-	return backupCanvas;
 };
 
 const backupCanvas = (canvas) => {
@@ -164,57 +154,62 @@ const drawSteps = (file, backgroundImage, width = WIDTH, height = HEIGHT, skip =
 };
 
 const gradientAnimation = (ctx, width, height) => {
-  const circlesNum = 40;
-  const minRadius  = 400;
-  const maxRadius  = 400;
-  const speed      = .02;
+	const circlesNum = 40;
+	const minRadius  = 400;
+	const maxRadius  = 400;
+	const speed      = .02;
 
-  const circles = [];
-  for (let i = 0 ; i < circlesNum ; ++i) {
-    circles.push(circle(width, height, minRadius, maxRadius));
-  }
+	const circles = [];
+	for (let i = 0 ; i < circlesNum ; ++i) {
+		circles.push(circle(width, height, minRadius, maxRadius));
+	}
 
-  return () => {
-    ctx.clearRect(0, 0, width, height);
-    circles.forEach(circle => circle(ctx, speed));
-  };
+	return () => {
+		ctx.clearRect(0, 0, width, height);
+		circles.forEach(circle => circle(ctx, speed));
+	};
 };
 
 const circle = (w, h, minR, maxR) => {
-  let x = Math.random() * w;
-  let y = Math.random() * h;
-  let angle  = Math.random() * Math.PI * 2;
-  const radius = Math.random() * (maxR - minR) + minR;
-  const firstColor  = `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
-  const secondColor = `hsla(${Math.random() * 360}, 100%, 50%, 0)`;
-  return (ctx, speed) => {
-    angle += speed;
-    const _x = x + Math.cos(angle) * 200;
-    const _y = y + Math.sin(angle) * 200;
-    const gradient = ctx.createRadialGradient(_x, _y, 0, _x, _y, radius);
-          gradient.addColorStop(0, firstColor);
-          gradient.addColorStop(1, secondColor);
+	let x = Math.random() * w;
+	let y = Math.random() * h;
+	let angle  = Math.random() * Math.PI * 2;
+	const radius = Math.random() * (maxR - minR) + minR;
+	const firstColor  = `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
+	const secondColor = `hsla(${Math.random() * 360}, 100%, 50%, 0)`;
+	return (ctx, speed) => {
+		angle += speed;
+		const _x = x + Math.cos(angle) * 200;
+		const _y = y + Math.sin(angle) * 200;
+		const gradient = ctx.createRadialGradient(_x, _y, 0, _x, _y, radius);
+					gradient.addColorStop(0, firstColor);
+					gradient.addColorStop(1, secondColor);
 
-    ctx.globalCompositeOperation = `overlay`;
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(_x, _y, radius, 0, Math.PI * 2);
-    ctx.fill(); 
-  };
+		ctx.globalCompositeOperation = `overlay`;
+		ctx.fillStyle = gradient;
+		ctx.beginPath();
+		ctx.arc(_x, _y, radius, 0, Math.PI * 2);
+		ctx.fill(); 
+	};
 };
 
-const drawEpisode = (ep) => {
-	const expandsFile = `${__dirname}/../../db/archive/${ep}/expands.log`;
+const drawEpisode = async (ep, bg) => {
+	const pixelsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}pixels.log`;
+	const expandsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}expands.log`;
 	const expands = fs.readFileSync(expandsFile)
 		.toString()
 		.split('\n')
 		.map((line) => line.split(';'));
-
+	const length = breakLine < Infinity ? breakLine : await getFileLinesCount(pixelsFile);
+	const bar = new Progress.Bar();
 	const canvas = createCanvas(videoWidth, videoHeight);
 	const ctx = canvas.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
-	const drawFrameBg = gradientAnimation(ctx, videoWidth, videoHeight);
-	
+	const drawFrameBg = bg === 'NOBG' ? () => {
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, videoWidth, videoHeight);
+	} : gradientAnimation(ctx, videoWidth, videoHeight);
+
 	let part = 0;
 	let nextPartStartTime = expands[part + 1] ? Number(expands[part + 1][0]) : Infinity;
 	let width = Number(expands[part][2]);
@@ -226,8 +221,12 @@ const drawEpisode = (ep) => {
 	let pixelsFrameX = videoWidth / 2 - width * scale / 2;
 	let pixelsFrameY = videoHeight / 2 - height * scale / 2;
 
+	const startTime = Date.now();
+
 	const mcanvas = createCanvas(Number(width), Number(height));
 	const mctx = mcanvas.getContext('2d');
+
+	bar.start(length, 0);
 
 	mctx.fillStyle = '#fff';
 	mctx.fillRect(0, 0, width, height);
@@ -236,12 +235,18 @@ const drawEpisode = (ep) => {
 	let frame = 0;
 
 	const rl = readline.createInterface({
-		input: fs.createReadStream(`${__dirname}/../../db/archive/${ep}/pixels.log`),
+		input: fs.createReadStream(pixelsFile),
 		crlfDelay: Infinity,
 	});
 
 	rl.on('line', (line) => {
 		i++;
+
+		bar.update(i);
+
+		if (i >= breakLine) {
+			return;
+		}
 
 		const [time, name, x, y, color] = line.split(';');
 
@@ -284,13 +289,12 @@ const drawEpisode = (ep) => {
 		}
 
 		if (i % 50_000 === 0) {
-			const sec = Math.floor(frame / PPS);
-
 			console.log(`#${frame} frame, ${i} pixels`);
 		}
 	});
 
 	rl.on('close', () => {
+		bar.stop();
 		drawFrameBg();
 		ctx.globalCompositeOperation = 'source-over';
 		ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
@@ -299,9 +303,11 @@ const drawEpisode = (ep) => {
 
 		fs.writeFileSync(output, canvas.toBuffer());
 
-		const sec = Math.floor(frame / PPS);
+		const sec = Math.floor(frame / FPS);
+		const finalInTime = Math.floor(Date.now() - startTime);
 
-		console.log(`Total. duration: ${Math.floor(sec / 60)}:${sec % 60}, #${frame} frame, ${i} pixels`);
+		console.log(`Done in ${Math.floor(finalInTime / 60)}:${finalInTime % 60}`)
+		console.log(`Total duration: ${Math.floor(sec / 60)}:${sec % 60}, ${frame} frames, ${i} pixels`);
 	});
 };
 

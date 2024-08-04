@@ -29,7 +29,7 @@
 - [ ] add to telegram web app (add qr to stream)
 - [ ] chat rate limit
 - [ ] check has new banned users/IP in pixels.log
-- [ ] groups/tags
+- [ ] rating for groups/squads/tags
 - [ ] achievements!
 использовал все цвета;
 вступил в группу;

@@ -247,10 +247,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				height / 2,
 			];
 
-			const leftFrontier = Math.floor(center[0] - canvasW / scale + 1);
-			const rightFrontier = Math.floor(center[0]);
-			const topFrontier = Math.floor(center[1] - canvasH / scale + 1);
-			const bottomFrontier = Math.floor(center[1]);
+			const leftFrontier = center[0] - canvasW / scale + 1;
+			const rightFrontier = center[0];
+			const topFrontier = center[1] - canvasH / scale + 1;
+			const bottomFrontier = center[1];
 
 			setPos((pos) => {
 				return {
@@ -442,12 +442,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 	const getPixelStyle = () => {
 		const { left = 0, top = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
+		const { width = 0, height = 0 } = canvasRef.current || {};
 		const [x, y] = coord;
 
 		const _color = isFinished ? getPixelColor(canvasRef.current, x, y) : color;
 
 		const style: any = {
-			display: coord.some((e) => e < 0) || scale < showPixelScale ? 'none' : 'block',
+			display: scale < showPixelScale || coord.some((e) => e < 0) || coord[0] >= width || coord[1] >= height ? 'none' : 'block',
 			left: `${left + x * scale}px`,
 			top: `${top + y * scale}px`,
 			width: `${scale}px`,

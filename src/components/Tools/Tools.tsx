@@ -63,6 +63,7 @@ export const Tools: FC<Props> = ({
 					{expand && (
 						<>
 							<Stats canvas={canvas} />
+							<Metrics />
 							<Stream />
 							<PixelStats coord={coord} />
 							<Maps canvas={canvas} />
@@ -74,7 +75,6 @@ export const Tools: FC<Props> = ({
 							/>
 							<Bans />
 							<Chat />
-							<Metrics />
 							<Countdown />
 							<Block title="* Откат полотна к состоянию">
 								<div>TODO</div>

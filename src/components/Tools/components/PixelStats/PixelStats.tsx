@@ -11,7 +11,18 @@ import {
 
 import { formatTime } from '/src/helpers';
 
-// import * as s from './Stats.module.scss';
+const saveToFile = (text, fileName, type = 'text/json') => {
+	const blob = new Blob([text], { type });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+
+	a.href = url;
+	a.download = fileName;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+};
 
 interface Props {
 	coord: {
@@ -40,6 +51,24 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				.catch(() => {/* */});
 		}
 	}, [coord, opened]);
+
+	const backup = async () => {
+		const data: any = {};
+
+		for (let x = 0; x < 720; x++) {
+			for (let y = 0; y < 720; y++) {
+				console.log('==== fetch', x, y);
+				try {
+					const json = await get(getQuery('pixel', { x, y }));
+					data[`${x}:${y}`] = json;
+				} catch (e) {
+					console.log('==== error', x, y, e);
+				}
+			}
+		}
+
+		saveToFile(JSON.stringify(data), 'backup.json');
+	};
 
 	const content = (typeof x === 'undefined') ? 'Не выбран пиксель' : (
 		<>
@@ -108,6 +137,8 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	return (
 		<Block title="❓ Чей пиксель" onToggle={setOpened}>
 			{content}
+			<hr />
+			<button onClick={backup}>BACKUP</button>
 		</Block>
 	);
 };
