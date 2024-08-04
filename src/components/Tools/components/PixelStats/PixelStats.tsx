@@ -54,10 +54,14 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	}, [coord, opened]);
 
 	const backup = async () => {
-		const data: any = {};
+		let data: any = {};
+
+		let i = 0;
+		let c = 0;
 
 		for (let x = 0; x < 720; x++) {
 			for (let y = 0; y < 720; y++) {
+				i++;
 				console.log('==== fetch', x, y);
 
 				const resp = await fetch(`${APIhost}/pix?x=${x}&y=${y}`, {
@@ -74,13 +78,17 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				try {
 					const json = await get(getQuery('pixel', { x, y }));
 					data[key] = json;
+					if (i % 10_000 === 0) {
+						saveToFile(JSON.stringify(data), `backup-${++c}.json`);
+						data = {};
+					}
 				} catch (e) {
 					console.log('==== error', x, y, e);
 				}
 			}
 		}
 
-		saveToFile(JSON.stringify(data), 'backup.json');
+		saveToFile(JSON.stringify(data), `backup-${++c}.json`);
 	};
 
 	const content = (typeof x === 'undefined') ? 'Не выбран пиксель' : (
