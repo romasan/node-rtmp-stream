@@ -55,12 +55,21 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	const backup = async () => {
 		const data: any = {};
 
+		const skips = (() => {return (window as any)['_skips'] || ['0:515']})();
+
 		for (let x = 0; x < 720; x++) {
 			for (let y = 0; y < 720; y++) {
 				console.log('==== fetch', x, y);
+				const key = `${x}:${y}`;
+
+				if (skips.includes(key)) {
+					console.log('==== skip', key);
+					continue;
+				}
+
 				try {
 					const json = await get(getQuery('pixel', { x, y }));
-					data[`${x}:${y}`] = json;
+					data[key] = json;
 				} catch (e) {
 					console.log('==== error', x, y, e);
 				}
