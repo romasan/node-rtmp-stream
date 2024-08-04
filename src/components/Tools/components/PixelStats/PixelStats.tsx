@@ -77,7 +77,13 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 
 				try {
 					const json = await get(getQuery('pixel', { x, y }));
+
+					delete json.logins;
+					delete json.user.id;
+					delete json.user.avatar;
+
 					data[key] = json;
+
 					if (i % 10_000 === 0) {
 						saveToFile(JSON.stringify(data), `backup-${++c}.json`);
 						data = {};
