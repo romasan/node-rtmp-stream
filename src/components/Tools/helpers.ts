@@ -50,3 +50,16 @@ export const patch = (command: string, payload?: any, type: string | boolean = '
 export const drop = (command: string, payload?: any, type: string | boolean = 'JSON') => {
 	return push(command, payload, 'DELETE', type);
 };
+
+export const saveToFile = (text: string, fileName: string, type = 'text/json') => {
+	const blob = new Blob([text], { type });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+
+	a.href = url;
+	a.download = fileName;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+};

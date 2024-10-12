@@ -5,7 +5,8 @@
 const fs = require('fs');
 
 const getDirectoriesRecursive = (directory) => {
-	fs.readdirSync(directory).forEach((file) => {
+	fs.readdirSync(directory)
+	 .forEach((file) => {
 		const absolutePath = path.join(directory, file);
 		if (fs.statSync(absolutePath).isDirectory()) {
 			getDirectoriesRecursive(absolutePath);

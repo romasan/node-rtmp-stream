@@ -7,23 +7,9 @@ import { Block } from '../Block';
 import {
 	get,
 	getQuery,
-	APIhost,
 } from '../../helpers';
 
 import { formatTime } from '/src/helpers';
-
-const saveToFile = (text, fileName, type = 'text/json') => {
-	const blob = new Blob([text], { type });
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-
-	a.href = url;
-	a.download = fileName;
-	document.body.appendChild(a);
-	a.click();
-	document.body.removeChild(a);
-	URL.revokeObjectURL(url);
-};
 
 interface Props {
 	coord: {
@@ -53,6 +39,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 		}
 	}, [coord, opened]);
 
+	/*
 	const backup = async () => {
 		let data: any = {};
 
@@ -96,6 +83,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 
 		saveToFile(JSON.stringify(data), `backup-${++c}.json`);
 	};
+	*/
 
 	const content = (typeof x === 'undefined') ? 'Не выбран пиксель' : (
 		<>
@@ -164,8 +152,8 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 	return (
 		<Block title="❓ Чей пиксель" onToggle={setOpened}>
 			{content}
-			<hr />
-			<button onClick={backup}>BACKUP</button>
+			{/* <hr /> */}
+			{/* <button onClick={backup}>BACKUP</button> */}
 		</Block>
 	);
 };

@@ -16,8 +16,8 @@ const {
 	HEIGHT,
 } = require('./constants.json');
 
-const PPF = 333;
-const FPS = 30;
+const PPF = 300;
+const FPS = 25;
 const PPS = PPF * FPS;
 
 const sec = 1000;
@@ -59,98 +59,6 @@ const backupCanvas = (canvas) => {
 	backupCtx.drawImage(canvas, 0, 0);
 
 	return backupCanvas;
-};
-
-const drawSteps = (file, backgroundImage, width = WIDTH, height = HEIGHT, skip = 0) => {
-
-	const canvas = createCanvas(videoWidth, videoHeight);
-	const ctx = canvas.getContext('2d');
-	ctx.imageSmoothingEnabled = false;
-
-	// ctx.font = `bold ${textLineHeight}px "Custom Font"`;
-
-	drawDayBG(ctx, 1);
-
-	const pixelsFrameX = videoWidth / 2 - width * scale / 2;
-	const pixelsFrameY = videoHeight / 2 - height * scale / 2;
-
-	if (backgroundImage !== 'NOIMAGE') {
-		const firstFrameBuf = fs.readFileSync(backgroundImage);
-		const firstFrame = new Image;
-		firstFrame.src = firstFrameBuf;
-
-		ctx.drawImage(firstFrame, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
-	}
-
-	ctx.fillStyle = '#fff';
-	ctx.fillRect(pixelsFrameX, pixelsFrameY, width * scale, height * scale);
-
-	let i = -1;
-	let frame = 0;
-
-	const rl = readline.createInterface({
-		input: fs.createReadStream(file),
-		crlfDelay: Infinity,
-	});
-
-	let firstPixelTime = 0;
-	// let dayNumber = 0;
-	
-	rl.on('line', (line) => {
-		i++;
-
-		// if (i < breakLine) {
-		// 	return
-		// }
-
-		const [time, name, x, y, color] = line.split(';');
-
-		// if (Number(time) < breakTime) {
-		// 	return
-		// }
-
-		if (!firstPixelTime) {
-			firstPixelTime = time;
-		}
-
-		// const _dayNumber = Math.floor((time - firstPixelTime) / day);
-
-		// if (_dayNumber !== dayNumber) {
-		// 	dayNumber = _dayNumber;
-
-		// 	console.log(`DAY #${dayNumber + 1}`);
-
-		// 	const backup = backupFixelsFrame(canvas);
-
-		// 	drawDayBG(ctx, dayNumber + 1);
-		// 	ctx.drawImage(backup, pixelsFrameX, pixelsFrameY);
-		// }
-
-		ctx.fillStyle = color;
-		ctx.fillRect(pixelsFrameX + x * scale, pixelsFrameY + y * scale, scale, scale);
-
-		if ((i % PPF === 0 || i === skip) && i >= skip) {
-			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
-
-			fs.writeFileSync(output, canvas.toBuffer());
-		}
-
-		if (i % 50_000 === 0) {
-			const sec = Math.floor(frame / PPS);
-
-			console.log(`duration: ${Math.floor(sec / 60)}:${sec % 60}, #${frame} frame, ${i} pixels`);
-		}
-	});
-
-	rl.on('close', () => {
-		const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
-
-		fs.writeFileSync(output, canvas.toBuffer());
-
-		const sec = Math.floor(frame / PPS);
-
-		console.log(`Total. duration: ${Math.floor(sec / 60)}:${sec % 60}, #${frame} frame, ${i} pixels`);
-	});
 };
 
 const gradientAnimation = (ctx, width, height) => {
@@ -312,6 +220,5 @@ const drawEpisode = async (ep, bg) => {
 };
 
 module.exports = {
-	drawSteps,
 	drawEpisode,
 };
