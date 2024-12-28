@@ -3,7 +3,7 @@ const day = 1000 * 60 * 60 * 24;
 export const padStartWeek = (year: number, month: number) => {
 	const date = new Date(year, month - 1, 1);
 
-	return date.getDay() - 1;
+	return Math.max(0, date.getDay() - 1);
 };
 
 export const getDaysInMonth = (year: number, month: number) => {
@@ -30,7 +30,7 @@ export const getMonthsRange = ([fromYear, fromMonth]: number[], [toYear, toMonth
 		time < new Date(toYear, toMonth, 1).getTime();
 		year = new Date(time).getFullYear(), month = new Date(time).getMonth() + 1, time += getDaysInMonth(year, month) * day
 	) {
-		list.push([year, month])
+		list.push([year, month]);
 	}
 
 	list.push([toYear, toMonth]);
@@ -45,14 +45,14 @@ export const getMonthCalendar = (year: number, month: number) => {
 	const weeks = Math.ceil(list.length / 7);
 
 	if (weeks * 7 > list.length) {
-		list.push(...Array(weeks * 7 - list.length).fill(null))
+		list.push(...Array(weeks * 7 - list.length).fill(null));
 	}
 
 	return list.reduce((matrix, item) => {
 		const lastList = matrix[matrix.length - 1];
 
 		if (lastList.length < 7) {
-				return matrix.slice(0, -1).concat([[...lastList, item]]);
+			return matrix.slice(0, -1).concat([[...lastList, item]]);
 		}
 
 		return matrix.concat([[item]]);

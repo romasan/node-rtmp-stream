@@ -46,7 +46,7 @@ export const useModal = (props?: Props | React.ReactElement) => {
 				containerRef.current.remove();
 				containerRef.current = null;
 			}
-		}
+		};
 	}, []);
 
 	const render = () => {

@@ -1,5 +1,6 @@
 inout.png
 frame.png
+output.png
 pid
 ssl-cert/
 node_modules/
@@ -18,3 +19,4 @@ _*
 .eslintcache
 *.zip
 .idea/
+lib/

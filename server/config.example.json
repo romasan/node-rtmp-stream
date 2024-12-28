@@ -53,6 +53,8 @@
 		},
 		"enable": true,
 		"streamFile": "/mnt/ramdisk/output.png",
+		"streamFilePath": "/mnt/ramdisk/",
+		"bgVideo": "",
 		"interval": 1000,
 		"rtmpHostKey": "",
 		"FFMPEGLog": false,

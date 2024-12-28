@@ -14,9 +14,9 @@ import {
 import * as s from './Calendar.module.scss';
 
 export const getChart = (data: number[][], width: number, height: number) => {
-	const max = data.reduce((current, [key, value]) => Math.max(current, value), 0);
+	const max = data.reduce((current, [, value]) => Math.max(current, value), 0);
 	const startY = height - data[0][1] / max * height;
-	const path = `M0 ${startY}L${data.slice(1).map(([_, value], index) => {
+	const path = `M0 ${startY}L${data.slice(1).map(([, value], index) => {
 		const y =  height - value / max * height;
 		const x =  width / data.length * (index + 1);
 
@@ -33,8 +33,8 @@ export const getChart = (data: number[][], width: number, height: number) => {
 		>
 			<path d={path} stroke="#000" fill="none" />
 		</svg>
-	)
-}
+	);
+};
 
 export const Calendar: FC = () => {
 	const [history, setHistory] = useState({});
@@ -64,14 +64,14 @@ export const Calendar: FC = () => {
 							return {
 								day,
 								...history.days[key],
-							}
+							};
 						}
 
 						return {
 							day,
 							totalPixels: 0,
 							uniqSessions: 0,
-						}
+						};
 					}
 
 					return null;
@@ -91,7 +91,7 @@ export const Calendar: FC = () => {
 								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
 									{week.map((day, dayIndex) => (
 										day ? (
-											<Tooltip title={
+											<Tooltip key={day.day} title={
 												<div className={s.tooltip}>
 													<div className={s.tooltip}>
 														<div className={s.hours}>

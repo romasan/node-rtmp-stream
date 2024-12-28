@@ -50,7 +50,7 @@ const icons = {
 
 const renderText = (raw: string, nickname?: string): string => {
 	return raw
-		.replace(nickname ? new RegExp(`@(${nickname})`, "ig") : '\n', '<b>$1</b>')
+		.replace(nickname ? new RegExp(`@(${nickname})`, 'ig') : '\n', '<b>$1</b>')
 		.replace(/(https\:\/\/www\.youtube\.com\/watch\?v\=[A-Za-z0-9_]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/www\.youtube\.com\/@[A-Za-z0-9_-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
@@ -140,7 +140,7 @@ export const Chat: React.FC<Props> = ({
 
 		return () => {
 			ee.off('ws:chatMessage', handleChatMessage);
-		}
+		};
 	}, []);
 
 	const onChange = (event: any) => {
@@ -209,4 +209,4 @@ export const Chat: React.FC<Props> = ({
 			</div>
 		</div>
 	);
-}
+};

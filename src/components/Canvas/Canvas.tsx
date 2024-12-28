@@ -526,7 +526,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 						resetImage: () => resetImage(image),
 					});
 				}
-			}
+			};
 			image.onerror = (err) => {
 				setError(err.toString());
 				setScale(1);

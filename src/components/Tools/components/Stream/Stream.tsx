@@ -10,10 +10,7 @@ import {
 
 // import * as s from './Stream.module.scss';
 
-interface Props {
-}
-
-export const Stream: FC<Props> = ({}) => {
+export const Stream: FC = () => {
 	const [canvasConf, setCanvasConf] = useState<any>({});
 
 	const onChangeFreeze = (event: any) => {

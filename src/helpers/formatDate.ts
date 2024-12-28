@@ -17,7 +17,7 @@ export const formatDate = (date: number, template?: string) => {
 	const currentYear = new Date().getFullYear();
 	const _date = new Date(Number(date));
 
-	let [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
+	const [sec, min, hour, day, month, year] = ['getSeconds', 'getMinutes', 'getHours', 'getDate', 'getMonth', 'getFullYear']
 		.map((key) => _date[key]());
 
 	if (template) {
@@ -34,7 +34,7 @@ export const formatDate = (date: number, template?: string) => {
 			.replace('mm', String(min).padStart(2, '0'))
 			.replace('m', min)
 			.replace('ss', String(sec).padStart(2, '0'))
-			.replace('s', sec)
+			.replace('s', sec);
 	}
 
 	return `${day} ${MONTHS[month]}${currentYear === year ? '' : ` ${year}`} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;

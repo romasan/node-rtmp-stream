@@ -1,7 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import cn from 'classnames';
-
 import { Block } from '../Block';
 
 import {

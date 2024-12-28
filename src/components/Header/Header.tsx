@@ -55,7 +55,7 @@ export const Header: React.FC<Props> = ({
 			<div className={s.root}>
 				<a href="/" className={s.title}>
 					<h1>PIXEL BATTLE</h1>
-					<h2>Пиксель батл 2024 S2E2</h2>
+					<h2>Пиксель батл 2025 S3E1</h2>
 				</a>
 				<div className={s.controlsWrapper}>
 					{isAuthorized && (

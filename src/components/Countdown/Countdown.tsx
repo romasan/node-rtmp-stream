@@ -12,7 +12,7 @@ interface Props {
 
 const renderText = (raw: string, nickname?: string): string => {
 	return raw
-		.replace(/\(([a-zA-Zа-яА-Я0-9\ ]+)\)\[(http[s]{0,1}\:\/\/[a-zA-Z0-9\-\/\.\@]+)\]/ig, '<a href="$2">$1</a>')
+		.replace(/\(([a-zA-Zа-яА-Я0-9\ ]+)\)\[(http[s]{0,1}\:\/\/[a-zA-Z0-9\-\/\.\@]+)\]/ig, '<a href="$2">$1</a>');
 };
 
 export const Countdown: FC<Props> = ({ finish, text }) => {

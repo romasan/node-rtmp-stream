@@ -3,17 +3,18 @@
   "version": "1.1.0",
   "description": "",
   "scripts": {
-    "start": "parcel pages/index.html pages/*/index.html",
+    "start": "npm run build:server && cd ./lib && pm2 start node index.js",
+    "stop": "pm2 stop index",
+    "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/",
+    "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
+    "dev:web": "parcel pages/index.html pages/*/index.html",
     "prebuild": "rm -rf dist/*.* .parcel-cache",
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
     "postbuild": "cp static/* dist/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
-    "serve": "cd ./server && pm2 start node index.js",
-    "serve:dev": "cd ./server && node index.js",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
-    "twitch:build": "zip pages/twitch/zip.zip pages/twitch/*",
-    "stop-server": "pm2 stop index",
+    "build:twitch": "npm run build && zip pages/twitch/zip.zip pages/twitch/*",
     "logs": "pm2 log"
   },
   "reactSnap": {
@@ -47,8 +48,11 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.3",
     "@parcel/transformer-svg-react": "^2.10.3",
+    "@types/node-fetch": "^2.6.12",
     "@types/react": "^18.0.29",
     "@types/react-dom": "^18.0.11",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.13",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "autoprefixer": "^10.4.14",
@@ -57,6 +61,7 @@
     "eslint-plugin-react": "^7.33.2",
     "form-data": "^4.0.0",
     "maxmind": "^4.3.20",
+    "nodemon": "^3.1.9",
     "parcel-plugin-static-files-copy": "^2.6.0",
     "pm2": "^5.3.1",
     "postcss": "^8.4.21",
@@ -64,6 +69,7 @@
     "postcss-modules": "^4.3.1",
     "react-snap": "^1.23.0",
     "sass": "^1.70.0",
+    "ts-node": "^10.9.2",
     "typescript-plugin-css-modules": "^5.0.0",
     "yargs": "^17.7.2"
   }

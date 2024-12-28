@@ -9,15 +9,16 @@ document.addEventListener('paste', function (e) {
 			const reader = new FileReader();
 
 			reader.onload = function (event) {
-				var img = new Image();
-				img.src = event.target.result;
+				const img = new Image();
 
+				img.src = event.target?.result as string;
 				img.onload = function () {
 					const canvas = document.createElement('canvas');
 					const ctx = canvas.getContext('2d');
+
 					canvas.width = img.width;
 					canvas.height = img.height;
-					ctx.drawImage(img, 0, 0);
+					ctx?.drawImage(img, 0, 0);
 					document.body.appendChild(canvas);
 				};
 			};

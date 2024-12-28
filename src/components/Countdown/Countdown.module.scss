@@ -24,3 +24,13 @@
 		color: rgb(152, 226, 255);
 	}
 }
+
+:global(.mobile) {
+	.timeout {
+		width: 90%;
+		font-size: 16pt;
+		white-space: break-spaces;
+		text-align: center;
+		z-index: 1;
+	}
+}

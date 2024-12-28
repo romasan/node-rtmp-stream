@@ -8,7 +8,7 @@ const getRGBByXY = (data: any, x: number, y: number, w: number) => {
 	const pos = getPosByXY(x, y, w);
 
 	return data.slice(pos, pos + 3);
-}
+};
 
 const eqA = (a: number[], b: number[]) => !a.some((e, i) => e !== b[i]);
 
@@ -30,7 +30,7 @@ const checkAround = (data: any, x: number, y: number, w: number, h: number) => {
 	const color = colors.length === 3 ? colors.reduce(blendSomeColors) : BLACK;
 
 	return [colors.length, color];
-}
+};
 
 let raf = 0;
 

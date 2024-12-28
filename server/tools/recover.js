@@ -55,6 +55,8 @@ const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) 
 		// }
 		fs.writeFileSync(output, canvas.toBuffer());
 	});
+
+	console.log('recover done');
 };
 
 // TODO use alternative canvas library

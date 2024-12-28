@@ -42,6 +42,7 @@
 - [x] chat moderation (delete all by user)
 - [ ] chat messages from user
 - [ ] chat delete all for banned
+- [ ] fix typescript warnings and remove all "any" plug
 
 # admin panel
 

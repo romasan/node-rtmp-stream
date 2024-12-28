@@ -156,7 +156,7 @@ export const App: React.FC = () => {
 			const data = await fetchTimelapse(selectedEpisode);
 
 			setTimelapse(data);
-		} catch (e) {}
+		} catch (ignore) {/* */}
 	};
 
 	const preloadPart = async (partIndex: number) => {

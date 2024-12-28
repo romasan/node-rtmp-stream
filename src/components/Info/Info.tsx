@@ -16,14 +16,6 @@ interface Props {
 	onClose: Function;
 }
 
-interface IMessage {
-	id: string;
-	time: number;
-	text: string;
-	name: string;
-	avatar: string;
-}
-
 const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
