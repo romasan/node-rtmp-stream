@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "",
   "scripts": {
-    "start": "npm run build:server && cd ./lib && pm2 start node index.js",
+    "start": "npm run build:server && pm2 start node ./lib/index.js",
     "stop": "pm2 stop index",
     "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/",
     "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
@@ -31,6 +31,7 @@
     "bad-words-next": "^2.3.1",
     "canvas": "^2.11.0",
     "classnames": "^2.3.2",
+    "crypto": "^1.0.1",
     "event-emitter": "^0.3.5",
     "is-mobile": "^4.0.0",
     "node-fetch": "^2.6.9",

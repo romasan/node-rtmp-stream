@@ -1,6 +1,27 @@
 <html>
 	<head>
 		<title>Авторизация</title>
+		<style>
+			#root {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root">
+			<div id="content">Авторизация</div>
+			<script id="tg-script"
+				data-telegram-login="PixelBattleOnlineBot"
+				data-size="large"
+				data-radius="10"
+				data-auth-url="https://api.pixelbattles.ru/auth/telegram"
+				data-request-access="write"></script>
+		</div>
+
 		<script>
 			const { hostname, protocol } = document.location;
 			const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
@@ -10,12 +31,19 @@
 				'twitch',
 				'steam',
 				'discord',
+				'telegram'
 			].includes(query) ? query : 'twitch';
 
-			document.location.href = `${APIhost}/auth/${key}`;
+			if (query === 'telegram') {
+				const content = document.querySelector('#content');
+				const tgScript = document.querySelector('#tg-script');
+
+				content.innerHTML = '';
+				tgScript.src = 'https://telegram.org/js/telegram-widget.js?7';
+			} else {
+				document.location.href = `${APIhost}/auth/${key}`;
+			}
+
 		</script>
-	</head>
-	<body>
-		Авторизация
 	</body>
 </html>
