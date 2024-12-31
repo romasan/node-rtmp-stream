@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
 
-export const getFileLinesCount = (file) => new Promise((resolve) => {
+const getFileLinesCount = (file) => new Promise((resolve) => {
 	const rl = readline.createInterface({
 		input: fs.createReadStream(file),
 		crlfDelay: Infinity
