@@ -1,4 +1,5 @@
 const fs = require('fs');
+const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
 
 const getFileLinesCount = (file) => new Promise((resolve) => {
