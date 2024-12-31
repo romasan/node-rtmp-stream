@@ -23,6 +23,7 @@ let users: IUsers = {
 		discord: {},
 		twitch: {},
 		steam: {},
+		telegram: {},
 	},
 };
 
@@ -42,6 +43,31 @@ const getAllUsers = () => {
 
 	if (!users.accounts) {
 		users.accounts = {};
+	}
+
+	if (!users.nicknames) {
+		users.nicknames = {
+			discord: {},
+			twitch: {},
+			steam: {},
+			telegram: {},
+		};
+	}
+
+	if (!users.nicknames.discord) {
+		users.nicknames.discord = {};
+	}
+
+	if (!users.nicknames.twitch) {
+		users.nicknames.twitch = {};
+	}
+
+	if (!users.nicknames.steam) {
+		users.nicknames.steam = {};
+	}
+
+	if (!users.nicknames.telegram) {
+		users.nicknames.telegram = {};
 	}
 };
 
@@ -133,6 +159,15 @@ export const _parseUserData = (raw: any): IParsedUser | null => {
 			name: raw?.username,
 			avatar: `https://cdn.discordapp.com/avatars/${raw?.id}/${raw?.avatar}.webp?size=64`,
 			area: 'discord',
+		};
+	}
+
+	if (raw?._authType === 'telegram') {
+		return {
+			id: raw?.id,
+			name: raw?.username || raw?.first_name,
+			avatar: raw?.photo_url,
+			area: 'telegram',
 		};
 	}
 

@@ -6,5 +6,6 @@ export interface IUsers {
 		discord: Record<string, string>;
 		twitch: Record<string, string>;
 		steam: Record<string, string>;
+		telegram: Record<string, string>;
 	};
 };

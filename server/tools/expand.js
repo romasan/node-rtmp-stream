@@ -1,6 +1,22 @@
 const fs = require('fs');
 const { createCanvas, Image } = require('canvas');
-const { getFileLinesCount } = require('../helpers');
+
+export const getFileLinesCount = (file) => new Promise((resolve) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+
+	let count = 0;
+
+	rl.on('line', () => {
+		count++;
+	});
+
+	rl.on('close', () => {
+		resolve(count);
+	});
+});
 
 const expand = async (input, output, width, height, shiftX = 0, shiftY = 0) => {
 	const countOfPixels = await getFileLinesCount(__dirname + '/../../db/pixels.log');

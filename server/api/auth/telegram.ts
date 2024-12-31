@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
-// import { authorizeUser } from '../../utils/auth';`
+import { authorizeUser } from '../../utils/auth';
 import { Log } from '../../utils/log';
-// import { parseCookies } from '../../helpers';
+import { parseCookies } from '../../helpers';
 
 const {
     server: {
@@ -32,15 +32,13 @@ const telegram = (req: IncomingMessage, res: ServerResponse) => {
 
         const success = checkTelegramAuth(query);
 
-        console.log('==== tg cb query', {
-            success,
-            query,
-        });
-
         if (success) {
-            // const { token } = parseCookies(req.headers.cookie || '');
+            const { token } = parseCookies(req.headers.cookie || '');
 
-            // authorizeUser(token, {});
+            authorizeUser(token, {
+                ...query,
+                _authType: 'telegram',
+            });
 
             res.writeHead(302, { Location: host });
             res.end();
