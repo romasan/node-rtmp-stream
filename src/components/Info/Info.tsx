@@ -9,6 +9,7 @@ import { formatNumber } from '../../helpers';
 import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
 import SteamIcon from '/assets/steam_bw.svg';
+import TelegramIcon from '/assets/telegram_bw.svg';
 
 import * as s from './Info.module.scss';
 
@@ -20,6 +21,7 @@ const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
 	steam: SteamIcon,
+	telegram: TelegramIcon,
 };
 
 export const Info: FC<Props> = ({
@@ -84,6 +86,26 @@ export const Info: FC<Props> = ({
 									</span>
 								</div>
 							))}
+						</div> */}
+						{/* <div>
+							<div>Squad-ы: </div>
+							<div>&nbsp;</div>
+							{(stats.leaderboard || []).map((item) => (
+								<div key={String(item.place)} className={s.leaderBoardItem}>
+									<span>
+										{item.place < 10 && <>&nbsp;</>}
+										{item.place}.
+										{icons[item.platform] ? icons[item.platform]() : <div className={s.space} />}
+										{item.name}
+									</span>
+									<span>
+										{formatNumber(item.count)}
+									</span>
+								</div>
+							))}
+							<div>
+								<button>Войти в squad</button>
+							</div>
 						</div> */}
 					</div>
 				)}
