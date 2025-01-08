@@ -45,3 +45,27 @@ export const RGBToHEX = ([r, g, b]: number[]): string => '#' +
 	r.toString(16).padStart(2, '0') +
 	g.toString(16).padStart(2, '0') +
 	b.toString(16).padStart(2, '0');
+
+export const getColorHeat = (v: number, angle = 359) => {
+	const h = v * angle;
+	const hsl = [h, 100, 50];
+	const rgb = HSLToRGB(hsl);
+
+	return RGBToHEX(rgb);
+};
+
+export const getGradient = (length: number) => Array(length)
+	.fill(null)
+	.map((_,i,a) => getColorHeat((1 / a.length) * i));
+
+export const getColorsRange = (length: number) => {
+	const colors = Array(length + 1).fill(null).map((e, i) => (
+		'#' + (
+				Math.floor(0xffffff / length) * i
+		).toString(16).padStart(6, '0')
+	));
+
+	colors.shift();
+
+	return colors;
+};

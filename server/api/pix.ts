@@ -26,7 +26,6 @@ import { Log } from '../utils/log';
 
 const {
 	colorShemes: { COLORS },
-	guestCanPlay,
 } = require('../config.json');
 
 export const pix = async (req: IncomingMessage, res: ServerResponse) => {
@@ -41,7 +40,7 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 		const { token } = parseCookies(req.headers.cookie);
 		const postPayload: any = await getPostPayload(req);
 
-		if (!guestCanPlay && !checkUserAuthByToken(token)) {
+		if (!checkUserAuthByToken(token)) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('fail');
 

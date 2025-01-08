@@ -3,6 +3,7 @@ import ee from '../lib/ee';
 const { hostname, protocol } = document.location;
 const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
 export const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '')}${isLocalhost ? ':8080' : ''}`;
+export const staticHost = 'https://static.pixelbattles.ru';
 
 export const addPix = async ({ x, y, color }: { x: number; y: number; color: string; }) => {
 	try {
@@ -62,16 +63,24 @@ export const getPixel = async (x: number, y: number) => {
 	return await resp.json();
 };
 
+export const fetchTimelapseSeasons = async () => {
+	const resp = await fetch(`${staticHost}/timelapse/index.json`, {
+		// credentials: 'include',
+	});
+
+	return await resp.json();
+};
+
 export const fetchTimelapse = async (name: string) => {
-	const resp = await fetch(`${APIhost}/timelapse/${name}/index.json`, {
-		credentials: 'include',
+	const resp = await fetch(`${staticHost}/timelapse/${name}/index.json`, {
+		// credentials: 'include',
 	});
 
 	return await resp.json();
 };
 
 export const fetchTimelapsePartBin = (name: string, index: number) => {
-	return fetch(`${APIhost}/timelapse/${name}/${index}.bin`, {
-		credentials: 'include',
+	return fetch(`${staticHost}/timelapse/${name}/${index}.bin`, {
+		// credentials: 'include',
 	});
 };

@@ -5,12 +5,12 @@
 	box-sizing: border-box;
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-start;
 	gap: 10px;
 	position: absolute;
 	top: 0;
-	padding: 10px;
+	padding: 4px 8px;
 	z-index: 1;
+	background: #fff7;
 }
 
 .title {
@@ -76,7 +76,7 @@ h2 {
 }
 
 .iconButton {
-	@include size(40px);
+	@include size(32px);
 
 	cursor: pointer;
 }

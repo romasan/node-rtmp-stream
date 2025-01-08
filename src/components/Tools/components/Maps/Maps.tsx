@@ -111,6 +111,10 @@ export const Maps: FC<Props> = ({
 				<input placeholder="UUID" onChange={handleChangeUUID}/>
 			</div>
 			<div>
+				<button onClick={getByIP}>по IP</button>
+				<input placeholder="IP" onChange={handleChangeIP}/>
+			</div>
+			<div>
 				<button onClick={getNewestMap}>по давности (время)</button>
 				<button onClick={getNewestMapByIndex}>по давности (порядок)</button>
 			</div>
@@ -151,10 +155,6 @@ export const Maps: FC<Props> = ({
 					<option value={7 * day}>неделя</option>
 				</select>
 				#{timeValue}#
-			</div>
-			<div>
-				<button onClick={getByIP}>по IP</button>
-				<input placeholder="IP" onChange={handleChangeIP}/>
 			</div>
 			<div>
 				<button disabled>без учёта заблокированных</button>

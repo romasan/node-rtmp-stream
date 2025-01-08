@@ -4,19 +4,20 @@
 
 import fs from 'fs';
 import readline from 'readline';
-import { getAuthID } from './auth';
 import { formatDate } from '../helpers/formatDate';
+import { shortArea, restoreArea } from '../helpers/shortArea';
 import { Log } from './log';
 import { IStats, IPixel } from '../types';
 
 let stats: IStats = {} as IStats;
-let inited = false;
+const namesCache: Record<string, number> = {};
 let uuidsCache: Record<string, number> = {};
-let ipsCache: Record<string, number> = {};
+const ipsCache: Record<string, number> = {};
 const uniqSessions = new Set();
 const SEC = 1000;
 const MIN = SEC * 60;
 const HOUR = MIN * 60;
+let inited = false;
 
 export const updateStats = ({ time = 0, area = '', x, y, color, uuid, ip, nickname = '' }: IPixel) => {
 	const key = `${x}:${y}`;
@@ -32,6 +33,8 @@ export const updateStats = ({ time = 0, area = '', x, y, color, uuid, ip, nickna
 		y,
 		color,
 		ip,
+		area,
+		nickname,
 	};
 
 	let uuidIndex: number = uuidsCache[uuid];
@@ -40,6 +43,19 @@ export const updateStats = ({ time = 0, area = '', x, y, color, uuid, ip, nickna
 		stats.uuids.push(uuid);
 		uuidIndex = stats.uuids.length - 1;
 		uuidsCache[uuid] = stats.uuids.length - 1;
+	}
+
+	// TODO use account uuid for unique <area>+<tw/st/tg:ID>
+	// need write account uuid instead of session uuid
+	// and do not delete account uuid on logout
+	const name = `${shortArea(area)}:${nickname}`;
+
+	let nameIndex: number = namesCache[name];
+
+	if (typeof nameIndex === 'undefined') {
+		stats.names.push(name);
+		nameIndex = stats.names.length - 1;
+		namesCache[name] = stats.names.length - 1;
 	}
 
 	let colorIndex = stats.colors.indexOf(color);
@@ -78,14 +94,15 @@ export const updateStats = ({ time = 0, area = '', x, y, color, uuid, ip, nickna
 		(count || 0) + 1,
 		ipIndex,
 		stats.totalCount || 0,
+		nameIndex,
 	];
 
 	stats.totalCount = (stats.totalCount || 0) + 1;
 
 	if (typeof uuidIndex === 'number') {
-		const _id = getAuthID(uuid) || uuid;
+		// const _id = getAuthID(uuid) || uuid;
 
-		stats.leaderboard[_id] = (stats?.leaderboard?.[_id] || 0) + 1;
+		stats.leaderboard[nameIndex] = (stats?.leaderboard?.[nameIndex] || 0) + 1;
 	}
 
 	const date = formatDate(time, 'YYYY-MM-DD-hh');
@@ -170,6 +187,10 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 
 		if (!stats.ips) {
 			stats.ips = [];
+		}
+
+		if (!stats.names) {
+			stats.names = [];
 		}
 
 		uuidsCache = stats?.uuids
@@ -278,33 +299,48 @@ export const getTotalPixels = () => {
 	return stats?.totalCount || 0;
 };
 
-export const getTopLeaderboard = (count = 10, uuid: string) => {
+export const getTopLeaderboard = (count = 10, nickname: string, area: string) => {
 	const sorted = Object.entries(stats?.leaderboard || {})
 		.sort(([, a], [, b]) => a < b ? 1 : -1);
 	const output: any[] = sorted
 		.slice(0, count)
-		.reduce((list, [id, value], index): any => [
+		.reduce((list, [nameIndex, value], index): any => [
 			...list,
 			{
-				id,
+				nameIndex,
 				count: value,
 				place: index + 1,
 			},
 		], []);
 
-	if (uuid && !output.some((item) => item.id === uuid)) {
-		const place = sorted.findIndex(([id]) => id === (getAuthID(uuid) || uuid));
+	const name = `${shortArea(area)}:${nickname}`;
+	const nameIndex = namesCache[name];
+
+	if (nameIndex >= 0 && !output.some((item) => item.nameIndex === nameIndex)) {
+		// const place = sorted.findIndex(([id]) => id === (getAuthID(uuid) || uuid));
+		const place = sorted.findIndex(([_nameIndex]) => Number(_nameIndex) === nameIndex);
 
 		if (place >= output.length) {
 			output.push({
-				id: uuid,
+				nameIndex,
 				count: sorted[place][1],
 				place: place + 1,
 			});
 		}
 	}
 
-	return output;
+	return output.map((item) => {
+		const name = stats.names[item.nameIndex];
+		const area = restoreArea(String(name).slice(0, 2));
+		const nickname = String(name).slice(3);
+
+		return {
+			name: nickname,
+			count: item.count,
+			place: item.place,
+			platform: area,
+		};
+	});
 };
 
 export const getLastActivity = () => {

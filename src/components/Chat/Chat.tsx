@@ -5,12 +5,14 @@ import cn from 'classnames';
 import { useDraggable } from '../../hooks/useDraggable';
 
 import { getChatMessages, sendChatMessage } from '../../lib/api';
-import { formatDate } from '../../helpers';
+import { formatDate } from '../../helpers/formatDate';
+import { nickSanitize } from '../../helpers/nickSanitize'
 import ee from '../../lib/ee';
 
 import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
 import SteamIcon from '/assets/steam_bw.svg';
+import TelegramIcon from '/assets/telegram_bw.svg';
 import StarIcon from '/assets/star.svg';
 
 import * as s from './Chat.module.scss';
@@ -45,6 +47,7 @@ const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
 	steam: SteamIcon,
+	telegram: TelegramIcon,
 	system: StarIcon,
 };
 
@@ -72,7 +75,7 @@ export const Message: React.FC<MessageProps> = ({
 				onClick={() => handleMention(message.name)}
 			>
 				<div>
-					{icons[message.area] && icons[message.area]()}{message.name || '[EMPTY NICKNAME]'}
+					{icons[message.area] && icons[message.area]()}{nickSanitize(message.name)}
 				</div>
 				<div>
 					{formatDate(message.time, 'hh:mm')}

@@ -25,7 +25,6 @@ const {
 	},
 	finishTimeStamp,
 	finishText,
-	guestCanPlay,
 } = require('../config.json');
 
 let webServer = null;
@@ -215,8 +214,9 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 		}
 
 		const ip = getIPAddress(req);
-		const onlineCount = getOnlineCount();
-		const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
+		// const onlineCount = getOnlineCount();
+		// const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
+		const countdown = -1;
 		const isAuthorized = checkUserAuthByToken(token);
 		const user = getUserData(token);
 
@@ -231,7 +231,7 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 			palette: COLORS,
 			finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
 			finishText: finishText || 'TIMEOUT',
-			needAuthorize: !guestCanPlay,
+			needAuthorize: true,
 		});
 
 		ws.on('message', (buf: Buffer) => {

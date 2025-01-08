@@ -3,7 +3,7 @@
  */
 
 import { createCanvas } from 'canvas';
-import { HSLToRGB, RGBToHEX } from '../helpers/colors';
+import { getColorHeat, getGradient } from '../helpers/colors';
 
 export const heatmapFromStats = (stats: any) => {
 	let width = 0;
@@ -47,10 +47,7 @@ export const heatmapFromStats = (stats: any) => {
 			const [,,, count = 0] = stats[key] || [];
 
 			if (count) {
-				const h = (1.0 - (Math.min(count / med, 1))) * 360;
-				const hsl = [h, 100, 50];
-				const rgb = HSLToRGB(hsl);
-				const color = RGBToHEX(rgb);
+				const color = getColorHeat(1.0 - (Math.min(count / med, 1)), 250);
 
 				ctx.fillStyle = color;
 				ctx.fillRect(x, y, 1, 1);
@@ -100,10 +97,7 @@ export const heatmapNewestFromStats = (stats: any) => {
 
 			if (stats[key]) {
 				const [time] = stats[key];
-				const h = (1.0 - (Math.min((time - min) / med, 1))) * 360;
-				const hsl = [h, 100, 50];
-				const rgb = HSLToRGB(hsl);
-				const color = RGBToHEX(rgb);
+				const color = getColorHeat(1.0 - (Math.min((time - min) / med, 1)), 250);
 	
 				ctx.fillStyle = color;
 				ctx.fillRect(x, y, 1, 1);
@@ -148,10 +142,7 @@ export const heatmapNewestByIndex = (stats: any) => {
 
 			if (stats[key]) {
 				const [,,,,, index] = stats[key];
-				const h = (1.0 - (Math.min(index / max, 1))) * 360;
-				const hsl = [h, 100, 50];
-				const rgb = HSLToRGB(hsl);
-				const color = RGBToHEX(rgb);
+				const color = getColorHeat(1.0 - (Math.min(index / max, 1)), 250);
 	
 				ctx.fillStyle = color;
 				ctx.fillRect(x, y, 1, 1);
@@ -230,13 +221,7 @@ export const mapByUsersFromStats = (stats: any, UUID: string) => {
 	ctx.fillRect(0, 0, width + 1, height + 1);
 
 	const length = Object.keys(uuids).length;
-	const colors = Array(length + 1).fill(null).map((e, i) => (
-		'#' + (
-				Math.floor(0xffffff / length) * i
-		).toString(16).padStart(6, '0')
-	));
-
-	colors.shift();
+	const colors = UUID ? [] : getGradient(length);
 
 	const uuidsData: any = Object.keys(uuids).reduce((list, key, index) => ({ ...list, [key]: index }), {});
 
@@ -278,13 +263,7 @@ export const mapByIP = (stats: any, IP: string) => {
 	ctx.fillRect(0, 0, width + 1, height + 1);
 
 	const length = Object.keys(IPs).length;
-	const colors = Array(length + 1).fill(null).map((e, i) => (
-		'#' + (
-				Math.floor(0xffffff / length) * i
-		).toString(16).padStart(6, '0')
-	));
-
-	colors.shift();
+	const colors = IP ? [] : getGradient(length);
 
 	const IPsData: any = Object.keys(IPs).reduce((list, key, index) => ({ ...list, [key]: index }), {});
 

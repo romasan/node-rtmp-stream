@@ -109,6 +109,11 @@
 	border-left-color: #2d2d3a;
 	box-sizing: border-box;
 	cursor: pointer;
+	transition: transform 0.2s;
+
+	&:hover {
+		transform: scale(1.2);
+	}
 }
 
 :global(.mobile) {
@@ -123,7 +128,7 @@
 	}
 
 	.colors {
-		max-width: calc(100vw - 5px);
+		max-width: calc(100vw - 10px);
 		overflow-x: auto;
 		overflow-y: hidden;
 		grid-template-rows: 1fr;
@@ -132,7 +137,12 @@
 
 	.color {
 		@include size(8vw);
-		border-radius: 10px;
+
+		border-radius: 12px;
+
+		&:hover {
+			transform: unset;
+		}
 	}
 
 	.currentColorWrapper {

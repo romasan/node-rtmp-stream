@@ -5,7 +5,7 @@
 - [x] auth by discord
 - [ ] auth by vk
 - [ ] auth by steam
-- [ ] auth by telegram
+- [x] auth by telegram
 - [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
@@ -43,6 +43,8 @@
 - [ ] chat messages from user
 - [ ] chat delete all for banned
 - [ ] fix typescript warnings and remove all "any" plug
+- [ ] mute/ban with timeout
+- [ ] use account uuid for stats
 
 # admin panel
 

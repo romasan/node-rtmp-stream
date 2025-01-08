@@ -10,9 +10,10 @@ import {
 } from '../../components';
 
 import {
+	fetchTimelapseSeasons,
 	fetchTimelapse,
 	fetchTimelapsePartBin,
-	APIhost,
+	staticHost,
 } from '../../lib/api';
 
 import { gzipAB, formatNumber } from '../../helpers';
@@ -95,7 +96,8 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 };
 
 export const App: React.FC = () => {
-	const [selectedEpisode, setSelectedEpisode] = useState('s2e2');
+	const [timelapseList, setTimelapseList] = useState<any[]>([]);
+	const [selectedEpisode, setSelectedEpisode] = useState('');
 	const [timelapse, setTimelapse] = useState<ITimelapse>({});
 	const [speed, setSpeed] = useState(defaultSpeed);
 	const speedRef = useRef(speed);
@@ -118,7 +120,7 @@ export const App: React.FC = () => {
 	const [cursorDisplay, setCursorDisplay] = useState('');
 
 	const imageSrc = useMemo(() => {
-		return `${APIhost}/timelapse/${selectedEpisode}/${startPart}.png`;
+		return selectedEpisode ? `${staticHost}/timelapse/${selectedEpisode}/${startPart}.png` : '';
 	}, [selectedEpisode, startPart]);
 
 	const frameWidth = useMemo(() => {
@@ -398,13 +400,22 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		const timer = setInterval(() => {
-			setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total) : 0}`);
+			setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total || 0) : 0}`);
 		}, 300);
 
 		return () => {
 			clearInterval(timer);
 		};
 	}, [timelapse]);
+
+	useEffect(() => {
+		fetchTimelapseSeasons().then(
+			(resp) => {
+				setTimelapseList(resp.seasons);
+				setSelectedEpisode(resp.seasons[resp.seasons.length - 1].key);
+			}
+		).catch(() => {});
+	}, []);
 
 	return (
 		<>
@@ -447,11 +458,16 @@ export const App: React.FC = () => {
 						<div>
 							Сезон:
 							<select onChange={handleSelectEpisode}>
-								<option value="s1e1">S1E1</option>
-								<option value="s1e2">S1E2</option>
-								<hr />
-								<option value="s2e1" selected>S2E1</option>
-								<option value="s2e2" selected>S2E2</option>
+								{timelapseList.map((item, i, { length }) => (
+									item.delimiter ? (
+										<hr key={item.key} />
+									) : (
+										<option key={item.key} value={item.key} selected={i === length - 1}>{item.label}</option>
+									)
+								))}
+								{timelapseList.length === 0 && (
+									<option>Загрузка...</option>
+								)}
 							</select>
 						</div>
 					</div>

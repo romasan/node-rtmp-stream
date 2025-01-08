@@ -45,7 +45,6 @@
 			"white": "#ffffff"
 		}
 	},
-	"guestCanPlay": true,
 	"stream": {
 		"videoSize": {
 			"width": 1280,

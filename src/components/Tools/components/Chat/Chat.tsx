@@ -10,6 +10,13 @@ import { get, post, put, patch, drop } from '../../helpers';
 
 import * as s from './Chat.module.scss';
 
+const shortArea = (area: string) => ({
+	steam: 'ST',
+	twitch: 'TV',
+	discord: 'DS',
+	telegram: 'TG',
+}[area] || area);
+
 export const Chat: FC = () => {
 	const [messages, setMessages] = useState<any[]>([]);
 	const [count, setCount] = useState('100');
@@ -120,7 +127,7 @@ export const Chat: FC = () => {
 				{messages.map((message) => (
 					<div key={message.id} className={s.item}>
 						<div>
-							<b>{message.name}</b> ({formatDate(message.time)}):
+							<b>{message.name}@{shortArea(message.area)}</b> ({formatDate(message.time)}):
 						</div>
 						<div>
 							{message.text}

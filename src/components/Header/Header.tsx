@@ -66,7 +66,7 @@ export const Header: React.FC<Props> = ({
 					<div className={s.controls}>
 						{isAuthorized ? (
 							<a href="/logout" className={cn({[s.disabled]: !isOnline})} aria-label="Выход">
-								<LogoutIcon />
+								<LogoutIcon className={s.iconButton} />
 							</a>
 						) : (
 							<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} aria-label="Выход" />
@@ -76,11 +76,11 @@ export const Header: React.FC<Props> = ({
 						</span>
 						<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
 						<a href="/timelapse" aria-label="Таймлапс">
-							<TimelapseIcon />
+							<TimelapseIcon className={s.iconButton} />
 						</a>
 						{role === ERole.moderator && (
 							<a href="/qq" aria-label="tools">
-								<GearIcon />
+								<GearIcon className={s.iconButton} />
 							</a>
 						)}
 					</div>

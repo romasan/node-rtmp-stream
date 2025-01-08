@@ -22,7 +22,6 @@ import { chat } from './chat';
 import { messages } from './messages';
 import { logout } from './logout';
 import { stats } from './stats';
-import { timelapse } from './timelapse';
 import { Log } from '../utils/log';
 
 const { server: { origin } } = require('../config.json');
@@ -139,8 +138,7 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 			!await twitchAuth(req, res) &&
 			!await steamAuth(req, res) &&
 			!await discordAuth(req, res) &&
-			!telegramAuth(req, res) &&
-			!timelapse(req, res)
+			!telegramAuth(req, res)
 		) {
 			getInfo(req, res);
 		} else {

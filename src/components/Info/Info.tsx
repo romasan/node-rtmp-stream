@@ -4,7 +4,8 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import { getStats } from '../../lib/api';
 
-import { formatNumber } from '../../helpers';
+import { formatNumber } from '../../helpers/formatNumber';
+import { nickSanitize } from '../../helpers/nickSanitize'
 
 import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
@@ -62,7 +63,7 @@ export const Info: FC<Props> = ({
 										{item.place < 10 && <>&nbsp;</>}
 										{item.place}.
 										{icons[item.platform] ? icons[item.platform]() : <div className={s.space} />}
-										{item.name}
+										{nickSanitize(item.name)}
 									</span>
 									<span>
 										{formatNumber(item.count)}
