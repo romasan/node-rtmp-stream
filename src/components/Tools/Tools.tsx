@@ -19,6 +19,7 @@ import {
 	Metrics,
 	Chat,
 	Countdown,
+	UpdateLevel,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -76,42 +77,20 @@ export const Tools: FC<Props> = ({
 							<Bans />
 							<Chat />
 							<Countdown />
+							<UpdateLevel />
 							<Block title="* Откат полотна к состоянию">
 								<div>TODO</div>
+								<div>
+									<label>
+										<input type="checkbox" />
+										lock canvas
+									</label>
+								</div>
 								<div>
 									<button>Предпросмотр без забаненных</button>
 								</div>
 								<div>
-									<button>PAUSE</button>
-								</div>
-								<div>
 									<button>RELOAD ALL (WAWE)</button>
-								</div>
-							</Block>
-							<Block title="* Увеличить размер полотна"
-								// onOpen={() => console.log('==== open #2')}
-								// onClose={() => console.log('==== close #2')}
-							>
-								<div>TODO</div>
-								<div>
-									<input type="checkbox" /> lock canvas
-								</div>
-								<div>999x999</div>
-								<div>
-									<input size="5" />
-									x
-									<input size="5" />
-								</div>
-								<div>
-									<input type="radio" name="corner" checked />
-									<input type="radio" name="corner" />
-								</div>
-								<div>
-									<input type="radio" name="corner" />
-									<input type="radio" name="corner" />
-								</div>
-								<div>
-									<button>update</button>
 								</div>
 							</Block>
 							<Block title="* Выставить окончание пиксельбаттла">

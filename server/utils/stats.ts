@@ -252,17 +252,22 @@ export const getPixelAuthor = (x: number, y: number) => {
 	const [
 		currentTime,
 		currentUuid,
-		// currentColor,
-		// prevColorUuid,
-		// prevColorColor,
-		// prevUserUuid,
-		// prevUserColor,
-		// count,
+		,
+		,
+		,
+		,
+		nameIndex,
 	] = stats?.[key] || [];
+
+	const name = stats.names[nameIndex];
+	const area = restoreArea(String(name).slice(0, 2));
+	const nickname = String(name).slice(3);
 
 	return {
 		uuid: stats?.uuids?.[currentUuid],
 		time: currentTime,
+		area,
+		nickname,
 	};
 };
 

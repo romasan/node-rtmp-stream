@@ -7,13 +7,11 @@ import {
 	getPixelColor,
 } from '../../utils/stats';
 import { getUserData } from '../../utils/auth';
-import { getSessionUserName } from '../../utils/sessions';
 
 export const pixel = (req: IncomingMessage, res: ServerResponse) => {
 	const { x, y } = getSearch(req.url as string) as any;
-	const { uuid, time } = getPixelAuthor(x, y);
+	const { area, nickname, uuid, time } = getPixelAuthor(x, y);
 	const pixelUser: any = getUserData(uuid);
-	const name = pixelUser?.name || getSessionUserName(uuid);
 	const ip = getPixelAuthorIPAddress(x, y);
 
 	const errors = [];
@@ -38,7 +36,8 @@ export const pixel = (req: IncomingMessage, res: ServerResponse) => {
 		uuid,
 		time,
 		color: getPixelColor(x, y),
-		name,
+		area,
+		name: nickname,
 		user: pixelUser,
 		logins: table,
 		ip,

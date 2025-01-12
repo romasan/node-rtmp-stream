@@ -5,19 +5,36 @@
 	box-sizing: border-box;
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	gap: 10px;
 	position: absolute;
 	top: 0;
 	padding: 4px 8px;
 	z-index: 1;
-	background: #fff7;
+	background: #fffb;
 }
 
 .title {
-	display: flex;
-	flex-direction: column;
+	display: grid;
 	text-decoration: none;
 	white-space: nowrap;
+
+	display: grid;
+	grid-template-columns: 30px 1fr;
+	grid-template-areas: 
+		"logo title"
+		"logo subtitle";
+	grid-column-gap: 8px;
+	grid-row-gap: 0px;
+	
+	& > h1 { grid-area: title; }
+	& > h2 { grid-area: subtitle; }
+}
+
+.logo {
+	@include size(32px);
+
+	grid-area: logo;
 }
 
 h1, h2 {
@@ -27,11 +44,11 @@ h1, h2 {
 }
 
 h1 {
-	font-size: 24px;
+	font-size: 20px;
 }
 
 h2 {
-	font-size: 14px;
+	font-size: 12px;
 }
 
 .controlsWrapper, .controls {
@@ -86,6 +103,13 @@ h2 {
 }
 
 :global(.mobile) {
+	.title {
+		grid-template-areas: "logo";
+
+		& > h1 { display: none; }
+		& > h2 { display: none; }
+	}
+
 	.controlsWrapper {
 		display: flex;
 		flex-direction: column-reverse;

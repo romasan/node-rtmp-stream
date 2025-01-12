@@ -26,16 +26,16 @@
 - [ ] integration tests
 - [ ] fix zoom on click on non canvas and "pixel" elements
 - [ ] webassembly + canvas =) rust?
-- [ ] add to telegram web app (add qr to stream)
+- [ ] add to telegram web app (add qr to stream) (like https://github.com/hip-hyena/PaintBot)
 - [ ] chat rate limit
 - [ ] check has new banned users/IP in pixels.log
 - [ ] rating for groups/squads/tags
 - [ ] achievements!
-использовал все цвета;
-вступил в группу;
-поставил 100, 1к, 10к, 100к пикселей;
-ставил точки не уходя 8, 24 часа;
-учавствовал каждый день в течении недели;
+	- used all colors;
+	- joined the squad;
+	- put 100, 1k, 10k, 100k pixels;
+	- put dots without leaving for 1, 8, 24 hours;
+	- participated every day for a week;
 - [ ] chat slow mode
 - [x] chat mute user
 - [x] add datetime for logs

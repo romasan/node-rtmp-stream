@@ -21,7 +21,6 @@ import {
 	getPixelColor,
 	getPixelAuthor,
 } from '../utils/stats';
-import { getSessionUserName } from '../utils/sessions';
 import { Log } from '../utils/log';
 
 const {
@@ -148,8 +147,7 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 	}
 
 	const { x, y } = getSearch(req.url as string) as any;
-	const { uuid, time } = getPixelAuthor(x, y);
-	const user: any = getUserData(uuid);
+	const { area, nickname, time } = getPixelAuthor(x, y);
 	const color = getPixelColor(x, y);
 
 	const finished = !checkStillTime();
@@ -166,7 +164,8 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 			time: time ? _time : -1,
 			...(color && {
 				color,
-				name: user?.name || getSessionUserName(uuid),
+				area,
+				name: nickname,
 			}),
 		}));
 

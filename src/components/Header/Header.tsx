@@ -7,6 +7,7 @@ import { Info } from '../Info';
 
 import { ERole } from '../../hooks';
 
+import LogoIcon from '/assets/logo.svg';
 import ChatIcon from '/assets/chat.svg';
 import LoginIcon from '/assets/login.svg';
 import LogoutIcon from '/assets/logout.svg';
@@ -54,6 +55,7 @@ export const Header: React.FC<Props> = ({
 		<>
 			<div className={s.root}>
 				<a href="/" className={s.title}>
+					<LogoIcon className={s.logo} />
 					<h1>PIXEL BATTLE</h1>
 					<h2>Пиксель батл 2025 S3E1</h2>
 				</a>
