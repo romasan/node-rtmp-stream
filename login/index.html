@@ -1,6 +1,21 @@
 <html>
 	<head>
 		<title>Авторизация</title>
+		<script>
+			function addScript(src, callback) {
+				const script = document.createElement('script');
+				script.src = src;
+				script.async = true;
+
+				script.onload = function() {
+					if (typeof callback === 'function') {
+						callback();
+					}
+				};
+
+				document.head.appendChild(script);
+			}
+		</script>
 		<style>
 			#root {
 				display: flex;
@@ -14,12 +29,48 @@
 	<body>
 		<div id="root">
 			<div id="content">Авторизация</div>
+			<!-- telegram -->
 			<script id="tg-script"
 				data-telegram-login="PixelBattleOnlineBot"
 				data-size="large"
 				data-radius="10"
 				data-auth-url="https://api.pixelbattles.ru/auth/telegram"
 				data-request-access="write"></script>
+			<!-- vk -->
+			<script>
+				const vk = () => {
+					console.log('==== VKIDSDK', 'VKIDSDK' in window);
+
+					if ('VKIDSDK' in window) {
+						const VKID = window.VKIDSDK;
+					
+						VKID.Config.init({
+							app: 52936975,
+							redirectUrl: 'https://api.vk.com/method/users.get',
+							responseMode: VKID.ConfigResponseMode.Callback,
+							source: VKID.ConfigSource.LOWCODE,
+							// scope: '',
+						});
+					
+						const oneTap = new VKID.OneTap();
+					
+						oneTap
+							.render({
+								container: document.currentScript.parentElement,
+								showAlternativeLogin: true
+							})
+							.on(VKID.WidgetEvents.ERROR, () => {})
+							.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+								const code = payload.code;
+								const deviceId = payload.device_id;
+						
+								VKID.Auth.exchangeCode(code, deviceId)
+									.then(() => {})
+									.catch(() => {});
+							});
+					}
+				};
+			</script>
 		</div>
 
 		<script>
@@ -31,19 +82,22 @@
 				'twitch',
 				'steam',
 				'discord',
-				'telegram'
+				'telegram',
+				'vk',
 			].includes(query) ? query : 'twitch';
+			const content = document.querySelector('#content');
 
 			if (query === 'telegram') {
-				const content = document.querySelector('#content');
 				const tgScript = document.querySelector('#tg-script');
 
 				content.innerHTML = '';
 				tgScript.src = 'https://telegram.org/js/telegram-widget.js?7';
+			} else if (query === 'vk') {
+				content.innerHTML = '';
+				addScript('https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js', vk);
 			} else {
 				document.location.href = `${APIhost}/auth/${key}`;
 			}
-
 		</script>
 	</body>
 </html>
