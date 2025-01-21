@@ -1,7 +1,8 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 
-// import { StatefulToolTip } from 'react-portal-tooltip-upgraded';
 import Tooltip from 'antd/es/tooltip';
+// import { LineChart } from 'react-chartkick';
+// import 'chartkick/chart.js'
 
 import { get } from '../../../../helpers';
 
@@ -13,7 +14,13 @@ import {
 
 import * as s from './Calendar.module.scss';
 
-export const getChart = (data: number[][], width: number, height: number) => {
+export const getChart = (data: number[][], width: number, height: number, label?: string) => {
+	console.log('==== getChart', {
+		data,
+		width,
+		height,
+		label,
+	});
 	const max = data.reduce((current, [, value]) => Math.max(current, value), 0);
 	const startY = height - data[0][1] / max * height;
 	const path = `M0 ${startY}L${data.slice(1).map(([, value], index) => {
@@ -91,7 +98,7 @@ export const Calendar: FC = () => {
 								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
 									{week.map((day, dayIndex) => (
 										day ? (
-											<Tooltip key={day.day} title={
+											<Tooltip key={day.day} fresh title={(...a) => (
 												<div className={s.tooltip}>
 													<div className={s.tooltip}>
 														<div className={s.hours}>
@@ -102,11 +109,12 @@ export const Calendar: FC = () => {
 															}
 														</div>
 														<div className={s.chart}>
-															{getChart(prepareHours(day.pixByHours), 300, 100)}
+															{getChart(prepareHours(day.pixByHours), 300, 100, `${month.title}-${weekIndex}-${day.day}`)}
+															{/* <LineChart data={{"2025-05-13": 2, "2025-05-14": 5}} /> */}
 														</div>
 													</div>
 												</div>
-											} color="#fff">
+											)} color="#fff">
 												<div className={s.day} key={`${month.title}-${dayIndex}`}>
 													<div>{day.day}</div>
 													<div>{day.uniqSessions || <>&nbsp;</>}</div>

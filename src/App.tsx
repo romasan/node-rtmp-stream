@@ -7,9 +7,10 @@ import mobile from 'is-mobile';
 import {
 	Canvas,
 	Palette,
-	Header,
+	HeaderLogo,
+	HeaderControls,
 	Countdown,
-	Bar,
+	// Bar,
 	Login,
 } from './components/';
 
@@ -120,7 +121,8 @@ export const App: React.FC = () => {
 	return (
 		<>
 			<div className={cn(s.root, { mobile: isMobile })}>
-				<Header
+				<HeaderLogo />
+				<HeaderControls
 					isAuthorized={isAuthorized}
 					name={wsStore ? wsStore.name : ''}
 					isOnline={isOnline}
@@ -140,13 +142,13 @@ export const App: React.FC = () => {
 					onInit={setCanvas}
 					src={`${APIhost}/canvas.png`}
 				/>
-				{!isMobile && (
+				{/* {!isMobile && (
 					<Bar
 						centering={canvas.centering}
 						setScale={canvas.setScale}
 						isFinished={isFinished}
 					/>
-				)}
+				)} */}
 				{wsStore.palette && !isFinished && (
 					<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
 				)}

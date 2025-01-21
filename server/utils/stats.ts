@@ -260,8 +260,9 @@ export const getPixelAuthor = (x: number, y: number) => {
 	] = stats?.[key] || [];
 
 	const name = stats.names[nameIndex];
-	const area = restoreArea(String(name).slice(0, 2));
-	const nickname = String(name).slice(3);
+	const noArea = name?.[0] === ':';
+	const area = noArea ? '' : restoreArea(String(name).slice(0, 2));
+	const nickname = String(name).slice(noArea ? 1 : 3);
 
 	return {
 		uuid: stats?.uuids?.[currentUuid],

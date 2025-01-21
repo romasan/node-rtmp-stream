@@ -6,5 +6,6 @@ export * from './Palette';
 export * from './Tools';
 export * from './Info';
 export * from './Countdown';
-export * from './Header';
+export * from './HeaderLogo';
+export * from './HeaderControls';
 export * from './Login';

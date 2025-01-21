@@ -6,7 +6,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 
 import { getChatMessages, sendChatMessage } from '../../lib/api';
 import { formatDate } from '../../helpers/formatDate';
-import { nickSanitize } from '../../helpers/nickSanitize'
+import { nickSanitize } from '../../helpers/nickSanitize';
 import ee from '../../lib/ee';
 
 import TwitchIcon from '/assets/twitch_bw.svg';

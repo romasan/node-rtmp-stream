@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getOnlineCountRaw, getOnlineCount } from '../../utils/ws';
+import { getOnlineCountRaw, getOnlineCountUniqUUID } from '../../utils/ws';
 import { getLastActivity, getTotalPixels } from '../../utils/stats';
 import { getUserData } from '../../utils/auth';
 import { getSessionUserName } from '../../utils/sessions';
@@ -8,7 +8,7 @@ const startTime = Date.now();
 
 export const stats = (req: IncomingMessage, res: ServerResponse) => {
 	const [open, all, countByActivity] = getOnlineCountRaw();
-	const uniq = getOnlineCount();
+	const uniq = getOnlineCountUniqUUID();
 	const {
 		lastActivity,
 		perMin,

@@ -3,7 +3,7 @@ export const shortArea = (area: string) => ({
 	twitch: 'TV',
 	discord: 'DS',
 	telegram: 'TG',
-}[area] || (area + area).slice(0, 2));
+}[area] || '');
 
 
 export const restoreArea = (shortArea: string) => ({

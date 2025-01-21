@@ -38,7 +38,7 @@
 
 .footer {
 	display: flex;
-	gap: 10px;
+	gap: 8px;
 	position: absolute;
 	bottom: 0;
 	right: 0;
@@ -51,6 +51,10 @@
 		&:hover {
 			transform: scale(1.2);
 		}
+	}
+
+	& svg {
+		@include size(32px);
 	}
 }
 

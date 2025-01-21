@@ -7,7 +7,6 @@ import { Info } from '../Info';
 
 import { ERole } from '../../hooks';
 
-import LogoIcon from '/assets/logo.svg';
 import ChatIcon from '/assets/chat.svg';
 import LoginIcon from '/assets/login.svg';
 import LogoutIcon from '/assets/logout.svg';
@@ -15,7 +14,7 @@ import TimelapseIcon from '/assets/clock.svg';
 import InfoIcon from '/assets/info.svg';
 import GearIcon from '/assets/gear.svg';
 
-import * as s from './Header.module.scss';
+import * as s from './HeaderControls.module.scss';
 
 interface Props {
 	isAuthorized: boolean;
@@ -29,7 +28,7 @@ interface Props {
 	[key: string]: any;
 }
 
-export const Header: React.FC<Props> = ({
+export const HeaderControls: React.FC<Props> = ({
 	isAuthorized,
 	name,
 	isOnline,
@@ -54,11 +53,6 @@ export const Header: React.FC<Props> = ({
 	return (
 		<>
 			<div className={s.root}>
-				<a href="/" className={s.title}>
-					<LogoIcon className={s.logo} />
-					<h1>PIXEL BATTLE</h1>
-					<h2>Пиксель батл 2025 S3E1</h2>
-				</a>
 				<div className={s.controlsWrapper}>
 					{isAuthorized && (
 						<div className={s.userName}>

@@ -67,7 +67,7 @@ export const spam = (data: any) => {
 // };
 
 export const updateClientCountdown = (token: string) => {
-	const onlineCount = getOnlineCount();
+	const onlineCount = getOnlineCountUniqUUID();
 	const countdown = getCountdown(token, onlineCount, false, true) * 1000;
 
 	const tokens = getAccoutntTokens(token);
@@ -100,7 +100,7 @@ export const getOnlineCountRaw = () => {
 let updatedCacheTime = 0;
 let cachedOnline = 0;
 
-export const getOnlineCount = (): number => {
+export const getOnlineCountUniqUUID = (): number => {
 	if (Date.now() - updatedCacheTime < 5_000) {
 		return cachedOnline;
 	}
@@ -214,9 +214,8 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 		}
 
 		const ip = getIPAddress(req);
-		// const onlineCount = getOnlineCount();
-		// const countdown = guestCanPlay ? getCountdown(token, onlineCount) * 1000 : -1;
-		const countdown = -1;
+		const onlineCount = getOnlineCountUniqUUID();
+		const countdown = getCountdown(token, onlineCount) * 1000;
 		const isAuthorized = checkUserAuthByToken(token);
 		const user = getUserData(token);
 

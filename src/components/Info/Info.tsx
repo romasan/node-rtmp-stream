@@ -33,6 +33,8 @@ export const Info: FC<Props> = ({
 		loading: true,
 		leaderboard: [],
 		total: 0,
+		onlineList: [],
+		onlineCount: 0,
 	});
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 350, y: 55});
 
@@ -53,10 +55,8 @@ export const Info: FC<Props> = ({
 				) : (
 					<div>
 						<div>Всего пикселей: {formatNumber(stats.total)}</div>
-						<div>&nbsp;</div>
 						<div>
-							<div>ТОП участников:</div>
-							<div>&nbsp;</div>
+							<div className={s.title}>ТОП участников:</div>
 							{(stats.leaderboard || []).map((item) => (
 								<div key={String(item.place)} className={s.leaderBoardItem}>
 									<span>
@@ -71,23 +71,25 @@ export const Info: FC<Props> = ({
 								</div>
 							))}
 						</div>
-						{/* <div>
-							<div>Онлайн: </div>
-							<div>&nbsp;</div>
-							{(stats.leaderboard || []).map((item) => (
-								<div key={String(item.place)} className={s.leaderBoardItem}>
-									<span>
-										{item.place < 10 && <>&nbsp;</>}
-										{item.place}.
-										{icons[item.platform] ? icons[item.platform]() : <div className={s.space} />}
-										{item.name}
-									</span>
-									<span>
-										{formatNumber(item.count)}
-									</span>
-								</div>
-							))}
-						</div> */}
+						{stats.onlineCount > 0 && (
+							<div>
+								<div className={s.title}>Онлайн ({stats.onlineCount}): </div>
+								{stats.onlineList.map((item, index) => (
+									<div key={String(item.place)} className={s.leaderBoardItem}>
+										<span>
+											&nbsp;&nbsp;&nbsp;
+											{icons[item.area] ? icons[item.area]() : <div className={s.space} />}
+											{item.name}
+										</span>
+									</div>
+								))}
+								{((stats.onlineList.length - stats.onlineCount) > 0) && (
+									<div>
+										&nbsp;&nbsp;&nbsp;и ещё {(stats.onlineList.length - stats.onlineCount)} игрока
+									</div>
+								)}
+							</div>
+						)}
 						{/* <div>
 							<div>Squad-ы: </div>
 							<div>&nbsp;</div>

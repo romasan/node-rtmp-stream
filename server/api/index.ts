@@ -14,6 +14,7 @@ import twitchAuth from './auth/twitch';
 import steamAuth from './auth/steam';
 import discordAuth from './auth/discord';
 import telegramAuth from './auth/telegram';
+import vkAuth from './auth/vk';
 import admin from './admin';
 import { getStatus } from '../utils/stats';
 import { start } from './start';
@@ -138,7 +139,8 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 			!await twitchAuth(req, res) &&
 			!await steamAuth(req, res) &&
 			!await discordAuth(req, res) &&
-			!telegramAuth(req, res)
+			!telegramAuth(req, res) &&
+			!vkAuth(req, res)
 		) {
 			getInfo(req, res);
 		} else {

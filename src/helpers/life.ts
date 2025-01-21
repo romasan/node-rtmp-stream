@@ -34,7 +34,7 @@ const checkAround = (data: any, x: number, y: number, w: number, h: number) => {
 
 let raf = 0;
 
-export const life = (canvas: any, data: any) => {
+export const life = (canvas: any, data?: any) => {
 	if (!canvas) {
 		return;
 	}

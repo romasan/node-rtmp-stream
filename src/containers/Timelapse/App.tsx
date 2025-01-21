@@ -5,7 +5,8 @@ import mobile from 'is-mobile';
 
 import {
 	Canvas,
-	Header,
+	HeaderLogo,
+	HeaderControls,
 	Login,
 } from '../../components';
 
@@ -15,6 +16,8 @@ import {
 	fetchTimelapsePartBin,
 	staticHost,
 } from '../../lib/api';
+
+import { ERole } from '../../hooks';
 
 import { gzipAB, formatNumber } from '../../helpers';
 import { useWsStore } from '../../hooks/useWsStore';
@@ -420,13 +423,15 @@ export const App: React.FC = () => {
 	return (
 		<>
 			<div className={cn(s.root, { mobile: isMobile })}>
-				<Header
+				<HeaderLogo />
+				<HeaderControls
 					isAuthorized={isAuthorized}
 					name={wsStore ? wsStore.name : ''}
 					isOnline={isOnline}
 					hasNewMessage={hasNewMessage}
 					setHasNewMessage={setHasNewMessage}
 					login={loginModal.open}
+					role={ERole.user}
 				/>
 				<Canvas
 					color={''}

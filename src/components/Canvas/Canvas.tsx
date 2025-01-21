@@ -16,7 +16,12 @@ import {
 	formatDate,
 	formatTime,
 } from '../../helpers';
+import { nickSanitize } from '../../helpers/nickSanitize'
 import { getPixel } from '../../lib/api';
+import TwitchIcon from '/assets/twitch_bw.svg';
+import DiscordIcon from '/assets/discord_bw.svg';
+import SteamIcon from '/assets/steam_bw.svg';
+import TelegramIcon from '/assets/telegram_bw.svg';
 
 import { showPixelScale, showPixelScaleMobile, scaleDegree, minScale, maxScale } from '../../const';
 
@@ -33,6 +38,13 @@ export enum ETouchMode {
 	MOVE = 'MOVE',
 	SCALE = 'SCALE',
 }
+
+const icons = {
+	twitch: TwitchIcon,
+	discord: DiscordIcon,
+	steam: SteamIcon,
+	telegram: TelegramIcon,
+};
 
 interface Props {
 	color: string;
@@ -94,28 +106,31 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const timer = useRef(0);
 	const [pixelData, setPixelData] = useState(defaultPixelData);
 	const touchMode = useRef<ETouchMode | null>(null);
+	const [isProgressInited, setIsProgressInited] = useState(false);
 	const showCoordinates = isOnline && !viewOnly;
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
-		let time = '';
-
-		if (isFinished) {
-			time = formatDate(Number(pixelData.time));
-		} else {
-			time = formatTime(pixelData.time);
-		}
-
+		
 		if (pixelData.x === x && pixelData.y === y) {
+			const time = isFinished
+				? formatDate(Number(pixelData.time))
+				: `${formatTime(pixelData.time)} назад`;
+
 			if (pixelData.time >= 0) {
-				return isFinished
-					? `${pixelData.name}\n${time} `
-					: `${pixelData.name}\n${time} назад`;
+				return {
+					name: nickSanitize(pixelData.name),
+					icon: icons[pixelData.area] && icons[pixelData.area](),
+					color: pixelData.color,
+					time,
+				};
 			}
 
-			return isFinished
-				? 'Про этот пиксель все забыли'
-				: 'Пустой пиксель, закрась его';
+			return {
+				label: isFinished
+					? 'Про этот пиксель все забыли'
+					: 'Пустой пиксель, закрась его'
+			};
 		}
 
 		return null;
@@ -491,7 +506,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const text = `${String(min).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
 
 		return (
-			<span className={s.countdown}>{text}</span>
+			<span className={s.countdown}>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<div className={s.countdownProgress} style={{
+					transition: `all ${expiration - Date.now()}ms linear`,
+					width: isProgressInited ? '100%' : '0%',
+				}}></div>
+				<div className={s.countdownLabel}>{text}</div>
+			</span>
 		);
 	};
 
@@ -593,6 +615,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [expiration]);
 
 	useEffect(() => {
+		setIsProgressInited(countdown > 0);
+	}, [countdown]);
+
+	useEffect(() => {
 		ee.on('pix', onPix);
 
 		return () => {
@@ -661,10 +687,27 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 						</div>
 						{scale >= showPixelScale && (
 							<div
-								className={cn(s.pixel, { [s.animated]: animatedPixel, [s.withTitle]: pixelTitle })}
+								className={cn(s.pixel, { [s.animated]: animatedPixel })}
 								style={scale ? getPixelStyle() : {}}
-								data-title={pixelTitle}
 							>
+								{pixelTitle && (
+									<div className={s.tooltip}>
+										<div className={s.tooltipName}>
+											{pixelTitle.icon || ''}
+											{pixelTitle.label || pixelTitle.name}
+										</div>
+										{pixelTitle.time && (
+											<div>{pixelTitle.time}</div>
+										)}
+										{pixelTitle.color && (
+											<div>
+												<span style={{ backgroundColor: pixelTitle.color }}>&nbsp;&nbsp;</span>
+												&nbsp;
+												{pixelTitle.color}
+											</div>
+										)}
+									</div>
+								)}
 								<div className={s.pixelInside}></div>
 							</div>
 						)}

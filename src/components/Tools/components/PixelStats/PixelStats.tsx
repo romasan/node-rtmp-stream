@@ -89,13 +89,13 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				<div key={text}>{text}</div>
 			))}
 			<div>
-				Пиксель: {x}:{y} {stats.color || '...'}
+				Пиксель: {x}:{y} {stats.color || '...'} (X слоёв TODO)
 			</div>
 			<div>
 				{formatTime(Date.now() - stats.time)} назад
 			</div>
 			<div>
-				Ник: {stats.name || '...'}
+				Ник: "{stats.name || '...'}"
 			</div>
 			<div>
 				TOKEN: {stats.uuid || '...'}
