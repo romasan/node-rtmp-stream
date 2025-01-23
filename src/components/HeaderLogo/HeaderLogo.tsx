@@ -2,6 +2,8 @@ import React from 'react';
 
 import LogoIcon from '/assets/logo.svg';
 
+const { year, episode } = require('../../constants.json');
+
 import * as s from './HeaderLogo.module.scss';
 
 export const HeaderLogo: React.FC = () => {
@@ -11,7 +13,7 @@ export const HeaderLogo: React.FC = () => {
 				<a href="/" className={s.title}>
 					<LogoIcon className={s.logo} />
 					<h1>PIXEL BATTLE</h1>
-					<h2>Пиксель батл 2025 S3E1</h2>
+					<h2>Пиксель батл {year} {episode}</h2>
 				</a>
 			</div>
 		</>

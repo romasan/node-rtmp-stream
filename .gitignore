@@ -16,6 +16,7 @@ _*
 *.mp3
 *.mp4
 *.json
+!src/constants.json
 .eslintcache
 *.zip
 .idea/

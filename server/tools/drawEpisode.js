@@ -6,17 +6,29 @@ const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
 const { createCanvas, Image, registerFont } = require('canvas');
-const { drawBGCanvas } = require('../utils/canvas');
-const { getFileLinesCount } = require('../helpers');
+// const { drawBGCanvas } = require('../utils/canvas');
+// const { getFileLinesCount } = require('../helpers');
+
+const getFileLinesCount = (file) => new Promise((resolve) => {
+	const rl = readline.createInterface({
+		input: fs.createReadStream(file),
+		crlfDelay: Infinity
+	});
+
+	let count = 0;
+
+	rl.on('line', () => {
+		count++;
+	});
+
+	rl.on('close', () => {
+		resolve(count);
+	});
+});
 
 registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
-const {
-	WIDTH,
-	HEIGHT,
-} = require('./constants.json');
-
-const PPF = 300;
+const PPF = 100; // 300;
 const FPS = 25;
 const PPS = PPF * FPS;
 
@@ -34,23 +46,23 @@ const videoHeight = 720; // 1080;
 
 // ffmpeg -r 25 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
 
-const scale = 2;
+// const scale = 2;
 
 const breakLine = Infinity;
 
-const drawDayBG = (ctx, day) => {
-	const bg = drawBGCanvas(videoWidth, videoHeight);
-	ctx.drawImage(bg, 0, 0);
+// const drawDayBG = (ctx, day) => {
+// 	const bg = drawBGCanvas(videoWidth, videoHeight);
+// 	ctx.drawImage(bg, 0, 0);
 
-	// const text = `Day #${day}`;
-	// ctx.fillStyle = '#000';
-	// ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
-	// ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
-	// ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
-	// ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
-	// ctx.fillStyle = '#fff';
-	// ctx.fillText(text, textX, textY + textLineHeight);
-};
+// 	const text = `Day #${day}`;
+// 	ctx.fillStyle = '#000';
+// 	ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
+// 	ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
+// 	ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
+// 	ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
+// 	ctx.fillStyle = '#fff';
+// 	ctx.fillText(text, textX, textY + textLineHeight);
+// };
 
 const backupCanvas = (canvas) => {
 	const backupCanvas = createCanvas(canvas.width, canvas.height);
@@ -101,7 +113,9 @@ const circle = (w, h, minR, maxR) => {
 	};
 };
 
-const drawEpisode = async (ep, bg) => {
+const drawEpisode = async (ep, bg, firstFrame) => {
+	console.log('Start draw episode', ep);
+
 	const pixelsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}pixels.log`;
 	const expandsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}expands.log`;
 	const expands = fs.readFileSync(expandsFile)
@@ -138,6 +152,14 @@ const drawEpisode = async (ep, bg) => {
 
 	mctx.fillStyle = '#fff';
 	mctx.fillRect(0, 0, width, height);
+
+	if (firstFrame) {
+		const imgBuf = fs.readFileSync(firstFrame);
+		const image = new Image;
+
+		image.src = imgBuf;
+		mctx.drawImage(image, 0, 0);
+	}
 
 	let i = -1;
 	let frame = 0;
@@ -196,9 +218,9 @@ const drawEpisode = async (ep, bg) => {
 			fs.writeFileSync(output, canvas.toBuffer());
 		}
 
-		if (i % 50_000 === 0) {
-			console.log(`#${frame} frame, ${i} pixels`);
-		}
+		// if (i % 50_000 === 0) {
+		// 	console.log(`#${frame} frame, ${i} pixels`);
+		// }
 	});
 
 	rl.on('close', () => {

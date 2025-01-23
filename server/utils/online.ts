@@ -1,5 +1,6 @@
 import { getOnlineCountList as getOnlineList } from './ws';
 import { getUserData } from './auth';
+import { getSessionUserName } from './sessions';
 
 const CACHE_DURATION = 5_000;
 
@@ -18,7 +19,11 @@ export const getOnlineCountList = (limit = Infinity) => {
 	
 		onlineCountList.forEach((item) => {
 			if (online.size < limit) {
-				const { area, name }: any = getUserData(item.uuid);
+				let { area, name }: any = getUserData(item.uuid);
+
+				if (!name) {
+					name = getSessionUserName(item.uuid);
+				}
 	
 				online.set(`${area}:${name}`, { area, name });
 			} else {

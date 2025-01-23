@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { year, episode } = require('../src/constants.json');
 
 const replaceInFile = (file, callback) => {
 	const source = fs.readFileSync(file).toString();
@@ -24,5 +25,5 @@ replaceInFile(
 		"alternateName": ["Пиксель Батл"],
 		"url": "https://www.pixelbattles.ru/"
 	}
-</script>`),
+</script>`).replace(/\%Y_S_E\%/ig, `${year} ${episode}`),
 );

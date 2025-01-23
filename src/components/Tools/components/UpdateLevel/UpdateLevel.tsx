@@ -8,7 +8,7 @@ import {
 	patch,
 } from '../../helpers';
 
-// import * as s from './Stream.module.scss';
+// import * as s from './UpdateLevel.module.scss';
 
 export const UpdateLevel: FC = () => {
 	// const [canvasConf, setCanvasConf] = useState<any>({});

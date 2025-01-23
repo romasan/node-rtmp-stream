@@ -9,3 +9,4 @@ export * from './Metrics';
 export * from './Chat';
 export * from './Countdown';
 export * from './UpdateLevel';
+export * from './Final';

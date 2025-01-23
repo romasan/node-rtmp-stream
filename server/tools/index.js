@@ -7,7 +7,7 @@ const libs = [
 	'upscale',
 	'drawDiffMask',
 	'checkLog',
-	'drawSteps',
+	'drawEpisode',
 	'filterByUUID',
 	'getDirectoriesRecursive',
 	'expand',
@@ -27,7 +27,7 @@ const libs = [
 const getLib = (key) => {
 	const lib = require(`./${key}`);
 
-	return lib;
+	return lib[key] || lib;
 };
 
 const [command, ...attrs] = argv;

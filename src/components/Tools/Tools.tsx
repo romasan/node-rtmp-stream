@@ -20,6 +20,7 @@ import {
 	Chat,
 	Countdown,
 	UpdateLevel,
+	Final,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -93,18 +94,7 @@ export const Tools: FC<Props> = ({
 									<button>RELOAD ALL (WAWE)</button>
 								</div>
 							</Block>
-							<Block title="* Выставить окончание пиксельбаттла">
-								<div>TODO</div>
-								<div>
-									<input type="datetime-local" />
-								</div>
-								<div>
-									<input placeholder="MESSAGE" />
-								</div>
-								<div>
-									<button>save</button>
-								</div>
-							</Block>
+							<Final />
 						</>
 					)}
 				</div>

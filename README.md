@@ -15,7 +15,7 @@
 - [x] session caching
 - [ ] moderations (with log)
 - [x] replace res/ -> assets/
-- [ ] online users list
+- [x] online users list
 - [x] reset countdown on login
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
@@ -24,7 +24,7 @@
 - [ ] use one countdown for active unauthorized users with one ip address
 - [ ] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
-- [ ] fix zoom on click on non canvas and "pixel" elements
+- [x] fix zoom on click on non canvas and "pixel" elements
 - [ ] webassembly + canvas =) rust?
 - [ ] add to telegram web app (add qr to stream) (like https://github.com/hip-hyena/PaintBot)
 - [ ] chat rate limit
@@ -99,7 +99,6 @@
 - [x] contrast border for pixel placeholder
 - [ ] FAQ page
 - [x] timelapse page
-- [ ] leaderboard page
 - [x] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
 - [ ] fix layout after resize
 - [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
@@ -109,6 +108,8 @@
 - [ ] offline indicator
 - [ ] add react router and make SPA
 - [ ] play button in center of timelapse canvas
+- [ ] hash link to coordinate, like https://pixelbattles.ru/#100,200 go to position, scale, higlight pixel
+- [ ] fix countdown progress position on reload page
 
 # page with infinity map
 
@@ -156,21 +157,6 @@ ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:
 ```bash
 ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
 ```
-
-# S1E2 TODO
-
-- [x] move and re create: (bash ./newep.sh)
-- (auto) pixels.log
-- (auto) expands.log
-- (auto) inout.log (112x112) // 120x120
-
-- [x] update .env file
-- clear FINISH_TIME_STAMP
-- UPSCALE=true
-
-- [x] update constants
-- coundown
-- add new colors
 
 # nginx
 
