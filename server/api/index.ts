@@ -81,7 +81,7 @@ const getCanvasImage = (req: IncomingMessage, res: ServerResponse) => {
 
 const getFavicon = (req: IncomingMessage, res: ServerResponse) => {
 	res.writeHead(200, { 'Content-Type': 'image/x-icon' });
-	fs.createReadStream('./favicon.ico').pipe(res);
+	fs.createReadStream(__dirname + '/../favicon.ico').pipe(res);
 };
 
 const getInfo = (req: IncomingMessage, res: ServerResponse) => {
