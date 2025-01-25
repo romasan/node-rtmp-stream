@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run build:server && pm2 start node ./lib/index.js",
     "stop": "pm2 stop index",
-    "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/",
+    "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/ && cp ./server/favicon.png ./lib/",
     "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
     "dev:web": "parcel pages/index.html pages/*/index.html",
     "prebuild": "rm -rf dist/*.* .parcel-cache",
