@@ -25,7 +25,6 @@ interface Props {
 	setHasNewMessage: (value: boolean) => void;
 	role: ERole;
 	login: () => void;
-	[key: string]: any;
 }
 
 export const HeaderControls: React.FC<Props> = ({
@@ -61,21 +60,21 @@ export const HeaderControls: React.FC<Props> = ({
 					)}
 					<div className={s.controls}>
 						{isAuthorized ? (
-							<a href="/logout" className={cn({[s.disabled]: !isOnline})} aria-label="Выход">
+							<a href="/logout" className={cn({[s.disabled]: !isOnline})} title="Выход">
 								<LogoutIcon className={s.iconButton} />
 							</a>
 						) : (
-							<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} aria-label="Выход" />
+							<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} title="Выход" />
 						)}
 						<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-							<ChatIcon className={s.iconButton} onClick={toggleChat} aria-label="Чат" />
+							<ChatIcon className={s.iconButton} onClick={toggleChat} title="Чат" />
 						</span>
-						<InfoIcon className={s.iconButton} onClick={toggleInfo} aria-label="Статистика" />
-						<a href="/timelapse" aria-label="Таймлапс">
+						<InfoIcon className={s.iconButton} onClick={toggleInfo} title="Статистика" />
+						<a href="/timelapse" title="Таймлапс">
 							<TimelapseIcon className={s.iconButton} />
 						</a>
 						{role === ERole.moderator && (
-							<a href="/qq" aria-label="tools">
+							<a href="/qq" title="Tools">
 								<GearIcon className={s.iconButton} />
 							</a>
 						)}

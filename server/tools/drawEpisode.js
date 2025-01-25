@@ -29,7 +29,7 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
 const PPF = 100; // 300;
-const FPS = 25;
+const FPS = 60; // 25;
 const PPS = PPF * FPS;
 
 const sec = 1000;
@@ -41,14 +41,17 @@ const textX = 1500;
 const textY = 1000;
 const textLineHeight = 70;
 
-const videoWidth = 1080; // 1920;
-const videoHeight = 720; // 1080;
-
-// ffmpeg -r 25 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
-
-// const scale = 2;
+const videoWidth = 1920; // 1080 | 1920;
+const videoHeight = 1080; // 720 | 1080;
 
 const breakLine = Infinity;
+
+// ffmpeg -i bg.mp4 -vf "fps=60" tmp/%08d.jpg
+// npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
+// ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
+// ffmpeg -stream_loop -1 -i bg.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S3E1" -metadata artist="pixelbattles.ru" output.mp4
+
+// const scale = 2;
 
 // const drawDayBG = (ctx, day) => {
 // 	const bg = drawBGCanvas(videoWidth, videoHeight);
@@ -123,14 +126,36 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		.split('\n')
 		.map((line) => line.split(';'));
 	const length = breakLine < Infinity ? breakLine : await getFileLinesCount(pixelsFile);
+
+	const _sec = Math.floor(length / PPS);
+	console.log(`Start renderind for: ${Math.floor(_sec / 60)}:${_sec % 60} duration, ${length / PPF} frames, ${length} pixels`);
+
 	const bar = new Progress.Bar();
 	const canvas = createCanvas(videoWidth, videoHeight);
 	const ctx = canvas.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
-	const drawFrameBg = bg === 'NOBG' ? () => {
-		ctx.fillStyle = '#ffffff';
-		ctx.fillRect(0, 0, videoWidth, videoHeight);
-	} : gradientAnimation(ctx, videoWidth, videoHeight);
+	let bgFiles;
+	let bgIndex = 0;
+	if (fs.existsSync(bg)) {
+		bgFiles = fs.readdirSync(bg);
+	}
+
+	const drawFrameBg = () => {
+		if (bgFiles) {
+			const frame = `${bg}/${bgFiles[bgIndex]}`;
+			const imgBuf = fs.readFileSync(frame);
+			const image = new Image;
+
+			image.src = imgBuf;
+			ctx.drawImage(image, 0, 0);
+			bgIndex = bgIndex === bgFiles.length - 1 ? 0 : bgIndex + 1;
+		} else if (bg === 'NOBG') {
+			ctx.fillStyle = '#ffffff';
+			ctx.fillRect(0, 0, videoWidth, videoHeight);
+		} else if (bg === 'GA') {
+			gradientAnimation(ctx, videoWidth, videoHeight);
+		}
+	}
 
 	let part = 0;
 	let nextPartStartTime = expands[part + 1] ? Number(expands[part + 1][0]) : Infinity;
@@ -234,7 +259,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		fs.writeFileSync(output, canvas.toBuffer());
 
 		const sec = Math.floor(frame / FPS);
-		const finalInTime = Math.floor(Date.now() - startTime);
+		const finalInTime = Math.floor((Date.now() - startTime) / 1000);
 
 		console.log(`Done in ${Math.floor(finalInTime / 60)}:${finalInTime % 60}`)
 		console.log(`Total duration: ${Math.floor(sec / 60)}:${sec % 60}, ${frame} frames, ${i} pixels`);

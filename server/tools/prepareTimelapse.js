@@ -4,6 +4,10 @@ const { createCanvas, Image } = require('canvas');
 const { colorShemes } = require('../config.json');
 const PART_PIXELS_COUNT = 100_000;
 
+// npm run tools prepareTimelapse s3e1 assets/s3e1.png
+// rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
+// http://localhost:8080/timelapse/#staticHost=http://localhost:8080
+
 const prepareTimelapse = (
 	season = 's1e1',
 	backgroundImage = `${__dirname}/../../assets/426x240.png`,
