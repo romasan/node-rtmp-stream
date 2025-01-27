@@ -409,7 +409,7 @@ export const App: React.FC = () => {
 			if (cursorType === ECursorType.PIXEL) {
 				setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total || 0) : 0} pix`);
 			} else {
-				const sec = Math.floor(playCursor?.current / speed);
+				const sec = Math.floor(playCursor.current / speed);
 				const totalSec = Math.floor(timelapse.total / speed);
 				const curTime = playCursor.current ? `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}` : '00:00';
 				const totalTime = timelapse ? `${String(Math.floor(totalSec / 60)).padStart(2, '0')}:${String(totalSec % 60).padStart(2, '0')}` : '00:00';
