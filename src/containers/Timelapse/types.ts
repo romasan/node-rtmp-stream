@@ -18,3 +18,8 @@ export interface ITimelapse {
 	expands?: IExpand[];
 	episode?: string;
 }
+
+export enum ECursorType {
+	PIXEL = 'PIXEL',
+	TIME = 'TIME',
+}

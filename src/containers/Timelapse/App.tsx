@@ -22,7 +22,7 @@ import { ERole } from '../../hooks';
 import { gzipAB, formatNumber } from '../../helpers';
 import { useWsStore } from '../../hooks/useWsStore';
 
-import { ITimelapse } from './types';
+import { ITimelapse, ECursorType } from './types';
 
 import { useModal } from '../../hooks';
 
@@ -121,6 +121,7 @@ export const App: React.FC = () => {
 	const [loadedPart, setLoadedPart] = useState(-1);
 	const [clickedCursor, setClickedCursor] = useState(-1);
 	const [cursorDisplay, setCursorDisplay] = useState('');
+	const [cursorType, setCursorType] = useState(ECursorType.PIXEL);
 
 	const imageSrc = useMemo(() => {
 		return selectedEpisode ? `${staticHost}/timelapse/${selectedEpisode}/${startPart}.png` : '';
@@ -360,6 +361,8 @@ export const App: React.FC = () => {
 		setSelectedEpisode(event.target.value);
 	};
 
+	const handleClickCursor = () => setCursorType((type) => type === ECursorType.PIXEL ? ECursorType.TIME : ECursorType.PIXEL);
+
 	useEffect(() => {
 		if (
 			timelapse &&
@@ -403,13 +406,21 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		const timer = setInterval(() => {
-			setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total || 0) : 0}`);
+			if (cursorType === ECursorType.PIXEL) {
+				setCursorDisplay(`${formatNumber(playCursor.current ? playCursor.current + 1 : 0)} / ${timelapse ? formatNumber(timelapse.total || 0) : 0} pix`);
+			} else {
+				const sec = Math.floor(playCursor?.current / speed);
+				const totalSec = Math.floor(timelapse.total / speed);
+				const curTime = playCursor.current ? `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}` : '00:00';
+				const totalTime = timelapse ? `${String(Math.floor(totalSec / 60)).padStart(2, '0')}:${String(totalSec % 60).padStart(2, '0')}` : '00:00';
+				setCursorDisplay(`${curTime} / ${totalTime}`);
+			}
 		}, 300);
 
 		return () => {
 			clearInterval(timer);
 		};
-	}, [timelapse]);
+	}, [timelapse, cursorType, speed]);
 
 	useEffect(() => {
 		fetchTimelapseSeasons().then(
@@ -458,7 +469,7 @@ export const App: React.FC = () => {
 
 							<div className={s.vDelimiter}></div>
 
-							{cursorDisplay} pix
+							<span className={s.cursor} onClick={handleClickCursor}>{cursorDisplay}</span>
 						</div>
 						<div>
 							Сезон:

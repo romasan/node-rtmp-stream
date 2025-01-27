@@ -6,12 +6,18 @@ const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
 
-const {
-	WIDTH,
-	HEIGHT,
-} = require('./constants.json');
+const recover = (file = __dirname + '/../../db/pixels.log', backgroundImage = 'NOIMAGE', output = __dirname + '/../../db/inout.png', width, height) => {
+	if (!width || !height) {
+		const [,, w, h] = fs.readFileSync(__dirname + '/../../db/expands.log')
+			.toString()
+			.split('\n')
+			.filter(Boolean)
+			.pop()
+			.split(';');
+		width = Number(w);
+		height = Number(h);
+	}
 
-const recover = (file, backgroundImage, output, width = WIDTH, height = HEIGHT) => {
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 

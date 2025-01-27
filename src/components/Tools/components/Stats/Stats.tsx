@@ -164,7 +164,10 @@ export const Stats: FC<Props> = ({ canvas }) => {
 			</div>
 			<hr />
 			<div>
-				Всего пикселей: {formatNumber(stats.total)}
+				Всего посталено пикселей: {formatNumber(stats.total)}
+			</div>
+			<div>
+				Свободных пикселей: {formatNumber(stats.empty)}
 			</div>
 			<div>
 				Uptime: {formatTime(stats.uptime)}

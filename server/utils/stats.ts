@@ -163,6 +163,25 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 			crlfDelay: Infinity
 		});
 
+		try {
+			// TODO use size from canvas?
+			const [,, width, height] = String(
+				fs.readFileSync(__dirname + '/../../db/expands.log')
+					.toString()
+					.split('\n')
+					.filter(Boolean)
+					.pop()
+				)
+				.split(';');
+	
+			stats.canvas = {
+				width: Number(width),
+				height: Number(height),
+			};
+		} catch (ignore) {
+			Log('Error: не удалось прочитать expands.log');
+		}
+
 		if (!stats.history) {
 			stats.history = {
 				days: {},
@@ -225,7 +244,9 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 			if (output) {
 				fs.writeFileSync(output, JSON.stringify(stats));
 			}
+
 			inited = true;
+
 			resolve(stats);
 		});
 	});
@@ -303,6 +324,12 @@ export const getPixelColor = (x: number, y: number) => {
 
 export const getTotalPixels = () => {
 	return stats?.totalCount || 0;
+};
+
+export const getEmptyPixelSCount = () => {
+	const { width, height } = stats?.canvas;
+
+	return (width * height) - Object.keys(stats).filter((key) => key.indexOf(':') > 0).length;
 };
 
 export const getTopLeaderboard = (count = 10, nickname: string, area: string) => {

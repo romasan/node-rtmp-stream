@@ -26,9 +26,9 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 	});
 });
 
-registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
+// registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
-const PPF = 100; // 300;
+const PPF = 157; // 300;
 const FPS = 60; // 25;
 const PPS = PPF * FPS;
 
@@ -116,6 +116,9 @@ const circle = (w, h, minR, maxR) => {
 	};
 };
 
+// const skipFrom = 0;
+// const skipTo = 1000;
+
 const drawEpisode = async (ep, bg, firstFrame) => {
 	console.log('Start draw episode', ep);
 
@@ -128,7 +131,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	const length = breakLine < Infinity ? breakLine : await getFileLinesCount(pixelsFile);
 
 	const _sec = Math.floor(length / PPS);
-	console.log(`Start renderind for: ${Math.floor(_sec / 60)}:${_sec % 60} duration, ${length / PPF} frames, ${length} pixels`);
+	console.log(`Start renderind for: ${String(Math.floor(_sec / 60)).padStart(2, '0')}:${String(_sec % 60).padStart(2, '0')} duration, ${length / PPF} frames, ${length} pixels`);
 
 	const bar = new Progress.Bar();
 	const canvas = createCanvas(videoWidth, videoHeight);
@@ -199,6 +202,10 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 
 		bar.update(i);
 
+		// if (i < skipFrom || i > skipTo) {
+		// 	return;
+		// }
+
 		if (i >= breakLine) {
 			return;
 		}
@@ -214,8 +221,10 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			width = Number(expands[part][2] || width);
 			height = Number(expands[part][3] || height);
 			scale = Math.min(
-				Math.floor(videoWidth / width),
-				Math.floor(videoHeight / height),
+				// Math.floor(videoWidth / width),
+				// Math.floor(videoHeight / height),
+				Number((videoWidth / width).toFixed(1)),
+				Number((videoHeight / height).toFixed(1)),
 			);
 			pixelsFrameX = videoWidth / 2 - width * scale / 2;
 			pixelsFrameY = videoHeight / 2 - height * scale / 2;
@@ -261,8 +270,8 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		const sec = Math.floor(frame / FPS);
 		const finalInTime = Math.floor((Date.now() - startTime) / 1000);
 
-		console.log(`Done in ${Math.floor(finalInTime / 60)}:${finalInTime % 60}`)
-		console.log(`Total duration: ${Math.floor(sec / 60)}:${sec % 60}, ${frame} frames, ${i} pixels`);
+		console.log(`Done in ${Math.floor(finalInTime / 60).toFixed(1)}:${(finalInTime % 60).toFixed(1)}`)
+		console.log(`Total duration: ${Math.floor(sec / 60).toFixed(1)}:${(sec % 60).toFixed(1)}, ${frame} frames, ${i} pixels`);
 	});
 };
 

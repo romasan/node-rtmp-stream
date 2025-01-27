@@ -54,7 +54,7 @@ export const Info: FC<Props> = ({
 					<div>Загрузка...</div>
 				) : (
 					<div>
-						<div>Всего пикселей: {formatNumber(stats.total)}</div>
+						<div>Всего поставлено пикселей: {formatNumber(stats.total)}</div>
 						<div>
 							<div className={s.title}>ТОП участников:</div>
 							{(stats.leaderboard || []).map((item) => (

@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { getOnlineCountRaw, getOnlineCountUniqUUID } from '../../utils/ws';
-import { getLastActivity, getTotalPixels } from '../../utils/stats';
+import { getLastActivity, getTotalPixels, getEmptyPixelSCount } from '../../utils/stats';
 import { getUserData } from '../../utils/auth';
 import { getSessionUserName } from '../../utils/sessions';
 
@@ -16,6 +16,7 @@ export const stats = (req: IncomingMessage, res: ServerResponse) => {
 	} = getLastActivity() as any;
 	const user: any = getUserData(lastActivity?.uuid);
 	const total = getTotalPixels();
+	const empty = getEmptyPixelSCount();
 
 	const payload = {
 		online: {
@@ -36,6 +37,7 @@ export const stats = (req: IncomingMessage, res: ServerResponse) => {
 		},
 		color: lastActivity.color,
 		total,
+		empty,
 		uptime: Date.now() - startTime,
 	};
 

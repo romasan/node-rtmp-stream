@@ -10,7 +10,7 @@ export const HeaderLogo: React.FC = () => {
 	return (
 		<>
 			<div className={s.root}>
-				<a href="/" className={s.title}>
+				<a href="/" className={s.title} aria-label="PIXEL BATTLE">
 					<LogoIcon className={s.logo} />
 					<h1>PIXEL BATTLE</h1>
 					<h2>Пиксель батл {year} {episode}</h2>
