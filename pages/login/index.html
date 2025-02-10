@@ -53,7 +53,7 @@
 						const oneTap = new VKID.OneTap();
 
 						oneTap.render({
-							container: document.currentScript.parentElement,
+							container: document.querySelector('#content'),
 							showAlternativeLogin: true
 						})
 						.on(VKID.WidgetEvents.ERROR, vkidOnError)
