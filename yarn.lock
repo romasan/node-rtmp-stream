@@ -2467,13 +2467,6 @@
   resolved "https://registry.npmjs.org/@ungap/structured-clone/-/structured-clone-1.2.0.tgz"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
-"@vkid/sdk@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.npmjs.org/@vkid/sdk/-/sdk-2.4.1.tgz"
-  integrity sha512-4CYE+caFt/s+gZOT1Mt7jfn/uXuxdkXpLK8fpW34qyBw0qc96p53yxshnjbHDMWLffte8Krq0AHw68b8Wu8Fpw==
-  dependencies:
-    crypto-js "^4.1.1"
-
 abab@^2.0.0:
   version "2.0.6"
   resolved "https://registry.npmjs.org/abab/-/abab-2.0.6.tgz"
@@ -4124,11 +4117,6 @@ crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
-
-crypto-js@^4.1.1:
-  version "4.2.0"
-  resolved "https://registry.npmjs.org/crypto-js/-/crypto-js-4.2.0.tgz"
-  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 crypto@^1.0.1:
   version "1.0.1"

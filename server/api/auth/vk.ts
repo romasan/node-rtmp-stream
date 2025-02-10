@@ -11,15 +11,7 @@ const {
 	},
 } = require('../../config.json');
 
-VKID.Config.init({
-	app: 52936975,
-	redirectUrl: 'https://api.pixelbattles.ru/auth/vk',
-	responseMode: VKID.ConfigResponseMode.Callback,
-	source: VKID.ConfigSource.LOWCODE,
-	scope: '',
-});
-
-const vk = (req: IncomingMessage, res: ServerResponse) => {
+const vk = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/vk')) {
 		try {
 			const { token } = parseCookies(req.headers.cookie || '');
@@ -34,7 +26,19 @@ const vk = (req: IncomingMessage, res: ServerResponse) => {
 				return true;
 			}
 
-			const { user }: any = VKID.Auth.publicInfo(query.token);
+			const urlEncoded = new URLSearchParams();
+
+			urlEncoded.append('id_token', query.token);
+
+			const resp = await fetch('https://id.vk.com/oauth2/public_info?client_id=52936975', {
+				method: 'POST',
+				body: urlEncoded,
+				// body: JSON.stringify({ id_token: query.token }),
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+			});
+			const { user } = await resp.json();
 
 			console.log('==== authorize (vk)', {
 				query,
