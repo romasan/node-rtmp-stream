@@ -11,6 +11,14 @@ const {
 	},
 } = require('../../config.json');
 
+VKID.Config.init({
+	app: 52936975,
+	redirectUrl: 'https://api.pixelbattles.ru/auth/vk',
+	responseMode: VKID.ConfigResponseMode.Callback,
+	source: VKID.ConfigSource.LOWCODE,
+	scope: '',
+});
+
 const vk = (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/vk')) {
 		try {
