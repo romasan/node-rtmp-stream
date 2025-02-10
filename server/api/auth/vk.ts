@@ -16,6 +16,16 @@ const vk = (req: IncomingMessage, res: ServerResponse) => {
 		try {
 			const { token } = parseCookies(req.headers.cookie || '');
 			const query: any = url.parse(req.url, true).query;
+
+			if (!query.token) {
+				Log('VK auth error: empty token');
+
+				res.writeHead(200, {'Content-Type': 'text/html'});
+				res.end('Ошибка, <a href="/auth/vk">попробуйте ещё раз</a>');
+
+				return true;
+			}
+
 			const { user }: any = VKID.Auth.publicInfo(query.token);
 
 			console.log('==== authorize (vk)', user);
@@ -28,7 +38,7 @@ const vk = (req: IncomingMessage, res: ServerResponse) => {
 			res.writeHead(302, { Location: host });
 			res.end();
 		} catch (error) {
-			Log('Discord auth error:', error);
+			Log('VK auth error:', error);
 
 			res.writeHead(200, {'Content-Type': 'text/html'});
 			res.end('Ошибка, <a href="/auth/vk">попробуйте ещё раз</a>');
