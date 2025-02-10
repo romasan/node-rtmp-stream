@@ -72,7 +72,7 @@ const getAllUsers = () => {
 		users.nicknames.telegram = {};
 	}
 
-	if (!users.nicknames.telegram) {
+	if (!users.nicknames.vk) {
 		users.nicknames.vk = {};
 	}
 };
