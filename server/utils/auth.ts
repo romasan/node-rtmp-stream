@@ -171,6 +171,15 @@ export const _parseUserData = (raw: any): IParsedUser | null => {
 		};
 	}
 
+	if (raw?._authType === 'vk') {
+		return {
+			id: raw?.user_id,
+			name: `${raw?.first_name}${raw.last_name ? ' ' : ''}${raw?.last_name || ''}`,
+			avatar: raw?.avatar,
+			area: 'vk',
+		};
+	}
+
 	return null;
 };
 

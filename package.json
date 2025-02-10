@@ -27,6 +27,7 @@
   "author": "Roman Bauer",
   "license": "ISC",
   "dependencies": {
+    "@vkid/sdk": "^2.4.1",
     "antd": "^5.17.0",
     "bad-words-next": "^2.3.1",
     "canvas": "^2.11.0",

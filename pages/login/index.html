@@ -47,7 +47,7 @@
 							redirectUrl: 'https://api.pixelbattles.ru/auth/vk',
 							responseMode: VKID.ConfigResponseMode.Callback,
 							source: VKID.ConfigSource.LOWCODE,
-							scope: 'email',
+							scope: '',
 						});
 
 						const oneTap = new VKID.OneTap();
@@ -62,12 +62,12 @@
 							const deviceId = payload.device_id;
 
 							VKID.Auth.exchangeCode(code, deviceId)
-							.then(vkidOnSuccess)
-							.catch(vkidOnError);
+								.then(vkidOnSuccess)
+								.catch(vkidOnError);
 						});
 						
 						function vkidOnSuccess(data) {
-							console.log('==== vkidOnSuccess', data);
+							document.location.href = `https://api.pixelbattles.ru/auth/vk?token=${data.id_token}`;
 						}
 						
 						function vkidOnError(error) {
