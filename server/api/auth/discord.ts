@@ -68,9 +68,9 @@ const discord = async (req: IncomingMessage, res: ServerResponse) => {
 			urlEncoded.append('client_id', clientId);
 			urlEncoded.append('response_type', 'code');
 			urlEncoded.append('redirect_uri', redirectUri);
-			urlEncoded.append('scope', 'identify+email');
+			// urlEncoded.append('scope', 'identify+email');
 
-			const url = `https://discord.com/oauth2/authorize?${urlEncoded}`;
+			const url = `https://discord.com/oauth2/authorize?${urlEncoded}&scope=identify+email`;
 
 			res.writeHead(302, { Location: url });
 			res.end();
