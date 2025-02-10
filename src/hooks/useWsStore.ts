@@ -15,6 +15,7 @@ export const useWsStore = (): {
 	finish: number;
 	hasNewMessage: boolean;
 	role: ERole;
+	paused: boolean;
 	setHasNewMessage: (value: boolean) => void;
 } => {
 	const [wsStore, setWsStore] = useState<any>({
@@ -26,12 +27,15 @@ export const useWsStore = (): {
 	const [isOnline, setIsOnline] = useState(false);
 	const [role, setRole] = useState<ERole>(ERole.user);
 	const [finish, setFinish] = useState(0);
+	const [paused, setPaused] = useState(false);
 	const [hasNewMessage, setHasNewMessage] = useState(false);
 
 	const onWsInit = (payload: any) => {
 		setWsStore((store = {}) => ({ ...store, ...payload }));
 		setExpiration(Date.now() + payload.countdown);
 		setIsAuthorized(payload.isAuthorized);
+		setPaused(payload.paused);
+
 		if (payload.finish !== 'newer') {
 			setFinish(Date.now() + payload.finish);
 		}
@@ -53,16 +57,29 @@ export const useWsStore = (): {
 		}
 	};
 
+	const handlePlayPause = (value: boolean) => {
+		setPaused(value);
+	};
+
+	const handleExpand = (payload: any) => {
+		setWsStore((store = {}) => ({ ...store, canvas: payload }));
+	};
+
 	useEffect(() => {
 		ee.on('ws:init', onWsInit);
 		ee.on('ws:countdown', onWsCountdown);
 		ee.on('ws:connect', onWsConnect);
 		ee.on('ws:chatMessage', handleChatMessage);
+		ee.on('ws:pause', handlePlayPause);
+		ee.on('ws:expand', handleExpand);
 
 		return () => {
 			ee.off('ws:init', onWsInit);
 			ee.off('ws:countdown', onWsCountdown);
 			ee.off('ws:connect', onWsConnect);
+			ee.off('ws:chatMessage', handleChatMessage);
+			ee.off('ws:pause', handlePlayPause);
+			ee.off('ws:expand', handleExpand);
 		};
 	}, [isAuthorized]);
 
@@ -74,6 +91,7 @@ export const useWsStore = (): {
 		finish,
 		hasNewMessage,
 		role,
+		paused,
 		setHasNewMessage,
 	};
 };

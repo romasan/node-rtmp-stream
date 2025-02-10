@@ -16,7 +16,7 @@ import {
 	formatDate,
 	formatTime,
 } from '../../helpers';
-import { nickSanitize } from '../../helpers/nickSanitize'
+import { nickSanitize } from '../../helpers/nickSanitize';
 import { getPixel } from '../../lib/api';
 import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
@@ -56,6 +56,13 @@ interface Props {
 	isOnline?: boolean;
 	src?: string;
 	viewOnly?: boolean;
+	expand?: {
+		width: number;
+		height: number;
+		shiftX: number;
+		shiftY: number;
+		colorScheme: string;
+	}
 	onClick?(x: number, y: number): void;
 	onSelect?(from: { x: number, y: number }, to: { x: number, y: number }): void;
 	onInit?(value: any): void;
@@ -85,6 +92,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	children,
 	src,
 	viewOnly,
+	expand,
 	onClick = () => null,
 	onSelect,
 	onInit,
@@ -95,7 +103,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
 	const pixelRef = useRef<null | HTMLDivElement>(null);
 	const cur = useRef<[number, number, boolean]>([-1, -1, false]);
-	const [coord, setCoord] = useState<[number, number]>([-1, -1]);
+	const [coord, setCoord] = useState<[number, number]>([Infinity, Infinity]);
 	const [scale, setScale] = useState(2);
 	const [pos, setPos] = useState<{ x: number; y: number}>({ x: 0, y: 0 });
 	const [error, setError] = useState('');
@@ -108,6 +116,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const touchMode = useRef<ETouchMode | null>(null);
 	const [isProgressInited, setIsProgressInited] = useState(false);
 	const showCoordinates = isOnline && !viewOnly;
+	const shiftRef = useRef([Infinity, Infinity]);
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
@@ -170,7 +179,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		ee.on('ws:drawPix', ({ x, y, color }: any) => {
 			if (ctx) {
 				ctx.fillStyle = color;
-				ctx.fillRect(x, y, 1, 1);
+				ctx.fillRect(x + shiftRef.current[0], y + shiftRef.current[1], 1, 1);
 			}
 		});
 	}, [canvasRef.current]);
@@ -228,6 +237,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			clientY = touches[0].clientY;
 		}
 
+		// touch resize
 		if (touches && touches.length === 2) {
 			const touch1 = touches[0];
 			const touch2 = touches[1];
@@ -249,7 +259,12 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const efp = document.elementFromPoint(clientX, clientY);
 		const isOverChild = rootRef.current && rootRef.current.contains(efp);
 
-		if (!cur.current.some((e) => e === -1) && mode === EMode.CLICK && isOverChild) {
+		// move
+		if (
+			!cur.current.some((e) => e === -1) &&
+			mode === EMode.CLICK &&
+			isOverChild
+		) {
 			const moveX = (clientX - cur.current[0]) / scale;
 			const moveY = (clientY - cur.current[1]) / scale;
 
@@ -276,10 +291,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
 
-		if (canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)) {
+		// drag
+		if (
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current)
+		) {
 			if (!isOverChild) {
 				if (mode === EMode.CLICK) {
-					setCoord([-1, -1]);
+					setCoord([Infinity, Infinity]);
 				}
 
 				return;
@@ -304,16 +323,16 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				const center = [width / scale / 2, height / scale / 2];
 
 				setCoord([
-					getInRange(Math.abs(Math.round(center[0] - pos.x)), [0, canvasRef.current.width - 1]),
-					getInRange(Math.abs(Math.round(center[1] - pos.y)), [0, canvasRef.current.height - 1]),
+					getInRange(Math.abs(Math.round(center[0] - pos.x)), [0, canvasRef.current.width - 1]) - shiftRef.current[0],
+					getInRange(Math.abs(Math.round(center[1] - pos.y)), [0, canvasRef.current.height - 1]) - shiftRef.current[1],
 				]);
 
 				return;
 			}
 
-			setCoord([x, y]);
+			setCoord([x - shiftRef.current[0], y - shiftRef.current[1]]);
 		} else {
-			setCoord([-1, -1]);
+			setCoord([Infinity, Infinity]);
 		}
 	};
 
@@ -327,6 +346,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		const [,, moved] = cur.current;
 
+		// touch
 		if (typeof clientX === 'undefined' || typeof clientY === 'undefined') {
 			if (
 				isMobile &&
@@ -356,22 +376,22 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (
 			!moved &&
 			!cur.current.some((e) => e === -1) &&
-			document.elementsFromPoint(clientX, clientY).includes(canvasRef.current as HTMLCanvasElement) &&
 			(scale >= showPixelScale || mode === EMode.SELECT) &&
 			canvasRef.current &&
+			document.elementsFromPoint(clientX, clientY).includes(canvasRef.current as HTMLCanvasElement) &&
 			posIsAbove([clientX, clientY], canvasRef.current) &&
 			isOverChild &&
 			(!isMobile || touchMode.current === ETouchMode.MOVE)
 		) {
 			const { top, left } = canvasRef.current.getBoundingClientRect();
-			const x = Math.floor((clientX - left) / scale);
-			const y = Math.floor((clientY - top) / scale);
+			const x = Math.floor((clientX - left) / scale) - shiftRef.current[0];
+			const y = Math.floor((clientY - top) / scale) - shiftRef.current[1];
 
 			if (mode === EMode.SELECT) {
 				if (onSelect) {
 					onSelect(selected.current.from, {
-						x: x + (x > selected.current.from.x ? 1 : 0),
-						y: y + (y > selected.current.from.y ? 1 : 0),
+						x: x + shiftRef.current[0] + (x > selected.current.from.x ? 1 : 0),
+						y: y + shiftRef.current[1] + (y > selected.current.from.y ? 1 : 0),
 					});
 				}
 				selected.current = defautSelected;
@@ -463,9 +483,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		const _color = isFinished ? getPixelColor(canvasRef.current, x, y) : color;
 
 		const style: any = {
-			display: scale < showPixelScale || coord.some((e) => e < 0) || coord[0] >= width || coord[1] >= height ? 'none' : 'block',
-			left: `${left + x * scale}px`,
-			top: `${top + y * scale}px`,
+			display: scale < showPixelScale || coord.some((e) => e === Infinity) || coord[0] >= width || coord[1] >= height ? 'none' : 'block',
+			left: `${left + (x + shiftRef.current[0]) * scale}px`,
+			top: `${top + (y + shiftRef.current[1]) * scale}px`,
 			width: `${scale}px`,
 			height: `${scale}px`,
 			'--bg-color': _color,
@@ -523,6 +543,31 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			setTimeout(() => {
 				setAnimatedPixel(false);
 			}, 500);
+		}
+	};
+
+	const onExpand = (payload: any) => {
+		if (canvasRef.current) {
+			canvasRef.current.toBlob((blob) => {
+				const img = document.createElement('img');
+				const url = URL.createObjectURL(blob as Blob);
+	
+				img.onload = () => {
+					(canvasRef.current as any).width = payload.width;
+					(canvasRef.current as any).height = payload.height;
+
+					const ctx = (canvasRef.current as any).getContext('2d');
+
+					ctx.fillStyle = '#fff';
+					ctx.fillRect(0, 0, payload.width, payload.height);
+					ctx.drawImage(img, payload.shiftX - shiftRef.current[0], payload.shiftY - shiftRef.current[1]);
+					shiftRef.current = [
+						payload.shiftX,
+						payload.shiftY,
+					];
+				};
+				img.src = url;
+			});
 		}
 	};
 
@@ -596,7 +641,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		color,
 		mode,
 		src,
-		viewOnly,
+		viewOnly,		
 	]);
 
 	useEffect(() => {
@@ -633,7 +678,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		clearTimeout(timer.current);
 
-		if (scale >= showPixelScale && !coord.some((e) => e < 0)) {
+		if (scale >= showPixelScale && !coord.some((e) => e === Infinity)) {
 			timer.current = Number(setTimeout(() => {
 				getPixel(...coord)
 					.then(setPixelData)
@@ -641,6 +686,24 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			}, 1000));
 		}
 	}, [coord, scale, viewOnly]);
+
+	useEffect(() => {
+		if (
+			expand && (
+				shiftRef.current[0] !== (expand && expand.shiftX) ||
+				shiftRef.current[1] !== (expand && expand.shiftY)
+			)
+		) {
+			if (shiftRef.current[0] === Infinity) {
+				shiftRef.current = [
+					expand && expand.shiftX || 0,
+					expand && expand.shiftY || 0,
+				];
+			} else {
+				onExpand(expand);
+			}
+		}
+	}, [expand]);
 
 	return (
 		<>
@@ -683,7 +746,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							{countdown > 0 && (
 								<>{renderCountdown()}&nbsp;</>
 							)}
-							{coord[0] >= 0 && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
+							{coord[0] !== Infinity && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
 						{scale >= showPixelScale && (
 							<div

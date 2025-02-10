@@ -53,6 +53,6 @@ export const asyncQuery = (query: string, ...values: string[]) => new Promise((r
 			return;
 		}
 
-		resolve(rows)
+		resolve(rows);
 	});
 });

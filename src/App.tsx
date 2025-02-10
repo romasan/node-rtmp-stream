@@ -27,6 +27,8 @@ import YoutubeIcon from '/assets/youtube.svg';
 import DiscordIcon from '/assets/discord.svg';
 import TelegramIcon from '/assets/telegram.svg';
 
+import { colorSchemes } from '../server/constants/colorSchemes';
+
 import { useModal } from './hooks';
 
 import * as s from './App.module.scss';
@@ -46,6 +48,7 @@ export const App: React.FC = () => {
 		finish,
 		hasNewMessage,
 		role,
+		paused,
 		setHasNewMessage,
 	} = useWsStore();
 
@@ -58,11 +61,13 @@ export const App: React.FC = () => {
 		width: '300px',
 	});
 
+	const palette = (colorSchemes as any)[wsStore.canvas && wsStore.canvas.colorScheme] || {};
+
 	useEffect(() => {
-		if (!color && wsStore.palette && wsStore.palette) {
-			const firstColor = 'black' in wsStore.palette
+		if (!color && palette) {
+			const firstColor = 'black' in palette
 				? 'black'
-				: (Object.keys(wsStore.palette) || []).pop();
+				: (Object.keys(palette) || []).pop();
 
 			setColor(firstColor as string);
 		}
@@ -133,7 +138,8 @@ export const App: React.FC = () => {
 					login={loginModal.open}
 				/>
 				<Canvas
-					color={wsStore.palette ? wsStore.palette[color] : ''}
+					color={palette[color] || ''}
+					expand={wsStore.canvas}
 					onClick={handleCanvasClick}
 					expiration={expiration}
 					isAuthorized={isAuthorized}
@@ -149,11 +155,14 @@ export const App: React.FC = () => {
 						isFinished={isFinished}
 					/>
 				)} */}
-				{wsStore.palette && !isFinished && (
-					<Palette color={color} colors={wsStore.palette} setColor={setColor} expiration={expiration} />
+				{isOnline && !isFinished && (
+					<Palette color={color} colors={palette} setColor={setColor} />
 				)}
 				{Boolean(finish) && (
 					<Countdown finish={finish} text={wsStore.finishText}/>
+				)}
+				{paused && (
+					<div className={s.paused}>PAUSE ||</div>
 				)}
 				<div className={s.footer}>
 					<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">

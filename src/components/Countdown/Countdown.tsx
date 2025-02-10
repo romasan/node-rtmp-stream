@@ -10,7 +10,7 @@ interface Props {
 	text: string;
 }
 
-const renderText = (raw: string, nickname?: string): string => {
+const renderText = (raw: string): string => {
 	return raw
 		.replace(/\(([a-zA-Zа-яА-Я0-9\ ]+)\)\[(http[s]{0,1}\:\/\/[a-zA-Z0-9\-\/\.\@]+)\]/ig, '<a href="$2">$1</a>');
 };

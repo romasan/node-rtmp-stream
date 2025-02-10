@@ -39,35 +39,40 @@
 			<!-- vk -->
 			<script>
 				const vk = () => {
-					console.log('==== VKIDSDK', 'VKIDSDK' in window);
-
 					if ('VKIDSDK' in window) {
 						const VKID = window.VKIDSDK;
-					
+
 						VKID.Config.init({
 							app: 52936975,
-							redirectUrl: 'https://api.vk.com/method/users.get',
+							redirectUrl: 'https://api.pixelbattles.ru/auth/vk',
 							responseMode: VKID.ConfigResponseMode.Callback,
 							source: VKID.ConfigSource.LOWCODE,
-							// scope: '',
+							scope: '',
 						});
-					
+
 						const oneTap = new VKID.OneTap();
-					
-						oneTap
-							.render({
-								container: document.querySelector('#content'),
-								showAlternativeLogin: true
-							})
-							.on(VKID.WidgetEvents.ERROR, () => {})
-							.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
-								const code = payload.code;
-								const deviceId = payload.device_id;
+
+						oneTap.render({
+							container: document.currentScript.parentElement,
+							showAlternativeLogin: true
+						})
+						.on(VKID.WidgetEvents.ERROR, vkidOnError)
+						.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+							const code = payload.code;
+							const deviceId = payload.device_id;
+
+							VKID.Auth.exchangeCode(code, deviceId)
+							.then(vkidOnSuccess)
+							.catch(vkidOnError);
+						});
 						
-								VKID.Auth.exchangeCode(code, deviceId)
-									.then(() => {})
-									.catch(() => {});
-							});
+						function vkidOnSuccess(data) {
+							console.log('==== vkidOnSuccess', data);
+						}
+						
+						function vkidOnError(error) {
+							console.log('==== vkidOnError', error);
+						}
 					}
 				};
 			</script>

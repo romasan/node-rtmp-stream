@@ -12,7 +12,7 @@ import {
 	getPathByToken,
 } from '../helpers';
 
-let sessions: Record<string, number> = {};
+const sessions: Record<string, number> = {};
 let failed: Record<string, boolean | number> = {};
 
 const maxLength = 1000;

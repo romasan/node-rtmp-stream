@@ -1,4 +1,4 @@
-export const formatTime = (time: number, template?: string) => {
+export const formatTime = (time: number/* , template?: string */) => {
 	const sec = Math.floor(time / 1000);
 	const min = Math.floor(sec / 60);
 	const hour = Math.floor(min / 60);

@@ -106,7 +106,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 		modalUser.open();
 	};
 
-	console.log('==== list:', list); // TODO open user controls popup
+	// console.log('==== list:', list); // TODO open user controls popup==== ranges
 
 	return (
 		<Block title="👤 Общее" onOpen={onOpen} onClose={onClose}>
@@ -117,6 +117,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 						A {stats.online.countByActivity} /
 						U {stats.online.uniq} /
 						O {stats.online.open} /
+						&nbsp;
 						{stats.online.all}
 					</div>
 					<div>

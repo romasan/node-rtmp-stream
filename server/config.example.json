@@ -1,54 +1,8 @@
 {
-	"colorShemes": {
-		"COLORS_1": {
-			"yellow": "#e2d747",
-			"lightgreen": "#a5dd5f",
-			"green": "#56ba37",
-			"cyan": "#5fcfdb",
-			"cyanblue": "#3681c1",
-			"blue": "#091de0",
-			"lightmagenta": "#c276de",
-			"magenta": "#77197c",
-			"white": "#ffffff",
-			"lightgray": "#e4e4e4",
-			"gray": "#888888",
-			"black": "#000000",
-			"pink": "#f1aacf",
-			"red": "#d22d1f",
-			"orange": "#db9834",
-			"brown": "#976c49"
-		},
-		"COLORS": {
-			"deepcarmine": "#ae233d",
-			"flame": "#ec5427",
-			"yelloworange": "#f4ab3c",
-			"naplesyellow": "#f9d759",
-			"mediumseagreen": "#48a06d",
-			"emerald": "#5cc87f",
-			"inchworm": "#9ae96c",
-			"myrtlegreen": "#317270",
-			"verdigris": "#469ca8",
-			"cyancobaltblue": "#2d519e",
-			"unitednationsblue": "#4d90e3",
-			"mediumskyblue": "#7ee6f2",
-			"oceanblue": "#4440ba",
-			"VeryLightBlue": "#6662f6",
-			"grape": "#772b99",
-			"purpleplum": "#a754ba",
-			"darkpink": "#eb4e81",
-			"mauvelous": "#f19eab",
-			"coffee": "#684a34",
-			"coconut": "#956a34",
-			"black": "#000000",
-			"philippinegray": "#898d90",
-			"lightsilver": "#d5d7d9",
-			"white": "#ffffff"
-		}
-	},
 	"stream": {
 		"videoSize": {
-			"width": 1280,
-			"height": 720
+			"width": 1920,
+			"height": 1080
 		},
 		"enable": true,
 		"streamFile": "/mnt/ramdisk/output.png",
@@ -63,33 +17,36 @@
 		"debugTime": false
 	},
 	"server": {
-		"host": "",
+		"host": "https://pixelbattles.ru",
 		"port": 8080,
 		"secure": true,
-		"origin": "",
+		"origin": "https://pixelbattles.ru",
 		"activityDuration": 600000,
-		"timelapseCachePeriod": 22896000,
 		"maxConnectionsWithOneIP": 2,
 		"proxyIp": true,
 		"auth": {
 			"twitch": {
 				"clientId": "",
 				"clientSecret": "",
-				"redirectUri": ""
+				"redirectUri": "https://api.pixelbattles.ru/auth/twitch/callback"
 			},
 			"steam": {
 				"key": "",
-				"redirectUri": ""
+				"redirectUri": "https://api.pixelbattles.ru/auth/steam/callback"
 			},
 			"discord": {
 				"clientId": "",
 				"clientSecret": "",
-				"redirectUri": ""
+				"redirectUri": "https://api.pixelbattles.ru/auth/discord/callback"
+			},
+			"telegram": {
+				"token": "",
+				"userName": "PixelBattleOnlineBot"
 			}
 		}
 	},
 	"adminEmail": "",
 	"finishTimeStamp": 0,
-	"finishText": "",
-	"moderatorNicks": ""
+	"finishText": "Сезон окончен, таймлапс как это было можно посмотреть (тут)[https://pixelbattles.ru/timelapse/] или (тут)[https://www.youtube.com/@Place-ru]",
+	"moderatorNicks": "TODO"
 }

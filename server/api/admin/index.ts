@@ -24,6 +24,8 @@ import {
 import { chat } from './chat';
 import { countdown } from './countdown';
 import { user } from './user';
+import { expand } from './expand';
+import { pause } from './pause';
 
 const getHistory = (req: IncomingMessage, res: ServerResponse) => {
 	res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -51,6 +53,8 @@ let routes: Record<string, any> = {
 	'chat': chat,
 	'countdown': countdown,
 	'user': user,
+	'expand': expand,
+	'pause': pause,
 };
 
 routes = Object.entries(routes).reduce((list, [key, callback]) => ({

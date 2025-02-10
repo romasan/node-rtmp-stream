@@ -20,7 +20,7 @@ export const Countdown: FC = () => {
 		}
 	}, [ranges, changed]);
 
-	console.log('==== ranges', ranges);
+	// console.log('==== ranges', ranges);
 
 	const handleOpen = () => {
 		get('countdown')

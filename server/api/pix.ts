@@ -22,16 +22,22 @@ import {
 	getPixelAuthor,
 } from '../utils/stats';
 import { Log } from '../utils/log';
-
-const {
-	colorShemes: { COLORS },
-} = require('../config.json');
+import { getExpand } from '../utils/expands';
+import { colorSchemes } from '../constants/colorSchemes';
+import { getValue } from '../utils/values';
 
 export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {
 		if (!checkStillTime()) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('timeout');
+
+			return;
+		}
+
+		if (getValue('paused')) {
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
+			res.end('paused');
 
 			return;
 		}
@@ -118,7 +124,7 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 			return;
 		}
 
-		const rawColor = COLORS[payload.color];
+		const rawColor = ((colorSchemes as any)[getExpand().colorScheme])[payload.color];
 		const pixelColor = getPixelColor(Math.floor(payload.x), Math.floor(payload.y));
 
 		if (pixelColor === rawColor) {

@@ -19,7 +19,7 @@ import {
 	Metrics,
 	Chat,
 	Countdown,
-	UpdateLevel,
+	Expand,
 	Final,
 } from './components';
 
@@ -30,6 +30,13 @@ interface Props {
 	coord: any;
 	range: any;
 	color: string;
+	expand?: {
+		width: number;
+		height: number;
+		shiftX: number;
+		shiftY: number;
+		colorScheme: string;
+	}
 	setCanvasMode: (value: EMode) => void;
 }
 
@@ -38,16 +45,16 @@ export const Tools: FC<Props> = ({
 	coord,
 	range,
 	color,
+	expand,
 	setCanvasMode,
-	...props
 }) => {
 	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 10});
 
 	const [opened, setOpened] = useState('');
-	const [expand, setExpand] = useState(true);
+	const [expandWindow, setExpandWindow] = useState(true);
 
 	const onToggle = () => {
-		setExpand((value) => !value);
+		setExpandWindow((value) => !value);
 	};
 
 	return (
@@ -61,8 +68,8 @@ export const Tools: FC<Props> = ({
 						<div>&gt;</div>
 					</button>
 				</div>
-				<div className={s.content} {...props}>
-					{expand && (
+				<div className={s.content}>
+					{expandWindow && (
 						<>
 							<Stats canvas={canvas} />
 							<Metrics />
@@ -71,6 +78,7 @@ export const Tools: FC<Props> = ({
 							<Maps canvas={canvas} />
 							<FillSquare
 								canvas={canvas}
+								expand={expand}
 								range={range}
 								color={color}
 								setCanvasMode={setCanvasMode}
@@ -78,7 +86,7 @@ export const Tools: FC<Props> = ({
 							<Bans />
 							<Chat />
 							<Countdown />
-							<UpdateLevel />
+							<Expand />
 							<Block title="* Откат полотна к состоянию">
 								<div>TODO</div>
 								<div>

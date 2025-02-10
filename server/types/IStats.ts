@@ -19,4 +19,4 @@ export interface IStats {
     totalCount: number;
     lastActivity: IPixel;
     [key: string]: any;
-};
+}

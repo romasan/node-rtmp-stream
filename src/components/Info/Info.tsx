@@ -5,7 +5,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 import { getStats } from '../../lib/api';
 
 import { formatNumber } from '../../helpers/formatNumber';
-import { nickSanitize } from '../../helpers/nickSanitize'
+import { nickSanitize } from '../../helpers/nickSanitize';
 
 import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
@@ -74,7 +74,7 @@ export const Info: FC<Props> = ({
 						{stats.onlineCount > 0 && (
 							<div>
 								<div className={s.title}>Онлайн ({stats.onlineCount}): </div>
-								{stats.onlineList.map((item, index) => (
+								{stats.onlineList.map((item) => (
 									<div key={String(item.place)} className={s.leaderBoardItem}>
 										<span>
 											&nbsp;&nbsp;&nbsp;

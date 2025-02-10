@@ -184,7 +184,7 @@ export const mapLastPixelsFromStats = (stats: any, count: number) => {
 	ctx.fillRect(0, 0, width, height);
 
 	for (let i = 0; i < Math.min(count, times.length); i++) {
-		const { x, y, time } = times[i];
+		const { x, y } = times[i];
 		const key = `${x}:${y}`;
 
 		if (stats[key]) {

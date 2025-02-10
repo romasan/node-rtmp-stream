@@ -110,7 +110,7 @@ export const Chat: React.FC<Props> = ({
 				return a.concat([
 					{ delimiter: month },
 					item,
-				])
+				]);
 			}
 
 			return a.concat(item);

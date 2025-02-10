@@ -8,4 +8,4 @@ export interface IUsers {
 		steam: Record<string, string>;
 		telegram: Record<string, string>;
 	};
-};
+}

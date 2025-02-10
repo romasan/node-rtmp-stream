@@ -6,14 +6,16 @@ import fs from 'fs';
 import { createCanvas, Image, Canvas, CanvasRenderingContext2D } from 'canvas';
 import { pixelsLog } from './pixels';
 import { updateStats } from './stats';
-import { spam } from '../utils/ws';
+import { spam } from './ws';
+import { getExpand } from './expands';
 import { IPixel } from '../types';
+import { colorSchemes } from '../constants/colorSchemes';
 
 const {
-	colorShemes: { COLORS },
-	stream: { videoSize, upscale, freezedFrame, withBg, debugTime },
+	stream: { videoSize, upscale, freezedFrame, debugTime },
 } = require('../config.json');
 
+// TODO use one storage for values db/values.json
 const conf = {
 	freezed: freezedFrame,
 };
@@ -132,11 +134,16 @@ export const getImageBuffer = () => {
 };
 
 export const drawPix = ({ x, y, color, nickname, uuid, ip, area }: IPixel) => {
-	if (x < 0 || y < 0 || x > canvas.width || y > canvas.width || !COLORS[color]) {
+	const { shiftX, shiftY } = getExpand();
+
+	if (
+		x < -shiftX || y < -shiftY || x > (canvas.width - shiftX) || y > (canvas.width - shiftY) ||
+		!(colorSchemes as any)[getExpand().colorScheme][color]
+	) {
 		return;
 	}
 
-	const rawColor = COLORS[color];
+	const rawColor = (colorSchemes as any)[getExpand().colorScheme][color];
 
 	updateStats({
 		time: Date.now(),
@@ -150,11 +157,11 @@ export const drawPix = ({ x, y, color, nickname, uuid, ip, area }: IPixel) => {
 	});
 
 	ctx.fillStyle = rawColor;
-	ctx.fillRect(x, y, 1, 1);
+	ctx.fillRect(x + shiftX, y + shiftY, 1, 1);
 
 	if (scale > 1 && scaledCTX) {
 		scaledCTX.fillStyle = rawColor;
-		scaledCTX.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
+		scaledCTX.fillRect((x + shiftX) * scale, (y + shiftY) * scale, 1 * scale, 1 * scale);
 	}
 
 	pixelsLog({ x, y, color: rawColor, area, nickname, uuid, ip });
@@ -167,6 +174,19 @@ export const drawPix = ({ x, y, color, nickname, uuid, ip, area }: IPixel) => {
 			color: rawColor,
 		},
 	});
+};
+
+export const expandCanvas = (width: number, height: number, shiftX: number, shiftY: number) => {
+	const image = new Image;
+
+	image.src = canvas.toBuffer();
+	canvas = createCanvas(Number(width), Number(height));
+	ctx = canvas.getContext('2d');
+	ctx.fillStyle = '#fff';
+	ctx.fillRect(0, 0, Number(width), Number(height));
+	ctx.drawImage(image, Number(shiftX), Number(shiftY));
+
+	saveCanvas();
 };
 
 export const saveCanvas = () => {

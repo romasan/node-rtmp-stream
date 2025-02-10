@@ -116,45 +116,12 @@
 
 # configurate
 
-# how to configurate ssl certificate
+# how to update ssl certificate
 
 ```bash
-sudo certbot certonly --webroot -w /var/www/html -d api.pixelbattles.ru
-```
-
-OR
-
-```bash
+sudo systemctl stop nginx
 sudo certbot certonly --standalone -d api.pixelbattles.ru
-sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/* ./
-```
-
-# how to render timelapse
-
-```bash
-ffmpeg -r 30 -i %08d.png -stream_loop -1 -i audio.mp3 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
-```
-
-or
-
-```bash
-ffmpeg -r 30 -i %08d.png -i https://play.lofiradio.ru:8000/mp3_128 -vf "scale=1704:960" -c:v libx264 -c:a aac -shortest output.mp4
-```
-
-or
-
-```bash
-ffmpeg -r 30 -i %08d.png -vf "scale=426:240" -c:v libx264 -c:a aac -shortest output.mp4
-```
-
-or
-
-```bash
-ffmpeg -i http://stream.antenne.de:80/antenne -r 30 -i %08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest output.mp4
-```
-
-```bash
-ffmpeg -i bgmusic.mp3 -r 30 -i %08d.png -vf "scale=1280:720" -c:v libx264 -c:a aac -shortest output.mp4
+sudo systemctl start nginx
 ```
 
 # nginx
@@ -169,40 +136,17 @@ sudo /etc/init.d/nginx restart
 sudo nginx -s reload
 ```
 
-```bash
-sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/fullchain.pem /etc/nginx/ssl/server.crt
-sudo cp /etc/letsencrypt/live/api.pixelbattles.ru/privkey.pem /etc/nginx/ssl/server.key
-```
-
 /etc/nginx/sites-available/example
 
 ```
 server {
 	listen 80;
 	listen 443 ssl;
-	server_name pixelbattle.online;
-
-	rewrite ^/$ http://www.pixelbattles.ru redirect;
-
-	ssl_certificate /etc/nginx/ssl/server.crt;
-	ssl_certificate_key /etc/nginx/ssl/server.key;
-}
-
-server {
-	listen 80;
-	listen 443 ssl;
-	server_name www.pixelbattle.online;
-
-	rewrite ^/$ http://www.pixelbattles.ru redirect;
-
-	ssl_certificate /etc/nginx/ssl/server.crt;
-	ssl_certificate_key /etc/nginx/ssl/server.key;
-}
-
-server {
-	listen 80;
-	listen 443 ssl;
 	server_name api.pixelbattles.ru;
+
+	# allow 93.100.95.191;
+	# deny all;
+	# deny 192.3.228.238;
 
 	location / {
 		proxy_pass http://localhost:7000;
@@ -210,11 +154,13 @@ server {
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection 'upgrade';
 		proxy_set_header Host $host;
+		# proxy_set_header Forwarded $proxy_add_forwarded;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		# proxy_set_header X-Forwarded-For "$realip_remote_addr";
 		proxy_cache_bypass $http_upgrade;
 	}
 
-	ssl_certificate /home/r/node-rtmp-stream/ssl-cert/fullchain.pem;
-	ssl_certificate_key /home/r/node-rtmp-stream/ssl-cert/privkey.pem;
+	ssl_certificate /etc/letsencrypt/live/api.pixelbattles.ru/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/api.pixelbattles.ru/privkey.pem;
 }
 ```

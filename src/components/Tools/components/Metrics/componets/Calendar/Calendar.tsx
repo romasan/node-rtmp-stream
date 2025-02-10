@@ -98,7 +98,7 @@ export const Calendar: FC = () => {
 								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
 									{week.map((day, dayIndex) => (
 										day ? (
-											<Tooltip key={day.day} fresh title={(...a) => (
+											<Tooltip key={day.day} fresh title={() => (
 												<div className={s.tooltip}>
 													<div className={s.tooltip}>
 														<div className={s.hours}>

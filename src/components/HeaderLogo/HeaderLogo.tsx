@@ -2,9 +2,9 @@ import React from 'react';
 
 import LogoIcon from '/assets/logo.svg';
 
-const { year, episode } = require('../../constants.json');
-
 import * as s from './HeaderLogo.module.scss';
+
+const { year, episode } = require('../../constants.json');
 
 export const HeaderLogo: React.FC = () => {
 	return (

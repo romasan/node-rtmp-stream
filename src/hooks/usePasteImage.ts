@@ -11,14 +11,14 @@ document.addEventListener('paste', function (e) {
 			reader.onload = function (event) {
 				const img = new Image();
 
-				img.src = event.target?.result as string;
+				(img as any).src = event.target && event.target.result as string;
 				img.onload = function () {
 					const canvas = document.createElement('canvas');
 					const ctx = canvas.getContext('2d');
 
 					canvas.width = img.width;
 					canvas.height = img.height;
-					ctx?.drawImage(img, 0, 0);
+					(ctx as any).drawImage(img, 0, 0);
 					document.body.appendChild(canvas);
 				};
 			};

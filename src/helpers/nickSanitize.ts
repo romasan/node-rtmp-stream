@@ -1,7 +1,7 @@
 export const nickSanitize = (nickname: string) => {
-    if (nickname === 'ㅤ') {
-        return 'типа самый умный';
-    }
+	if (nickname === 'ㅤ') {
+		return 'типа самый умный';
+	}
 
-    return nickname;
+	return nickname;
 };

@@ -16,7 +16,7 @@ const reduceMessage = ({ data }: MessageEvent) => {
 
 	const { event, payload } = json;
 
-	if (event && payload) {
+	if (event && typeof payload !== 'undefined') {
 		ee.emit(`ws:${event}`, payload);
 	}
 };

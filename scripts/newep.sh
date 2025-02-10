@@ -1,7 +1,10 @@
 #!/bin/bash
 
-cp assets/s3e1.png db/inout.png
-cd ./db
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+cd "$SCRIPT_DIR/../db" || exit
+
+# cp assets/s3e1.png db/inout.png
 echo -n > pixels.log
-echo "0;0;112;112;0;0" > expands.log
-# npm run tools recover ./db/pixels.log NOIMAGE ./db/inout.png 112 112
+echo "0;0;112;112;0;0;COLORS" > expands.log
+npm run tools recover

@@ -1,7 +1,8 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const { colorShemes } = require('../config.json');
+// TODO use color schemes from constants/colorSchemes.ts
+const { colorSchemes } = require('../config.json');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png
@@ -11,9 +12,9 @@ const PART_PIXELS_COUNT = 100_000;
 const prepareTimelapse = (
 	season = 's1e1',
 	backgroundImage = `${__dirname}/../../assets/426x240.png`,
-	colors = 'COLORS'
+	colors = 'COLORS',
 ) => {
-	const COLORS = colorShemes[colors];
+	const COLORS = colorSchemes[colors];
 	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
 	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
 	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;

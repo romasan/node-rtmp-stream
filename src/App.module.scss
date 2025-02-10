@@ -58,6 +58,17 @@
 	}
 }
 
+.paused {
+	position: absolute;
+	top: 50px;
+	left: 50px;
+	font-size: 48px;
+	color: #fff;
+	background: #000;
+	white-space: pre-wrap;
+	padding: 10px;
+}
+
 @keyframes blinkAnimation {
 	0% {
 		transform: scale(1);

@@ -6,7 +6,7 @@ import WebSocket from 'ws';
 import fs from 'fs';
 import https from 'https';
 import http, { IncomingMessage, ServerResponse } from 'http';
-import { getCountdown } from '../utils/countdown';
+import { getCountdown } from './countdown';
 import { parseCookies, getIPAddress } from '../helpers';
 import { checkSession } from './sessions';
 import {
@@ -14,9 +14,10 @@ import {
 	getUserData,
 	getAccoutntTokens,
 } from './auth';
+import { getExpand } from './expands';
+import { getValue } from './values';
 
 const {
-	colorShemes: { COLORS },
 	server: {
 		port,
 		secure,
@@ -227,10 +228,11 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 			...user,
 			countdown,
 			isAuthorized,
-			palette: COLORS,
+			canvas: getExpand(),
 			finish: finishTimeStamp ? new Date(finishTimeStamp).getTime() - Date.now() : 'newer',
 			finishText: finishText || 'TIMEOUT',
 			needAuthorize: true,
+			paused: getValue('paused'),
 		});
 
 		ws.on('message', (buf: Buffer) => {

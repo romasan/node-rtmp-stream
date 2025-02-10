@@ -10,11 +10,10 @@ import * as s from './Palette.module.scss';
 interface Props {
 	color: string;
 	colors: any;
-	expiration?: number;
 	setColor(value: string): void;
 }
 
-export const Palette: React.FC<Props> = ({ color, colors, expiration = 0, setColor }) => {
+export const Palette: React.FC<Props> = ({ color, colors, setColor }) => {
 	const isMobile = mobile();
 	const { anchorRef, draggableRef } = useDraggable({ x: 6, y: window.innerHeight - 68, ready: !isMobile });
 

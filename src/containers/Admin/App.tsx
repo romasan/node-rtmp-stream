@@ -13,6 +13,8 @@ import { APIhost } from '../../lib/api';
 
 import ee from '../../lib/ee';
 
+import { colorSchemes } from '../../../server/constants/colorSchemes';
+
 import * as s from './App.module.scss';
 
 export const App: React.FC = () => {
@@ -28,11 +30,13 @@ export const App: React.FC = () => {
 
 	const layer = useRef(null);
 
+	const palette = (colorSchemes as any)[wsStore.canvas && wsStore.canvas.colorScheme] || {};
+
 	useEffect(() => {
-		if (!color && wsStore.palette) {
-			const firstColor = 'black' in wsStore.palette
+		if (!color && palette) {
+			const firstColor = 'black' in palette
 				? 'black'
-				: (Object.keys(wsStore.palette) || []).pop();
+				: (Object.keys(palette) || []).pop();
 			setColor(firstColor as string);
 		}
 	}, [color, wsStore]);
@@ -56,6 +60,9 @@ export const App: React.FC = () => {
 		ee.on('ws:init', (payload: any) => {
 			setWsStore((store = {}) => ({ ...store, ...payload }));
 		});
+		ee.on('ws:expand', (payload: any) => {
+			setWsStore((store = {}) => ({ ...store, canvas: payload }));
+		});
 	}, []);
 
 	return (
@@ -63,8 +70,9 @@ export const App: React.FC = () => {
 			<a href="/" className={s.backButton}>←</a>
 			<Canvas
 				mode={canvasMode}
+				expand={wsStore.canvas}
 				className={s.canvas}
-				color={wsStore.palette ? wsStore.palette[color] : ''}
+				color={palette[color] || ''}
 				isOnline={true}
 				onClick={handleCanvasClick}
 				onSelect={handleSelect}
@@ -73,15 +81,16 @@ export const App: React.FC = () => {
 			>
 				<canvas className={s.layer} width={size.width} height={size.height} ref={layer}></canvas>
 			</Canvas>
-			{(wsStore && wsStore.palette) && (
+			{(wsStore && palette) && (
 				<Palette
 					color={color}
-					colors={wsStore.palette}
+					colors={palette}
 					setColor={setColor}
 				/>
 			)}
 			<Tools
 				canvas={layer.current}
+				expand={wsStore.canvas}
 				coord={coord}
 				range={range}
 				color={color}

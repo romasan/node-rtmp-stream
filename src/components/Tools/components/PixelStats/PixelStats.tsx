@@ -95,7 +95,7 @@ export const PixelStats: FC<Props> = ({ coord }) => {
 				{formatTime(Date.now() - stats.time)} назад
 			</div>
 			<div>
-				Ник: "{stats.name || '...'}"
+				Ник: &quot;{stats.name || '...'}&quot;
 			</div>
 			<div>
 				TOKEN: {stats.uuid || '...'}

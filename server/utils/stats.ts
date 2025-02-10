@@ -8,6 +8,7 @@ import { formatDate } from '../helpers/formatDate';
 import { shortArea, restoreArea } from '../helpers/shortArea';
 import { Log } from './log';
 import { IStats, IPixel } from '../types';
+import { getExpand } from './expands';
 
 let stats: IStats = {} as IStats;
 const namesCache: Record<string, number> = {};
@@ -163,25 +164,6 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 			crlfDelay: Infinity
 		});
 
-		try {
-			// TODO use size from canvas?
-			const [,, width, height] = String(
-				fs.readFileSync(__dirname + '/../../db/expands.log')
-					.toString()
-					.split('\n')
-					.filter(Boolean)
-					.pop()
-				)
-				.split(';');
-	
-			stats.canvas = {
-				width: Number(width),
-				height: Number(height),
-			};
-		} catch (ignore) {
-			Log('Error: не удалось прочитать expands.log');
-		}
-
 		if (!stats.history) {
 			stats.history = {
 				days: {},
@@ -327,7 +309,7 @@ export const getTotalPixels = () => {
 };
 
 export const getEmptyPixelSCount = () => {
-	const { width, height } = stats?.canvas;
+	const { width, height } = getExpand();
 
 	return (width * height) - Object.keys(stats).filter((key) => key.indexOf(':') > 0).length;
 };
