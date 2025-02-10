@@ -24,6 +24,7 @@ let users: IUsers = {
 		twitch: {},
 		steam: {},
 		telegram: {},
+		vk: {},
 	},
 };
 
