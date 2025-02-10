@@ -51,6 +51,7 @@ const getAllUsers = () => {
 			twitch: {},
 			steam: {},
 			telegram: {},
+			vk: {},
 		};
 	}
 
@@ -68,6 +69,10 @@ const getAllUsers = () => {
 
 	if (!users.nicknames.telegram) {
 		users.nicknames.telegram = {};
+	}
+
+	if (!users.nicknames.telegram) {
+		users.nicknames.vk = {};
 	}
 };
 
