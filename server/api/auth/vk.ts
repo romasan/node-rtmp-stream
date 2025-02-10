@@ -28,7 +28,19 @@ const vk = (req: IncomingMessage, res: ServerResponse) => {
 
 			const { user }: any = VKID.Auth.publicInfo(query.token);
 
-			console.log('==== authorize (vk)', user);
+			console.log('==== authorize (vk)', {
+				query,
+				user,
+			});
+
+			if (!user) {
+				Log('VK auth error: empty user data');
+
+				res.writeHead(200, {'Content-Type': 'text/html'});
+				res.end('Ошибка, <a href="/auth/vk">попробуйте ещё раз</a>');
+
+				return true;
+			}
 
 			authorizeUser(token, {
 				...user,
