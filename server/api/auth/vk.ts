@@ -1,4 +1,3 @@
-import * as VKID from '@vkid/sdk';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 import { authorizeUser } from '../../utils/auth';
