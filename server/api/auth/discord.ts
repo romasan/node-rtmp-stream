@@ -29,6 +29,8 @@ const discord = async (req: IncomingMessage, res: ServerResponse) => {
 				urlEncoded.append('redirect_uri', redirectUri);
 				urlEncoded.append('scope', 'identify+email');
 
+				console.log('==== discord #1');
+
 				const respToken = await fetch(`https://discord.com/api/oauth2/token?${urlEncoded}`, {
 					method: 'POST',
 					body: urlEncoded,
@@ -37,11 +39,17 @@ const discord = async (req: IncomingMessage, res: ServerResponse) => {
 					},
 				});
 				const jsonToken = await respToken.json();
+
+				console.log('==== discord #2');
+
 				const respUserInfo = await fetch('https://discord.com/api/users/@me', {
 					headers: {
 						'authorization': `${jsonToken.token_type} ${jsonToken.access_token}`,
 					}
 				});
+
+				console.log('==== discord #3');
+
 				const jsonUserInfo = await respUserInfo.json();
 
 				if (!jsonUserInfo.id) {
