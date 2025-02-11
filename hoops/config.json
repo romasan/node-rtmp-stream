@@ -1,0 +1,7 @@
+{
+    "discord": {
+        "protocol": "http",
+        "host": "hoop.pixelbattles.ru",
+        "port": 7777
+    }
+}
