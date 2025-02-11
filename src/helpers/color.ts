@@ -16,17 +16,15 @@ export const invertRgb = ([r, g, b]: number[]): number[] => [
 ];
 
 export const getPixelColor = (canvas: any, x: number, y: number) => {
-	if (!canvas) {
-		return '#fff';
-	}
+	let color = '#fff';
 
-	const ctx = canvas.getContext('2d');
+	try {
+		const ctx = canvas.getContext('2d');
+	
+		color = rgbToHex(ctx.getImageData(x, y, 1, 1).data);
+	} catch (ignore) {}
 
-	if (!ctx) {
-		return '#fff';
-	}
-
-	return rgbToHex(ctx.getImageData(x, y, 1, 1).data);
+	return color;
 };
 
 const colorChannelMixer = (a: number, b: number, amountToMix: number) =>
