@@ -45,7 +45,7 @@ export const life = (canvas: any, data?: any) => {
 	const w = canvas.width;
 	const h = canvas.height;
 	
-	data = data || [...ctx.getImageData(0, 0, w, h).data];
+	data = data || [...ctx.getImageData(0, 0, w, h, { willReadFrequently: true }).data];
 	const next = new Array(data.length).fill(255);
 
 	for (let y = 0; y < canvas.height; y++) {

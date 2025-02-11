@@ -19,7 +19,7 @@ export const getPixelColor = (canvas: any, x: number, y: number) => {
 	let color = '#fff';
 
 	try {
-		const ctx = canvas.getContext('2d');
+		const ctx = canvas.getContext('2d', { willReadFrequently: true });
 	
 		color = rgbToHex(ctx.getImageData(x, y, 1, 1).data);
 	} catch (ignore) {}
