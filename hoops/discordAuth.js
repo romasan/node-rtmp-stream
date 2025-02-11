@@ -23,6 +23,8 @@ const webServer = http.createServer(async (req, res) => {
                 redirectUri,
             } = await getPostPayload(req);
 
+            const urlEncoded = new URLSearchParams();
+
             urlEncoded.append('client_id', clientId);
             urlEncoded.append('client_secret', clientSecret);
             urlEncoded.append('code', code);
