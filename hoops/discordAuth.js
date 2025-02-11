@@ -32,14 +32,6 @@ const webServer = http.createServer(async (req, res) => {
             urlEncoded.append('redirect_uri', redirectUri);
             urlEncoded.append('scope', 'identify+email');
 
-            console.log('==== discord #1.1', {
-                clientId,
-                clientSecret,
-                code,
-                redirectUri,
-            });
-
-            // const authUrl = `https://discord.com/api/oauth2/token?${urlEncoded}`;
             const authUrl = 'https://discord.com/api/oauth2/token';
 
             const respToken = await fetch(authUrl, {
@@ -51,8 +43,6 @@ const webServer = http.createServer(async (req, res) => {
             });
 
             const jsonToken = await respToken.json();
-
-            console.log('==== discord #1.2', jsonToken);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(jsonToken));
@@ -69,11 +59,6 @@ const webServer = http.createServer(async (req, res) => {
     if (req.url.startsWith('/auth/discord/api/users/@me')) {
         try {
             const { token_type, access_token } = url.parse(req.url, true).query;
-
-            console.log('==== discord #2.1', {
-                token_type,
-                access_token,
-            });
     
             const respUserInfo = await fetch('https://discord.com/api/users/@me', {
                 headers: {
@@ -82,8 +67,6 @@ const webServer = http.createServer(async (req, res) => {
             });
 
             const jsonUserInfo = await respUserInfo.json();
-
-            console.log('==== discord #2.2', jsonUserInfo);
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(jsonUserInfo));
@@ -101,9 +84,6 @@ const webServer = http.createServer(async (req, res) => {
 
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('not found');
-
-    // res.writeHead(302, { Location: 'https://pixelbattles.ru/login/?discord' });
-    // res.end();
 });
 
-webServer.listen(port/* , 'localhost' */);
+webServer.listen(port);
