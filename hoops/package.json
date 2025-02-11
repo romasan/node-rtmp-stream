@@ -1,0 +1,10 @@
+{
+  "name": "hoops",
+  "version": "1.0.0",
+  "scripts": {
+    "discord": "node ./discordAuth.js"
+  },
+  "author": "Roman Bauer",
+  "license": "ISC",
+  "description": ""
+}
