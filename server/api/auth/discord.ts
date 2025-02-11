@@ -6,6 +6,14 @@ import { Log } from '../../utils/log';
 import { parseCookies } from '../../helpers';
 
 const {
+	discord: {
+		protocol: hoopProtocol,
+		host: hoopHost,
+		port: hoopPort,
+	}
+} = require('../../../hoops/config.json');
+
+const {
 	server: {
 		host,
 		auth: {
@@ -29,28 +37,44 @@ const discord = async (req: IncomingMessage, res: ServerResponse) => {
 				urlEncoded.append('redirect_uri', redirectUri);
 				urlEncoded.append('scope', 'identify+email');
 
+				// const authUrl = `https://discord.com/api/oauth2/token?${urlEncoded}`;
+				// const authUrl = 'https://discord.com/api/oauth2/token';
+
+				// const respToken = await fetch(authUrl, {
+				// 	method: 'POST',
+				// 	body: urlEncoded,
+				// 	headers: {
+				// 		'Content-Type': 'application/x-www-form-urlencoded',
+				// 	},
+				// });
+
 				console.log('==== discord #1');
 
-				const respToken = await fetch(`https://discord.com/api/oauth2/token?${urlEncoded}`, {
+				const respToken = await fetch(`${hoopProtocol}://${hoopHost}:${hoopPort}/auth/discord/callback`, {
 					method: 'POST',
-					body: urlEncoded,
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
+					body: JSON.stringify({
+						clientId,
+						clientSecret,
+						code: query.code,
+						redirectUri,
+					}),
 				});
+
 				const jsonToken = await respToken.json();
 
-				console.log('==== discord #2');
+				console.log('==== discord #2', jsonToken);
 
-				const respUserInfo = await fetch('https://discord.com/api/users/@me', {
-					headers: {
-						'authorization': `${jsonToken.token_type} ${jsonToken.access_token}`,
-					}
-				});
+				// const respUserInfo = await fetch('https://discord.com/api/users/@me', {
+				// 	headers: {
+				// 		'authorization': `${jsonToken.token_type} ${jsonToken.access_token}`,
+				// 	}
+				// });
 
-				console.log('==== discord #3');
+				const respUserInfo = await fetch(`${hoopProtocol}://${hoopHost}:${hoopPort}/auth/discord/api/users/@me?token_type=${jsonToken.token_type}&access_token=${jsonToken.access_token}`);
 
 				const jsonUserInfo = await respUserInfo.json();
+
+				console.log('==== discord #3', jsonUserInfo);
 
 				if (!jsonUserInfo.id) {
 					throw new Error('Error: failed load user info');

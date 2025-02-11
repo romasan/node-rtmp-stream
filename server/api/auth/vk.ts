@@ -32,17 +32,11 @@ const vk = async (req: IncomingMessage, res: ServerResponse) => {
 			const resp = await fetch('https://id.vk.com/oauth2/public_info?client_id=52936975', {
 				method: 'POST',
 				body: urlEncoded,
-				// body: JSON.stringify({ id_token: query.token }),
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 				},
 			});
 			const { user } = await resp.json();
-
-			console.log('==== authorize (vk)', {
-				query,
-				user,
-			});
 
 			if (!user) {
 				Log('VK auth error: empty user data');

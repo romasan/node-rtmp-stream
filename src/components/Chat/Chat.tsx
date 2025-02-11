@@ -13,6 +13,7 @@ import TwitchIcon from '/assets/twitch_bw.svg';
 import DiscordIcon from '/assets/discord_bw.svg';
 import SteamIcon from '/assets/steam_bw.svg';
 import TelegramIcon from '/assets/telegram_bw.svg';
+import VkIcon from '/assets/vk_bw.svg';
 import StarIcon from '/assets/star.svg';
 
 import * as s from './Chat.module.scss';
@@ -48,6 +49,7 @@ const icons = {
 	discord: DiscordIcon,
 	steam: SteamIcon,
 	telegram: TelegramIcon,
+	vk: VkIcon,
 	system: StarIcon,
 };
 
