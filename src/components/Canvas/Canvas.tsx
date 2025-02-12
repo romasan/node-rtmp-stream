@@ -33,6 +33,7 @@ import * as s from './Canvas.module.scss';
 export enum EMode {
 	CLICK = 'CLICK',
 	SELECT = 'SELECT',
+	PICK = 'PICK',
 }
 
 export enum ETouchMode {
@@ -65,7 +66,7 @@ interface Props {
 		shiftY: number;
 		colorScheme: string;
 	}
-	onClick?(x: number, y: number): void;
+	onClick?: (x: number | string, y?: number) => void;
 	onSelect?(from: { x: number, y: number }, to: { x: number, y: number }): void;
 	onInit?(value: any): void;
 	onScale?([scale, setScale]: [number, Function]): null;
@@ -365,7 +366,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					setCoord([x, y]);
 					setScale(showPixelScaleMobile);
 				} else {
-					onClick(...coord);
+					onClick(coord[0], coord[1]);
 				}
 			}
 
@@ -414,6 +415,24 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			(!isMobile || touchMode.current === ETouchMode.MOVE)
 		) {
 			setScale(showPixelScale);
+		}
+
+		if (
+			scale >= showPixelScale &&
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current) &&
+			mode === EMode.PICK &&
+			isOverChild
+		) {
+			const { top, left } = canvasRef.current.getBoundingClientRect();
+			const x = Math.floor((clientX - left) / scale) - shiftRef.current[0];
+			const y = Math.floor((clientY - top) / scale) - shiftRef.current[1];
+			const ctx = canvasRef.current && canvasRef.current.getContext('2d');
+			const color = ctx && rgbToHex((ctx as any).getImageData(x, y, 1, 1).data);
+
+			if (color) {
+				onClick(color);
+			}
 		}
 
 		cur.current = [-1, -1, false];
@@ -728,9 +747,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					>
 						<canvas
 							ref={canvasRef}
-							className={cn(s.canvas, {
-								[s.inactive]: scale < showPixelScale && !viewOnly,
-							})}
+							className={cn(
+								s.canvas,
+								{
+									[s.inactive]: scale < showPixelScale && !viewOnly,
+									[s.pickable]: mode === EMode.PICK,
+								},
+							)}
 						/>
 						{children}
 						{mode === EMode.SELECT && (
@@ -773,7 +796,12 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 										)}
 									</div>
 								)}
-								<div className={s.pixelInside}></div>
+								<div className={cn(
+									s.pixelInside,
+									{
+										[s.pickable]: mode === EMode.PICK,
+									}
+								)}></div>
 							</div>
 						)}
 					</>

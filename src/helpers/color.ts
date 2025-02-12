@@ -35,3 +35,18 @@ export const colorBlendRGB = (rgbA: number[], rgbB: number[], amountToMix: numbe
 	colorChannelMixer(rgbA[1], rgbB[1], amountToMix),
 	colorChannelMixer(rgbA[2], rgbB[2], amountToMix),
 ];
+
+const blendWithWhiteAndBlack = (color: number, whiteOpacity: number, blackOpacity: number) =>
+	Math.round((1 - blackOpacity) * (whiteOpacity * 255 + (1 - whiteOpacity) * color));
+
+export const blendColorWhiteBlack = (hexColor: string, whiteOpacity: number, blackOpacity: number) => {
+	const [red, green, blue] = hexToRgb(hexColor);
+
+	return rgbToHex([
+		blendWithWhiteAndBlack(red, whiteOpacity, blackOpacity),
+		blendWithWhiteAndBlack(green, whiteOpacity, blackOpacity),
+		blendWithWhiteAndBlack(blue, whiteOpacity, blackOpacity),
+	]);
+};
+
+export const isHEX = (str: string) => /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(str);

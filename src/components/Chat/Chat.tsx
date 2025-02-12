@@ -96,7 +96,7 @@ export const Chat: React.FC<Props> = ({
 }) => {
 	const [list, setList] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 60});
+	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 60 });
 	const inputRef = useRef<HTMLInputElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
 

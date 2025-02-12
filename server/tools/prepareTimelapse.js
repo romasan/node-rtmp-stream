@@ -9,6 +9,27 @@ const PART_PIXELS_COUNT = 100_000;
 // rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
 // http://localhost:8080/timelapse/#staticHost=http://localhost:8080
 
+const hexToRgb = (hex) => [
+	parseInt(hex.substring(1, 3), 16),
+	parseInt(hex.substring(3, 5), 16),
+	parseInt(hex.substring(5, 7), 16),
+];
+
+const rgb2num = ([r, g, b]) => (r << 16) | (g << 8) | b;
+
+const num2rgb = (num) => [
+	(num >> 16) & 0xFF,
+	(num >> 8) & 0xFF,
+	num & 0xFF
+];
+
+const u32toU16 = (num) => [
+	(num >> 16) & 0xFFFF,
+	num & 0xFFFF,
+];
+
+const u16tou32 = (high, low) => (high << 16) | (low & 0xFFFF);
+
 const prepareTimelapse = (
 	season = 's1e1',
 	backgroundImage = `${__dirname}/../../assets/426x240.png`,
@@ -26,7 +47,7 @@ const prepareTimelapse = (
 
 	const expandsRaw = fs.readFileSync(expandsFile).toString();
 	const expands = expandsRaw.split('\n').filter(Boolean).map((item) => {
-		const [time, index, width, height, shiftX, shiftY] = item.split(';');
+		const [time, index, width, height, shiftX, shiftY, colorScheme] = item.split(';');
 
 		return {
 			time: Number(time),
@@ -35,6 +56,7 @@ const prepareTimelapse = (
 			height: Number(height),
 			shiftX: Number(shiftX),
 			shiftY: Number(shiftY),
+			colorScheme,
 		};
 	});
 
@@ -57,9 +79,28 @@ const prepareTimelapse = (
 		[color]: index,
 	}), {});
 
+	const colorSchemes = {
+		// COLOR: 0,
+	};
+
 	const timelapse = {
-		colors: Object.values(COLORS),
-		expands: [],
+		version: '2.0',
+		// colors: Object.values(COLORS),
+		colorSchemes: [
+			// {
+			// 	name: 'COLORS',
+			// 	colors: []
+			// }
+		],
+		expands: [
+			// {
+			// 	canvas: { width, height },
+			// 	index: { from, to },
+			// 	part: { from, to },
+			// 	shift: { x, y },
+			// 	colorScheme: 0,
+			// }
+		],
 		// days: {
 		// 	// "01.01.2023": {
 		// 	// 	from: 0,
@@ -88,6 +129,8 @@ const prepareTimelapse = (
 
 	let savePreview = false;
 
+	let isTruecolor = false;
+
 	rl.on('line', (line) => {
 		// if (index >= _breakCount) {
 		// 	return;
@@ -112,6 +155,8 @@ const prepareTimelapse = (
 
 			expandIndex = newExpandIndex;
 
+			isTruecolor = expands[expandIndex].colorScheme === 'truecolor';
+
 			timelapse.expands[expandIndex] = {
 				canvas: {
 					width: expands[expandIndex].width,
@@ -124,7 +169,12 @@ const prepareTimelapse = (
 				part: {
 					from: partIndex + 1,
 					to: partIndex + 1
-				}
+				},
+				shift: {
+					x: expands[expandIndex].shiftX,
+					y: expands[expandIndex].shiftY,
+				},
+				colorScheme: expands[expandIndex].colorScheme,
 			};
 
 			if (index) {
@@ -151,7 +201,12 @@ const prepareTimelapse = (
 		// month = MONTHS[month + 1];
 		// const date = `${year.padStart(2, 0)}/${month.padStart(2, 0)}/${day.padStart(2, 0)}`;
 
-		partPixels.push([colorsCache[color], Number(x), Number(y)]);
+		if (isTruecolor) {
+			const [high, low] = u32toU16(rgb2num(hexToRgb(color)));
+			partPixels.push([high, low, Number(x), Number(y)]);
+		} else {
+			partPixels.push([colorsCache[color], Number(x), Number(y)]);
+		}
 
 		index++;
 
@@ -159,6 +214,7 @@ const prepareTimelapse = (
 			packTimelapsePart(
 				partPixels,
 				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				isTruecolor,
 			);
 			partPixels = [];
 			partIndex++;
@@ -182,6 +238,7 @@ const prepareTimelapse = (
 			packTimelapsePart(
 				partPixels,
 				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				isTruecolor,
 			);
 		}
 
@@ -194,7 +251,7 @@ const prepareTimelapse = (
 };
 
 const gzipAB = async (input, compress = false) => {
-	const cs = compress ? new CompressionStream('gzip') : new DecompressionStream("gzip");
+	const cs = compress ? new CompressionStream('gzip') : new DecompressionStream('gzip');
 	const writer = cs.writable.getWriter();
 	const reader = cs.readable.getReader();
 	const output = [];
@@ -219,13 +276,17 @@ const gzipAB = async (input, compress = false) => {
 	return concatenated;
 };
 
-const packTimelapsePart = async (json, output) => {
-	const binary_16 = new Uint16Array(json.length * 3);
+const packTimelapsePart = async (list, output, isTruecolor) => {
+	const length = isTruecolor ? 4 : 3;
+	const binary_16 = new Uint16Array(list.length * length);
 
-	json.forEach((item, index) => {
-		binary_16[index * 3] = item[0];
-		binary_16[index * 3 + 1] = item[1];
-		binary_16[index * 3 + 2] = item[2];
+	list.forEach((item, index) => {
+		binary_16[index * length] = item[0];
+		binary_16[index * length + 1] = item[1];
+		binary_16[index * length + 2] = item[2];
+		if (isTruecolor) {
+			binary_16[index * length + 3] = item[3];
+		}
 	});
 
 	const binary_8 = new Uint8Array(binary_16.buffer, binary_16.byteOffset, binary_16.byteLength);
@@ -234,8 +295,9 @@ const packTimelapsePart = async (json, output) => {
 	fs.writeFileSync(output, zipped);
 };
 
-const unpackTimelapsePart = async () => {
-	const zipped = fs.readFileSync(`${__dirname}/debug.bin`);
+const unpackTimelapsePart = async (file, isTruecolor) => {
+	const length = isTruecolor ? 4 : 3;
+	const zipped = fs.readFileSync(file);
 	const binary_8 = await gzipAB(zipped);
 	const binary_16 = new Uint16Array(binary_8.buffer);
 	const data = [];
@@ -243,8 +305,17 @@ const unpackTimelapsePart = async () => {
 
 	binary_16.forEach((value) => {
 		item.push(value);
-		if (item.length === 3) {
-			data.push(item);
+
+		if (item.length === length) {
+			data.push(
+				isTruecolor
+					? {
+						colorRGB: num2rgb(u16tou32(item[0], item[1])),
+						x: item[2],
+						y: item[3],
+					}
+					: item
+			);
 			item = [];
 		}
 	});

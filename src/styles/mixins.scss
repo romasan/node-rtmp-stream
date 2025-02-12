@@ -41,6 +41,30 @@ $color-window-border-dark: #2d2d3a;
 	}
 }
 
+@mixin inputLike() {
+	border-style: solid;
+	border-width: 2px;
+	border-right-color: $color-window-border-light;
+	border-bottom-color: $color-window-border-light;
+	border-top-color: $color-window-border-dark;
+	border-left-color: $color-window-border-dark;
+	background: #bbbaf1;
+	border-radius: 5px;
+	box-sizing: border-box;
+
+	&:focus{
+		outline: none;
+
+		&::placeholder {
+			color: transparent;
+		}
+	}
+
+	&::placeholder {
+		text-transform: uppercase;
+	}
+}
+
 @mixin size($size) {
 	width: $size;
 	height: $size;

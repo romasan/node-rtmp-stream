@@ -90,6 +90,22 @@
 	}
 }
 
+.addColor {
+	@include size(20px);
+	@include buttonLike();
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: -1px 0 0 0;
+	padding: 0;
+
+	&:active {
+		padding: 0 0 0 1px;
+		margin: 0;
+	}
+}
+
 :global(.mobile) {
 	.root {
 		width: 100%;

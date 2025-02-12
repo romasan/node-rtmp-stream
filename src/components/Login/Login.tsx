@@ -2,6 +2,7 @@ import React from 'react';
 
 import TwitchIcon from '/assets/twitch.svg';
 import DiscordIcon from '/assets/discord.svg';
+import SteamIcon from '/assets/steam.svg';
 import TelegramIcon from '/assets/telegram.svg';
 import VkIcon from '/assets/vk.svg';
 
@@ -20,6 +21,10 @@ export const Login = () => {
 					<DiscordIcon />
 					Discord
 				</a>
+				<a href="/login/?steam">
+					<SteamIcon />
+					Steam
+				</a>
 				<a href="/login/?telegram">
 					<TelegramIcon />
 					Telegram
@@ -28,10 +33,6 @@ export const Login = () => {
 					<VkIcon />
 					VK ID
 				</a>
-				{/*<a href="/login/?steam">*/}
-				{/*	<SteamIcon />*/}
-				{/*	Steam*/}
-				{/*</a>*/}
 			</div>
 		</>
 	);

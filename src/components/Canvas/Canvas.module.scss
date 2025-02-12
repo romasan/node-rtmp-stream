@@ -188,6 +188,10 @@
 	box-sizing: border-box;
 }
 
+.pickable {
+	cursor: url(../../../assets/eye-dropper.png) 9 22, crosshair;
+}
+
 :global(.mobile) {
 	.root {
 		@include size(100%);

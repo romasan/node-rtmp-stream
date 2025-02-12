@@ -1,6 +1,5 @@
 export const colorSchemes = {
-	truecolor: 'truecolor',
-	// COLORS_8: {},
+	truecolor: {},
 	COLORS_1: { // 16
 		yellow: '#e2d747',
 		lightgreen: '#a5dd5f',
