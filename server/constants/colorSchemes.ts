@@ -43,7 +43,7 @@ export const colorSchemes = {
 		black: '#000000',
 		philippinegray: '#898d90',
 		lightsilver: '#d5d7d9',
-		white: '#fffff'
+		white: '#ffffff'
 	},
 	COLORS_32: { // 32
 		rosewood: '#6b0119',
