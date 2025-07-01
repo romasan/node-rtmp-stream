@@ -60,8 +60,7 @@ const renderText = (raw: string, nickname?: string): string => {
 		.replace(/(https\:\/\/www\.youtube\.com\/@[A-Za-z0-9_-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/youtu\.be\/[A-Za-z0-9_\-]+)/ig, '<a href="$1" target="_blank">$1</a>')
 		.replace(/(https\:\/\/pixelbattles\.ru[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1">$1</a>')
-		.replace(/(https\:\/\/discord\.gg[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1">$1</a>');
-		;
+		.replace(/(https\:\/\/discord\.gg[A-Za-z0-9_\-\/]{0,})/ig, '<a href="$1" target="_blank">$1</a>');
 };
 
 export const Message: React.FC<MessageProps> = ({
