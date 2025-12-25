@@ -1,39 +1,44 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 
 import cn from 'classnames';
 
 import { useDraggable } from '../../../../hooks/useDraggable';
-import { rgbToHex, hexToRgb, isHEX, blendColorWhiteBlack } from '../../../../helpers/color';
+import {
+	rgbToHex,
+	hexToRgb,
+	isHEX,
+	blendColorWhiteBlack,
+	invertHex,
+	expandShortHex,
+} from '../../../../helpers/color';
 
 import mobile from 'is-mobile';
-
-// import { useDraggable } from '../../hooks/useDraggable';
 
 import * as s from './ColorPicker.module.scss';
 
 const colors = [
-    [255, 0, 0],    // red
-    [255, 255, 0],  // yellow
-    [0, 255, 0],    // green
-    [0, 255, 255],  // cyan
-    [0, 0, 255],    // blue
-    [255, 0, 255],  // magenta
-    [255, 0, 0]     // red (again)
+	[255, 0, 0],   // red
+	[255, 255, 0], // yellow
+	[0, 255, 0],   // green
+	[0, 255, 255], // cyan
+	[0, 0, 255],   // blue
+	[255, 0, 255], // magenta
+	[255, 0, 0]    // red (again)
 ];
 
 const interpolateColor = (i: number, index: number, ratio: number) =>
-    Math.round(colors[index][i] + (colors[index + 1][i] - colors[index][i]) * ratio);
+	Math.round(colors[index][i] + (colors[index + 1][i] - colors[index][i]) * ratio);
 
 const getColorInRainbow = (percent: number) => {
-    let position = (percent / 100) * 6;
-    let index = Math.floor(position);
-    let ratio = position - index;
+	let position = (percent / 100) * 6;
+	let index = Math.min(5, Math.floor(position));
+	let ratio = position - index;
 
-    return rgbToHex([
-        interpolateColor(0, index, ratio),
-        interpolateColor(1, index, ratio),
-        interpolateColor(2, index, ratio),
-    ]);
+	return rgbToHex([
+		interpolateColor(0, index, ratio),
+		interpolateColor(1, index, ratio),
+		interpolateColor(2, index, ratio),
+	]);
 };
 
 const getColorInPicker = (percent: number, percentX: number, percentY: number) => {
@@ -42,119 +47,212 @@ const getColorInPicker = (percent: number, percentX: number, percentY: number) =
 	return blendColorWhiteBlack(color, (100 - percentX) / 100, percentY / 100);
 };
 
+const calculateDistance = (rgb1: any, rgb2: any) =>
+	Math.sqrt(
+		(rgb1[0] - rgb2[0]) ** 2 +
+		(rgb1[1] - rgb2[1]) ** 2 +
+		(rgb1[2] - rgb2[2]) ** 2
+	);
+
 const getPickerPosition = (targetColor: string) => {
-    const targetRgb = hexToRgb(targetColor);
+	const targetRgb = hexToRgb(targetColor);
 
-    let bestMatch = null;
-    let bestDistance = Infinity;
+	let bestMatch = null;
+	let bestDistance = Infinity;
 
-    for (let percent = 0; percent <= 100; percent += 1) {
-        for (let percentX = 0; percentX <= 100; percentX += 1) {
-            for (let percentY = 0; percentY <= 100; percentY += 1) {
-                const color = getColorInPicker(percent, percentX, percentY);
-                const rgb = hexToRgb(color);
+	for (let percent = 0; percent <= 100; percent += 10) {
+		for (let percentX = 0; percentX <= 100; percentX += 10) {
+			for (let percentY = 0; percentY <= 100; percentY += 10) {
+				const color = getColorInPicker(percent, percentX, percentY);
+				const rgb = hexToRgb(color);
 
-                const distance = Math.sqrt(
-                    Math.pow(rgb[0] - targetRgb[0], 2) +
-                    Math.pow(rgb[1] - targetRgb[1], 2) +
-                    Math.pow(rgb[2] - targetRgb[2], 2)
-                );
+				const distance = calculateDistance(rgb, targetRgb);
 
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestMatch = [percent, percentX, percentY];
-                }
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestMatch = [percent, percentX, percentY];
+				}
+			}
+		}
+	}
 
-                if (bestDistance === 0) {
-                    return bestMatch;
-                }
-            }
-        }
-    }
+	const [bestPercent, bestPercentX, bestPercentY] = bestMatch as any;
 
-    return bestMatch;
+	for (let percent = Math.max(0, bestPercent - 1); percent <= Math.min(100, bestPercent + 1); percent++) {
+		for (let percentX = Math.max(0, bestPercentX - 1); percentX <= Math.min(100, bestPercentX + 1); percentX++) {
+			for (let percentY = Math.max(0, bestPercentY - 1); percentY <= Math.min(100, bestPercentY + 1); percentY++) {
+				const color = getColorInPicker(percent, percentX, percentY);
+				const rgb = hexToRgb(color);
+				const distance = calculateDistance(rgb, targetRgb);
+
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					bestMatch = [percent, percentX, percentY];
+				}
+			}
+		}
+	}
+
+	return bestMatch;
 };
 
 interface Props {
-    onChange: (value: string) => void;
-    onClose: () => void;
+	color: string;
+	pickedColor?: string;
+	slot: string;
+	onChange(value: string): void;
+	onClose(): void;
+	onDelete(): void;
+	onPick(value?: boolean): void;
 }
 
-export const ColorPicker: React.FC<Props> = ({ onChange, onClose }) => {
-    const [baseColor, setBaseColor] = useState('#0000ff');
-    const [pickerColor, setPickerColor] = useState('#0000ff');
-    const [textColor, setTextColor] = useState('#0000ff');
-    const refRainbow = useRef(null);
-    const refPicker = useRef(null);
+export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, slot, onChange, onClose, onDelete, onPick }) => {
+	const [baseColor, setBaseColor] = useState('#ff0000');
+	const [pickerColor, setPickerColor] = useState('#ff0000');
+	const [textColor, setTextColor] = useState('#ff0000');
+	const [percent, setPercent] = useState(0);
+	const [percentXY, setPercentXY] = useState([0, 0]);
+	const refRainbow = useRef(null);
+	const refPicker = useRef(null);
 
-    const isMobile = mobile();
+	const isMobile = mobile();
 
-    const { anchorRef, draggableRef } = useDraggable({ x: 200, y: window.innerHeight - 400, ready: !isMobile });
+	const { anchorRef, draggableRef } = useDraggable({ x: isMobile ? 10 : 200, y: window.innerHeight - 400 });
 
-    const handleClickRainbow = (event: any) => {
-        const rect = (refRainbow.current as any).getBoundingClientRect();
-        const y = Math.round(((event.clientY - rect.top) / rect.height) * 100);
+	const handleClickRainbow = (event: any) => {
+		const rect = (refRainbow.current as any).getBoundingClientRect();
+		const y = Math.round(((event.clientY - rect.top) / rect.height) * 100);
 
-        setBaseColor(getColorInRainbow(y))
-    };
+		setPercent(y);
+		setBaseColor(getColorInRainbow(y));
 
-    const handleClickPicker = (event: any) => {
-        const rect = (refPicker.current as any).getBoundingClientRect();
-        const x = Math.round(((event.clientX - rect.left) / rect.width) * 100);
-        const y = Math.round(((event.clientY - rect.top) / rect.height) * 100);
-        const color = blendColorWhiteBlack(baseColor, (100 - x) / 100, y / 100);
+		const color = getColorInPicker(y, percentXY[0], percentXY[1]);
 
-        setPickerColor(color);
-        setTextColor(color);
-    };
+		setPickerColor(color);
+		setTextColor(color);
+	};
 
-    const handleChangeText = (event: any) => {
-        setTextColor(event.target.value)
-    };
+	const handleClickPicker = (event: any) => {
+		const rect = (refPicker.current as any).getBoundingClientRect();
+		const x = Math.round(((event.clientX - rect.left) / rect.width) * 100);
+		const y = Math.round(((event.clientY - rect.top) / rect.height) * 100);
+		const color = blendColorWhiteBlack(baseColor, (100 - x) / 100, y / 100);
+		
+		setPercentXY([x, y]);
+		setPickerColor(color);
+		setTextColor(color);
+	};
 
-    const handleBlurText = (event: any) => {
-        if (isHEX(textColor)) {
-            setPickerColor(textColor);
-        } else {
-            setTextColor(pickerColor);
-        }
-    };
+	const handleChangeText = (event: any) => {
+		setTextColor(event.target.value);
 
-    return (
-        <div className={s.root} ref={draggableRef}>
-            <div className={s.draggable} ref={anchorRef}>
-                <button className={s.close} onClick={onClose}>&times;</button>
-            </div>
-            <div>
-                <div className={s.wrapper}>
-                    <div
-                        ref={refPicker}
-                        className={cn(s.picker, s.color)}
-                        style={{ backgroundColor: baseColor }}
-                        onClick={handleClickPicker}
-                    >
-                        <div className={cn(s.picker, s.gradientWhite)}>
-                            <div className={cn(s.picker, s.gradientBlack)}></div>
-                        </div>
-                    </div>
-                    <div className={s.rainbow} ref={refRainbow} onClick={handleClickRainbow}></div>
-                </div>
-                <div className={s.info}>
-                    <div className={s.output} style={{ backgroundColor: pickerColor }}></div>
-                    <div className={s.colorLabel}>Цвет:</div>
-                    <input
-                        value={textColor}
-                        size={7}
-                        className={s.input}
-                        onChange={handleChangeText}
-                        onBlur={handleBlurText}
-                    />
-                </div>
-                <div className={s.footer}>
-                    <button className={s.button}>OK</button>
-                    <button className={s.button} onClick={onClose}>Отмена</button>
-                </div>
-            </div>
-        </div>
-    );
+		if (event.target.value !== pickerColor && isHEX(event.target.value)) {
+			updateColorForm(event.target.value);
+		}
+	};
+
+	const handleBlurText = () => {
+		if (textColor === pickerColor) {
+			return;
+		}
+
+		if (isHEX(textColor)) {
+			updateColorForm(expandShortHex(textColor));
+		} else {
+			setTextColor(expandShortHex(pickerColor));
+		}
+	};
+
+	const updateColorPosition = (color: string) => {
+		const [_percent, _percentX, _percentY] = getPickerPosition(expandShortHex(color)) as any;
+
+		setBaseColor(getColorInRainbow(_percent));
+		setPercent(_percent);
+		setPercentXY([_percentX, _percentY]);
+	};
+
+	const updateColorForm = (color: string) => {
+		const longColor = expandShortHex(color);
+
+		setPickerColor(longColor);
+		setTextColor(color);
+
+		updateColorPosition(longColor);
+	};
+
+	const invertedColor = useMemo(
+		() => invertHex(expandShortHex(pickerColor)),
+		[pickerColor],
+	);
+
+	const handleSave = () => {
+		if (!isHEX(pickerColor)) {
+			return;
+		}
+
+		onChange(pickerColor);
+		onClose();
+	};
+
+	useEffect(() => {
+		if (isHEX(color)) {
+			updateColorForm(color);
+		}
+	}, [color]);
+
+	useEffect(() => {
+		if (pickedColor && isHEX(pickedColor)) {
+			updateColorForm(pickedColor);
+		}
+	}, [pickedColor]);
+
+	return (
+		<div className={s.root} ref={draggableRef}>
+			<div className={s.draggable} ref={anchorRef}>
+				<button className={s.close} onClick={onClose}>&times;</button>
+			</div>
+			<div>
+				<div className={s.wrapper}>
+					<div
+						ref={refPicker}
+						className={cn(s.picker, s.color)}
+						style={{ backgroundColor: baseColor }}
+						onClick={handleClickPicker}
+					>
+						<div className={cn(s.picker, s.gradientWhite)}>
+							<div className={cn(s.picker, s.gradientBlack)}></div>
+						</div>
+						<div className={s.dot} style={{
+							left: `${percentXY[0]}%`,
+							top: `${percentXY[1]}%`,
+							backgroundColor: invertedColor,
+						}}></div>
+					</div>
+					<div className={s.rainbow} ref={refRainbow} onClick={handleClickRainbow}>
+						<div className={s.arrow} style={{ top: `${percent}%` }}></div>
+					</div>
+				</div>
+				<div className={s.info}>
+					<div className={s.output} style={{ backgroundColor: pickerColor }}></div>
+					<div className={s.colorLabel}>Цвет:</div>
+					<input
+						value={textColor}
+						size={7}
+						className={s.input}
+						onChange={handleChangeText}
+						onBlur={handleBlurText}
+						onSubmit={handleBlurText}
+					/>
+					<button className={s.pickButton} onClick={onPick}></button>
+				</div>
+				<div className={s.footer}>
+					<button className={s.button} onClick={handleSave}>OK</button>
+					<button className={s.button} onClick={onClose}>Отмена</button>
+					{slot && (
+						<button className={s.button} onClick={onDelete}>Удалить</button>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 };

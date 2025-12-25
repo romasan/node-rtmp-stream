@@ -16,7 +16,7 @@ export const colorSchemes = {
 		pink: '#f1aacf',
 		red: '#d22d1f',
 		orange: '#db9834',
-		brown: '#976c4'
+		brown: '#976c41'
 	},
 	COLORS: { // 24
 		deepcarmine: '#ae233d',
@@ -45,40 +45,6 @@ export const colorSchemes = {
 		white: '#fffff'
 	},
 	COLORS_32: { // 32
-		rosewood: '#6b0119',
-		crimsonglory: '#bd0037',
-		redorange: '#ff4500',
-		chromeyellow: '#fea800',
-		sunglow: '#fed435',
-		dodieyellow: '#fefa59',
-		green: '#01a267',
-		caribbeangreen: '#09cc76',
-		kiwi: '#7eec57',
-		pinegreen: '#02756d',
-		munsell: '#009daa',
-		bluemunsell: '#00ccbe',
-		cyancobaltblue: '#244fa4',
-		bleudefrance: '#3790ea',
-		turquoise: '#52e8f3',
-		oceanblue: '#4839bf',
-		verylightblue: '#695bff',
-		violetsareblue: '#9483ff',
-		chinesepurple: '#801d9f',
-		deepfuchsia: '#b449bf',
-		mauve: '#e4abfd',
-		vividcerise: '#dd117e',
-		sasquatchsocks: '#fe3781',
-		salmonpink: '#fe99a9',
-		vandykebrown: '#6d462f',
-		goldenbrown: '#9b6926',
-		verylighttangelo: '#feb470',
-		black: '#000000',
-		davysgrey: '#525252',
-		philippinegray: '#888d90',
-		lightsilver: '#d5d6d8',
-		white: '#ffffff'
-	},
-	COLORS_32_2: { // 32
 		rosewood: '#6d011b',
 		crimsonglory: '#bd0038',
 		redorange: '#ff4500',
@@ -123,3 +89,5 @@ export const colorSchemes = {
 		white: '#ffffff'
 	}
 };
+
+colorSchemes.truecolor = colorSchemes.COLORS_32;

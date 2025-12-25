@@ -1,16 +1,23 @@
 import fs, { WriteStream } from 'fs';
+import path from 'path';
 import { getTotalPixels } from './stats';
 
 const expandsFile = __dirname + '/../../db/expands.log';
 let file: WriteStream;
-
 let data = {
-	colorScheme: '',
-	width: 0,
-	height: 0,
+	colorScheme: 'COLORS_1',
+	width: 100,
+	height: 100,
 	shiftX: 0,
 	shiftY: 0,
 };
+
+if (!fs.existsSync(expandsFile)) {
+	const dirname = path.dirname(expandsFile);
+
+	fs.mkdirSync(dirname, { recursive: true });
+	fs.writeFileSync(expandsFile, `0;0;${data.width};${data.height};${data.shiftX};${data.shiftY};${data.colorScheme}`);
+}
 
 export const expandsInit = () => {
 	const [,, width, height, shiftX, shiftY, colorScheme] = String(

@@ -64,12 +64,16 @@ export const HeaderControls: React.FC<Props> = ({
 								<LogoutIcon className={s.iconButton} />
 							</a>
 						) : (
-							<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} title="Выход" />
+							<span title="Выход">
+								<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} />
+							</span>
 						)}
-						<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })}>
-							<ChatIcon className={s.iconButton} onClick={toggleChat} title="Чат" />
+						<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })} title="Чат">
+							<ChatIcon className={s.iconButton} onClick={toggleChat} />
 						</span>
-						<InfoIcon className={s.iconButton} onClick={toggleInfo} title="Статистика" />
+						<span title="Статистика">
+							<InfoIcon className={s.iconButton} onClick={toggleInfo} />
+						</span>
 						<a href="/timelapse" title="Таймлапс">
 							<TimelapseIcon className={s.iconButton} />
 						</a>

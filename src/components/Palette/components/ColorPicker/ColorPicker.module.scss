@@ -58,7 +58,7 @@
 .button {
 	@include buttonLike();
 
-	width: 62px;
+	min-width: 62px;
 	padding: 3px 5px;
 	font-family: 'Custom Font', monospace;
 	font-size: 16px;
@@ -70,11 +70,12 @@
 
 .wrapper {
 	display: inline-flex;
-	gap: 5px;
+	gap: 6px;
 }
 
 .picker {
 	@include size(200px);
+
 	cursor: crosshair;
 }
 
@@ -84,6 +85,15 @@
 	box-sizing: content-box;
     overflow: hidden;
 	padding: 0;
+	position: relative;
+}
+
+.dot {
+	@include size(16px);
+
+	position: absolute;
+	transform: translateX(-50%) translateY(-50%);
+	mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M7 11h2v5H7v-5ZM11 7h5v2h-5V7ZM0 7h5v2H0V7ZM7 0h2v5H7V0Z' fill='currentColor'/></svg>");
 }
 
 .gradientBlack {
@@ -97,10 +107,23 @@
 .rainbow {
 	@include inputLike();
 
+	position: relative;
 	padding: 0;
 	width: 20px;
 	background: linear-gradient(to bottom, rgb(255, 0, 0) 0%, rgb(255, 255, 0) 17%, rgb(0, 255, 0) 33%, rgb(0, 255, 255) 50%, rgb(0, 0, 255) 67%, rgb(255, 0, 255) 83%, rgb(255, 0, 0) 100%);
 	cursor: pointer;
+}
+
+.arrow {
+	position: absolute;
+	transform: translateY(-50%);
+	left: -8px;
+	width: 0; 
+	height: 0; 
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	
+	border-left: 5px solid #000;
 }
 
 .info {
@@ -110,9 +133,22 @@
 }
 
 .output {
-	@include size(30px);
 	@include inputLike();
+	@include size(30px);
 
 	padding: 0;
 	display: block;
+}
+
+.pickButton {
+	@include buttonLike();
+	@include size(30px);
+
+	background-image: url(../../../../../assets/eye-dropper.png);
+	background-position: center center;
+	padding: 0;
+
+	&:active {
+		padding: 0;
+	}
 }

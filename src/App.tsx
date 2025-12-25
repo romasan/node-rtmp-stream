@@ -12,6 +12,7 @@ import {
 	Countdown,
 	// Bar,
 	Login,
+	EMode,
 } from './components/';
 
 import { doOnEnter, life } from './helpers';
@@ -35,6 +36,7 @@ import * as s from './App.module.scss';
 
 export const App: React.FC = () => {
 	const [color, setColor] = useState('');
+	const [pickedColor, setPickedColor] = useState('');
 	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
 	const [isFinished, setIsFinished] = useState(false);
 	const [canvas, setCanvas] = useState<any>({});
@@ -60,6 +62,8 @@ export const App: React.FC = () => {
 		),
 		width: '300px',
 	});
+
+	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);
 
 	const palette = (colorSchemes as any)[wsStore.canvas && wsStore.canvas.colorScheme] || {};
 
@@ -89,11 +93,18 @@ export const App: React.FC = () => {
 
 	}, [finish]);
 
-	const handleCanvasClick = (x: number, y: number) => {
+	const handleCanvasClick = (x: number | string, y: number) => {
+		if (canvasMode === EMode.PICK) {
+			setPickedColor(x as string);
+			setCanvasMode(EMode.CLICK);
+
+			return;
+		}
+
 		if (wsStore.needAuthorize && !isAuthorized) {
 			loginModal.open();
 		} else {
-			addPix({ x, y, color });
+			addPix({ x, y, color } as any);
 		}
 	};
 
@@ -105,6 +116,10 @@ export const App: React.FC = () => {
 				setBlinkedLoginAnimation(false);
 			}, 3000);
 		}
+	};
+
+	const handlePick = (v = true): void => {
+		setCanvasMode(v ? EMode.PICK : EMode.CLICK);
 	};
 
 	useEffect(() => {
@@ -138,7 +153,8 @@ export const App: React.FC = () => {
 					login={loginModal.open}
 				/>
 				<Canvas
-					color={palette[color] || ''}
+					mode={canvasMode}
+					color={(wsStore.canvas && wsStore.canvas.colorScheme === 'truecolor') ? color : palette[color]}
 					expand={wsStore.canvas}
 					onClick={handleCanvasClick}
 					expiration={expiration}
@@ -148,15 +164,14 @@ export const App: React.FC = () => {
 					onInit={setCanvas}
 					src={`${APIhost}/canvas.png`}
 				/>
-				{/* {!isMobile && (
-					<Bar
-						centering={canvas.centering}
-						setScale={canvas.setScale}
-						isFinished={isFinished}
-					/>
-				)} */}
 				{isOnline && !isFinished && (
-					<Palette color={color} colors={palette} setColor={setColor} />
+					<Palette
+						color={color}
+						pickedColor={pickedColor}
+						colorScheme={wsStore.canvas && wsStore.canvas.colorScheme}
+						setColor={setColor}
+						onPick={handlePick}
+					/>
 				)}
 				{Boolean(finish) && (
 					<Countdown finish={finish} text={wsStore.finishText}/>
@@ -165,7 +180,7 @@ export const App: React.FC = () => {
 					<div className={s.paused}>PAUSE ||</div>
 				)}
 				<div className={s.footer}>
-					<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VKPlay Live">
+					<a href="https://vkplay.live/place_tv" target="_blank" rel="noreferrer" aria-label="Стрим на VK Play Live">
 						<VkplayIcon />
 					</a>
 					<a href="https://www.twitch.tv/place_ru" target="_blank" rel="noreferrer" aria-label="Стрим на Twitch">

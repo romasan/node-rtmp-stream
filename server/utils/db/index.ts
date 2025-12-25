@@ -2,11 +2,19 @@
  * работа с базой данных
  */
 
+import fs from 'fs';
+import path from 'path';
 import sqlite3 from 'sqlite3';
-import { Log } from './log';
+import { Log } from '../log';
 
-const dbFile = __dirname + '/../../db/db.sqlite3';
+const dbFile = __dirname + '/../../../db/db.sqlite3';
 const sqlite3db = sqlite3.verbose();
+
+if (!fs.existsSync(dbFile)) {
+	const dirname = path.dirname(dbFile);
+
+	fs.mkdirSync(dirname, { recursive: true });
+}
 
 export const db = new sqlite3db.Database(dbFile);
 
