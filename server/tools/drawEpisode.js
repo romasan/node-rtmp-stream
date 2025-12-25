@@ -164,6 +164,8 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	let nextPartStartTime = expands[part + 1] ? Number(expands[part + 1][0]) : Infinity;
 	let width = Number(expands[part][2]);
 	let height = Number(expands[part][3]);
+	let shiftX = Number(expands[part][4]);
+	let shiftY = Number(expands[part][5]);
 	let scale = Math.min(
 		Math.floor(videoWidth / width),
 		Math.floor(videoHeight / height),

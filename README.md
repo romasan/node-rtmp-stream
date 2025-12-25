@@ -1,5 +1,7 @@
 # basic
 
+(!) - high priority
+
 - [x] auth by twitch
 - [x] auth by discord
 - [x] auth by telegram
@@ -22,11 +24,10 @@
 - [x] chat moderation (delete all by user)
 - [ ] read chat from stream(s)?
 - [ ] support for multiple colors
-- [ ] moderations (with log)
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
 - [ ] use one countdown for active unauthorized users with one ip address
-- [ ] do not allow more than one (or percentage of the number online) user with one IP address
+- [ ] (!) do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
 - [ ] webassembly + canvas =) rust?
 - [ ] add to telegram web app (add qr to stream) (like https://github.com/hip-hyena/PaintBot)
@@ -43,8 +44,23 @@
 - [ ] chat messages from user
 - [ ] chat delete all for banned
 - [ ] fix typescript warnings and remove all "any" plug
-- [ ] mute/ban with timeout
 - [ ] use account uuid for stats
+- [ ] moderators tools
+	- users on selected region, with count of pixel (ban status, count of pixel inside / outside region, registration date, chat messages count)
+	- ban / mute controls in "whose pixel" panel, ant banned status
+	- checbox, translate to chat message "<username> is banner by <moderator>"
+	- control for fast show activity map for session / username in "whose pixel" panel
+	- chat moderation in separate wide window
+	- update moderation panel layout
+	- add popup messages on ban user (banned <username> / <username> already banned)
+	- tool for restore canvas without pixels of banned users (with pause mode)
+	- preview canvas without pixels of banned users
+	- activity map banned and unbanned (banned colors for sessions)
+	- mute / ban with timeout
+	- ban with chat access
+	- admin add / remove moderators
+	- log of moderation actions
+	- newest map by index for session / nick / ip
 
 # admin panel
 
@@ -109,6 +125,7 @@
 - [ ] play button in center of timelapse canvas
 - [ ] hash link to coordinate, like https://pixelbattles.ru/#100,200 go to position, scale, higlight pixel
 - [ ] fix countdown progress position on reload page
+- [ ] fix coundown on login to ended game
 
 # page with infinity map
 

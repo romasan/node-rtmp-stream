@@ -9,7 +9,6 @@ import { updateStats } from './stats';
 import { spam } from './ws';
 import { getExpand } from './expands';
 import { IPixel } from '../types';
-import { colorSchemes } from '../constants/colorSchemes';
 
 const {
 	stream: { videoSize, upscale, freezedFrame, debugTime },
@@ -44,6 +43,15 @@ const file = __dirname + '/../../db/inout.png';
 
 export const initStreamCanvas = () => {
 	if (!fs.existsSync(file)) {
+		const expand = getExpand();
+
+		canvas = createCanvas(expand.width, expand.height);
+		ctx = canvas.getContext('2d');
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, expand.width, expand.height);
+
+		fs.writeFileSync(file, canvas.toBuffer());
+
 		return;
 	}
 
@@ -137,41 +145,46 @@ export const drawPix = ({ x, y, color, nickname, uuid, ip, area }: IPixel) => {
 	const { shiftX, shiftY } = getExpand();
 
 	if (
-		x < -shiftX || y < -shiftY || x > (canvas.width - shiftX) || y > (canvas.width - shiftY) ||
-		!(colorSchemes as any)[getExpand().colorScheme][color]
+		x < -shiftX ||
+		y < -shiftY ||
+		x > (canvas.width - shiftX) ||
+		y > (canvas.width - shiftY)
 	) {
 		return;
 	}
-
-	const rawColor = (colorSchemes as any)[getExpand().colorScheme][color];
 
 	updateStats({
 		time: Date.now(),
 		area,
 		x,
 		y,
-		color: rawColor,
+		color,
 		uuid,
 		ip,
 		nickname,
 	});
 
-	ctx.fillStyle = rawColor;
+	ctx.fillStyle = color;
 	ctx.fillRect(x + shiftX, y + shiftY, 1, 1);
 
 	if (scale > 1 && scaledCTX) {
-		scaledCTX.fillStyle = rawColor;
-		scaledCTX.fillRect((x + shiftX) * scale, (y + shiftY) * scale, 1 * scale, 1 * scale);
+		scaledCTX.fillStyle = color;
+		scaledCTX.fillRect(
+			(x + shiftX) * scale,
+			(y + shiftY) * scale,
+			1 * scale,
+			1 * scale
+		);
 	}
 
-	pixelsLog({ x, y, color: rawColor, area, nickname, uuid, ip });
+	pixelsLog({ x, y, color, area, nickname, uuid, ip });
 
 	spam({
 		event: 'drawPix',
 		payload: {
 			x,
 			y,
-			color: rawColor,
+			color,
 		},
 	});
 };

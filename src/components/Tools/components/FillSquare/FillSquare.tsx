@@ -45,13 +45,6 @@ export const FillSquare: FC<Props> = ({
 		[range, expand],
 	);
 
-	const _color = useMemo(() => {
-		const key = expand && expand.colorScheme;
-		const colorScheme = (colorSchemes as any)[key] || {};
-
-		return colorScheme[color];
-	}, [color, colorSchemes, expand]);
-
 	const onOpen = () => {
 		if (canvas) {
 			canvas.width = canvas.width;
@@ -79,7 +72,7 @@ export const FillSquare: FC<Props> = ({
 
 			const ctx = canvas.getContext('2d');
 
-			ctx.fillStyle = _color;
+			ctx.fillStyle = color;
 			ctx.fillRect(
 				range.from.x,
 				range.from.y,
@@ -87,7 +80,7 @@ export const FillSquare: FC<Props> = ({
 				range.to.y - range.from.y,
 			);
 		}
-	}, [canvas, range, _color, opened]);
+	}, [canvas, range, color, opened]);
 
 	return (
 		<Block title="🖌️ Заполнение области цветом"
@@ -107,7 +100,7 @@ export const FillSquare: FC<Props> = ({
 						:
 						{band.to.y || -1}
 						&nbsp;]&nbsp;
-						{color} ({_color})
+						{color}
 					</div>
 					<div>{Math.abs(range.from.x - range.to.x) * Math.abs(range.from.y - range.to.y)} pixels</div>
 				</>

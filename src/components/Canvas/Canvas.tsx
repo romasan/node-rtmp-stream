@@ -15,6 +15,7 @@ import {
 	getPixelColor,
 	formatDate,
 	formatTime,
+	eq,
 } from '../../helpers';
 import { nickSanitize } from '../../helpers/nickSanitize';
 import { getPixel } from '../../lib/api';
@@ -33,6 +34,7 @@ import * as s from './Canvas.module.scss';
 export enum EMode {
 	CLICK = 'CLICK',
 	SELECT = 'SELECT',
+	PICK = 'PICK',
 }
 
 export enum ETouchMode {
@@ -65,7 +67,7 @@ interface Props {
 		shiftY: number;
 		colorScheme: string;
 	}
-	onClick?(x: number, y: number): void;
+	onClick?: (x: number | string, y?: number) => void;
 	onSelect?(from: { x: number, y: number }, to: { x: number, y: number }): void;
 	onInit?(value: any): void;
 	onScale?([scale, setScale]: [number, Function]): null;
@@ -119,6 +121,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const [isProgressInited, setIsProgressInited] = useState(false);
 	const showCoordinates = isOnline && !viewOnly;
 	const shiftRef = useRef([Infinity, Infinity]);
+	const expandPrev = useRef<any>();
+	// const [debugLog, setDebug] = useState({});
+	const Log = (key: string, value: string) => {
+		// setDebug(v => ({ ...v, [key]: value }));
+	};
 
 	const pixelTitle = useMemo(() => {
 		const [x, y] = coord;
@@ -255,6 +262,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				initialDistance.current = currentDistance;
 			}
 
+			Log('move-type', 'resize');
+
 			return;
 		}
 
@@ -293,6 +302,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
 		}
 
+		Log('clientXY', [clientX, clientY].join(', '));
+		Log('posIsAbove', String(canvasRef.current && posIsAbove([clientX, clientY], canvasRef.current)));
+		Log('canvasRef', String(Boolean(canvasRef.current)) + ' - ' + Date.now());
+
 		// drag
 		if (
 			canvasRef.current &&
@@ -300,8 +313,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		) {
 			if (!isOverChild) {
 				if (mode === EMode.CLICK) {
+					Log('setCoord', '#1');
 					setCoord([Infinity, Infinity]);
 				}
+
+				Log('move-type', 'drag outside');
 
 				return;
 			}
@@ -324,6 +340,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				const { width, height } = (canvasRef.current as any).parentNode.parentNode.getBoundingClientRect();
 				const center = [width / scale / 2, height / scale / 2];
 
+				Log('setCoord', '#2');
 				setCoord([
 					getInRange(Math.abs(Math.round(center[0] - pos.x)), [0, canvasRef.current.width - 1]) - shiftRef.current[0],
 					getInRange(Math.abs(Math.round(center[1] - pos.y)), [0, canvasRef.current.height - 1]) - shiftRef.current[1],
@@ -332,9 +349,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				return;
 			}
 
+			Log('setCoord', '#3');
+			Log('- x', String(x));
+			Log('- y', String(y));
+			Log('- shiftX', String(shiftRef.current[0]));
+			Log('- shiftY', String(shiftRef.current[1]));
 			setCoord([x - shiftRef.current[0], y - shiftRef.current[1]]);
+
+			Log('move-type', 'drag');
 		} else {
+			Log('setCoord', '#4');
 			setCoord([Infinity, Infinity]);
+			Log('move-type', 'no drag');
 		}
 	};
 
@@ -362,10 +388,11 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					const x = Math.abs(Math.round(center[0] - pos.x));
 					const y = Math.abs(Math.round(center[1] - pos.y));
 
-					setCoord([x, y]);
+					Log('setCoord', '#5');
+					setCoord([x - shiftRef.current[0], y - shiftRef.current[1]]);
 					setScale(showPixelScaleMobile);
 				} else {
-					onClick(...coord);
+					onClick(coord[0], coord[1]);
 				}
 			}
 
@@ -414,6 +441,23 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			(!isMobile || touchMode.current === ETouchMode.MOVE)
 		) {
 			setScale(showPixelScale);
+		}
+
+		if (
+			canvasRef.current &&
+			posIsAbove([clientX, clientY], canvasRef.current) &&
+			mode === EMode.PICK &&
+			isOverChild
+		) {
+			const { top, left } = canvasRef.current.getBoundingClientRect();
+			const x = Math.floor((clientX - left) / scale);
+			const y = Math.floor((clientY - top) / scale);
+			const ctx = canvasRef.current && canvasRef.current.getContext('2d');
+			const color = ctx && rgbToHex((ctx as any).getImageData(x, y, 1, 1).data);
+
+			if (color) {
+				onClick(color);
+			}
 		}
 
 		cur.current = [-1, -1, false];
@@ -549,28 +593,35 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const onExpand = (payload: any) => {
-		if (canvasRef.current) {
-			canvasRef.current.toBlob((blob) => {
-				const img = document.createElement('img');
-				const url = URL.createObjectURL(blob as Blob);
-	
-				img.onload = () => {
-					(canvasRef.current as any).width = payload.width;
-					(canvasRef.current as any).height = payload.height;
-
-					const ctx = (canvasRef.current as any).getContext('2d');
-
-					ctx.fillStyle = '#fff';
-					ctx.fillRect(0, 0, payload.width, payload.height);
-					ctx.drawImage(img, payload.shiftX - shiftRef.current[0], payload.shiftY - shiftRef.current[1]);
-					shiftRef.current = [
-						payload.shiftX,
-						payload.shiftY,
-					];
-				};
-				img.src = url;
-			});
+		if (!payload || !canvasRef.current) {
+			return;
 		}
+
+		const isInit = shiftRef.current[0] === Infinity || shiftRef.current[1] === Infinity;
+
+		const tempCanvas = document.createElement('canvas');
+		const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
+
+		tempCanvas.width = canvasRef.current.width;
+		tempCanvas.height = canvasRef.current.height;
+		tempContext.drawImage(canvasRef.current, 0, 0);
+
+		const ctx = (canvasRef.current as any).getContext('2d');
+					
+		canvasRef.current.width = Number(payload.width);
+		canvasRef.current.height = Number(payload.height);
+
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, Number(payload.width), Number(payload.height));
+		if (isInit) {
+			ctx.drawImage(tempCanvas, 0, 0);
+		} else {
+			ctx.drawImage(tempCanvas, Number(payload.shiftX) - shiftRef.current[0], Number(payload.shiftY) - shiftRef.current[1]);
+		}
+		shiftRef.current = [
+			Number(payload.shiftX),
+			Number(payload.shiftY),
+		];
 	};
 
 	useEffect(() => {
@@ -690,21 +741,17 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [coord, scale, viewOnly]);
 
 	useEffect(() => {
-		if (
-			expand && (
-				shiftRef.current[0] !== (expand && expand.shiftX) ||
-				shiftRef.current[1] !== (expand && expand.shiftY)
-			)
-		) {
-			if (shiftRef.current[0] === Infinity) {
-				shiftRef.current = [
-					expand && expand.shiftX || 0,
-					expand && expand.shiftY || 0,
-				];
-			} else {
-				onExpand(expand);
-			}
+		if (!expand) {
+			return;
 		}
+
+		if (eq(expandPrev.current, expand)) {
+			return;
+		}
+
+		expandPrev.current = expand;
+
+		onExpand(expand);
 	}, [expand]);
 
 	return (
@@ -728,9 +775,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					>
 						<canvas
 							ref={canvasRef}
-							className={cn(s.canvas, {
-								[s.inactive]: scale < showPixelScale && !viewOnly,
-							})}
+							className={cn(
+								s.canvas,
+								{
+									[s.inactive]: scale < showPixelScale && !viewOnly,
+									[s.pickable]: mode === EMode.PICK,
+								},
+							)}
 						/>
 						{children}
 						{mode === EMode.SELECT && (
@@ -750,7 +801,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							)}
 							{coord[0] !== Infinity && `[${coord.join(', ')}]`} X{Number(scale.toFixed(1))}
 						</div>
-						{scale >= showPixelScale && (
+						{scale >= showPixelScale && mode !== EMode.PICK && (
 							<div
 								className={cn(s.pixel, { [s.animated]: animatedPixel })}
 								style={scale ? getPixelStyle() : {}}
@@ -774,11 +825,18 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 									</div>
 								)}
 								<div className={s.pixelInside}></div>
+
 							</div>
 						)}
 					</>
 				)}
 			</div>
+
+			{/* <div className={s.debug} id="debug-log">
+				{Object.entries(debugLog).map(([key, value]) => (
+					<div key={key}>{key}: {String(value)}</div>
+				))}
+			</div> */}
 		</>
 	);
 };

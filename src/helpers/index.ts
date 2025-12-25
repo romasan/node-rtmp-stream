@@ -7,3 +7,5 @@ export * from './formatTime';
 export * from './gzipAB';
 export * from './doOnEnter';
 export * from './life';
+export * from './pipe';
+export * from './eq';

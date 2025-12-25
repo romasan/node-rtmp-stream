@@ -57,7 +57,16 @@ const getTimelapseIndexes = (timelapse: any, cursor: number) => {
 	};
 };
 
-const fetchAndUnzipPart = async (episode: string, index: number) => {
+const num2rgb = (num: number) => [
+	(num >> 16) & 0xFF,
+	(num >> 8) & 0xFF,
+	num & 0xFF
+];
+
+const u16tou32 = (high: number, low: number) => (high << 16) | (low & 0xFFFF);
+
+const fetchAndUnzipPart = async (episode: string, index: number, isTruecolor: boolean) => {
+	const length = isTruecolor ? 4 : 3;
 	const list: number[][] = [];
 
 	try {
@@ -71,8 +80,16 @@ const fetchAndUnzipPart = async (episode: string, index: number) => {
 		binary_16.forEach((value) => {
 			item.push(value);
 
-			if (item.length === 3) {
-				list.push(item);
+			if (item.length === length) {
+				if (isTruecolor) {
+					list.push([
+						...num2rgb(u16tou32(item[0], item[1])),
+						item[2],
+						item[3]
+					]);
+				} else {
+					list.push(item);
+				}
 				item = [];
 			}
 		});
@@ -165,10 +182,10 @@ export const App: React.FC = () => {
 		} catch (ignore) {/* */}
 	};
 
-	const preloadPart = async (partIndex: number) => {
+	const preloadPart = async (partIndex: number, isTruecolor: boolean) => {
 		if (!parts.current[partIndex]) {
 			parts.current[partIndex] = true;
-			parts.current[partIndex] = await fetchAndUnzipPart(selectedEpisode, partIndex);
+			parts.current[partIndex] = await fetchAndUnzipPart(selectedEpisode, partIndex, isTruecolor);
 			setLoadedPart(partIndex);
 		}
 	};
@@ -217,7 +234,9 @@ export const App: React.FC = () => {
 			const cursorInPart = ((prevExpand && prevExpand.index.to) || 0) + partIndex * timelapse.partSize;
 
 			if (globalPartIndex <= timelapse.totalParts - 1 && !parts.current[globalPartIndex + 1]) {
-				void preloadPart(globalPartIndex + 1);
+				const isTruecolor = expand.colorScheme === 'truecolor'; // TODO
+
+				void preloadPart(globalPartIndex + 1, isTruecolor);
 			}
 
 			const pixelsToEndOfPart = partToIndex - playCursor.current;
@@ -346,7 +365,7 @@ export const App: React.FC = () => {
 		setClickedCursor(cursor);
 		moveTimelapseCursor();
 		setStartPart(globalPartIndex);
-		void preloadPart(globalPartIndex);
+		void preloadPart(globalPartIndex, false); // TODO isTruecolor
 	};
 
 	const handleFasterClick = () => {
@@ -380,7 +399,7 @@ export const App: React.FC = () => {
 			playCursor.current = 0;
 			parts.current = [];
 			setStartPart(0);
-			void preloadPart(0);
+			void preloadPart(0, false); // TODO isTruecolor
 			void fetchSelectedEpisodeTimelapse();
 			moveTimelapseCursor();
 		}

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import './utils/db';
 import { initStreamCanvas, saveCanvas, getImageBuffer } from './utils/canvas';
 import { initStats } from './utils/stats';
 import { expandsInit } from './utils/expands';
@@ -9,8 +10,8 @@ const { stream } = require('./config.json');
 
 initStreamCanvas();
 
-expandsInit();
 initStats();
+expandsInit();
 
 if (stream.enable) {
 	require('./utils/stream');

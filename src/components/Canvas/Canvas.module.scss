@@ -130,6 +130,7 @@
 	0% {
 		transform: translate(0, 0);
 	}
+
 	100% {
 		transform: translate(2000px, -1000px);
 	}
@@ -140,6 +141,7 @@
 		transform: scale(1) rotate(0deg);
 		opacity: 1;
 	}
+
 	100% {
 		transform: scale(15) rotate(360deg);
 		opacity: 0;
@@ -149,7 +151,7 @@
 .animated {
 	animation: moveAnimation 500ms linear forwards;
 
-	& > div {
+	&>div {
 		animation: scaleAndRotateAnimation 500ms linear forwards;
 	}
 }
@@ -169,9 +171,11 @@
 	0% {
 		opacity: 0;
 	}
+
 	50% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}
@@ -188,6 +192,20 @@
 	box-sizing: border-box;
 }
 
+.pickable {
+	cursor: url(../../../assets/eye-dropper.png) 9 22, crosshair;
+}
+
+@keyframes rotate {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 :global(.mobile) {
 	.root {
 		@include size(100%);
@@ -198,4 +216,21 @@
 	.coordinates {
 		bottom: 70px;
 	}
+
+	.pixelInside {
+		border-width: 3px;
+		box-sizing: content-box;
+		margin: -3px;
+		// animation: rotate 10s linear infinite;
+	}
+}
+
+.debug {
+	background-color: #000;
+	color: #fff;
+	position: fixed;
+	top: 40px;
+	right: 3px;
+	border-radius: 3px;
+	padding: 3px;
 }

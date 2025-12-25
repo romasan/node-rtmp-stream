@@ -124,10 +124,13 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 			return;
 		}
 
-		const rawColor = ((colorSchemes as any)[getExpand().colorScheme])[payload.color];
+		const { colorScheme } = getExpand();
+		const rawColor = colorScheme === 'truecolor'
+			? (((colorSchemes as any)[colorScheme])[payload.color] || payload.color)
+			: ((colorSchemes as any)[colorScheme])[payload.color];
 		const pixelColor = getPixelColor(Math.floor(payload.x), Math.floor(payload.y));
 
-		if (pixelColor === rawColor) {
+		if (!rawColor || pixelColor === rawColor) {
 			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('skip');
 
@@ -135,7 +138,7 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 		}
 
 		drawPix({
-			color: payload.color,
+			color: rawColor,
 			x: Math.floor(payload.x),
 			y: Math.floor(payload.y),
 			nickname: user?.name || '',
