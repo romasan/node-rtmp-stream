@@ -23,6 +23,7 @@ const {
 		secure,
 		activityDuration,
 		maxConnectionsWithOneIP,
+		maxConnectionsDuration = 60_000,
 	},
 	finishTimeStamp,
 	finishText,
@@ -166,17 +167,33 @@ export const checkHasWSConnect = (token: string) => {
 	return has;
 };
 
+const ipCache: any = {};
+
 export const checkIPRateLimit = (req: IncomingMessage) => {
 	// TODO check without WS
 	// and/or cache 1-5 sec?
-	const ip = getIPAddress(req);
+	const ip = getIPAddress(req) || '';
 	let count = 0;
 
-	wss?.clients.forEach((ws: WebSocket) => {
+	if (!ipCache[ip]) {
+		ipCache[ip] = {};
+	}
+
+	wss?.clients.forEach((ws: WebSocket) => {		
 		if ((ws as any)._ip === ip) {
-			count++;
+			const token = (ws as any)._token;
+
+			ipCache[ip][token] = Date.now();
 		}
 	});
+
+	for (const key in ipCache[ip]) {
+		if ((Date.now() - ipCache[ip][key]) > maxConnectionsDuration) {
+			delete ipCache[ip][key];
+		} else {
+			count++;
+		}
+	}
 
 	return count <= maxConnectionsWithOneIP ? false : `${ip} (${count})`;
 };
