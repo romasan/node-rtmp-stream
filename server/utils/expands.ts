@@ -16,7 +16,7 @@ if (!fs.existsSync(expandsFile)) {
 	const dirname = path.dirname(expandsFile);
 
 	fs.mkdirSync(dirname, { recursive: true });
-	fs.writeFileSync(expandsFile, `0;0;${data.width};${data.height};${data.shiftX};${data.shiftY};${data.colorScheme}`);
+	fs.writeFileSync(expandsFile, `0;0;${data.width};${data.height};${data.shiftX};${data.shiftY};${data.colorScheme}\n`);
 }
 
 export const expandsInit = () => {
