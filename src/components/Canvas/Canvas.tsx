@@ -42,6 +42,8 @@ export enum ETouchMode {
 	SCALE = 'SCALE',
 }
 
+const DEBUG = false;
+
 const icons = {
 	twitch: TwitchIcon,
 	discord: DiscordIcon,
@@ -122,9 +124,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const showCoordinates = isOnline && !viewOnly;
 	const shiftRef = useRef([Infinity, Infinity]);
 	const expandPrev = useRef<any>();
-	// const [debugLog, setDebug] = useState({});
+	const [prevScale, setPrevScale] = useState(-1);
+	const [debugLog, setDebug] = useState({});
 	const Log = (key: string, value: string) => {
-		// setDebug(v => ({ ...v, [key]: value }));
+		if (!DEBUG) {
+			return;
+		}
+
+		setDebug(v => ({ ...v, [key]: value }));
 	};
 
 	const pixelTitle = useMemo(() => {
@@ -392,7 +399,12 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					setCoord([x - shiftRef.current[0], y - shiftRef.current[1]]);
 					setScale(showPixelScaleMobile);
 				} else {
-					onClick(coord[0], coord[1]);
+					const [_x, _y] = cur.current;
+					const target = document.elementFromPoint(_x, _y);
+
+					if (rootRef.current && rootRef.current.contains(target)) {
+						onClick(coord[0], coord[1]);
+					}
 				}
 			}
 
@@ -522,6 +534,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const getPixelStyle = () => {
+		if (prevScale !== scale) {
+			setTimeout(() => {
+				setPrevScale(scale);
+			}, 0);
+
+			return null;
+		}
+
 		const { left = 0, top = 0 } = canvasRef.current && canvasRef.current.getBoundingClientRect() || {};
 		const { width = 0, height = 0 } = canvasRef.current || {};
 		const [x, y] = coord;
@@ -584,7 +604,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const onPix = (payload: string) => {
-		if (payload === 'await' && !isAuthorized) {
+		if (isMobile && payload === 'ok') {
 			setAnimatedPixel(true);
 			setTimeout(() => {
 				setAnimatedPixel(false);
@@ -804,7 +824,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 						{scale >= showPixelScale && mode !== EMode.PICK && (
 							<div
 								className={cn(s.pixel, { [s.animated]: animatedPixel })}
-								style={scale ? getPixelStyle() : {}}
+								style={(scale && prevScale) ? getPixelStyle() : {}}
 							>
 								{pixelTitle && (
 									<div className={s.tooltip}>
@@ -832,11 +852,13 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 				)}
 			</div>
 
-			{/* <div className={s.debug} id="debug-log">
-				{Object.entries(debugLog).map(([key, value]) => (
-					<div key={key}>{key}: {String(value)}</div>
-				))}
-			</div> */}
+			{DEBUG && (
+				<div className={s.debug} id="debug-log">
+					{Object.entries(debugLog).map(([key, value]) => (
+						<div key={key}>{key}: {String(value)}</div>
+					))}
+				</div>
+			)}
 		</>
 	);
 };

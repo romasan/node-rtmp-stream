@@ -167,35 +167,70 @@ export const checkHasWSConnect = (token: string) => {
 	return has;
 };
 
-const ipCache: any = {};
+const ipConnections = new Map<string, Map<string, number>>(); // ip -> token -> timestamp
+const cleanupInterval = 60_000; // 1 минута
+
+// Запускаем периодическую очистку устаревших записей
+setInterval(() => {
+	const now = Date.now();
+	for (const [ip, tokens] of ipConnections.entries()) {
+		for (const [token, timestamp] of tokens.entries()) {
+			if (now - timestamp > maxConnectionsDuration) {
+				tokens.delete(token);
+			}
+		}
+		// Удаляем IP если нет активных соединений
+		if (tokens.size === 0) {
+			ipConnections.delete(ip);
+		}
+	}
+}, cleanupInterval);
 
 export const checkIPRateLimit = (req: IncomingMessage) => {
-	// TODO check without WS
-	// and/or cache 1-5 sec?
 	const ip = getIPAddress(req) || '';
-	let count = 0;
-
-	if (!ipCache[ip]) {
-		ipCache[ip] = {};
+	
+	// Получаем данные для IP или создаем новые
+	let ipTokens = ipConnections.get(ip);
+	if (!ipTokens) {
+		ipTokens = new Map<string, number>();
+		ipConnections.set(ip, ipTokens);
 	}
 
-	wss?.clients.forEach((ws: WebSocket) => {		
-		if ((ws as any)._ip === ip) {
-			const token = (ws as any)._token;
-
-			ipCache[ip][token] = Date.now();
-		}
-	});
-
-	for (const key in ipCache[ip]) {
-		if ((Date.now() - ipCache[ip][key]) > maxConnectionsDuration) {
-			delete ipCache[ip][key];
-		} else {
+	// Подсчитываем количество активных соединений для этого IP
+	let count = 0;
+	const now = Date.now();
+	for (const [token, timestamp] of ipTokens.entries()) {
+		if (now - timestamp <= maxConnectionsDuration) {
 			count++;
+		} else {
+			// Удаляем устаревшие соединения
+			ipTokens.delete(token);
 		}
 	}
 
 	return count <= maxConnectionsWithOneIP ? false : `${ip} (${count})`;
+};
+
+// Функция для добавления нового соединения
+export const addIPConnection = (ip: string, token: string) => {
+	let ipTokens = ipConnections.get(ip);
+	if (!ipTokens) {
+		ipTokens = new Map<string, number>();
+		ipConnections.set(ip, ipTokens);
+	}
+	ipTokens.set(token, Date.now());
+};
+
+// Функция для удаления соединения
+export const removeIPConnection = (ip: string, token: string) => {
+	const ipTokens = ipConnections.get(ip);
+	if (ipTokens) {
+		ipTokens.delete(token);
+		// Удаляем IP если нет активных соединений
+		if (ipTokens.size === 0) {
+			ipConnections.delete(ip);
+		}
+	}
 };
 
 const certFiles = {
@@ -241,6 +276,11 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 		(ws as any)._token = token;
 		(ws as any)._lastActivity = Date.now();
 
+		// Добавляем соединение в систему отслеживания IP
+		if (ip) {
+			addIPConnection(ip, token);
+		}
+
 		send(token, 'init', {
 			...user,
 			countdown,
@@ -250,6 +290,13 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 			finishText: finishText || 'TIMEOUT',
 			needAuthorize: true,
 			paused: getValue('paused'),
+		});
+
+		ws.on('close', () => {
+			// Удаляем соединение при закрытии
+			if (ip) {
+				removeIPConnection(ip, token);
+			}
 		});
 
 		ws.on('message', (buf: Buffer) => {

@@ -30,8 +30,11 @@ const Color: React.FC<ColorProps> = ({
 	const isMobile = mobile();
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const timeRef = useRef(0);
+	const movedRef = useRef(false);
 
 	const touchStartCallback = ({ target, touches }: any) => {
+		movedRef.current = false;
+
 		if (
 			touches &&
 			touches.length &&
@@ -42,9 +45,13 @@ const Color: React.FC<ColorProps> = ({
 		}
 	};
 
+	const touchMoveCallback = () => {
+		movedRef.current = true;
+	};
+
 	const touchEndCallback = () => {
 		if (timeRef.current) {
-			if (Date.now() - timeRef.current > 100) {
+			if (((Date.now() - timeRef.current) > 300) && !movedRef.current) {
 				onChange();
 			}
 
@@ -55,6 +62,7 @@ const Color: React.FC<ColorProps> = ({
 	useEffect(() => {
 		if (isMobile) {
 			document.addEventListener('touchstart', touchStartCallback);
+			document.addEventListener('touchmove', touchMoveCallback);
 			document.addEventListener('touchend', touchEndCallback);
 		}
 
