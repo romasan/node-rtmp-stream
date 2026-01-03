@@ -107,7 +107,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const firstRender = useRef('');
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
-	const pixelRef = useRef<null | HTMLDivElement>(null);
 	const cur = useRef<[number, number, boolean]>([-1, -1, false]);
 	const [coord, setCoord] = useState<[number, number]>([Infinity, Infinity]);
 	const [scale, setScale] = useState(2);
@@ -126,6 +125,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const expandPrev = useRef<any>();
 	const [prevScale, setPrevScale] = useState(-1);
 	const [debugLog, setDebug] = useState({});
+	const scaleRef = useRef<number>(2);
 	const Log = (key: string, value: string) => {
 		if (!DEBUG) {
 			return;
@@ -206,8 +206,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const canvas = canvasRef.current.getBoundingClientRect();
 
 			setPos({
-				x: width / 2 - canvas.width / scale / 2,
-				y: height / 2 - canvas.height / scale / 2,
+				x: width / 2 - canvas.width / scaleRef.current / 2,
+				y: height / 2 - canvas.height / scaleRef.current / 2,
 			});
 		}
 	};
@@ -707,7 +707,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [
 		rootRef.current,
 		canvasRef.current,
-		pixelRef.current,
 		scale,
 		coord,
 		pos,
@@ -773,6 +772,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		onExpand(expand);
 	}, [expand]);
+
+	useEffect(() => {
+		scaleRef.current = scale;
+	}, [scale]);
 
 	return (
 		<>

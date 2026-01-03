@@ -6,6 +6,7 @@ import mobile from 'is-mobile';
 import { ColorPicker } from './components';
 
 import { useDraggable } from '../../hooks/useDraggable';
+import { useLandscape } from '../../hooks/useLandscape';
 import { getRandomColor } from '../../helpers/color';
 
 import { colorSchemes } from '../../../server/constants/colorSchemes';
@@ -16,6 +17,7 @@ interface ColorProps {
 	active: boolean,
 	color: string,
 	canChangeColor: boolean,
+	isLandscape: boolean;
 	onClick(): void,
 	onChange(): void,
 }
@@ -24,6 +26,7 @@ const Color: React.FC<ColorProps> = ({
 	active,
 	color,
 	canChangeColor,
+	isLandscape,
 	onClick,
 	onChange,
 }) => {
@@ -77,7 +80,10 @@ const Color: React.FC<ColorProps> = ({
 	return (
 		<div
 			ref={rootRef}
-			className={cn(s.color, { [s.active]: active })}
+			className={cn(s.color, {
+				[s.active]: active,
+				[s.landscape]: isLandscape,
+			})}
 			style={{ background: color as string }}
 			title={
 				canChangeColor && !isMobile
@@ -100,6 +106,7 @@ interface Props {
 
 export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setColor, onPick }) => {
 	const isMobile = mobile();
+	const isLandscape = useLandscape();
 	const [newColor, setNewColor] = useState(color);
 	const [colors, setColors] = useState({});
 	const [slot, setSlot] = useState('');
@@ -184,12 +191,13 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 									color={itemColor as string}
 									active={color === key}
 									canChangeColor={canChangeColor}
+									isLandscape={isLandscape}
 									onClick={() => setColor(canChangeColor ? itemColor as string : key)}
 									onChange={handleDoubleClick}
 								/>
 							))}
 							{canChangeColor && (
-								<div className={s.addColor} onClick={handleClickAddColor}>+</div>
+								<div className={cn(s.addColor, { [s.landscape]: isLandscape })} onClick={handleClickAddColor}>+</div>
 							)}
 						</div>
 					</div>

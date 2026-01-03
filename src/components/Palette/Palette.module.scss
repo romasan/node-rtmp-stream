@@ -157,4 +157,8 @@
 
 		border-radius: 12px;
 	}
+
+	.landscape {
+		@include size(8vh);
+	}
 }
