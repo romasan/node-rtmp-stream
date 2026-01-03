@@ -68,12 +68,18 @@ export const App: React.FC = () => {
 	const palette = (colorSchemes as any)[wsStore.canvas && wsStore.canvas.colorScheme] || {};
 
 	useEffect(() => {
-		if (!color && palette) {
-			const firstColor = 'black' in palette
-				? 'black'
-				: (Object.keys(palette) || []).pop();
+		const isTruecolor = (wsStore && wsStore.canvas && wsStore.canvas.colorScheme) === 'truecolor';
 
-			setColor(firstColor as string);
+		if (!color && palette) {
+			const firstColor = ('black' in palette && !isTruecolor)
+				? 'black'
+				: isTruecolor
+					? (Object.values(palette) || []).pop()
+					: (Object.keys(palette) || []).pop();
+
+			if (firstColor) {
+				setColor(firstColor as string);
+			}
 		}
 	}, [color, wsStore]);
 
@@ -102,7 +108,9 @@ export const App: React.FC = () => {
 		}
 
 		if (wsStore.needAuthorize && !isAuthorized) {
-			loginModal.open();
+			setTimeout(() => {
+				loginModal.open();
+			}, 100);
 		} else {
 			addPix({ x, y, color } as any);
 		}
