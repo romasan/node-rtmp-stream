@@ -19,7 +19,7 @@ interface ColorProps {
 	canChangeColor: boolean,
 	isLandscape: boolean;
 	onClick(): void,
-	onChange(): void,
+	onChange(color?: string): void,
 }
 
 const Color: React.FC<ColorProps> = ({
@@ -55,7 +55,7 @@ const Color: React.FC<ColorProps> = ({
 	const touchEndCallback = () => {
 		if (timeRef.current) {
 			if (((Date.now() - timeRef.current) > 300) && !movedRef.current) {
-				onChange();
+				onChange(color);
 			}
 
 			timeRef.current = 0;
@@ -75,7 +75,7 @@ const Color: React.FC<ColorProps> = ({
 				document.removeEventListener('touchend', touchEndCallback);
 			}
 		};
-	}, [isMobile]);
+	}, [isMobile, color, onChange]);
 
 	return (
 		<div
@@ -91,7 +91,7 @@ const Color: React.FC<ColorProps> = ({
 					: color as string
 			}
 			onClick={onClick}
-			onDoubleClick={onChange}
+			onDoubleClick={() => onChange(color)}
 		/>
 	);
 };
@@ -116,12 +116,17 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 
 	const canChangeColor = colorScheme === 'truecolor';
 
-	const handleDoubleClick = () => {
-		const _slot = canChangeColor ? (Object.entries(colors).find(([k, v]) => v === color) || [])[0] : color;
+	const handleColorItemChange = (colorValue?: string) => {
+		const _color = isMobile ? colorValue : color;
+		const _slot = canChangeColor ? (Object.entries(colors).find(([k, v]) => v === _color) || [])[0] : _color;
 
 		setNewColor(colors && colors[_slot]);
 		setSlot(_slot);
 		setColorPickerIsShowed(canChangeColor);
+	};
+
+	const handleColorItemClick = (key: string, itemColor: any) => {
+		setColor(canChangeColor ? itemColor as string : key)
 	};
 
 	const handleClickAddColor = () => {
@@ -192,8 +197,8 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 									active={color === key}
 									canChangeColor={canChangeColor}
 									isLandscape={isLandscape}
-									onClick={() => setColor(canChangeColor ? itemColor as string : key)}
-									onChange={handleDoubleClick}
+									onClick={() => handleColorItemClick(key, itemColor)}
+									onChange={handleColorItemChange}
 								/>
 							))}
 							{canChangeColor && (

@@ -213,6 +213,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	};
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
+		cur.current = [-1, -1, false];
+
 		if (touches && touches.length) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
@@ -306,7 +308,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
 				};
 			});
-			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
+			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveY))];
 		}
 
 		Log('clientXY', [clientX, clientY].join(', '));
@@ -321,7 +323,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			if (!isOverChild) {
 				if (mode === EMode.CLICK) {
 					Log('setCoord', '#1');
-					setCoord([Infinity, Infinity]);
+					// setCoord([Infinity, Infinity]);
 				}
 
 				Log('move-type', 'drag outside');
@@ -400,9 +402,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					setScale(showPixelScaleMobile);
 				} else {
 					const [_x, _y] = cur.current;
-					const target = document.elementFromPoint(_x, _y);
+					const efp = document.elementFromPoint(_x, _y);
+					const isOverChild = rootRef.current && rootRef.current.contains(efp);
 
-					if (rootRef.current && rootRef.current.contains(target)) {
+					if (isOverChild) {
 						onClick(coord[0], coord[1]);
 					}
 				}
@@ -776,6 +779,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	useEffect(() => {
 		scaleRef.current = scale;
 	}, [scale]);
+
+	useEffect(() => {
+		Log('set-color', color);
+	}, [color]);
 
 	return (
 		<>
