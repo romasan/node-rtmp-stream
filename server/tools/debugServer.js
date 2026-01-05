@@ -1,4 +1,5 @@
 const http = require('http');
+const crypto = require('crypto');
 const { v4: uuid } = require('uuid');
 
 const parseCookies = (cookies = '') => {
