@@ -30,29 +30,6 @@ const checkTelegramAuth = (query: any) => {
 	return hash === query.hash;
 };
 
-function validateTelegramData(initDataStr: string) {
-  const params = new URLSearchParams(initDataStr);
-
-  return checkTelegramAuth(params);
-//   const hash = params.get('hash');
-//   params.delete('hash');
-
-//   const dataCheckString = Array.from(params.entries())
-//     .sort(([a], [b]) => a.localeCompare(b))
-//     .map(([key, value]) => `${key}=${value}`)
-//     .join('\n');
-
-//   const secret = crypto.createHmac('sha256', 'WebAppData')
-//     .update(botToken)
-//     .digest();
-
-//   const computedHash = crypto.createHmac('sha256', secret)
-//     .update(dataCheckString)
-//     .digest('hex');
-
-//   return computedHash === hash;
-}
-
 const telegram = (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/telegram/app')) {
 		// TODO

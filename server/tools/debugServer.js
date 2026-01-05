@@ -63,10 +63,34 @@ const checkTelegramAuth = (query) => {
     return hash === query.hash;
 };
 
+function validateTelegramData(initDataStr) {
+  const params = new URLSearchParams(initDataStr);
+
+  const hash = params.get('hash');
+  params.delete('hash');
+
+  const dataCheckString = Array.from(params.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n');
+
+  const secret = crypto.createHmac('sha256', 'WebAppData')
+    .update(token)
+    .digest();
+
+  const computedHash = crypto.createHmac('sha256', secret)
+    .update(dataCheckString)
+    .digest('hex');
+
+  return computedHash === hash;
+}
+
 const callback = async (req, res) => {
     const { token: prevToken } = parseCookies(req.headers.cookie || '');
     const payload = await getPostPayload(req);
     const params = Object.fromEntries(new URLSearchParams(payload));
+
+    const valid0 = validateTelegramData(payload);
 
     let user = {};
     try {
@@ -96,6 +120,7 @@ const callback = async (req, res) => {
     console.log('==== new token:', newToken);
     console.log('==== payload:', payload);
     console.log('==== params:', params);
+    console.log('==== valid0:', valid0);
     console.log('==== valid:', valid);
     console.log('==== params.hash:', params.hash);
     console.log('==== query:', query);
