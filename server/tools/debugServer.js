@@ -2,6 +2,14 @@ const http = require('http');
 const crypto = require('crypto');
 const { v4: uuid } = require('uuid');
 
+const {
+	server: {
+		auth: {
+			telegram: { token }
+		},
+	},
+} = require('../config.json');
+
 const parseCookies = (cookies = '') => {
     return cookies
         .split(';')
@@ -56,7 +64,7 @@ const checkTelegramAuth = (query) => {
 };
 
 const callback = async (req, res) => {
-    const { token } = parseCookies(req.headers.cookie || '');
+    const { token: prevToken } = parseCookies(req.headers.cookie || '');
     const payload = await getPostPayload(req);
 
     const params = new URLSearchParams(payload);
@@ -66,7 +74,7 @@ const callback = async (req, res) => {
 
     console.log('==== origin:', req.headers['origin']);
     console.log('==== url:', req.url);
-    console.log('==== token:', token);
+    console.log('==== token:', prevToken);
     console.log('==== new token:', newToken);
     console.log('==== payload:', payload);
     console.log('==== params:', params);
