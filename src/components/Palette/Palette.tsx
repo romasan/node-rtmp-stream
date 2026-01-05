@@ -11,6 +11,8 @@ import { getRandomColor } from '../../helpers/color';
 
 import { colorSchemes } from '../../../server/constants/colorSchemes';
 
+import AddIcon from '/assets/add.svg';
+
 import * as s from './Palette.module.scss';
 
 interface ColorProps {
@@ -202,7 +204,9 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 								/>
 							))}
 							{canChangeColor && (
-								<div className={cn(s.addColor, { [s.landscape]: isLandscape })} onClick={handleClickAddColor}>+</div>
+								<div className={cn(s.addColor, { [s.landscape]: isLandscape })} onClick={handleClickAddColor}>
+									<AddIcon />
+								</div>
 							)}
 						</div>
 					</div>

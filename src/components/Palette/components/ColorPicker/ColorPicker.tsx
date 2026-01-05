@@ -117,7 +117,10 @@ export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, s
 
 	const isMobile = mobile();
 
-	const { anchorRef, draggableRef } = useDraggable({ x: isMobile ? 10 : 200, y: window.innerHeight - 400 });
+	const { anchorRef, draggableRef } = useDraggable({
+		x: isMobile ? window.innerWidth - 250 : 200,
+		y: isMobile ? window.innerHeight - 350 : window.innerHeight - 400
+	});
 
 	const handleClickRainbow = (event: any) => {
 		const rect = (refRainbow.current as any).getBoundingClientRect();

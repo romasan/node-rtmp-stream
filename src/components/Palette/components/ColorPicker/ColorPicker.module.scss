@@ -152,3 +152,9 @@
 		padding: 0;
 	}
 }
+
+:global(.mobile) {
+	.pickButton {
+		display: none;
+	}
+}

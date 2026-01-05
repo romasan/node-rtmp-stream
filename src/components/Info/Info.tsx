@@ -1,5 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 
+import mobile from 'is-mobile';
+
 import { useDraggable } from '../../hooks/useDraggable';
 
 import { getStats } from '../../lib/api';
@@ -31,6 +33,7 @@ export const Info: FC<Props> = ({
 	onClose,
 	...props
 }) => {
+	const isMobile = mobile();
 	const [stats, setStats] = useState({
 		loading: true,
 		leaderboard: [],
@@ -38,7 +41,10 @@ export const Info: FC<Props> = ({
 		onlineList: [],
 		onlineCount: 0,
 	});
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 350, y: 55});
+	const { anchorRef, draggableRef } = useDraggable({
+		x: isMobile ? 1 : document.body.offsetWidth - 350,
+		y: isMobile ? 40 : 55,
+	});
 
 	useEffect(() => {
 		getStats()

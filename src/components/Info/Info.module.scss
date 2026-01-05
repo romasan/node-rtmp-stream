@@ -148,3 +148,10 @@
 .title {
 	margin: 10px 0 5px;
 }
+
+:global(.mobile) {
+	.content {
+		width: calc(100vw - 41px);
+		max-height: calc(100vh - 143px);
+	}
+}
