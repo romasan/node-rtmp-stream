@@ -66,11 +66,26 @@ const checkTelegramAuth = (query) => {
 const callback = async (req, res) => {
     const { token: prevToken } = parseCookies(req.headers.cookie || '');
     const payload = await getPostPayload(req);
-
     const params = Object.fromEntries(new URLSearchParams(payload));
-    const valid = checkTelegramAuth(params);
 
-    // const user = JSON.parse(params.user);
+    let user = {};
+    try {
+        user = JSON.parse(params.user);
+    } catch (error) {
+        console.log(`Error: ${error}`);
+    }
+
+    const query = {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username,
+        photo_url: user.photo_url.replace('.svg', '.jpg'),
+        auth_date: params.auth_date,
+        hash: params.hash,
+    };
+
+    const valid = checkTelegramAuth(query);
 
     const newToken = uuid();
 
@@ -83,6 +98,7 @@ const callback = async (req, res) => {
     console.log('==== params:', params);
     console.log('==== valid:', valid);
     console.log('==== params.hash:', params.hash);
+    console.log('==== query:', query);
 
     res.setHeader('Access-Control-Allow-Origin', 'https://tg.pixelbattles.ru');
 	res.setHeader('Access-Control-Allow-Credentials', 'true');

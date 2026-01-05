@@ -30,7 +30,7 @@ const checkTelegramAuth = (query: any) => {
 	return hash === query.hash;
 };
 
-function validateTelegramData(initDataStr) {
+function validateTelegramData(initDataStr: string) {
   const params = new URLSearchParams(initDataStr);
 
   return checkTelegramAuth(params);
