@@ -25,7 +25,7 @@ import { logout } from './logout';
 import { stats } from './stats';
 import { Log } from '../utils/log';
 
-const { server: { origin } } = require('../config.json');
+const { server: { origin, originAlias } } = require('../config.json');
 
 const checkAccessWrapper = (
 	callback:
@@ -101,15 +101,11 @@ const routes: Record<string, any> = {
 };
 
 export const webServerHandler = async (req: IncomingMessage, res: ServerResponse) => {
-	// TODO handle origin for telegramm app
+	const _origin = originAlias.includes(req.headers['origin'])
+		? req.headers['origin']
+		: origin;
 
-	// if (req.url?.startsWith('/tg/')) {
-	// 	return;
-	// }
-
-	// console.log('==== origin', req.headers['origin']);
-
-	res.setHeader('Access-Control-Allow-Origin', origin);
+	res.setHeader('Access-Control-Allow-Origin', _origin);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

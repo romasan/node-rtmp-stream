@@ -21,6 +21,7 @@
 		"port": 8080,
 		"secure": true,
 		"origin": "https://pixelbattles.ru",
+		"originAlias": ["https://tg.pixelbattles.ru"],
 		"activityDuration": 600000,
 		"maxConnectionsWithOneIP": 2,
 		"proxyIp": true,
@@ -44,10 +45,6 @@
 				"userName": "PixelBattleOnlineBot"
 			}
 		}
-	},
-	"bot": {
-		"host": "https://tg.pixelbattles.ru",
-		"token": ""
 	},
 	"adminEmail": "",
 	"finishTimeStamp": 0,
