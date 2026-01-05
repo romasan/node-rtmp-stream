@@ -45,6 +45,10 @@
 			}
 		}
 	},
+	"bot": {
+		"host": "https://tg.pixelbattles.ru",
+		"token": ""
+	},
 	"adminEmail": "",
 	"finishTimeStamp": 0,
 	"finishText": "Сезон окончен, таймлапс как это было можно посмотреть (тут)[https://pixelbattles.ru/timelapse/] или (тут)[https://www.youtube.com/@Place-ru]",
