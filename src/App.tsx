@@ -146,6 +146,18 @@ export const App: React.FC = () => {
 		return breakDo;
 	}, [canvas]);
 
+	useEffect(() => {
+		const callback = () => {
+			canvas && canvas.centering();
+		};
+
+		window.addEventListener('resize', callback);
+
+		return () => {
+			window.removeEventListener('resize', callback);
+		};
+	}, [canvas]);
+
 	return (
 		<>
 			<div className={cn(s.root, { mobile: isMobile })}>

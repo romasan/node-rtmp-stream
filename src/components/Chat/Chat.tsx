@@ -1,6 +1,7 @@
 import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 
 import cn from 'classnames';
+import mobile from 'is-mobile';
 
 import { useDraggable } from '../../hooks/useDraggable';
 
@@ -95,9 +96,13 @@ export const Chat: React.FC<Props> = ({
 	onClose,
 	...props
 }) => {
+	const isMobile = mobile();
 	const [list, setList] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 60 });
+	const { anchorRef, draggableRef } = useDraggable({
+		x: isMobile ? 1 : document.body.offsetWidth - 330,
+		y: isMobile ? 40 : 60
+	});
 	const inputRef = useRef<HTMLInputElement>(null);
 	const contentRef = useRef<HTMLDivElement>(null);
 

@@ -6,9 +6,12 @@ import mobile from 'is-mobile';
 import { ColorPicker } from './components';
 
 import { useDraggable } from '../../hooks/useDraggable';
+import { useLandscape } from '../../hooks/useLandscape';
 import { getRandomColor } from '../../helpers/color';
 
 import { colorSchemes } from '../../../server/constants/colorSchemes';
+
+import AddIcon from '/assets/add.svg';
 
 import * as s from './Palette.module.scss';
 
@@ -16,14 +19,16 @@ interface ColorProps {
 	active: boolean,
 	color: string,
 	canChangeColor: boolean,
+	isLandscape: boolean;
 	onClick(): void,
-	onChange(): void,
+	onChange(color?: string): void,
 }
 
 const Color: React.FC<ColorProps> = ({
 	active,
 	color,
 	canChangeColor,
+	isLandscape,
 	onClick,
 	onChange,
 }) => {
@@ -52,7 +57,7 @@ const Color: React.FC<ColorProps> = ({
 	const touchEndCallback = () => {
 		if (timeRef.current) {
 			if (((Date.now() - timeRef.current) > 300) && !movedRef.current) {
-				onChange();
+				onChange(color);
 			}
 
 			timeRef.current = 0;
@@ -72,12 +77,15 @@ const Color: React.FC<ColorProps> = ({
 				document.removeEventListener('touchend', touchEndCallback);
 			}
 		};
-	}, [isMobile]);
+	}, [isMobile, color, onChange]);
 
 	return (
 		<div
 			ref={rootRef}
-			className={cn(s.color, { [s.active]: active })}
+			className={cn(s.color, {
+				[s.active]: active,
+				[s.landscape]: isLandscape,
+			})}
 			style={{ background: color as string }}
 			title={
 				canChangeColor && !isMobile
@@ -85,7 +93,7 @@ const Color: React.FC<ColorProps> = ({
 					: color as string
 			}
 			onClick={onClick}
-			onDoubleClick={onChange}
+			onDoubleClick={() => onChange(color)}
 		/>
 	);
 };
@@ -100,6 +108,7 @@ interface Props {
 
 export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setColor, onPick }) => {
 	const isMobile = mobile();
+	const isLandscape = useLandscape();
 	const [newColor, setNewColor] = useState(color);
 	const [colors, setColors] = useState({});
 	const [slot, setSlot] = useState('');
@@ -109,12 +118,17 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 
 	const canChangeColor = colorScheme === 'truecolor';
 
-	const handleDoubleClick = () => {
-		const _slot = canChangeColor ? (Object.entries(colors).find(([k, v]) => v === color) || [])[0] : color;
+	const handleColorItemChange = (colorValue?: string) => {
+		const _color = isMobile ? colorValue : color;
+		const _slot = canChangeColor ? (Object.entries(colors).find(([k, v]) => v === _color) || [])[0] : _color;
 
 		setNewColor(colors && colors[_slot]);
 		setSlot(_slot);
 		setColorPickerIsShowed(canChangeColor);
+	};
+
+	const handleColorItemClick = (key: string, itemColor: any) => {
+		setColor(canChangeColor ? itemColor as string : key)
 	};
 
 	const handleClickAddColor = () => {
@@ -184,12 +198,15 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 									color={itemColor as string}
 									active={color === key}
 									canChangeColor={canChangeColor}
-									onClick={() => setColor(canChangeColor ? itemColor as string : key)}
-									onChange={handleDoubleClick}
+									isLandscape={isLandscape}
+									onClick={() => handleColorItemClick(key, itemColor)}
+									onChange={handleColorItemChange}
 								/>
 							))}
 							{canChangeColor && (
-								<div className={s.addColor} onClick={handleClickAddColor}>+</div>
+								<div className={cn(s.addColor, { [s.landscape]: isLandscape })} onClick={handleClickAddColor}>
+									<AddIcon />
+								</div>
 							)}
 						</div>
 					</div>

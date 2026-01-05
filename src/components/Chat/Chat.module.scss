@@ -145,3 +145,10 @@
 	margin: -3px;
 	z-index: 1;
 }
+
+:global(.mobile) {
+	.content {
+		width: calc(100vw - 27px);
+		height: calc(100vh - 162px);
+	}
+}

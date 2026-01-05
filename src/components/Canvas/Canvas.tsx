@@ -107,7 +107,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const firstRender = useRef('');
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
-	const pixelRef = useRef<null | HTMLDivElement>(null);
 	const cur = useRef<[number, number, boolean]>([-1, -1, false]);
 	const [coord, setCoord] = useState<[number, number]>([Infinity, Infinity]);
 	const [scale, setScale] = useState(2);
@@ -126,6 +125,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const expandPrev = useRef<any>();
 	const [prevScale, setPrevScale] = useState(-1);
 	const [debugLog, setDebug] = useState({});
+	const scaleRef = useRef<number>(2);
 	const Log = (key: string, value: string) => {
 		if (!DEBUG) {
 			return;
@@ -206,13 +206,15 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			const canvas = canvasRef.current.getBoundingClientRect();
 
 			setPos({
-				x: width / 2 - canvas.width / scale / 2,
-				y: height / 2 - canvas.height / scale / 2,
+				x: width / 2 - canvas.width / scaleRef.current / 2,
+				y: height / 2 - canvas.height / scaleRef.current / 2,
 			});
 		}
 	};
 
 	const mouseDownCallback = ({ clientX, clientY, target, touches }: any) => {
+		cur.current = [-1, -1, false];
+
 		if (touches && touches.length) {
 			clientX = touches[0].clientX;
 			clientY = touches[0].clientY;
@@ -306,7 +308,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					y: getInRange(pos.y + moveY, [topFrontier, bottomFrontier]),
 				};
 			});
-			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveX))];
+			cur.current = [clientX, clientY, moved || Boolean(Math.abs(moveX) + Math.abs(moveY))];
 		}
 
 		Log('clientXY', [clientX, clientY].join(', '));
@@ -321,7 +323,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 			if (!isOverChild) {
 				if (mode === EMode.CLICK) {
 					Log('setCoord', '#1');
-					setCoord([Infinity, Infinity]);
+					// setCoord([Infinity, Infinity]);
 				}
 
 				Log('move-type', 'drag outside');
@@ -400,9 +402,10 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 					setScale(showPixelScaleMobile);
 				} else {
 					const [_x, _y] = cur.current;
-					const target = document.elementFromPoint(_x, _y);
+					const efp = document.elementFromPoint(_x, _y);
+					const isOverChild = rootRef.current && rootRef.current.contains(efp);
 
-					if (rootRef.current && rootRef.current.contains(target)) {
+					if (isOverChild) {
 						onClick(coord[0], coord[1]);
 					}
 				}
@@ -707,7 +710,6 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [
 		rootRef.current,
 		canvasRef.current,
-		pixelRef.current,
 		scale,
 		coord,
 		pos,
@@ -773,6 +775,14 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 
 		onExpand(expand);
 	}, [expand]);
+
+	useEffect(() => {
+		scaleRef.current = scale;
+	}, [scale]);
+
+	useEffect(() => {
+		Log('set-color', color);
+	}, [color]);
 
 	return (
 		<>
