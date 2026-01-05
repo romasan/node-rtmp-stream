@@ -67,7 +67,7 @@ const callback = async (req, res) => {
     const { token: prevToken } = parseCookies(req.headers.cookie || '');
     const payload = await getPostPayload(req);
 
-    const params = new URLSearchParams(payload);
+    const params = Object.fromEntries(new URLSearchParams(payload));
     const valid = checkTelegramAuth(params);
 
     // const user = JSON.parse(params.user);
@@ -82,7 +82,7 @@ const callback = async (req, res) => {
     console.log('==== payload:', payload);
     console.log('==== params:', params);
     console.log('==== valid:', valid);
-    console.log('==== query.hash:', query.hash);
+    console.log('==== params.hash:', params.hash);
 
     res.setHeader('Access-Control-Allow-Origin', 'https://tg.pixelbattles.ru');
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
