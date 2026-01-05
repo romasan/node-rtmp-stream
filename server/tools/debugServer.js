@@ -8,14 +8,46 @@ const parseCookies = (cookies = '') => {
         .reduce((list, [key, value]) => ({ ...list, [key?.trim()]: value?.trim() }), {});
 };
 
-const callback = (req, res) => {
+const getPostPayload = (req, type = 'text') => {
+    return new Promise((resolve, reject) => {
+        let body = '';
+
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            if (type === 'json') {
+                let json = {};
+
+                try {
+                    json = JSON.parse(body);
+                } catch (ignore) {/* */}
+
+                resolve(json);
+
+                return;
+            }
+
+            resolve(body);
+        });
+
+        req.on('error', () => {
+            reject();
+        });
+    });
+};
+
+const callback = async (req, res) => {
     const { token } = parseCookies(req.headers.cookie || '');
+    const payload = await getPostPayload(req);
     const newToken = uuid();
 
     console.log('==== origin:', req.headers['origin']);
     console.log('==== url:', req.url);
     console.log('==== token:', token);
     console.log('==== new token:', newToken);
+    console.log('==== payload:', payload);
 
     res.setHeader('Access-Control-Allow-Origin', 'https://tg.pixelbattles.ru');
 	res.setHeader('Access-Control-Allow-Credentials', 'true');

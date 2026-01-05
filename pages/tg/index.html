@@ -21,7 +21,8 @@
 
 <body>
 	<h1 id="greeting">Загрузка...</h1>
-	<button id="sendBtn" style="display:none;">Отправить в чат</button>
+	<!-- <button id="sendBtn" style="display:none;">Отправить в чат</button> -->
+	<button id="authBtn">AUTH</button>
 
 	<script>
 		const tg = window.Telegram.WebApp;
@@ -34,31 +35,39 @@
 		tg.setHeaderColor('#d9d7ff');
 
 		const user = tg.initDataUnsafe?.user;
-		const greeting = user ? `Привет, ${user.first_name}! (#${user?.id})` : 'Привет, аноним!';
+		const greeting = user ? `Привет, ${user.first_name}! (#${user?.id}) [1]` : 'Привет, аноним!';
 		document.getElementById('greeting').textContent = greeting;
 
 		// Пример отправки данных обратно в бот
-		document.getElementById('sendBtn').onclick = () => {
-			tg.sendData(JSON.stringify({ action: "hello", from: user?.id || "anon" }));
-			tg.close();
-		};
+		// document.getElementById('sendBtn').onclick = () => {
+		// 	tg.sendData(JSON.stringify({ action: "hello", from: user?.id || "anon" }));
+		// 	tg.close();
+		// };
 
 		// Показать кнопку, если приложение запущено из чата
-		if (tg.initDataUnsafe?.start_param) {
-			document.getElementById('sendBtn').style.display = 'block';
-		}
+		// if (tg.initDataUnsafe?.start_param) {
+		// 	document.getElementById('sendBtn').style.display = 'block';
+		// }
 
 		const initData = tg.initData; // это строка вида "query_id=...&user=...&auth_date=...&hash=..."
-		fetch('https://dev-api.pixelbattles.ru/auth/telegram', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: initData
-		})
-			.then(r => r.text())
-			.then(text => {
-				// теперь у вас есть session_id, user_id и т.д.
-				// document.write(`Result: "${text}"`);
-			});
+		const handleAuth = () => {
+			fetch('https://dev-api.pixelbattles.ru/auth/telegram/app', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				credentials: 'include',
+				body: initData
+			})
+				.then(r => r.text())
+				.then(text => {
+					// теперь у вас есть session_id, user_id и т.д.
+					// document.write(`Result: "${text}"`);
+				});
+		};
+		handleAuth();
+
+		document.getElementById('authBtn').onclick = () => {
+			handleAuth();
+		};
 	</script>
 </body>
 
