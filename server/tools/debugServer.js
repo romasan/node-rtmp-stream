@@ -70,15 +70,19 @@ const callback = async (req, res) => {
     const params = new URLSearchParams(payload);
     const valid = checkTelegramAuth(params);
 
+    // const user = JSON.parse(params.user);
+
     const newToken = uuid();
 
     console.log('==== origin:', req.headers['origin']);
     console.log('==== url:', req.url);
-    console.log('==== token:', prevToken);
+    console.log('==== bot token:', token);
+    console.log('==== prev token:', prevToken);
     console.log('==== new token:', newToken);
     console.log('==== payload:', payload);
     console.log('==== params:', params);
     console.log('==== valid:', valid);
+    console.log('==== query.hash:', query.hash);
 
     res.setHeader('Access-Control-Allow-Origin', 'https://tg.pixelbattles.ru');
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
