@@ -101,6 +101,14 @@ const routes: Record<string, any> = {
 };
 
 export const webServerHandler = async (req: IncomingMessage, res: ServerResponse) => {
+	// TODO handle origin for telegramm app
+
+	// if (req.url?.startsWith('/tg/')) {
+	// 	return;
+	// }
+
+	// console.log('==== origin', req.headers['origin']);
+
 	res.setHeader('Access-Control-Allow-Origin', origin);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
