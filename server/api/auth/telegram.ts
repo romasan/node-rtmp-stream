@@ -3,7 +3,7 @@ import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 import { authorizeUser } from '../../utils/auth';
 import { Log } from '../../utils/log';
-import { parseCookies } from '../../helpers';
+import { parseCookies, getPostPayload } from '../../helpers';
 
 const {
 	server: {
@@ -14,8 +14,8 @@ const {
 	},
 } = require('../../config.json');
 
-const checkTelegramAuth = (query: any) => {
-	const secret = crypto.createHash('sha256')
+const checkTelegramAuth = (query: any, isWebApp = false) => {
+	const secret: any = (isWebApp ? crypto.createHmac('sha256', 'WebAppData') : crypto.createHash('sha256'))
 		.update(token)
 		.digest();
 	const checkString = Object.keys(query)
@@ -30,9 +30,41 @@ const checkTelegramAuth = (query: any) => {
 	return hash === query.hash;
 };
 
-const telegram = (req: IncomingMessage, res: ServerResponse) => {
+const telegram = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/telegram/app')) {
-		// TODO
+		const payload = await getPostPayload(req);
+		const params = Object.fromEntries(new URLSearchParams(payload as string));
+		let user = {};
+
+		try {
+			user = JSON.parse(params.user);
+		} catch (error) {
+			Log('Telegram mimiapp auth error: Failed parse user data');
+			res.writeHead(200, {'Content-Type': 'text/html'});
+			res.end('Failed');
+
+			return false;
+		}
+
+		const success = checkTelegramAuth(params, true);
+
+		if (success) {
+			const { token } = parseCookies(req.headers.cookie || '');
+
+			authorizeUser(token, {
+				...user,
+				_authType: 'telegram',
+			});
+
+			res.writeHead(200, {'Content-Type': 'text/html'});
+			res.end('success');
+
+			return true;
+		} else {
+			Log('Telegram auth error: Invalid hash');
+			res.writeHead(200, {'Content-Type': 'text/html'});
+			res.end('Failed');
+		}
 	} else if (req.url?.startsWith('/auth/telegram')) {
 		const query: any = url.parse(req.url, true).query;
 
