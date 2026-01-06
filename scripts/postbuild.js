@@ -27,3 +27,8 @@ replaceInFile(
 	}
 </script>`).replace(/\%Y_S_E\%/ig, `${year} ${episode}`),
 );
+
+replaceInFile(
+	__dirname + '/../dist/tg/index.html',
+	(source) => source.replace(/\/tg\//ig, '/'),
+);
