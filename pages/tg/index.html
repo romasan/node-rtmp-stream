@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<title>PIXEL BATTLE - Пиксель батл</title>
+		<style>
+			@font-face {
+				font-family: 'Custom Font';
+				src: url('../../assets/fonts/CustomFont.ttf') format('truetype');
+				font-display: swap;
+			}
+			html {
+				padding: 0;
+				margin: 0;
+				overflow: hidden;
+			}
+			body {
+				overflow: hidden;
+				font-family: 'Custom Font', monospace;
+				margin: 0;
+				padding: 0px;
+			}
+			html, body {
+				-webkit-user-select: none;
+				-khtml-user-select: none;
+				-moz-user-select: none;
+				-o-user-select: none;
+				user-select: none;
+				-webkit-user-drag: none;
+				-ms-user-drag: none;
+				-moz-user-drag: none;
+			}
+			html, body, #root {
+				height: 100%;
+			}
+		</style>
+		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+		<script src="../../src/containers/TgMiniApp/index.tsx" type="module"></script>
+		<script>
+			const tg = window.Telegram.WebApp;
+
+			tg.expand();
+			tg.setBackgroundColor('#d9d7ff');
+			tg.setHeaderColor('#d9d7ff');
+
+			const handleAuth = () => {
+				fetch('https://dev-api.pixelbattles.ru/auth/telegram/app', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					credentials: 'include',
+					body: tg.initData
+				})
+					.then(r => r.text())
+					.then(text => {
+						// теперь у вас есть session_id, user_id и т.д.
+						// document.write(`Result: "${text}"`);
+					});
+			};
+			// handleAuth();
+		</script>
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+</html>

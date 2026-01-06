@@ -25,7 +25,7 @@ import { logout } from './logout';
 import { stats } from './stats';
 import { Log } from '../utils/log';
 
-const { server: { origin } } = require('../config.json');
+const { server: { origin, originAlias } } = require('../config.json');
 
 const checkAccessWrapper = (
 	callback:
@@ -101,7 +101,11 @@ const routes: Record<string, any> = {
 };
 
 export const webServerHandler = async (req: IncomingMessage, res: ServerResponse) => {
-	res.setHeader('Access-Control-Allow-Origin', origin);
+	const _origin = originAlias.includes(req.headers['origin'])
+		? req.headers['origin']
+		: origin;
+
+	res.setHeader('Access-Control-Allow-Origin', _origin);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -135,19 +139,22 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 			return;
 		}
 
-		if (
-			!await twitchAuth(req, res) &&
-			!await steamAuth(req, res) &&
-			!await discordAuth(req, res) &&
-			!telegramAuth(req, res) &&
-			!vkAuth(req, res)
-		) {
-			getInfo(req, res);
-		} else {
+		const _twitchAuth = await twitchAuth(req, res);
+		const _steamAuth = !_twitchAuth && await steamAuth(req, res);
+		const _discordAuth = !_steamAuth && await discordAuth(req, res);
+		const _telegramAuth = !_discordAuth && telegramAuth(req, res);
+		const _vkAuth = !_telegramAuth && await vkAuth(req, res);
+		const _isSomeAuth = _twitchAuth || _steamAuth || _discordAuth || _telegramAuth || _vkAuth;
+
+		if (_isSomeAuth) {
 			const { token } = parseCookies(req.headers.cookie || '');
 
 			resetCountdownTemp(token);
+
+			return;
 		}
+
+		getInfo(req, res);
 	} catch (error) {
 		try {
 			res.writeHead(200);

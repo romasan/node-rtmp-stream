@@ -14,6 +14,7 @@ const libs = [
 	'debugStream',
 	'prepareTimelapse',
 	'collectIPAdresses',
+	'debugServer',
 
 	'fixSessionByNickName',
 	'filterByIP',
