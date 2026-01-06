@@ -2,7 +2,7 @@ import ee from '../lib/ee';
 
 const { hostname, protocol } = document.location;
 const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
-export const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '')}${isLocalhost ? ':8080' : ''}`;
+export const APIhost = `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '').replace('tg.', '')}${isLocalhost ? ':8080' : ''}`;
 export const staticHost = document.location.hash.indexOf('staticHost=') > 0
 	? document.location.hash.split('staticHost=').pop()
 	: 'https://static.pixelbattles.ru';
@@ -79,4 +79,19 @@ export const fetchTimelapse = async (name: string) => {
 
 export const fetchTimelapsePartBin = (name: string, index: number) => {
 	return fetch(`${staticHost}/timelapse/${name}/${index}.bin`);
+};
+
+export const authTgMiniApp = async () => {
+	const tg = (window as any).Telegram.WebApp;
+
+	const resp = await fetch(`${APIhost}/auth/telegram/app`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		credentials: 'include',
+		body: tg.initData
+	})
+
+	return await resp.text();
 };

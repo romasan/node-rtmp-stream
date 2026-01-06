@@ -7,7 +7,7 @@
 - [x] auth by telegram
 - [ ] auth by vkplay
 - [ ] auth by vk
-- [ ] auth by steam
+- [x] auth by steam
 - [x] countdown
 - [x] githib actions deploy (front only?)
 - [x] ssl support
@@ -27,10 +27,11 @@
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
 - [ ] use one countdown for active unauthorized users with one ip address
-- [ ] (!) do not allow more than one (or percentage of the number online) user with one IP address
+- [x] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
 - [ ] webassembly + canvas =) rust?
-- [ ] add to telegram web app (add qr to stream) (like https://github.com/hip-hyena/PaintBot)
+- [x] add to telegram web app
+- [ ] add qr to stream) (like https://github.com/hip-hyena/PaintBot)
 - [ ] chat rate limit
 - [ ] check has new banned users/IP in pixels.log
 - [ ] rating for groups/squads/tags

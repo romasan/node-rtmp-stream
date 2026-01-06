@@ -1,7 +1,5 @@
 import React, { FC, useRef, useState, useMemo, useCallback, useEffect, PropsWithChildren } from 'react';
 
-import mobile from 'is-mobile';
-
 import cn from 'classnames';
 
 import ee from '../../lib/ee';
@@ -103,7 +101,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	onSelect,
 	onInit,
 }) => {
-	const isMobile = mobile();
+	const isMobile = 'ontouchstart' in window;
 	const firstRender = useRef('');
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const canvasRef = useRef<null | HTMLCanvasElement>(null);
@@ -739,6 +737,8 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	}, [countdown]);
 
 	useEffect(() => {
+		Log('isAuthorized', String(isAuthorized));
+
 		ee.on('pix', onPix);
 
 		return () => {

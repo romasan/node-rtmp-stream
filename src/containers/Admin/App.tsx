@@ -1,14 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-import mobile from 'is-mobile';
-
 import {
 	Canvas,
 	EMode,
 	Palette,
 	Tools,
 } from '../../components';
-
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { APIhost } from '../../lib/api';
 
 import ee from '../../lib/ee';
@@ -26,7 +24,7 @@ export const App: React.FC = () => {
 	const [size, setSize] = useState({ width: 0, height: 0 });
 	// const [isFinished, setIsFinished] = useState(false); TODO
 
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 
 	const layer = useRef(null);
 

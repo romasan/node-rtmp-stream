@@ -1,8 +1,7 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 
 import cn from 'classnames';
-import mobile from 'is-mobile';
-
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import {
 	Canvas,
 	HeaderLogo,
@@ -158,7 +157,7 @@ export const App: React.FC = () => {
 		setHasNewMessage,
 	} = useWsStore();
 
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 
 	const loginModal = useModal({
 		content: (

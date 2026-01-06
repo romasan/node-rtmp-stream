@@ -24,7 +24,8 @@ interface Props {
 	blinkedLoginAnimation?: boolean;
 	setHasNewMessage: (value: boolean) => void;
 	role: ERole;
-	login: () => void;
+	login?: () => void;
+	withTimelapse?: boolean;
 }
 
 export const HeaderControls: React.FC<Props> = ({
@@ -33,8 +34,9 @@ export const HeaderControls: React.FC<Props> = ({
 	isOnline,
 	hasNewMessage,
 	blinkedLoginAnimation,
-	setHasNewMessage,
 	role,
+	withTimelapse = true,
+	setHasNewMessage,
 	login,
 }) => {
 	const [chatIsShowed, setChatIsShowed] = useState(false);
@@ -59,14 +61,16 @@ export const HeaderControls: React.FC<Props> = ({
 						</div>
 					)}
 					<div className={s.controls}>
-						{isAuthorized ? (
-							<a href="/logout" className={cn({[s.disabled]: !isOnline})} title="Выход">
-								<LogoutIcon className={s.iconButton} />
-							</a>
-						) : (
-							<span title="Выход">
-								<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} />
-							</span>
+						{Boolean(login) && (
+							isAuthorized ? (
+								<a href="/logout" className={cn({[s.disabled]: !isOnline})} title="Выход">
+									<LogoutIcon className={s.iconButton} />
+								</a>
+							) : (
+								<span title="Выход">
+									<LoginIcon onClick={login} className={cn(s.iconButton, {[s.disabled]: !isOnline, [s.blinked]: blinkedLoginAnimation})} />
+								</span>
+							)
 						)}
 						<span className={cn(s.iconWrapper, { [s.badge]: hasNewMessage && !chatIsShowed })} title="Чат">
 							<ChatIcon className={s.iconButton} onClick={toggleChat} />
@@ -74,9 +78,11 @@ export const HeaderControls: React.FC<Props> = ({
 						<span title="Статистика">
 							<InfoIcon className={s.iconButton} onClick={toggleInfo} />
 						</span>
-						<a href="/timelapse" title="Таймлапс">
-							<TimelapseIcon className={s.iconButton} />
-						</a>
+						{withTimelapse && (
+							<a href="/timelapse" title="Таймлапс">
+								<TimelapseIcon className={s.iconButton} />
+							</a>
+						)}
 						{role === ERole.moderator && (
 							<a href="/qq" title="Tools">
 								<GearIcon className={s.iconButton} />

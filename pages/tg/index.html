@@ -35,29 +35,25 @@
 				height: 100%;
 			}
 		</style>
-		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+		<!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
 		<script src="../../src/containers/TgMiniApp/index.tsx" type="module"></script>
 		<script>
 			const tg = window.Telegram.WebApp;
 
-			tg.expand();
-			tg.setBackgroundColor('#d9d7ff');
-			tg.setHeaderColor('#d9d7ff');
+			function isRunningInTelegram() {
+				return typeof window !== 'undefined' &&
+						window.Telegram &&
+						window.Telegram.WebApp &&
+						typeof window.Telegram.WebApp.ready === 'function';
+			}
 
-			const handleAuth = () => {
-				fetch('https://dev-api.pixelbattles.ru/auth/telegram/app', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-					credentials: 'include',
-					body: tg.initData
-				})
-					.then(r => r.text())
-					.then(text => {
-						// теперь у вас есть session_id, user_id и т.д.
-						// document.write(`Result: "${text}"`);
-					});
-			};
-			// handleAuth();
+			if (isRunningInTelegram()) {
+				tg.expand();
+				tg.setBackgroundColor('#d9d7ff');
+				tg.setHeaderColor('#d9d7ff');
+			} else {
+				document.location.href = 'https://pixelbattles.ru/';
+			}
 		</script>
 	</head>
 	<body>

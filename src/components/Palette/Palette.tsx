@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 
 import cn from 'classnames';
-import mobile from 'is-mobile';
 
 import { ColorPicker } from './components';
 
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useLandscape } from '../../hooks/useLandscape';
 import { getRandomColor } from '../../helpers/color';
@@ -32,7 +32,7 @@ const Color: React.FC<ColorProps> = ({
 	onClick,
 	onChange,
 }) => {
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 	const rootRef = useRef<null | HTMLDivElement>(null);
 	const timeRef = useRef(0);
 	const movedRef = useRef(false);
@@ -107,7 +107,7 @@ interface Props {
 }
 
 export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setColor, onPick }) => {
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 	const isLandscape = useLandscape();
 	const [newColor, setNewColor] = useState(color);
 	const [colors, setColors] = useState({});
