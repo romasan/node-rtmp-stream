@@ -10,7 +10,7 @@
     "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/ && cp ./server/favicon.ico ./lib/",
     "prebuild": "rm -rf dist/*.* .parcel-cache",
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
-    "postbuild": "cp static/* dist/ && ls -la dist/ && ls -la dist/tg/ && pwd && cp ./dist/*.{js,css} ./dist/tg/ && node ./scripts/postbuild.js",
+    "postbuild": "cp static/* dist/ && cp dist/*.js dist/tg/ && cp dist/*.css dist/tg/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
     "build:twitch": "npm run build && zip pages/twitch/zip.zip pages/twitch/*",
     "tools": "node ./server/tools/index.js",
