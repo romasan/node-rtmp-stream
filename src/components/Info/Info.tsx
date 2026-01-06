@@ -1,7 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import mobile from 'is-mobile';
-
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
 
 import { getStats } from '../../lib/api';
@@ -33,7 +32,7 @@ export const Info: FC<Props> = ({
 	onClose,
 	...props
 }) => {
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 	const [stats, setStats] = useState({
 		loading: true,
 		leaderboard: [],

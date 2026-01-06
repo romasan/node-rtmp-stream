@@ -1,9 +1,9 @@
 import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 
 import cn from 'classnames';
-import mobile from 'is-mobile';
 
 import { useDraggable } from '../../hooks/useDraggable';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 
 import { getChatMessages, sendChatMessage } from '../../lib/api';
 import { formatDate } from '../../helpers/formatDate';
@@ -96,7 +96,7 @@ export const Chat: React.FC<Props> = ({
 	onClose,
 	...props
 }) => {
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 	const [list, setList] = useState<IMessage[]>([]);
 	const [input, setInput] = useState('');
 	const { anchorRef, draggableRef } = useDraggable({

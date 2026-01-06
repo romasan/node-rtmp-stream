@@ -1,5 +1,9 @@
 @import "../../styles/mixins";
 
+.root {
+	height: 100%;
+}
+
 .canvas.canvas {
 	background-image: unset;
 	background-color: #3c3c3c;
@@ -26,4 +30,15 @@
 	font-size: 20px;
 	text-decoration: unset;
 	z-index: 1;
+}
+
+.paused {
+	position: absolute;
+	top: 50px;
+	left: 50px;
+	font-size: 48px;
+	color: #fff;
+	background: #000;
+	white-space: pre-wrap;
+	padding: 10px;
 }

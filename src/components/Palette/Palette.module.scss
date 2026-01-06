@@ -163,5 +163,9 @@
 
 	.landscape {
 		@include size(8vh);
+
+		& > svg {
+			@include size(5vh);
+		}
 	}
 }

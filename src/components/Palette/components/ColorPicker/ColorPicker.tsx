@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react'
 
 import cn from 'classnames';
 
+import { useMobileLayout } from '../../../../hooks/useMobileLayout';
 import { useDraggable } from '../../../../hooks/useDraggable';
 import {
 	rgbToHex,
@@ -11,8 +12,6 @@ import {
 	invertHex,
 	expandShortHex,
 } from '../../../../helpers/color';
-
-import mobile from 'is-mobile';
 
 import * as s from './ColorPicker.module.scss';
 
@@ -115,7 +114,7 @@ export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, s
 	const refRainbow = useRef(null);
 	const refPicker = useRef(null);
 
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 
 	const { anchorRef, draggableRef } = useDraggable({
 		x: isMobile ? window.innerWidth - 250 : 200,

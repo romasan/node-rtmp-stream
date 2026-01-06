@@ -2,8 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 
 import cn from 'classnames';
 
-import mobile from 'is-mobile';
-
 import {
 	Canvas,
 	Palette,
@@ -21,6 +19,7 @@ import { addPix, APIhost } from './lib/api';
 import ee from './lib/ee';
 
 import { useWsStore } from './hooks/useWsStore';
+import { useMobileLayout } from './hooks/useMobileLayout';
 
 import TwitchIcon from '/assets/twitch.svg';
 import VkplayIcon from '/assets/vkplay.svg';
@@ -54,7 +53,7 @@ export const App: React.FC = () => {
 		setHasNewMessage,
 	} = useWsStore();
 
-	const isMobile = mobile();
+	const isMobile = useMobileLayout();
 
 	const loginModal = useModal({
 		content: (
