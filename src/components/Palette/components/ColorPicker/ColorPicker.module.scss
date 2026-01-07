@@ -9,6 +9,8 @@
 	flex-direction: column;
 	gap: 3px;
 	z-index: 1;
+	transform-origin: bottom right;
+	transition: transform 300ms, opacity 300ms;
 }
 
 .draggable {
@@ -153,8 +155,7 @@
 	}
 }
 
-:global(.mobile) {
-	.pickButton {
-		display: none;
-	}
+.transparent {
+	opacity: .5;
+	transform: scale(.5);
 }

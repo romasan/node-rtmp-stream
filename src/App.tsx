@@ -125,8 +125,13 @@ export const App: React.FC = () => {
 		}
 	};
 
-	const handlePick = (v = true): void => {
-		setCanvasMode(v ? EMode.PICK : EMode.CLICK);
+	const handlePick = (value?: boolean): void => {
+		if (typeof value === 'boolean') {
+			setPickedColor('');
+			setCanvasMode(value ? EMode.PICK : EMode.CLICK);
+		} else {
+			setCanvasMode((v) => v === EMode.PICK ? EMode.CLICK : EMode.PICK);
+		}
 	};
 
 	useEffect(() => {
@@ -185,6 +190,7 @@ export const App: React.FC = () => {
 				/>
 				{isOnline && !isFinished && (
 					<Palette
+						mode={canvasMode}
 						color={color}
 						pickedColor={pickedColor}
 						colorScheme={wsStore.canvas && wsStore.canvas.colorScheme}
