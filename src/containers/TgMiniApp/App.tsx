@@ -108,8 +108,13 @@ export const App: React.FC = () => {
 		}
 	};
 
-	const handlePick = (): void => {
-		setCanvasMode((value) => value === EMode.PICK ? EMode.CLICK : EMode.PICK);
+	const handlePick = (value?: boolean): void => {
+		if (typeof value === 'boolean') {
+			setPickedColor('');
+			setCanvasMode(value ? EMode.PICK : EMode.CLICK);
+		} else {
+			setCanvasMode((v) => v === EMode.PICK ? EMode.CLICK : EMode.PICK);
+		}
 	};
 
 	useEffect(() => {
