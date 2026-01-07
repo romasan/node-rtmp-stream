@@ -106,7 +106,7 @@ interface Props {
 	pickedColor?: string;
 	mode: EMode;
 	setColor(value: string): void;
-	onPick?:(value?: boolean) => void;
+	onPick:(value?: boolean) => void;
 }
 
 export const Palette: React.FC<Props> = ({
@@ -150,6 +150,8 @@ export const Palette: React.FC<Props> = ({
 	}
 
 	const handleChangeColor = (value: string) => {
+		onPick(false);
+
 		if (Object.values(colors).some((v) => v === value)) {
 			setColor(value);
 
