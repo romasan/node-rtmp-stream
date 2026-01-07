@@ -1,7 +1,8 @@
-import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 
 import cn from 'classnames';
 
+import { EMode } from '../../../Canvas/types';
 import { useMobileLayout } from '../../../../hooks/useMobileLayout';
 import { useDraggable } from '../../../../hooks/useDraggable';
 import {
@@ -99,13 +100,23 @@ interface Props {
 	color: string;
 	pickedColor?: string;
 	slot: string;
+	mode: EMode;
 	onChange(value: string): void;
 	onClose(): void;
 	onDelete(): void;
 	onPick(value?: boolean): void;
 }
 
-export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, slot, onChange, onClose, onDelete, onPick }) => {
+export const ColorPicker: React.FC<Props> = ({
+	mode,
+	color = '#ff0000',
+	pickedColor,
+	slot,
+	onChange,
+	onClose,
+	onDelete,
+	onPick,
+}) => {
 	const [baseColor, setBaseColor] = useState('#ff0000');
 	const [pickerColor, setPickerColor] = useState('#ff0000');
 	const [textColor, setTextColor] = useState('#ff0000');
@@ -209,7 +220,10 @@ export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, s
 	}, [pickedColor]);
 
 	return (
-		<div className={s.root} ref={draggableRef}>
+		<div
+			className={cn(s.root, { [s.transparent]: mode === EMode.PICK })}
+			ref={draggableRef}
+		>
 			<div className={s.draggable} ref={anchorRef}>
 				<button className={s.close} onClick={onClose}>&times;</button>
 			</div>
@@ -245,7 +259,7 @@ export const ColorPicker: React.FC<Props> = ({ color = '#ff0000', pickedColor, s
 						onBlur={handleBlurText}
 						onSubmit={handleBlurText}
 					/>
-					<button className={s.pickButton} onClick={onPick}></button>
+					<button className={s.pickButton} onClick={() => onPick(true)}></button>
 				</div>
 				<div className={s.footer}>
 					<button className={s.button} onClick={handleSave}>OK</button>

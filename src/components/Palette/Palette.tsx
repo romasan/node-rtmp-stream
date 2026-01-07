@@ -4,6 +4,8 @@ import cn from 'classnames';
 
 import { ColorPicker } from './components';
 
+import { EMode } from '../Canvas/types';
+
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
 import { useLandscape } from '../../hooks/useLandscape';
@@ -102,11 +104,19 @@ interface Props {
 	color: string;
 	colorScheme: string;
 	pickedColor?: string;
+	mode: EMode;
 	setColor(value: string): void;
 	onPick?:(value?: boolean) => void;
 }
 
-export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setColor, onPick }) => {
+export const Palette: React.FC<Props> = ({
+	mode,
+	color,
+	colorScheme,
+	pickedColor,
+	setColor,
+	onPick,
+}) => {
 	const isMobile = useMobileLayout();
 	const isLandscape = useLandscape();
 	const [newColor, setNewColor] = useState(color);
@@ -120,7 +130,9 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 
 	const handleColorItemChange = (colorValue?: string) => {
 		const _color = isMobile ? colorValue : color;
-		const _slot = canChangeColor ? (Object.entries(colors).find(([k, v]) => v === _color) || [])[0] : _color;
+		const _slot = canChangeColor
+			? (Object.entries(colors).find(([k, v]) => v === _color) || [])[0]
+			: _color;
 
 		setNewColor(colors && colors[_slot]);
 		setSlot(_slot);
@@ -139,6 +151,8 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 
 	const handleChangeColor = (value: string) => {
 		if (Object.values(colors).some((v) => v === value)) {
+			setColor(value);
+
 			return;
 		}
 
@@ -196,7 +210,7 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 								<Color
 									key={key}
 									color={itemColor as string}
-									active={color === key}
+									active={color === key || color === itemColor}
 									canChangeColor={canChangeColor}
 									isLandscape={isLandscape}
 									onClick={() => handleColorItemClick(key, itemColor)}
@@ -215,6 +229,7 @@ export const Palette: React.FC<Props> = ({ color, colorScheme, pickedColor, setC
 			</div>
 			{colorPickerIsShowed && (
 				<ColorPicker
+					mode={mode}
 					color={newColor}
 					pickedColor={pickedColor}
 					slot={slot}

@@ -81,6 +81,7 @@ export const App: React.FC = () => {
 			</Canvas>
 			{(wsStore && palette) && (
 				<Palette
+					mode={canvasMode}
 					color={color}
 					colorScheme={wsStore.canvas && wsStore.canvas.colorScheme}
 					setColor={setColor}
