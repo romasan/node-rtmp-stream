@@ -10,9 +10,10 @@ import * as s from './Stats.module.scss';
 
 interface Props {
 	canvas: any;
+	userInfo: (userId: string) => void;
 }
 
-export const Stats: FC<Props> = ({ canvas }) => {
+export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 	const [stats, setStats] = useState<any>({});
 	const [list, setList] = useState<{ name: string; active: boolean; }[]>([]);
 	const [uuid, setUuid] = useState('');
@@ -174,6 +175,9 @@ export const Stats: FC<Props> = ({ canvas }) => {
 				Uptime: {formatTime(stats.uptime)}
 			</div>
 			{modalUser.render()}
+			<div>
+				<button onClick={() => userInfo('foo')}>user window</button>
+			</div>
 		</Block>
 	);
 };

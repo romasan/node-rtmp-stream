@@ -1,26 +1,35 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import * as s from './Modal.module.scss';
+import { useDraggable } from '../../hooks/useDraggable';
+
+import * as s from './Window.module.scss';
 
 interface Props {
 	content: React.ReactElement;
 	width?: string;
 	height?: string;
+	x?: number;
+	y?: number;
 	portal?: boolean;
 	onClose?(): void;
 }
 
-export const useModal = (props?: Props | React.ReactElement) => {
+export const useWindow = (props?: Props | React.ReactElement) => {
 	const {
 		content,
-		width,
-		height,
+		width = '300px',
+		height = '200px',
+		x = 10,
+		y = 50,
 		portal,
 		onClose,
 	} = props as Props || {};
 	const [visible, setVisible] = useState(false);
 	const containerRef = useRef<any>(null);
+	const [ready, setReady] = useState(false);
+
+	const { anchorRef, draggableRef } = useDraggable({ x, y, ready });
 
 	const close = () => {
 		onClose && onClose();
@@ -49,15 +58,27 @@ export const useModal = (props?: Props | React.ReactElement) => {
 		};
 	}, [portal]);
 
+	useEffect(() => {
+		setTimeout(() => {
+			setReady(visible);
+		}, 0);
+	}, [visible]);
+
 	const render = () => {
 		if (!visible) {
 			return null;
 		}
 
 		const wrapper = (
-			<div className={s.root}>
-				<div className={s.window} style={{ width, height }}> 
-					<div className={s.close} onClick={close}>&times;</div>
+			<div
+				className={s.root}
+				ref={draggableRef}
+				style={{ width, height }}
+			>
+				<div className={s.draggable} ref={anchorRef}>
+					<button className={s.close} onClick={close}>&times;</button>
+				</div>
+				<div>
 					{content || props}
 				</div>
 			</div>
