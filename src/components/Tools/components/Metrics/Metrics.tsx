@@ -11,6 +11,7 @@ export const Metrics: FC = () => {
 		),
 		portal: true,
 	});
+
 	return (
 		<Block title="📊 Метрики">
 			<button onClick={modalCalendar.toggle}>календарь</button>

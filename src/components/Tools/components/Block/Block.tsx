@@ -1,4 +1,5 @@
 import React, { FC, PropsWithChildren, useRef, useMemo, useContext, useEffect } from 'react';
+import cn from 'classnames';
 
 import { v4 as uuid } from 'uuid';
 
@@ -14,15 +15,22 @@ interface Props {
 	onToggle?: (value: boolean) => void;
 }
 
-export const Block: FC<PropsWithChildren<Props>> = ({ id, title, onOpen, onClose, onToggle, children }) => {
-	const { opened, setOpened } = useContext(ToolsContext);
+export const Block: FC<PropsWithChildren<Props>> = ({
+	id,
+	title,
+	onOpen,
+	onClose,
+	onToggle,
+	children,
+}) => {
+	const { opened, setOpened, wideWindow, renderRef } = useContext(ToolsContext);
 	const first = useRef(true);
 
 	const _id = useMemo(() => {
 		return id || uuid();
 	}, [id]);
 
-	const isOpened = opened === _id;
+	const isOpened = useMemo(() => opened === _id, [opened, _id]);
 
 	useEffect(() => {
 		if (isOpened) {
@@ -50,14 +58,24 @@ export const Block: FC<PropsWithChildren<Props>> = ({ id, title, onOpen, onClose
 		}
 	};
 
+	const render = () => (
+		<div className={s.content}>
+			{children}
+		</div>
+	);
+
+	useEffect(() => {
+		if (isOpened && typeof renderRef.current === 'function') {
+			renderRef.current(render);
+		}
+	}, [render, isOpened]);
+
 	return (
 		<div className={s.root}>
-			<div className={s.title} onClick={toggle}>
+			<div className={cn(s.title, { [s.active]: isOpened })} onClick={toggle}>
 				{title}
 			</div>
-			{isOpened && (
-				<div className={s.content}>{children}</div>
-			)}
+			{!wideWindow && isOpened && render()}
 		</div>
 	);
 };

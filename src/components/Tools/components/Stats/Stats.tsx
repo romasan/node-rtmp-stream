@@ -109,7 +109,7 @@ export const Stats: FC<Props> = ({ canvas }) => {
 	// console.log('==== list:', list); // TODO open user controls popup==== ranges
 
 	return (
-		<Block title="👤 Общее" onOpen={onOpen} onClose={onClose}>
+		<Block title="👤 Общее" onOpen={onOpen} onClose={onClose} id="stats">
 			{Boolean(stats.online) && (
 				<div>
 					<div>
