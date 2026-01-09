@@ -32,7 +32,7 @@ const {
 let webServer = null;
 let wss: WebSocket.Server | null = null;
 
-const send = (token: string, event: string, payload: any) => {
+export const send = (token: string, event: string, payload: any) => {
 	wss?.clients.forEach((ws: WebSocket) => {
 		if (ws.readyState === WebSocket.OPEN && (ws as any)._token === token) {
 			ws.send(JSON.stringify({ event, payload }));

@@ -68,22 +68,26 @@ export const Tools: FC<Props> = ({
 	const [expandWindow, setExpandWindow] = useState(true);
 	const [wideWindow, setWideWindow] = useState(!isMobile);
 	const renderRef = useRef(null);
-	const [userId, setUserId] = useState<string | null>(null);
+	const [userQuery, setUserQuery] = useState<string | null>(null);
+	const [userFilter, setUserFilter] = useState('id');
 
 	const userWindow = useWindow({
 		content: (
-			// <UserContent userId={userId} />
+			// <UserContent userQuery={userQuery} userFilter={userFilter} />
 			<div>
 				<div>User Info:</div>
-				<div>Nick: test</div>
-				<div>UUIDs: {userId}</div>
+				<div>Nick: ???</div>
+				<div>UUID: ???</div>
+				<div>query: {userQuery}</div>
+				<div>type: {userFilter}</div>
 			</div>
 		),
 		portal: true,
 	});
 
-	const userInfo = (userId: string) => {
-		setUserId(userId);
+	const userInfo = (query: string, filter = 'id') => {
+		setUserQuery(query);
+		setUserFilter(filter);
 		userWindow.open();
 	};
 

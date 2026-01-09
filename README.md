@@ -32,7 +32,7 @@
 - [ ] webassembly + canvas =) rust?
 - [x] add to telegram web app
 - [ ] add qr to stream) (like https://github.com/hip-hyena/PaintBot)
-- [ ] chat rate limit
+- [x] chat rate limit
 - [ ] check has new banned users/IP in pixels.log
 - [ ] rating for groups/squads/tags
 - [ ] achievements!
