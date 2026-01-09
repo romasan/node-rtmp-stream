@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import cn from 'classnames';
 
@@ -11,27 +11,23 @@ import {
 	EMode,
 } from '../../components/';
 
-import { doOnEnter, life } from '../../helpers';
-
 import { addPix, APIhost, authTgMiniApp } from '../../lib/api';
-import ee from '../../lib/ee';
 
-import { useWsStore } from '../../hooks/useWsStore';
-import { useMobileLayout } from '../../hooks/useMobileLayout';
-
-import { colorSchemes } from '../../../server/constants/colorSchemes';
+import { useApp } from '../../hooks/useApp';
 
 import * as s from './App.module.scss';
 
 export const App: React.FC = () => {
-	const [color, setColor] = useState('');
-	const [pickedColor, setPickedColor] = useState('');
-	const [blinkedLoginAnimation, setBlinkedLoginAnimation] = useState(false);
-	const [isFinished, setIsFinished] = useState(false);
-	const [canvas, setCanvas] = useState<any>({});
 	const blinkedTimer = useRef<number | NodeJS.Timeout>(-1);
 
 	const {
+		color,
+		setColor,
+		pickedColor,
+		setPickedColor,
+		blinkedLoginAnimation,
+		isFinished,
+		setCanvas,
 		wsStore,
 		isAuthorized,
 		expiration,
@@ -41,104 +37,12 @@ export const App: React.FC = () => {
 		role,
 		paused,
 		setHasNewMessage,
-	} = useWsStore();
-
-	const isMobile = useMobileLayout();
-
-	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);
-
-	const palette = (colorSchemes as any)[wsStore.canvas && wsStore.canvas.colorScheme] || {};
-
-	useEffect(() => {
-		const isTruecolor = (wsStore && wsStore.canvas && wsStore.canvas.colorScheme) === 'truecolor';
-
-		if (!color && palette) {
-			const firstColor = ('black' in palette && !isTruecolor)
-				? 'black'
-				: isTruecolor
-					? (Object.values(palette) || []).pop()
-					: (Object.keys(palette) || []).pop();
-
-			if (firstColor) {
-				setColor(firstColor as string);
-			}
-		}
-	}, [color, wsStore]);
-
-	useEffect(() => {
-		if (finish) {
-			const timer = setInterval(() => {
-				if (finish <= Date.now()) {
-					setIsFinished(true);
-					clearInterval(timer);
-				}
-			}, 1000);
-	
-			return () => {
-				clearInterval(timer);
-			};
-		}
-
-	}, [finish]);
-
-	const handleCanvasClick = (x: number | string, y: number) => {
-		if (canvasMode === EMode.PICK) {
-			setPickedColor(x as string);
-			setCanvasMode(EMode.CLICK);
-
-			return;
-		}
-
-		if (wsStore.needAuthorize && !isAuthorized) {
-			// setTimeout(() => {
-			// 	loginModal.open();
-			// }, 100);
-		} else {
-			addPix({ x, y, color } as any);
-		}
-	};
-
-	const onPix = (payload: string) => {
-		if (payload === 'await' && !isAuthorized) {
-			setBlinkedLoginAnimation(true);
-			clearTimeout(blinkedTimer.current);
-			blinkedTimer.current = setTimeout(() => {
-				setBlinkedLoginAnimation(false);
-			}, 3000);
-		}
-	};
-
-	const handlePick = (): void => {
-		setCanvasMode((value) => value === EMode.PICK ? EMode.CLICK : EMode.PICK);
-	};
-
-	useEffect(() => {
-		ee.on('pix', onPix);
-
-		return () => {
-			ee.off('pix', onPix);
-		};
-	}, [isAuthorized]);
-
-	useEffect(() => {
-		const breakDo = doOnEnter('life', () => {
-			life(canvas.image);
-		});
-
-		return breakDo;
-	}, [canvas]);
-
-	useEffect(() => {
-		const callback = () => {
-			canvas && canvas.centering();
-		};
-
-		window.addEventListener('resize', callback);
-
-		return () => {
-			window.removeEventListener('resize', callback);
-		};
-	}, [canvas]);
+		isMobile,
+		canvasMode,
+		setCanvasMode,
+		palette,
+		handlePick,
+	} = useApp();
 
 	useEffect(() => {
 		if (wsStore.needAuthorize && !isAuthorized) {
@@ -158,7 +62,19 @@ export const App: React.FC = () => {
 					// alert('ошибка входа #2');
 				});
 		}
-	}, [isAuthorized, wsStore])
+	}, [isAuthorized, wsStore]);
+
+	// Обновим обработчик клика для TgMiniApp
+	const handleCanvasClickTg = (x: number | string, y: number) => {
+		if (canvasMode === EMode.PICK) {
+			setPickedColor(x as string);
+			setCanvasMode(EMode.CLICK);
+			return;
+		}
+
+		// Для TgMiniApp не нужна логика авторизации, она обрабатывается отдельно
+		addPix({ x, y, color } as any);
+	};
 
 	return (
 		<>
@@ -178,7 +94,7 @@ export const App: React.FC = () => {
 					mode={canvasMode}
 					color={(wsStore.canvas && wsStore.canvas.colorScheme === 'truecolor') ? color : palette[color]}
 					expand={wsStore.canvas}
-					onClick={handleCanvasClick}
+					onClick={handleCanvasClickTg}
 					expiration={expiration}
 					isAuthorized={isAuthorized}
 					isFinished={isFinished}

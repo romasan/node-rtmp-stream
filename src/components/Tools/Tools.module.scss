@@ -3,7 +3,7 @@
 .root {
 	background: #323233;
 	border: 1px solid #797979;
-
+	min-width: 300px;
 	position: absolute;
 	padding: 4px 4px 0 4px;
 	display: flex;
@@ -23,7 +23,7 @@
 }
 
 .draggable {
-	width: calc(100% - 20px);
+	width: calc(100% - 40px);
 	height: 16px;
 	background-image: linear-gradient(0deg, #797979 0%, #797979 25%, #2d2d3a 25.1%, #2d2d3a 50%, transparent 50.1%, transparent 100%);
 	background-size: 4px 4px;
@@ -36,13 +36,12 @@
 	color: #fff;
 	font-family: monospace;
 	font-size: 10pt;
-	width: 300px;
-	max-height: 600px;
+	max-height: calc(100vh - 100px);
 	overflow-y: auto;
 	overflow-x: hidden;
 }
 
-.close {
+.close, .wide {
 	background: #323233;
 	border: 1px solid #797979;
 	color: #797979;
@@ -58,9 +57,48 @@
 
 	& > div {
 		rotate: -90deg;
+		transition: rotate 300ms;
 	}
+}
+
+.wide {
+	right: 22px;
+
+	& > div {
+		rotate: 180deg;
+	}
+}
+
+.wided > div {
+	rotate: 0deg;
 }
 
 .toggled > div {
 	rotate: 90deg;
+}
+
+.columns {
+	display: flex;
+}
+
+.leftSide {
+	min-width: 280px;
+}
+
+.rightSide {
+	min-width: 300px;
+	padding-left: 10px;
+}
+
+.list tr:hover {
+	background: #535353;
+}
+
+:global(.mobile) {
+	.root {
+		width: calc(100vw - 14px);
+	}
+	.leftSide {
+		width: 100%;
+	}
 }

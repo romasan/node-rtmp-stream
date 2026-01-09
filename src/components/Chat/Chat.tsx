@@ -158,10 +158,18 @@ export const Chat: React.FC<Props> = ({
 		setInput(event.target.value || '');
 	};
 
-	const sendMessage = () => {
+	const sendMessage = async () => {
 		if (input) {
-			sendChatMessage(input);
-			setInput('');
+			try {
+				const resp = await sendChatMessage(input);
+				const text = await resp.text();
+
+				if (text === 'ok') {
+					setInput('');
+				}
+			} catch (error) {
+				console.log('Error:', error);
+			}
 		}
 	};
 
@@ -187,7 +195,7 @@ export const Chat: React.FC<Props> = ({
 			</div>
 			{/* <div>Online (0)</div> */}
 			<div className={s.content} ref={contentRef} {...props}>
-				{groupedList.map((message) => 
+				{groupedList.map((message, index) => 
 					message.delimiter ? (
 						<div key={message.delimiter} className={s.delimiter}>
 							{message.delimiter}

@@ -169,11 +169,13 @@ export const Palette: React.FC<Props> = ({
 	};
 
 	const handleCloseColorPicker = () => {
-		setColorPickerIsShowed(false);
 		onPick(false);
+		setColorPickerIsShowed(false);
 	};
 
 	const handleDelete = () => {
+		onPick(false);
+
 		const _colors = Object.entries(colors)
 			.filter(([key]) => key !== slot)
 			.reduce((list, [key, value]) => ({ ...list, [key]: value }), {});

@@ -1,0 +1,38 @@
+@import "../../styles/mixins";
+
+.root {
+	@include windowLike();
+
+	position: absolute;
+	padding: 4px;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	z-index: 1;
+	transform-origin: bottom right;
+	transition: transform 300ms, opacity 300ms;
+}
+
+.draggable {
+	position: relative;
+	width: 100%;
+	height: 16px;
+	background-image: linear-gradient(0deg, #edeefc 0%, #edeefc 25%, #2d2d3a 25.1%, #2d2d3a 50%, transparent 50.1%, transparent 100%);
+	background-size: 4px 4px;
+	margin-bottom: 5px;
+	cursor: grab;
+}
+
+.close {
+	@include buttonLike();
+
+	position: absolute;
+	top: -2px;
+	right: 1px;
+	outline: 4px solid $color-window-bg;
+
+	&,
+	&:active {
+		padding: 0 3px;
+	}
+}

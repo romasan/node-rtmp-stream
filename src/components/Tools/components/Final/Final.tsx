@@ -18,8 +18,8 @@ export const Final: FC = () => {
 	};
 
 	return (
-		<Block title="* Выставить окончание пиксельбаттла">
-			<div>TODO</div>
+		<Block title="🚧 Выставить окончание пиксельбаттла">
+			<div>[TODO]</div>
 			<div>
 				<input type="datetime-local" onChange={handleChangeDateTime}/>
 			</div>

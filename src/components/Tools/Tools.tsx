@@ -1,8 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useRef, useContext } from 'react';
 
 import cn from 'classnames';
 
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
+import { useWindow } from '../../hooks/useWindow';
 
 import { EMode } from '../Canvas';
 
@@ -24,6 +26,17 @@ import {
 } from './components';
 
 import * as s from './Tools.module.scss';
+
+export const Content = () => {
+	const { renderRef, opened } = useContext(ToolsContext);
+	const [render, setRender] = useState(null);
+
+	renderRef.current = setRender;
+
+	return (
+		<div className={cn('wideWindow', s.rightSide)}>{opened ? render : 'Select tab'}</div>
+	);
+};
 
 interface Props {
 	canvas: any;
@@ -48,65 +61,138 @@ export const Tools: FC<Props> = ({
 	expand,
 	setCanvasMode,
 }) => {
-	const { anchorRef, draggableRef } = useDraggable({ x: document.body.offsetWidth - 330, y: 10});
+	const isMobile = useMobileLayout();
+	const { anchorRef, draggableRef } = useDraggable({ x: 2, y: 55 });
 
-	const [opened, setOpened] = useState('');
+	const [opened, setOpened] = useState('stats');
 	const [expandWindow, setExpandWindow] = useState(true);
+	const [wideWindow, setWideWindow] = useState(!isMobile);
+	const renderRef = useRef(null);
+	const [userQuery, setUserQuery] = useState<string | null>(null);
+	const [userFilter, setUserFilter] = useState('id');
+
+	const userWindow = useWindow({
+		content: (
+			// <UserContent userQuery={userQuery} userFilter={userFilter} />
+			<div>
+				<div>User Info:</div>
+				<div>Nick: ???</div>
+				<div>UUID: ???</div>
+				<div>query: {userQuery}</div>
+				<div>type: {userFilter}</div>
+			</div>
+		),
+		portal: true,
+	});
+
+	const userInfo = (query: string, filter = 'id') => {
+		setUserQuery(query);
+		setUserFilter(filter);
+		userWindow.open();
+	};
 
 	const onToggle = () => {
 		setExpandWindow((value) => !value);
 	};
 
+	const onWide = () => {
+		setWideWindow((value) => !value);
+	};
+
 	return (
-		<ToolsContext.Provider value={{
-			opened,
-			setOpened,
-		}}>
-			<div className={s.root} ref={draggableRef}>
-				<div className={s.draggable} ref={anchorRef}>
-					<button className={cn(s.close, { [s.toggled]: !expand })} onClick={onToggle}>
-						<div>&gt;</div>
-					</button>
+		<>
+			<ToolsContext.Provider value={{
+				opened,
+				wideWindow,
+				setOpened,
+				renderRef,
+			}}>
+				<div className={s.root} ref={draggableRef}>
+					<div className={s.draggable} ref={anchorRef}>
+						<button className={cn(s.wide, { [s.wided]: !wideWindow })} onClick={onWide}>
+							<div>&gt;</div>
+						</button>
+						<button className={cn(s.close, { [s.toggled]: !expandWindow })} onClick={onToggle}>
+							<div>&gt;</div>
+						</button>
+					</div>
+					<div className={s.content}>
+						{expandWindow && (
+							<div className={s.columns}>
+								<div className={s.leftSide}>
+									<Stats canvas={canvas} userInfo={userInfo} />
+									<Metrics />
+									<Stream />
+									<PixelStats coord={coord} />
+									<Maps canvas={canvas} />
+									<FillSquare
+										canvas={canvas}
+										expand={expand}
+										range={range}
+										color={color}
+										setCanvasMode={setCanvasMode}
+									/>
+									<Bans />
+									<Chat />
+									<Countdown />
+									<Expand />
+									<Block title="🚧 Откат полотна к состоянию">
+										<div>[TODO]</div>
+										<div>
+											<label>
+												<input type="checkbox" />
+												lock canvas
+											</label>
+										</div>
+										<div>
+											<button>Предпросмотр без забаненных</button>
+										</div>
+										<div>
+											<button>RELOAD ALL (WAWE)</button>
+										</div>
+									</Block>
+									<Final />
+									<Block title="🚧 Лог действий">
+										<div>[TODO]</div>
+										<div>
+											<table border={1} className={s.list}>
+												<tr>
+													<td>User</td>
+													<td>Action</td>
+													<td>Details</td>
+													<td>Time</td>
+												</tr>
+												<tr>
+													<td>👑 Admin</td>
+													<td>Ban (temporary)</td>
+													<td><a href="#">fucker123</a> until 31.12.2099 23.59</td>
+													<td>01.01.2026 15.35</td>
+												</tr>
+												<tr>
+													<td>👷 SimpleGuy</td>
+													<td>remove message</td>
+													<td>from <a href="#">fucker123</a> at 31.12.2099 23.59</td>
+													<td>01.01.2026 14.05</td>
+												</tr>
+												<tr>
+													<td>👑 Admin</td>
+													<td>Draw square</td>
+													<td>[ -109:-25 - -89:-9 ] black, total 320 pix</td>
+													<td>01.01.2026 00.35</td>
+												</tr>
+											</table>
+										</div>
+									</Block>
+								</div>
+								{wideWindow && (
+									<Content />
+								)}
+							</div>
+						)}
+					</div>
 				</div>
-				<div className={s.content}>
-					{expandWindow && (
-						<>
-							<Stats canvas={canvas} />
-							<Metrics />
-							<Stream />
-							<PixelStats coord={coord} />
-							<Maps canvas={canvas} />
-							<FillSquare
-								canvas={canvas}
-								expand={expand}
-								range={range}
-								color={color}
-								setCanvasMode={setCanvasMode}
-							/>
-							<Bans />
-							<Chat />
-							<Countdown />
-							<Expand />
-							<Block title="* Откат полотна к состоянию">
-								<div>TODO</div>
-								<div>
-									<label>
-										<input type="checkbox" />
-										lock canvas
-									</label>
-								</div>
-								<div>
-									<button>Предпросмотр без забаненных</button>
-								</div>
-								<div>
-									<button>RELOAD ALL (WAWE)</button>
-								</div>
-							</Block>
-							<Final />
-						</>
-					)}
-				</div>
-			</div>
-		</ToolsContext.Provider>
+			</ToolsContext.Provider>
+			{userWindow.render()}
+		</>
 	);
 };
