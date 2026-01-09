@@ -148,7 +148,7 @@ export const drawPix = ({ x, y, color, nickname, uuid, ip, area }: IPixel) => {
 		x < -shiftX ||
 		y < -shiftY ||
 		x > (canvas.width - shiftX) ||
-		y > (canvas.width - shiftY)
+		y > (canvas.height - shiftY)
 	) {
 		return;
 	}
