@@ -1,20 +1,10 @@
 {
 	"stream": {
-		"videoSize": {
-			"width": 1920,
-			"height": 1080
-		},
 		"enable": true,
+		"bgImage": "",
 		"streamFile": "/mnt/ramdisk/output.png",
-		"bgVideo": "",
-		"interval": 1000,
 		"rtmpHostKey": "",
-		"FFMPEGLog": false,
-		"inputAudio": "",
-		"upscale": true,
-		"freezedFrame": true,
-		"withBg": false,
-		"debugTime": false
+		"inputAudio": ""
 	},
 	"server": {
 		"host": "https://pixelbattles.ru",

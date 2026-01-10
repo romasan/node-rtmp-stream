@@ -35,6 +35,7 @@
     "crypto": "^1.0.1",
     "event-emitter": "^0.3.5",
     "is-mobile": "^4.0.0",
+    "jsonwebtoken": "^9.0.3",
     "node-fetch": "^2.6.9",
     "parcel": "^2.10.3",
     "parcel-bundler": "^1.12.5",

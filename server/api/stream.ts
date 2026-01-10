@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { getCanvas } from '../utils/canvas';
-import { createCanvas, Image, Canvas, CanvasRenderingContext2D } from 'canvas';
+import { createCanvas, Image } from 'canvas';
 
 const {
 	stream: { bgImage },
