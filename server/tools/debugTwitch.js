@@ -1,6 +1,6 @@
 const http = require('http');
 // const crypto = require('crypto');
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 // const { v4: uuid } = require('uuid');
 
 const {
@@ -52,13 +52,15 @@ const twitchExtensionAuth = async (req, res) => {
       req.on('end', async () => {
         const { token } = JSON.parse(body);
 
+		console.log('==== token', token);
+
         if (!token) {
           res.writeHead(400);
           return res.end('Missing token');
         }
 
         // 🔐 Проверка JWT
-        const decoded: any = jwt.verify(token, extensionSecret, {
+        const decoded = jwt.verify(token, extensionSecret, {
           algorithms: ['HS256']
         });
 
@@ -66,6 +68,10 @@ const twitchExtensionAuth = async (req, res) => {
         const userId = decoded.user_id; // ID зрителя
         const channelId = decoded.channel_id; // ID канала, где запущено расширение
         const role = decoded.role; // "viewer", "broadcaster", "moderator"
+
+		console.log('==== userId', userId);
+		console.log('==== channelId', channelId);
+		console.log('==== role', role);
 
         if (!userId) {
           res.writeHead(400);
@@ -77,13 +83,15 @@ const twitchExtensionAuth = async (req, res) => {
 
         // Генерируем внутренний токен сессии (аналогично вашему authorizeUser)
         const fakeToken = 'twitch-ext-' + userId; // или используйте настоящий сессионный токен
-        await authorizeUser(fakeToken, {
-          id: userId,
-          login: decoded.login || 'user_' + userId,
-          display_name: decoded.display_name || 'User',
-          profile_image_url: '', // можно получить через Helix, но требует access_token
-          _authType: 'twitch-extension'
-        });
+
+		console.log('==== fakeToken', fakeToken)
+        // await authorizeUser(fakeToken, {
+        //   id: userId,
+        //   login: decoded.login || 'user_' + userId,
+        //   display_name: decoded.display_name || 'User',
+        //   profile_image_url: '', // можно получить через Helix, но требует access_token
+        //   _authType: 'twitch-extension'
+        // });
 
         // Устанавливаем куку сессии
         res.setHeader('Set-Cookie', `token=${fakeToken}; Max-Age=31536000; HttpOnly; Secure; SameSite=Lax`);
