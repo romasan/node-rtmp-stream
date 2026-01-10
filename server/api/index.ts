@@ -23,6 +23,7 @@ import { chat } from './chat';
 import { messages } from './messages';
 import { logout } from './logout';
 import { stats } from './stats';
+import { getStreamFrame } from './stream';
 import { Log } from '../utils/log';
 
 const { server: { origin, originAlias } } = require('../config.json');
@@ -97,6 +98,7 @@ const routes: Record<string, any> = {
 	'/stats': stats,
 	'/auth/logout': logout,
 	'/canvas.png': getCanvasImage,
+	'/stream.png': getStreamFrame,
 	'/favicon.ico': getFavicon,
 };
 
@@ -142,7 +144,7 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 		const _twitchAuth = await twitchAuth(req, res);
 		const _steamAuth = !_twitchAuth && await steamAuth(req, res);
 		const _discordAuth = !_steamAuth && await discordAuth(req, res);
-		const _telegramAuth = !_discordAuth && telegramAuth(req, res);
+		const _telegramAuth = !_discordAuth && await telegramAuth(req, res);
 		const _vkAuth = !_telegramAuth && await vkAuth(req, res);
 		const _isSomeAuth = _twitchAuth || _steamAuth || _discordAuth || _telegramAuth || _vkAuth;
 

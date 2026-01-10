@@ -15,7 +15,7 @@ interface Props {
 
 export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 	const [stats, setStats] = useState<any>({});
-	const [list, setList] = useState<{ name: string; active: boolean; }[]>([]);
+	const [list, setList] = useState<{ name: string; active: boolean; lastActivity: number; uuid: string }[]>([]);
 	const [uuid, setUuid] = useState('');
 	const [nick, setNick] = useState('');
 	const [user, setUser] = useState<any>(null);
@@ -134,8 +134,8 @@ export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 						</a>
 						<div className={s.list}>
 							{list.map((item) => (
-								<div key={String(item.name)}>
-									{item.name} {item.active ? '*' : ''}
+								<div key={String(item.name)} title={formatTime(Date.now() - item.lastActivity)}>
+									{item.active ? '*' : ''}"{item.name}" ({item.uuid})
 								</div>
 							))}
 						</div>
