@@ -138,11 +138,7 @@ const twitchExtensionAuth = async (req, res) => {
 			// 	created_at: '2023-02-06T06:59:40Z'
 			// }
 
-			// Получаем данные пользователя через Helix API (опционально)
-			// Но можно обойтись только userId, если у вас уже есть данные в БД
-
-			// Генерируем внутренний токен сессии (аналогично вашему authorizeUser)
-			const fakeToken = uuid(); // или используйте настоящий сессионный токен
+			const fakeToken = uuid();
 
 			console.log('==== fakeToken', fakeToken);
 
