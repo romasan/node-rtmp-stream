@@ -138,10 +138,6 @@ const twitchExtensionAuth = async (req, res) => {
 			// 	created_at: '2023-02-06T06:59:40Z'
 			// }
 
-			const fakeToken = uuid();
-
-			console.log('==== fakeToken', fakeToken);
-
 			// await authorizeUser(fakeToken, {
 			//   id: userId,
 			//   login: decoded.login || 'user_' + userId,
@@ -150,8 +146,10 @@ const twitchExtensionAuth = async (req, res) => {
 			//   _authType: 'twitch-extension'
 			// });
 
-			// Устанавливаем куку сессии
-			// res.setHeader('Set-Cookie', `token=${fakeToken}; Max-Age=31536000; HttpOnly; Secure; SameSite=Lax`);
+			const newToken = uuid();
+
+			console.log('==== newToken', newToken);
+
 			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly`);
 			res.setHeader('Content-Type', 'application/json');
 			res.end(JSON.stringify({
