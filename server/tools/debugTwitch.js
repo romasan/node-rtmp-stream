@@ -15,7 +15,6 @@ const {
 	},
 } = require('../config.json');
 
-
 const getPostPayload = (req, type = 'text') => {
 	return new Promise((resolve, reject) => {
 		let body = '';
@@ -45,6 +44,14 @@ const getPostPayload = (req, type = 'text') => {
 		});
 	});
 };
+
+const parseCookies = (cookies = '') => {
+	return cookies
+		.split(';')
+		.map((item) => item.split('='))
+		.reduce((list, [key, value]) => ({ ...list, [key?.trim()]: value?.trim() }), {});
+};
+
 
 const getAppAccessToken = async () => {
 	const params = new URLSearchParams();
