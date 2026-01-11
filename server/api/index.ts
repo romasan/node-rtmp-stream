@@ -26,7 +26,13 @@ import { stats } from './stats';
 import { getStreamFrame } from './stream';
 import { Log } from '../utils/log';
 
-const { server: { origin, originAlias } } = require('../config.json');
+const {
+	server: {
+		origin,
+		originAlias = [],
+		anyOriginEndpoints = [],
+	},
+} = require('../config.json');
 
 const checkAccessWrapper = (
 	callback:
@@ -94,7 +100,7 @@ const routes: Record<string, any> = {
 	'/start': start,
 	'/pix': checkAccessWrapper(pix),
 	'/chat': checkAccessWrapper(chat, true),
-	'/messages': checkAccessWrapper(messages),
+	'/messages': messages,
 	'/stats': stats,
 	'/auth/logout': logout,
 	'/canvas.png': getCanvasImage,
@@ -103,9 +109,14 @@ const routes: Record<string, any> = {
 };
 
 export const webServerHandler = async (req: IncomingMessage, res: ServerResponse) => {
-	const _origin = originAlias.includes(req.headers['origin'])
-		? req.headers['origin']
-		: origin;
+	let _origin = origin;
+	
+	if (
+		originAlias.includes(req.headers['origin']) ||
+		anyOriginEndpoints.includes(req.url)
+	) {
+		_origin = req.headers['origin'];
+	}
 
 	res.setHeader('Access-Control-Allow-Origin', _origin);
 	res.setHeader('Access-Control-Allow-Credentials', 'true');

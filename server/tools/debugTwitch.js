@@ -159,7 +159,7 @@ const callback = async (req, res) => {
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
-	if (twitchExtensionAuth(req, res)) {
+	if (await twitchExtensionAuth(req, res)) {
 		return;
 	}
 
