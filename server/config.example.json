@@ -24,7 +24,7 @@
 			"twitchExtension": {
 				"secret": "",
 				"jwtSecret": "",
-				"clientId": ""
+				"extensionId": ""
 			},
 			"steam": {
 				"key": "",

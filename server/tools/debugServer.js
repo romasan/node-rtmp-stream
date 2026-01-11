@@ -31,7 +31,7 @@ const getPostPayload = (req, type = 'text') => {
 
 				try {
 					json = JSON.parse(body);
-				} catch (ignore) {/* */ }
+				} catch (ignore) {/* */}
 
 				resolve(json);
 

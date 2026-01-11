@@ -9,13 +9,72 @@ const {
 	server: {
 		host,
 		auth: {
-			twitch: { clientId, clientSecret, redirectUri },
+			twitch: {
+				clientId,
+				clientSecret,
+				redirectUri,
+			},
+			twitchExtension: {
+				jwtSecret,
+				extensionId,
+				secret,
+			}
 		},
 	},
 } = require('../../config.json');
 
+let accessTokenCache = {
+	token: '',
+	time: 0,
+};
+
+const SEC = 1000;
+const MIN = SEC * 60;
+const HOUR = MIN * 60;
+
+const getAppAccessToken = async () => {
+	if (
+		accessTokenCache.token &&
+		((Date.now() - accessTokenCache.time) >= (HOUR * 24))
+	) {
+		return accessTokenCache.token;
+	}
+
+	const params = new URLSearchParams();
+	params.append('client_id', extensionId);
+	params.append('client_secret', secret);
+	params.append('grant_type', 'client_credentials');
+
+	const resp = await fetch('https://id.twitch.tv/oauth2/token', {
+		method: 'POST',
+		body: params
+	});
+	const data = await resp.json();
+
+	accessTokenCache = {
+		token: data.access_token,
+		time: Date.now(),
+	};
+
+	return accessTokenCache.token;
+};
+
+const getUserInfo = async (userId: string) => {
+	const token = await getAppAccessToken();
+	const resp = await fetch(`https://api.twitch.tv/helix/users?id=${userId}`, {
+		headers: {
+			'Client-ID': extensionId,
+			'Authorization': `Bearer ${token}`
+		},
+	});
+
+	return await resp.json();
+};
+
 const twitch = async (req: IncomingMessage, res: ServerResponse) => {
-	if (req.url?.startsWith('/auth/twitch')) {
+	if (req.url?.startsWith('/auth/twitch/app')) {
+		// TODO
+	} else if (req.url?.startsWith('/auth/twitch')) {
 		if (req.url.startsWith('/auth/twitch/callback')) {
 			try {
 				const { token } = parseCookies(req.headers.cookie || '');
