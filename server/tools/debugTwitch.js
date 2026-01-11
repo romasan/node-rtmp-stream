@@ -6,9 +6,10 @@ const jwt = require('jsonwebtoken');
 const {
 	server: {
 		auth: {
-			twitch: {
-				extensionSecret,
-				extensionId,
+			twitchExtension: {
+				jwtSecret,
+				clientId,
+				secret,
 			}
 		},
 	},
@@ -47,8 +48,8 @@ const getPostPayload = (req, type = 'text') => {
 
 const getAppAccessToken = async () => {
 	const params = new URLSearchParams();
-	params.append('client_id', extensionId);
-	params.append('client_secret', extensionSecret);
+	params.append('client_id', clientId);
+	params.append('client_secret', secret);
 	params.append('grant_type', 'client_credentials');
 
 	const resp = await fetch('https://id.twitch.tv/oauth2/token', {
@@ -56,6 +57,11 @@ const getAppAccessToken = async () => {
 		body: params
 	});
 	const data = await resp.json();
+	console.log('==== getAppAccessToken', {
+		clientId,
+		jwtSecret,
+		data,
+	});
 	return data.access_token; // живёт 24 часа
 };
 
@@ -63,17 +69,19 @@ const getUserInfo = async (userId) => {
   const token = await getAppAccessToken(); // или кэшируйте на 24ч
   const resp = await fetch(`https://api.twitch.tv/helix/users?id=${userId}`, {
     headers: {
-      'Client-ID': extensionId,
+      'Client-ID': clientId,
       'Authorization': `Bearer ${token}`
     }
   });
   const data = await resp.json();
+  console.log('==== getUserInfo', data);
   return data.data[0]; // { id, login, display_name, profile_image_url, ... }
 };
 
 const twitchExtensionAuth = async (req, res) => {
 	if (req.url === '/auth/twitch-extension' && req.method === 'POST') {
 		try {
+			const { token: cookieToken } = parseCookies(req.headers.cookie || '');
 			const { token } = await getPostPayload(req, 'json');
 			//   let body = '';
 			//   req.on('data', chunk => body += chunk);
@@ -81,7 +89,10 @@ const twitchExtensionAuth = async (req, res) => {
 			//     const { token } = JSON.parse(body);
 
 			console.log('==== token', token);
-			console.log('==== extensionSecret', extensionSecret);
+			console.log('==== cookieToken', cookieToken);
+			console.log('==== jwtSecret', jwtSecret);
+			console.log('==== clientId', clientId);
+			console.log('==== secret', secret);
 
 			if (!token) {
 				res.writeHead(400);
@@ -89,7 +100,7 @@ const twitchExtensionAuth = async (req, res) => {
 			}
 
 			// 🔐 Проверка JWT
-			const secretBuffer = Buffer.from(extensionSecret, 'base64');
+			const secretBuffer = Buffer.from(jwtSecret, 'base64');
 			const decoded = jwt.verify(token, secretBuffer, { algorithms: ['HS256'] });
 
 			// Извлекаем данные
@@ -106,7 +117,7 @@ const twitchExtensionAuth = async (req, res) => {
 				return res.end('Invalid token');
 			}
 
-			const userData = getUserInfo(userId);
+			const userData = await getUserInfo(userId);
 
 			console.log('==== user data:', userData);
 
@@ -116,7 +127,7 @@ const twitchExtensionAuth = async (req, res) => {
 			// Генерируем внутренний токен сессии (аналогично вашему authorizeUser)
 			const fakeToken = 'twitch-ext-' + userId; // или используйте настоящий сессионный токен
 
-			console.log('==== fakeToken', fakeToken)
+			console.log('==== fakeToken', fakeToken);
 			// await authorizeUser(fakeToken, {
 			//   id: userId,
 			//   login: decoded.login || 'user_' + userId,

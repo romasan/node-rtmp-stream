@@ -19,9 +19,12 @@
 			"twitch": {
 				"clientId": "",
 				"clientSecret": "",
-				"redirectUri": "https://api.pixelbattles.ru/auth/twitch/callback",
-				"extensionSecret": "",
-				"extensionId": ""
+				"redirectUri": "https://api.pixelbattles.ru/auth/twitch/callback"
+			},
+			"twitchExtension": {
+				"secret": "",
+				"jwtSecret": "",
+				"clientId": ""
 			},
 			"steam": {
 				"key": "",
@@ -33,8 +36,7 @@
 				"redirectUri": "https://api.pixelbattles.ru/auth/discord/callback"
 			},
 			"telegram": {
-				"token": "",
-				"userName": "PixelBattleOnlineBot"
+				"token": ""
 			}
 		}
 	},
