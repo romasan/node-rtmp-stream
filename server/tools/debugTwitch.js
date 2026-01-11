@@ -53,6 +53,7 @@ const twitchExtensionAuth = async (req, res) => {
         const { token } = JSON.parse(body);
 
 		console.log('==== token', token);
+		console.log('==== extensionSecret', extensionSecret);
 
         if (!token) {
           res.writeHead(400);
@@ -60,9 +61,8 @@ const twitchExtensionAuth = async (req, res) => {
         }
 
         // 🔐 Проверка JWT
-        const decoded = jwt.verify(token, extensionSecret, {
-          algorithms: ['HS256']
-        });
+		const secretBuffer = Buffer.from(extensionSecret, 'base64');
+		const decoded = jwt.verify(token, secretBuffer, { algorithms: ['HS256'] });
 
         // Извлекаем данные
         const userId = decoded.user_id; // ID зрителя
@@ -122,7 +122,14 @@ const callback = async (req, res) => {
 	console.log('==== origin:', req.headers['origin']);
 	console.log('==== url:', req.url);
 
-	twitchExtensionAuth(req, res);
+	res.setHeader('Access-Control-Allow-Origin', req.headers['origin']);
+	res.setHeader('Access-Control-Allow-Credentials', 'true');
+	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+	if (twitchExtensionAuth(req, res)) {
+		return;
+	}
 	// const params = Object.fromEntries(new URLSearchParams(payload));
 
 	// let user = {};
@@ -140,11 +147,6 @@ const callback = async (req, res) => {
 	// console.log('==== new token:', newToken);
 	// console.log('==== valid:', valid);
 	// console.log('==== user:', user);
-
-	res.setHeader('Access-Control-Allow-Origin', req.headers['origin']);
-	res.setHeader('Access-Control-Allow-Credentials', 'true');
-	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
 	// res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly`);
 
