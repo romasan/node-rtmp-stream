@@ -8,6 +8,7 @@ const {
 		auth: {
 			twitch: {
 				extensionSecret,
+				extensionId,
 			}
 		},
 	},
@@ -44,75 +45,106 @@ const getPostPayload = (req, type = 'text') => {
 	});
 };
 
-const twitchExtensionAuth = async (req, res) => {
-  if (req.url === '/auth/twitch-extension' && req.method === 'POST') {
-    try {
-      let body = '';
-      req.on('data', chunk => body += chunk);
-      req.on('end', async () => {
-        const { token } = JSON.parse(body);
+const getAppAccessToken = async () => {
+	const params = new URLSearchParams();
+	params.append('client_id', extensionId);
+	params.append('client_secret', extensionSecret);
+	params.append('grant_type', 'client_credentials');
 
-		console.log('==== token', token);
-		console.log('==== extensionSecret', extensionSecret);
+	const resp = await fetch('https://id.twitch.tv/oauth2/token', {
+		method: 'POST',
+		body: params
+	});
+	const data = await resp.json();
+	return data.access_token; // живёт 24 часа
+};
 
-        if (!token) {
-          res.writeHead(400);
-          return res.end('Missing token');
-        }
-
-        // 🔐 Проверка JWT
-		const secretBuffer = Buffer.from(extensionSecret, 'base64');
-		const decoded = jwt.verify(token, secretBuffer, { algorithms: ['HS256'] });
-
-        // Извлекаем данные
-        const userId = decoded.user_id; // ID зрителя
-        const channelId = decoded.channel_id; // ID канала, где запущено расширение
-        const role = decoded.role; // "viewer", "broadcaster", "moderator"
-
-		console.log('==== userId', userId);
-		console.log('==== channelId', channelId);
-		console.log('==== role', role);
-
-        if (!userId) {
-          res.writeHead(400);
-          return res.end('Invalid token');
-        }
-
-        // Получаем данные пользователя через Helix API (опционально)
-        // Но можно обойтись только userId, если у вас уже есть данные в БД
-
-        // Генерируем внутренний токен сессии (аналогично вашему authorizeUser)
-        const fakeToken = 'twitch-ext-' + userId; // или используйте настоящий сессионный токен
-
-		console.log('==== fakeToken', fakeToken)
-        // await authorizeUser(fakeToken, {
-        //   id: userId,
-        //   login: decoded.login || 'user_' + userId,
-        //   display_name: decoded.display_name || 'User',
-        //   profile_image_url: '', // можно получить через Helix, но требует access_token
-        //   _authType: 'twitch-extension'
-        // });
-
-        // Устанавливаем куку сессии
-        res.setHeader('Set-Cookie', `token=${fakeToken}; Max-Age=31536000; HttpOnly; Secure; SameSite=Lax`);
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
-          success: true,
-          user: {
-            id: userId,
-            display_name: decoded.display_name || 'User',
-            profile_image_url: '' // или запросите через Helix
-          }
-        }));
-      });
-    } catch (error) {
-      console.error('Twitch Extension auth error:', error);
-      res.writeHead(401);
-      res.end(JSON.stringify({ success: false, error: 'Invalid token' }));
+const getUserInfo = async (userId) => {
+  const token = await getAppAccessToken(); // или кэшируйте на 24ч
+  const resp = await fetch(`https://api.twitch.tv/helix/users?id=${userId}`, {
+    headers: {
+      'Client-ID': extensionId,
+      'Authorization': `Bearer ${token}`
     }
-    return true;
-  }
-  return false;
+  });
+  const data = await resp.json();
+  return data.data[0]; // { id, login, display_name, profile_image_url, ... }
+};
+
+const twitchExtensionAuth = async (req, res) => {
+	if (req.url === '/auth/twitch-extension' && req.method === 'POST') {
+		try {
+			const { token } = await getPostPayload(req, 'json');
+			//   let body = '';
+			//   req.on('data', chunk => body += chunk);
+			//   req.on('end', async () => {
+			//     const { token } = JSON.parse(body);
+
+			console.log('==== token', token);
+			console.log('==== extensionSecret', extensionSecret);
+
+			if (!token) {
+				res.writeHead(400);
+				return res.end('Missing token');
+			}
+
+			// 🔐 Проверка JWT
+			const secretBuffer = Buffer.from(extensionSecret, 'base64');
+			const decoded = jwt.verify(token, secretBuffer, { algorithms: ['HS256'] });
+
+			// Извлекаем данные
+			const userId = decoded.user_id; // ID зрителя
+			const channelId = decoded.channel_id; // ID канала, где запущено расширение
+			const role = decoded.role; // "viewer", "broadcaster", "moderator"
+
+			console.log('==== userId', userId);
+			console.log('==== channelId', channelId);
+			console.log('==== role', role);
+
+			if (!userId) {
+				res.writeHead(400);
+				return res.end('Invalid token');
+			}
+
+			const userData = getUserInfo(userId);
+
+			console.log('==== user data:', userData);
+
+			// Получаем данные пользователя через Helix API (опционально)
+			// Но можно обойтись только userId, если у вас уже есть данные в БД
+
+			// Генерируем внутренний токен сессии (аналогично вашему authorizeUser)
+			const fakeToken = 'twitch-ext-' + userId; // или используйте настоящий сессионный токен
+
+			console.log('==== fakeToken', fakeToken)
+			// await authorizeUser(fakeToken, {
+			//   id: userId,
+			//   login: decoded.login || 'user_' + userId,
+			//   display_name: decoded.display_name || 'User',
+			//   profile_image_url: '', // можно получить через Helix, но требует access_token
+			//   _authType: 'twitch-extension'
+			// });
+
+			// Устанавливаем куку сессии
+			res.setHeader('Set-Cookie', `token=${fakeToken}; Max-Age=31536000; HttpOnly; Secure; SameSite=Lax`);
+			res.setHeader('Content-Type', 'application/json');
+			res.end(JSON.stringify({
+				success: true,
+				user: {
+					id: userId,
+					display_name: decoded.display_name || 'User',
+					profile_image_url: '' // или запросите через Helix
+				}
+			}));
+			//   });
+		} catch (error) {
+			console.error('Twitch Extension auth error:', error);
+			res.writeHead(401);
+			res.end(JSON.stringify({ success: false, error: 'Invalid token' }));
+		}
+		return true;
+	}
+	return false;
 };
 
 const callback = async (req, res) => {
@@ -130,25 +162,6 @@ const callback = async (req, res) => {
 	if (twitchExtensionAuth(req, res)) {
 		return;
 	}
-	// const params = Object.fromEntries(new URLSearchParams(payload));
-
-	// let user = {};
-	// try {
-	// 	user = JSON.parse(params.user);
-	// } catch (error) {
-	// 	console.log(`Error: ${error}`);
-	// }
-
-	// const valid = checkTelegramAuth(params);
-
-	// const newToken = uuid();
-
-	// console.log('==== prev token:', prevToken);
-	// console.log('==== new token:', newToken);
-	// console.log('==== valid:', valid);
-	// console.log('==== user:', user);
-
-	// res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly`);
 
 	res.writeHead(200, { 'Content-Type': 'text/html' });
 	res.end('=)');

@@ -19,7 +19,9 @@
 			"twitch": {
 				"clientId": "",
 				"clientSecret": "",
-				"redirectUri": "https://api.pixelbattles.ru/auth/twitch/callback"
+				"redirectUri": "https://api.pixelbattles.ru/auth/twitch/callback",
+				"extensionSecret": "",
+				"extensionId": ""
 			},
 			"steam": {
 				"key": "",
