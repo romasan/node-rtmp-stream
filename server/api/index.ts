@@ -1,22 +1,23 @@
 import fs from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import { getCanvas } from '../utils/canvas';
 import packageFile from '../../package.json';
+import { getIPAddress } from '../helpers';
 import {
-	parseCookies,
-	getIPAddress,
-} from '../helpers';
-import { resetCountdownTemp } from '../utils/countdown';
-import { checkSession } from '../utils/sessions';
-import { checkUserAuthByToken } from '../utils/auth';
-import { checkBan } from '../utils/bans';
+	getCanvas,
+	resetCountdownTemp,
+	checkSession,
+	checkUserAuthByToken,
+	checkBan,
+	getStatus,
+	Log,
+	getToken,
+} from '../utils';
 import twitchAuth from './auth/twitch';
 import steamAuth from './auth/steam';
 import discordAuth from './auth/discord';
 import telegramAuth from './auth/telegram';
 import vkAuth from './auth/vk';
 import admin from './admin';
-import { getStatus } from '../utils/stats';
 import { start } from './start';
 import { pix } from './pix';
 import { chat } from './chat';
@@ -24,7 +25,6 @@ import { messages } from './messages';
 import { logout } from './logout';
 import { stats } from './stats';
 import { getStreamFrame } from './stream';
-import { Log } from '../utils/log';
 
 const {
 	server: {
@@ -45,7 +45,7 @@ const checkAccessWrapper = (
 	checkAuth?: boolean,
 ) => {
 	return async (req: IncomingMessage, res: ServerResponse) => {
-		const { token } = parseCookies(req.headers.cookie || '');
+		const token = getToken(req);
 
 		if (checkSession(token)) {
 			const ip = getIPAddress(req);
@@ -160,7 +160,7 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 		const _isSomeAuth = _twitchAuth || _steamAuth || _discordAuth || _telegramAuth || _vkAuth;
 
 		if (_isSomeAuth) {
-			const { token } = parseCookies(req.headers.cookie || '');
+			const token = getToken(req);
 
 			resetCountdownTemp(token);
 

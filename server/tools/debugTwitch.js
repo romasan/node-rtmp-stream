@@ -95,6 +95,7 @@ const twitchExtensionAuth = async (req, res) => {
 
 			console.log('==== token', token);
 			console.log('==== cookieToken', cookieToken);
+			console.log('==== all cookies', req.headers.cookie);
 			console.log('==== jwtSecret', jwtSecret);
 			console.log('==== extensionId', extensionId);
 			console.log('==== secret', secret);
@@ -154,6 +155,7 @@ const twitchExtensionAuth = async (req, res) => {
 			res.setHeader('Content-Type', 'application/json');
 			res.end(JSON.stringify({
 				success: true,
+				token: newToken,
 				user: {
 					id: userId,
 					display_name: decoded.display_name || 'User',

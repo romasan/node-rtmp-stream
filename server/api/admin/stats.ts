@@ -1,8 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getOnlineCountRaw, getOnlineCountUniqUUID } from '../../utils/ws';
-import { getLastActivity, getTotalPixels, getEmptyPixelSCount } from '../../utils/stats';
-import { getUserData } from '../../utils/auth';
-import { getSessionUserName } from '../../utils/sessions';
+import {
+	getOnlineCountRaw,
+	getOnlineCountUniqUUID,
+	getLastActivity,
+	getTotalPixels,
+	getEmptyPixelSCount,
+	getUserData,
+	getSessionUserName,
+} from '../../utils';
 
 const startTime = Date.now();
 

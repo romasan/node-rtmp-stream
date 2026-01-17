@@ -1,11 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { parseCookies } from '../helpers';
-import { removeUser } from '../utils/auth';
+import { removeUser, getToken } from '../utils';
 
 const { server: { host } } = require('../config.json');
 
 export const logout = (req: IncomingMessage, res: ServerResponse) => {
-	const { token } = parseCookies(req.headers.cookie);
+	const token = getToken(req);
 
 	removeUser(token);
 

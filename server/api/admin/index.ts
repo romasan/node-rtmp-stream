@@ -1,8 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getStats } from '../../utils/stats';
-import { parseCookies } from '../../helpers';
-import { checkSession } from '../../utils/sessions';
-import { checkIsAdmin } from '../../utils/auth';
+import {
+	getStats,
+	checkSession,
+	checkIsAdmin,
+	getToken,
+} from '../../utils';
 import { stats } from './stats';
 import { streamSettings } from './streamSettings';
 import { updateFreezedFrame } from './updateFreezedFrame';
@@ -67,7 +69,7 @@ const index = async (req: IncomingMessage, res: ServerResponse, {
 }: {
 	getInfo: (req: IncomingMessage, res: ServerResponse) => void;
 }) => {
-	const { token } = parseCookies(req.headers.cookie || '');
+	const token = getToken(req);
 
 	if (
 		!checkSession(token) ||

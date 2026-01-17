@@ -1,12 +1,15 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { v4 as uuid } from 'uuid';
-import { parseCookies, getPostPayload } from '../helpers';
-import { getUserData } from '../utils/auth';
-import { checkBan } from '../utils/bans';
-import { addMessage } from '../utils/chat';
-import { Log } from '../utils/log';
-import { getValue } from '../utils/values';
-import { send } from '../utils/ws';
+import { getPostPayload } from '../helpers';
+import {
+	getUserData,
+	checkBan,
+	addMessage,
+	Log,
+	getValue,
+	send,
+	getToken,
+} from '../utils';
 
 const DEFAUL_COOLDOWN = 5_000;
 
@@ -14,7 +17,7 @@ const cache: any = {};
 
 export const chat = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {
-		const { token } = parseCookies(req.headers.cookie);
+		const token = getToken(req);
 		const postPayload = await getPostPayload(req) as string;
 
 		const user: any = getUserData(token);

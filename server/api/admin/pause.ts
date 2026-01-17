@@ -1,6 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getValue, setValue } from '../../utils/values';
-import { spam } from '../../utils/ws';
+import {
+	getValue,
+	setValue,
+	spam,
+} from '../../utils';
 
 export const pause = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {

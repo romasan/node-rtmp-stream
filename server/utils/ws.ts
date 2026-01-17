@@ -7,8 +7,8 @@ import fs from 'fs';
 import https from 'https';
 import http, { IncomingMessage, ServerResponse } from 'http';
 import { getCountdown } from './countdown';
-import { parseCookies, getIPAddress } from '../helpers';
-import { checkSession } from './sessions';
+import { getIPAddress } from '../helpers';
+import { checkSession, getToken } from './sessions';
 import {
 	checkUserAuthByToken,
 	getUserData,
@@ -124,7 +124,7 @@ export const getOnlineCountUniqUUID = (): number => {
 	return cachedOnline;
 };
 
-export const getOnlineCountList = () => {
+export const getOnlineCountListWS = () => {
 	const list: Array<{
 		uuid: string;
 		active: boolean;
@@ -258,7 +258,7 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 	wss = new WebSocket.Server({ server: webServer });
 
 	wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
-		const { token } = parseCookies(req.headers.cookie);
+		const token = getToken(req);
 
 		if (!checkSession(token, true)) {
 			ws.close();

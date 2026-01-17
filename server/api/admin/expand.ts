@@ -1,8 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { getPostPayload } from '../../helpers';
-import { expand as setExpand, getExpand } from '../../utils/expands';
-import { expandCanvas } from '../../utils/canvas';
-import { spam } from '../../utils/ws';
+import {
+	expand as setExpand,
+	getExpand,
+	expandCanvas,
+	spam,
+} from '../../utils';
 
 export const expand = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {

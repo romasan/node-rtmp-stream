@@ -1,10 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getOnlineCountList } from '../../utils/ws';
-import { getUserData } from '../../utils/auth';
-import { getSessionUserName } from '../../utils/sessions';
+import {
+	getOnlineCountListWS,
+	getUserData,
+	getSessionUserName,
+} from '../../utils';
 
 export const onlineList = (req: IncomingMessage, res: ServerResponse) => {
-	const list = getOnlineCountList().map((item) => {
+	const list = getOnlineCountListWS().map((item) => {
 		const user: any = getUserData(item?.uuid);
 
 		return {

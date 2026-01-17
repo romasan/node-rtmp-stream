@@ -1,8 +1,11 @@
 import './utils/db';
-import { initStreamCanvas, saveCanvas } from './utils/canvas';
-import { initStats } from './utils/stats';
-import { expandsInit } from './utils/expands';
-import { initServer } from './utils/ws';
+import {
+    initStreamCanvas,
+    saveCanvas,
+    initStats,
+    expandsInit,
+    initServer,
+} from './utils';
 import { webServerHandler } from './api';
 
 initStreamCanvas();

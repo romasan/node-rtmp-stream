@@ -1,30 +1,29 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import {
 	checkStillTime,
-	parseCookies,
 	getPostPayload,
 	getIPAddress,
 	getSearch,
 	isNumber,
 } from '../helpers';
-import { checkUserAuthByToken, getUserData } from '../utils/auth';
 import {
+	checkUserAuthByToken,
+	getUserData,
 	checkHasWSConnect,
 	checkIPRateLimit,
 	uptateActiveTime,
 	updateClientCountdown,
-} from '../utils/ws';
-import { checkBan } from '../utils/bans';
-import { getExpiration } from '../utils/countdown';
-import { drawPix } from '../utils/canvas';
-import {
+	checkBan,
+	getExpiration,
+	drawPix,
 	getPixelColor,
 	getPixelAuthor,
-} from '../utils/stats';
-import { Log } from '../utils/log';
-import { getExpand } from '../utils/expands';
+	Log,
+	getExpand,
+	getValue,
+	getToken,
+} from '../utils';
 import { colorSchemes } from '../constants/colorSchemes';
-import { getValue } from '../utils/values';
 
 export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {
@@ -42,7 +41,7 @@ export const pix = async (req: IncomingMessage, res: ServerResponse) => {
 			return;
 		}
 
-		const { token } = parseCookies(req.headers.cookie);
+		const token = getToken(req);
 		const postPayload: any = await getPostPayload(req);
 
 		if (!checkUserAuthByToken(token)) {

@@ -7,9 +7,30 @@ export const staticHost = document.location.hash.indexOf('staticHost=') > 0
 	? document.location.hash.split('staticHost=').pop()
 	: 'https://static.pixelbattles.ru';
 
+export enum EAuthType {
+	cookie,
+	header,
+}
+
+let authType = EAuthType.cookie;
+let authToken = '';
+
+export const setAuthType = (type: EAuthType) => authType = type;
+export const setAuthToken = (token: string) => authToken = token;
+	
+const _fetch = (url: string, options?: any) => fetch(url, {
+	...(options || {}),
+	headers: {
+		...(options?.headers || {}),
+		...(authType === EAuthType.header ? {
+			authorization: `Bearer ${authToken}`,
+		} : {}),
+	},
+});
+
 export const addPix = async ({ x, y, color }: { x: number; y: number; color: string; }) => {
 	try {
-		const resp = await fetch(`${APIhost}/pix`, {
+		const resp = await _fetch(`${APIhost}/pix`, {
 			method: 'PUT',
 			credentials: 'include',
 			headers: {
@@ -25,7 +46,7 @@ export const addPix = async ({ x, y, color }: { x: number; y: number; color: str
 };
 
 export const start = async () => {
-	const resp = await fetch(`${APIhost}/start`, {
+	const resp = await _fetch(`${APIhost}/start`, {
 		credentials: 'include',
 	});
 
@@ -33,7 +54,7 @@ export const start = async () => {
 };
 
 export const sendChatMessage = (message: string) => {
-	return fetch(`${APIhost}/chat`, {
+	return _fetch(`${APIhost}/chat`, {
 		method: 'PUT',
 		credentials: 'include',
 		body: message,
@@ -41,7 +62,7 @@ export const sendChatMessage = (message: string) => {
 };
 
 export const getChatMessages = async () => {
-	const resp = await fetch(`${APIhost}/messages`, {
+	const resp = await _fetch(`${APIhost}/messages`, {
 		credentials: 'include',
 	});
 
@@ -49,7 +70,7 @@ export const getChatMessages = async () => {
 };
 
 export const getStats = async () => {
-	const resp = await fetch(`${APIhost}/stats`, {
+	const resp = await _fetch(`${APIhost}/stats`, {
 		credentials: 'include',
 	});
 
@@ -58,33 +79,41 @@ export const getStats = async () => {
 
 export const getPixel = async (x: number, y: number) => {
 	const search = new URLSearchParams({ x, y }).toString();
-	const resp = await fetch(`${APIhost}/pix?${search}`, {
+	const resp = await _fetch(`${APIhost}/pix?${search}`, {
 		credentials: 'include',
 	});
 
 	return await resp.json();
 };
 
+export const sendCursor = async (x: number, y: number, color: string) => {
+	await _fetch(`${APIhost}/cursor`, {
+		method: 'PUT',
+		credentials: 'include',
+		body: JSON.stringify({ x, y, color }),
+	});
+};
+
 export const fetchTimelapseSeasons = async () => {
-	const resp = await fetch(`${staticHost}/timelapse/index.json`);
+	const resp = await _fetch(`${staticHost}/timelapse/index.json`);
 
 	return await resp.json();
 };
 
 export const fetchTimelapse = async (name: string) => {
-	const resp = await fetch(`${staticHost}/timelapse/${name}/index.json`);
+	const resp = await _fetch(`${staticHost}/timelapse/${name}/index.json`);
 
 	return await resp.json();
 };
 
 export const fetchTimelapsePartBin = (name: string, index: number) => {
-	return fetch(`${staticHost}/timelapse/${name}/${index}.bin`);
+	return _fetch(`${staticHost}/timelapse/${name}/${index}.bin`);
 };
 
 export const authTgMiniApp = async () => {
 	const tg = (window as any).Telegram.WebApp;
 
-	const resp = await fetch(`${APIhost}/auth/telegram/app`, {
+	const resp = await _fetch(`${APIhost}/auth/telegram/app`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',

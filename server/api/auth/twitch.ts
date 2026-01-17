@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
-import { authorizeUser } from '../../utils/auth';
-import { Log } from '../../utils/log';
-import { parseCookies } from '../../helpers';
+import {
+	authorizeUser,
+	Log,
+	getToken,
+} from '../../utils';
 
 const {
 	server: {
@@ -77,7 +79,7 @@ const twitch = async (req: IncomingMessage, res: ServerResponse) => {
 	} else if (req.url?.startsWith('/auth/twitch')) {
 		if (req.url.startsWith('/auth/twitch/callback')) {
 			try {
-				const { token } = parseCookies(req.headers.cookie || '');
+				const token = getToken(req);
 				const query: any = url.parse(req.url, true).query;
 				const urlEncoded = new URLSearchParams();
 

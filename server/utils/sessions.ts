@@ -5,7 +5,8 @@
 import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
-import { addSessionForIP } from '../helpers';
+import { IncomingMessage } from 'http';
+import { addSessionForIP, parseCookies } from '../helpers';
 
 import {
 	validateToken,
@@ -117,3 +118,6 @@ export const getSessionUserName = (token: string) => {
 
 	return `Гость${guestIndex}`;
 };
+
+export const getToken = (req: IncomingMessage) =>
+	parseCookies(req.headers.cookie)?.token || req.headers['authorization']?.split(' ')[1] || '';

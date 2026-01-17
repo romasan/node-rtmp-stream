@@ -1,9 +1,12 @@
 import crypto from 'crypto';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
-import { authorizeUser } from '../../utils/auth';
-import { Log } from '../../utils/log';
-import { parseCookies, getPostPayload } from '../../helpers';
+import {
+	authorizeUser,
+	Log,
+	getToken,
+} from '../../utils';
+import { getPostPayload } from '../../helpers';
 
 const {
 	server: {
@@ -49,7 +52,7 @@ const telegram = async (req: IncomingMessage, res: ServerResponse) => {
 		const success = checkTelegramAuth(params, true);
 
 		if (success) {
-			const { token } = parseCookies(req.headers.cookie || '');
+			const token = getToken(req);
 
 			authorizeUser(token, {
 				...user,
@@ -71,7 +74,7 @@ const telegram = async (req: IncomingMessage, res: ServerResponse) => {
 		const success = checkTelegramAuth(query);
 
 		if (success) {
-			const { token } = parseCookies(req.headers.cookie || '');
+			const token = getToken(req);
 
 			authorizeUser(token, {
 				...query,

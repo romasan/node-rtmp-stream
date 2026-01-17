@@ -25,6 +25,12 @@ window.Twitch.ext.onAuthorized(async (auth) => {
 			userIdEl.textContent = data.user.id || '—';
 			loadingEl.classList.add('hidden');
 			userInfoEl.classList.remove('hidden');
+
+			// fetch('https://dev-api.pixelbattles.ru/protected-data', {
+			// 	headers: {
+			// 		'Authorization': `Bearer ${data.token}`
+			// 	}
+			// });
 		} else {
 			throw new Error(data.error || 'Unknown error');
 		}
