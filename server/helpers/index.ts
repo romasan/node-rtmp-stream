@@ -9,3 +9,4 @@ export { getFileLinesCount } from './getFileLinesCount';
 export { getSearch } from './getSearch';
 export { isNumber } from './isNumber';
 export { checkStillTime } from './checkStillTime';
+export { getAllSessions } from './getAllSessions';

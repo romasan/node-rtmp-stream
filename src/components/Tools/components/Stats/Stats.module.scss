@@ -9,3 +9,17 @@
 	overflow-y: auto;
 	max-height: 200px;
 }
+
+.session {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+
+	button {
+		padding: 0 2px;
+	}
+}
+
+.active {
+	color: #00ce00;
+}

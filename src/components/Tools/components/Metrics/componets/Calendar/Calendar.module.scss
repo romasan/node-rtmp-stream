@@ -38,6 +38,15 @@
 	}
 }
 
+.selectedDay {
+	background-color: #007cdb;
+	color: #fff;
+}
+
+.active:not(.selectedDay):hover {
+	background-color: #c0c0c0;
+}
+
 .tooltip {
 	color: #000;
 }

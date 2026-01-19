@@ -59,10 +59,10 @@ let routes: Record<string, any> = {
 	'pause': pause,
 };
 
-routes = Object.entries(routes).reduce((list, [key, callback]) => ({
-	...list,
-	[`/admin/${key}`]: callback,
-}), {});
+// routes = Object.entries(routes).reduce((list, [key, callback]) => ({
+// 	...list,
+// 	[`/admin/${key}`]: callback,
+// }), {});
 
 const index = async (req: IncomingMessage, res: ServerResponse, {
 	getInfo,
@@ -80,7 +80,9 @@ const index = async (req: IncomingMessage, res: ServerResponse, {
 		return;
 	}
 
-	const reqUrl = req.url?.split('?')[0] as string;
+	const reqUrl = req.url
+		?.replace('/admin/', '')
+		?.split(/[?\/]+/ig)[0] as string;
 
 	if (routes[reqUrl]) {
 		routes[reqUrl](req, res);
@@ -88,8 +90,8 @@ const index = async (req: IncomingMessage, res: ServerResponse, {
 		return;
 	}
 
-	res.writeHead(200, { 'Content-Type': 'application/json' });
-	res.end('{}');
+	res.writeHead(404, { 'Content-Type': 'application/json' });
+	res.end();
 };
 
 export default index;

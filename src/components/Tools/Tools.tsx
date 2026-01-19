@@ -4,7 +4,7 @@ import cn from 'classnames';
 
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
-import { useWindow } from '../../hooks/useWindow';
+import { useWindows } from '../../hooks/useWindow';
 
 import { EMode } from '../Canvas';
 
@@ -23,6 +23,7 @@ import {
 	Countdown,
 	Expand,
 	Final,
+	UserContent,
 } from './components';
 
 import * as s from './Tools.module.scss';
@@ -62,33 +63,27 @@ export const Tools: FC<Props> = ({
 	setCanvasMode,
 }) => {
 	const isMobile = useMobileLayout();
-	const { anchorRef, draggableRef } = useDraggable({ x: 2, y: 55 });
+	const { anchorRef, draggableRef } = useDraggable({ x: 2, y: 55, hoisting: false });
 
 	const [opened, setOpened] = useState('stats');
 	const [expandWindow, setExpandWindow] = useState(true);
 	const [wideWindow, setWideWindow] = useState(!isMobile);
 	const renderRef = useRef(null);
-	const [userQuery, setUserQuery] = useState<string | null>(null);
-	const [userFilter, setUserFilter] = useState('id');
 
-	const userWindow = useWindow({
-		content: (
-			// <UserContent userQuery={userQuery} userFilter={userFilter} />
-			<div>
-				<div>User Info:</div>
-				<div>Nick: ???</div>
-				<div>UUID: ???</div>
-				<div>query: {userQuery}</div>
-				<div>type: {userFilter}</div>
-			</div>
-		),
-		portal: true,
-	});
+	const {
+		newWindow,
+		windowsRender,
+	} = useWindows();
 
-	const userInfo = (query: string, filter = 'id') => {
-		setUserQuery(query);
-		setUserFilter(filter);
-		userWindow.open();
+	const userInfo = (query: string, filter = 'token', event?: any) => {
+		const { clientX, clientY } = event || {};
+
+		newWindow({
+			x: clientX,
+			y: clientY,
+			height: '',
+			content: <UserContent query={query} filter={filter} />,
+		});
 	};
 
 	const onToggle = () => {
@@ -192,7 +187,7 @@ export const Tools: FC<Props> = ({
 					</div>
 				</div>
 			</ToolsContext.Provider>
-			{userWindow.render()}
+			{windowsRender()}
 		</>
 	);
 };

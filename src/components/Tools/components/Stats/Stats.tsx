@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import cn from 'classnames';
 
 import { Block } from '../Block';
 
@@ -10,7 +11,7 @@ import * as s from './Stats.module.scss';
 
 interface Props {
 	canvas: any;
-	userInfo: (userId: string) => void;
+	userInfo: (userId: string, filter?: string, event?: any) => void;
 }
 
 export const Stats: FC<Props> = ({ canvas, userInfo }) => {
@@ -134,8 +135,17 @@ export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 						</a>
 						<div className={s.list}>
 							{list.map((item) => (
-								<div key={String(item.name)} title={formatTime(Date.now() - item.lastActivity)}>
-									{item.active ? '*' : ''}"{item.name}" ({item.uuid})
+								<div 
+									key={String(item.name)}
+									title={formatTime(Date.now() - item.lastActivity)}
+									className={cn(s.session, { [s.active]: item.active })}
+								>
+									<button onClick={(event) => userInfo(item.name, 'nick', event)}>🔑</button>
+									"{item.name}"
+									(
+										<button onClick={(event) => userInfo(item.uuid, 'token', event)}>🔑</button>
+										{item.uuid}
+									)
 								</div>
 							))}
 						</div>
@@ -148,8 +158,17 @@ export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 			</div>
 			{Boolean(stats.coord) && (
 				<div>
-					{stats.lastUserName} ({stats.lastUserUUID} / {stats.lastUserIP || 'IP'})&nbsp;
-					<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
+					<button onClick={(event) => userInfo(stats.lastUserName, 'nick', event)}>🔑</button>
+					"{stats.lastUserName}"
+					(
+						<button onClick={(event) => userInfo(stats.lastUserUUID, 'token', event)}>🔑</button>
+						{stats.lastUserUUID}
+						&nbsp;/&nbsp;
+						{stats.lastUserIP || 'IP'}
+					)
+					<div>
+						<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
+					</div>
 				</div>
 			)}
 			<div>
@@ -175,9 +194,6 @@ export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 				Uptime: {formatTime(stats.uptime)}
 			</div>
 			{modalUser.render()}
-			<div>
-				<button onClick={() => userInfo('foo')}>user window</button>
-			</div>
 		</Block>
 	);
 };
