@@ -12,7 +12,7 @@
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
     "postbuild": "cp static/* dist/ && cp dist/*.js dist/tg/ && cp dist/*.css dist/tg/ && cp dist/*.webp dist/tg/ && cp dist/*.png dist/tg/ && cp dist/*.ttf dist/tg/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
-    "build:twitch": "npm run build && zip pages/twitch/zip.zip pages/twitch/*",
+    "build:twitch": "cd pages/twitch/ && zip -r twitch-extension.zip ./*",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
     "logs": "pm2 log"
@@ -27,7 +27,6 @@
   "author": "Roman Bauer",
   "license": "ISC",
   "dependencies": {
-    "antd": "^5.17.0",
     "bad-words-next": "^2.3.1",
     "canvas": "^2.11.0",
     "chart.js": "^4.4.7",
@@ -35,6 +34,7 @@
     "crypto": "^1.0.1",
     "event-emitter": "^0.3.5",
     "is-mobile": "^4.0.0",
+    "jsonwebtoken": "^9.0.3",
     "node-fetch": "^2.6.9",
     "parcel": "^2.10.3",
     "parcel-bundler": "^1.12.5",

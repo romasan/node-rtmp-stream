@@ -15,6 +15,7 @@ const libs = [
 	'prepareTimelapse',
 	'collectIPAdresses',
 	'debugServer',
+	'debugTwitch',
 
 	'fixSessionByNickName',
 	'filterByIP',

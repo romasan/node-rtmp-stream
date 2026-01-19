@@ -1,7 +1,7 @@
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
-import { getStats } from '../../utils/stats';
 import {
+	getStats,
 	heatmapFromStats,
 	mapByUsersFromStats,
 	heatmapNewestByIndex,
@@ -9,7 +9,7 @@ import {
 	mapLastPixelsFromStats,
 	mapByIP,
 	mapByTime,
-} from '../../utils/maps';
+} from '../../utils';
 
 export const heatmap = (req: IncomingMessage, res: ServerResponse) => {
 	const heatmapCanvas = heatmapFromStats(getStats());

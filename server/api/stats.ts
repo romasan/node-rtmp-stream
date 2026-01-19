@@ -1,11 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { parseCookies } from '../helpers';
-import { getTotalPixels, getTopLeaderboard } from '../utils/stats';
-import { getUserData } from '../utils/auth';
-import { getOnlineCountList } from '../utils/online';
+import {
+	getTotalPixels,
+	getTopLeaderboard,
+	getUserData,
+	getOnlineCountList,
+	getToken,
+} from '../utils';
 
 export const stats = (req: IncomingMessage, res: ServerResponse) => {
-	const { token } = parseCookies(req.headers.cookie);
+	const token = getToken(req);
 	const user: any = getUserData(token);
 	const total = getTotalPixels();
 	const leaderboard = getTopLeaderboard(10, user.name, user.area);

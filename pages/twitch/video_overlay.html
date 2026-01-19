@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel Battles — Twitch Extension</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: repeating-conic-gradient(#d9d7ff 0% 25%, #f4f4f4 0% 50%);
+      background-position: 0 0, 16px 16px;
+      background-size: 32px 32px;
+      background-color: #c5c4fe;
+      color: #000;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    #status {
+      font-size: 18px;
+      margin-top: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #log {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #000;
+      color: #fff;
+      padding: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="root">
+    <div>Pixel Battle</div>
+    <div id="loading">Авторизация через Twitch... #17</div>
+    <div id="user-info" class="hidden">
+      <h2 id="display-name">—</h2>
+      <p>ID: <span id="user-id">—</span></p>
+      <p>Вы успешно авторизованы!</p>
+    </div>
+    <div id="error" class="hidden" style="color: #ff6666;">Ошибка авторизации</div>
+  </div>
+
+  <!-- Twitch Extension Helper (обязательно) -->
+  <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

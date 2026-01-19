@@ -1,6 +1,6 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
+import cn from 'classnames';
 
-import Tooltip from 'antd/es/tooltip';
 // import { LineChart } from 'react-chartkick';
 // import 'chartkick/chart.js'
 
@@ -45,6 +45,7 @@ export const getChart = (data: number[][], width: number, height: number, label?
 
 export const Calendar: FC = () => {
 	const [history, setHistory] = useState({});
+	const [selected, setSelected] = useState(null);
 
 	useEffect(() => {
 		get('history')
@@ -98,29 +99,22 @@ export const Calendar: FC = () => {
 								<div className={s.week} key={`week-${month.title}-${weekIndex}`}>
 									{week.map((day, dayIndex) => (
 										day ? (
-											<Tooltip key={day.day} fresh title={() => (
-												<div className={s.tooltip}>
-													<div className={s.tooltip}>
-														<div className={s.hours}>
-															{prepareHours(day.pixByHours)
-																.map(([key, value]) => (
-																	<div key={key}>{key}-00: {value}</div>
-																))
-															}
-														</div>
-														<div className={s.chart}>
-															{getChart(prepareHours(day.pixByHours), 300, 100, `${month.title}-${weekIndex}-${day.day}`)}
-															{/* <LineChart data={{"2025-05-13": 2, "2025-05-14": 5}} /> */}
-														</div>
-													</div>
-												</div>
-											)} color="#fff">
-												<div className={s.day} key={`${month.title}-${dayIndex}`}>
-													<div>{day.day}</div>
-													<div>{day.uniqSessions || <>&nbsp;</>}</div>
-													<div>{day.totalPixels || <>&nbsp;</>}</div>
-												</div>
-											</Tooltip>
+											<div
+												key={`${month.title}-${dayIndex}`}
+												className={cn(s.day, {
+													[s.selectedDay]: selected && selected.day.day === day.day && selected.month.title === month.title,
+													[s.active]: Boolean(day.totalPixels),
+												})}
+												onClick={() => setSelected({
+													day,
+													month,
+													weekIndex,
+												})}
+											>
+												<div>{day.day}</div>
+												<div>{day.uniqSessions || <>&nbsp;</>}</div>
+												<div>{day.totalPixels || <>&nbsp;</>}</div>
+											</div>
 										) : (
 											<div className={s.day} key={`${month.title}-${dayIndex}`}>&nbsp;</div>
 										)
@@ -131,6 +125,22 @@ export const Calendar: FC = () => {
 					</div>
 				))}
 			</div>
+
+			{Boolean(selected) && (
+				<div className={s.chart}>
+					<div className={s.hours}>
+						{prepareHours(selected.day.pixByHours)
+							.map(([key, value]) => (
+								<div key={key}>{key}-00: {value}</div>
+							))
+						}
+					</div>
+					<div className={s.chart}>
+						{getChart(prepareHours(selected.day.pixByHours), 300, 100, `${selected.month.title}-${selected.weekIndex}-${selected.day.day}`)}
+						{/* <LineChart data={{"2025-05-13": 2, "2025-05-14": 5}} /> */}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

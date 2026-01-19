@@ -10,3 +10,4 @@ export * from './Chat';
 export * from './Countdown';
 export * from './Expand';
 export * from './Final';
+export * from './UserContent';

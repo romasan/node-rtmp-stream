@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 import { IncomingMessage, ServerResponse } from 'http';
-import { authorizeUser } from '../../utils/auth';
-import { Log } from '../../utils/log';
-import { parseCookies } from '../../helpers';
+import {
+	authorizeUser,
+	Log,
+	getToken,
+} from '../../utils';
 
 const {
 	server: {
@@ -17,7 +19,7 @@ const steam = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/steam')) {
 		if (req.url.startsWith('/auth/steam/callback')) {
 			try {
-				const { token } = parseCookies(req.headers.cookie || '');
+				const token = getToken(req);
 				const [, steamID] = req.url.match(/openid%2Fid%2F([^&]*)/) || [];
 				const urlEncoded = new URLSearchParams();
 

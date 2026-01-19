@@ -1,8 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { getStats } from '../../utils/stats';
-import { parseCookies } from '../../helpers';
-import { checkSession } from '../../utils/sessions';
-import { checkIsAdmin } from '../../utils/auth';
+import {
+	getStats,
+	checkSession,
+	checkIsAdmin,
+	getToken,
+} from '../../utils';
 import { stats } from './stats';
 import { streamSettings } from './streamSettings';
 import { updateFreezedFrame } from './updateFreezedFrame';
@@ -57,17 +59,17 @@ let routes: Record<string, any> = {
 	'pause': pause,
 };
 
-routes = Object.entries(routes).reduce((list, [key, callback]) => ({
-	...list,
-	[`/admin/${key}`]: callback,
-}), {});
+// routes = Object.entries(routes).reduce((list, [key, callback]) => ({
+// 	...list,
+// 	[`/admin/${key}`]: callback,
+// }), {});
 
 const index = async (req: IncomingMessage, res: ServerResponse, {
 	getInfo,
 }: {
 	getInfo: (req: IncomingMessage, res: ServerResponse) => void;
 }) => {
-	const { token } = parseCookies(req.headers.cookie || '');
+	const token = getToken(req);
 
 	if (
 		!checkSession(token) ||
@@ -78,7 +80,9 @@ const index = async (req: IncomingMessage, res: ServerResponse, {
 		return;
 	}
 
-	const reqUrl = req.url?.split('?')[0] as string;
+	const reqUrl = req.url
+		?.replace('/admin/', '')
+		?.split(/[?\/]+/ig)[0] as string;
 
 	if (routes[reqUrl]) {
 		routes[reqUrl](req, res);
@@ -86,8 +90,8 @@ const index = async (req: IncomingMessage, res: ServerResponse, {
 		return;
 	}
 
-	res.writeHead(200, { 'Content-Type': 'application/json' });
-	res.end('{}');
+	res.writeHead(404, { 'Content-Type': 'application/json' });
+	res.end();
 };
 
 export default index;

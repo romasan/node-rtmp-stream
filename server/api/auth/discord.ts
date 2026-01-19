@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
-import { authorizeUser } from '../../utils/auth';
-import { Log } from '../../utils/log';
-import { parseCookies } from '../../helpers';
+import {
+	authorizeUser,
+	Log,
+	getToken,
+} from '../../utils';
 
 const {
 	discord: {
@@ -26,7 +28,7 @@ const discord = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.url?.startsWith('/auth/discord')) {
 		if (req.url.startsWith('/auth/discord/callback')) {
 			try {
-				const { token } = parseCookies(req.headers.cookie || '');
+				const token = getToken(req);
 				const query: any = url.parse(req.url, true).query;
 				const urlEncoded = new URLSearchParams();
 

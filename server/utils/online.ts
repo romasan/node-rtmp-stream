@@ -1,4 +1,4 @@
-import { getOnlineCountList as getOnlineList } from './ws';
+import { getOnlineCountListWS } from './ws';
 import { getUserData } from './auth';
 import { getSessionUserName } from './sessions';
 
@@ -12,7 +12,7 @@ export const getOnlineCountList = (limit = Infinity) => {
 	let onlineCount = limit;
 
 	if ((Date.now() - onlineCacheTime) > CACHE_DURATION) {
-		const onlineCountList = getOnlineList();
+		const onlineCountList = getOnlineCountListWS();
 		const online = new Map();
 
 		onlineCacheTime = Date.now();

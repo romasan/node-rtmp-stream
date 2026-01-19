@@ -1,11 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { drawPix } from '../../utils/canvas';
-import { Log } from '../../utils/log';
-import { getPostPayload, parseCookies } from '../../helpers';
+import {
+	drawPix,
+	Log,
+	getToken,
+} from '../../utils';
+import { getPostPayload } from '../../helpers';
 
 export const fillSquare = async (req: IncomingMessage, res: ServerResponse) => {
 	if (req.method === 'PUT') {
-		const { token } = parseCookies(req.headers.cookie || '');
+		const token = getToken(req);
 		const payload: any = await getPostPayload(req, 'json');
 
 		try {
