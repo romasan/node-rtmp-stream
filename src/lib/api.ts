@@ -21,7 +21,7 @@ export const setAuthToken = (token: string) => authToken = token;
 const _fetch = (url: string, options?: any) => fetch(url, {
 	...(options || {}),
 	headers: {
-		...(options?.headers || {}),
+		...((options && options.headers) || {}),
 		...(authType === EAuthType.header ? {
 			authorization: `Bearer ${authToken}`,
 		} : {}),
