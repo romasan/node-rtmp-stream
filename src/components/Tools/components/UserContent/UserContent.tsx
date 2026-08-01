@@ -49,7 +49,7 @@ export const UserContent = ({ filter, query }: IProps) => {
 					<div>Ник: {user.parsed && user.parsed.name}</div>
 					<div>Авторизован через: {user.parsed && user.parsed.area}</div>
 					<div>
-						Сессии: <a href="#">99</a> TODO
+						Сессии: <a href="#">TODO</a>
 					</div>
 					<div>
 						<button disabled>Бан по нику</button>
@@ -89,6 +89,7 @@ export const UserContent = ({ filter, query }: IProps) => {
 					)}
 					<div>Первый логин: {session && simpleDate(session.firstLogin)}</div>
 					<div>Последний логин: {session && simpleDate(session.lastLogin)}</div>
+					<div>Первая активность (пиксель): TODO -1,-1 #000000</div>
 					<div>Последняя активность (пиксель): TODO -1,-1 #000000</div>
 				</>
 			) : (

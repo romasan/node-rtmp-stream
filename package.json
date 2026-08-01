@@ -7,6 +7,7 @@
     "stop": "pm2 stop pixelbattle && pm2 delete pixelbattle",
     "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
     "dev:web": "parcel pages/index.html pages/*/index.html",
+    "dev:timelapse": "npx http-server --cors",
     "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/ && cp ./server/favicon.ico ./lib/",
     "prebuild": "rm -rf dist/*.* .parcel-cache",
     "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",

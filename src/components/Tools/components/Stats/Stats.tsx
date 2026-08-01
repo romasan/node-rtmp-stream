@@ -171,9 +171,6 @@ export const Stats: FC<Props> = ({ canvas, userInfo }) => {
 					</div>
 				</div>
 			)}
-			<div>
-				Первый пиксель: TODO
-			</div>
 			<hr />
 			<div>
 				<input placeholder="UUID" onChange={onChangeUuid} disabled/>

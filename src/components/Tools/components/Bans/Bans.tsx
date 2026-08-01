@@ -205,6 +205,12 @@ export const Bans: FC = () => {
 					</div>
 				</>
 			)}
+			<div>
+				<div>
+					IP с несколькими юзерами:&nbsp;
+					<a href="#">TODO</a>
+				</div>
+			</div>
 			{ipsModal.render()}
 		</Block>
 	);

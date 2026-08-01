@@ -6,6 +6,7 @@ const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
 const { createCanvas, Image, registerFont } = require('canvas');
+const { colorSchemes } = require('../constants/colorSchemes.ts');
 // const { drawBGCanvas } = require('../utils/canvas');
 // const { getFileLinesCount } = require('../helpers');
 
@@ -48,8 +49,10 @@ const breakLine = Infinity;
 
 // ffmpeg -i bg.mp4 -vf "fps=60" tmp/%08d.jpg
 // npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
+// npm run tools drawEpisode CURRENT ./tmp NOIMAGE
 // ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
-// ffmpeg -stream_loop -1 -i bg.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S3E1" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E1" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -af apad -shortest output.mp4
 
 // const scale = 2;
 
@@ -166,6 +169,9 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	let height = Number(expands[part][3]);
 	let shiftX = Number(expands[part][4]);
 	let shiftY = Number(expands[part][5]);
+	let colorScheme = expands[part][6];
+	let currentColors = colorSchemes[colorScheme] || colorSchemes.COLORS_1;
+	let isTruecolor = colorScheme === 'truecolor' || colorScheme === 'COLORS_32';
 	let scale = Math.min(
 		Math.floor(videoWidth / width),
 		Math.floor(videoHeight / height),
@@ -183,7 +189,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	mctx.fillStyle = '#fff';
 	mctx.fillRect(0, 0, width, height);
 
-	if (firstFrame) {
+	if (firstFrame && firstFrame !== 'NOIMAGE') {
 		const imgBuf = fs.readFileSync(firstFrame);
 		const image = new Image;
 
@@ -222,6 +228,11 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			nextPartStartTime = expands[part + 1] ? Number(expands[part + 1][0]) : Infinity;
 			width = Number(expands[part][2] || width);
 			height = Number(expands[part][3] || height);
+			shiftX = Number(expands[part][4] || 0);
+			shiftY = Number(expands[part][5] || 0);
+			colorScheme = expands[part][6];
+			currentColors = colorSchemes[colorScheme] || colorSchemes.COLORS_1;
+			isTruecolor = colorScheme === 'truecolor' || colorScheme === 'COLORS_32';
 			scale = Math.min(
 				// Math.floor(videoWidth / width),
 				// Math.floor(videoHeight / height),
@@ -237,12 +248,12 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			mctx.fillStyle = '#fff';
 			mctx.fillRect(0, 0, width, height);
 
-			// restore
-			mctx.drawImage(backupImage, 0, 0);
+			// restore с учётом сдвига старого канваса в новом
+			mctx.drawImage(backupImage, shiftX, shiftY);
 		}
 
 		mctx.fillStyle = color;
-		mctx.fillRect(x, y, 1, 1);
+		mctx.fillRect(Number(x) + shiftX, Number(y) + shiftY, 1, 1);
 
 		if (i % PPF === 0) {
 			drawFrameBg();

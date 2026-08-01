@@ -99,7 +99,7 @@ const fetchAndUnzipPart = async (episode: string, index: number, isTruecolor: bo
 	return list;
 };
 
-const expandCanvas = (canvas: any, w: number, h: number) => {
+const expandCanvas = (canvas: any, w: number, h: number, shiftX = 0, shiftY = 0) => {
 	const ctx = canvas.getContext('2d');
 	const backup = document.createElement('canvas');
 	const backupCTX: any = backup.getContext('2d');
@@ -111,7 +111,32 @@ const expandCanvas = (canvas: any, w: number, h: number) => {
 	canvas.height = h;
 	ctx.fillStyle = '#ffffff';
 	ctx.fillRect(0, 0, w, h);
-	ctx.drawImage(backup, 0, 0);
+	ctx.drawImage(backup, shiftX, shiftY);
+};
+
+const getExpandByGlobalPart = (timelapse: any, globalPartIndex: number) =>
+	timelapse.expands.find((expand: any) =>
+		globalPartIndex >= expand.part.from && globalPartIndex <= expand.part.to
+	);
+
+const getExpandIsTruecolor = (timelapse: any, expand: any) =>
+	expand && expand.isTruecolor !== undefined
+		? expand.isTruecolor
+		: !!(timelapse && timelapse.isTruecolor);
+
+const drawTimelapsePixel = (timelapse: any, expand: any, pixel: number[], ctx: any) => {
+	if (getExpandIsTruecolor(timelapse, expand)) {
+		const [r, g, b, x, y] = pixel;
+
+		ctx.fillStyle = `rgb(${r},${g},${b})`;
+		ctx.fillRect(x, y, 1, 1);
+	} else {
+		const [colorIndex, x, y] = pixel;
+		const colors: string[] = (expand && expand.colors) || (timelapse && timelapse.colors) || [];
+
+		ctx.fillStyle = colors[colorIndex];
+		ctx.fillRect(x, y, 1, 1);
+	}
 };
 
 export const App: React.FC = () => {
@@ -144,9 +169,9 @@ export const App: React.FC = () => {
 	}, [selectedEpisode, startPart]);
 
 	const frameWidth = useMemo(() => {
-		const { width } = timelapseRef.current ? timelapseRef.current.getBoundingClientRect() : {};
+		const { width } = timelapseRef.current ? (timelapseRef.current as any).getBoundingClientRect() : {};
 
-		return (width - 3) / timelapse.total;
+		return ((width || 0) - 3) / (timelapse.total || 1);
 	}, [timelapse]);
 
 	const {
@@ -233,9 +258,9 @@ export const App: React.FC = () => {
 			const cursorInPart = ((prevExpand && prevExpand.index.to) || 0) + partIndex * timelapse.partSize;
 
 			if (globalPartIndex <= timelapse.totalParts - 1 && !parts.current[globalPartIndex + 1]) {
-				const isTruecolor = expand.colorScheme === 'truecolor'; // TODO
+				const nextExpand = getExpandByGlobalPart(timelapse, globalPartIndex + 1);
 
-				void preloadPart(globalPartIndex + 1, isTruecolor);
+				void preloadPart(globalPartIndex + 1, getExpandIsTruecolor(timelapse, nextExpand || expand));
 			}
 
 			const pixelsToEndOfPart = partToIndex - playCursor.current;
@@ -248,7 +273,13 @@ export const App: React.FC = () => {
 				cursorExpand.current = expandIndex;
 
 				if (expandIndex) {
-					expandCanvas(canvas.current, expand.canvas.width, expand.canvas.height);
+					expandCanvas(
+						canvas.current,
+						expand.canvas.width,
+						expand.canvas.height,
+						expand.shift && expand.shift.x,
+						expand.shift && expand.shift.y,
+					);
 					centeringRef.current();
 				}
 			}
@@ -258,10 +289,9 @@ export const App: React.FC = () => {
 
 				try {
 					if (partCursor >= 0) {
-						const [colorIndex, x, y] = parts.current[globalPartIndex][partCursor];
+						const pixel = (parts.current as number[][][])[globalPartIndex][partCursor];
 	
-						canvasCTX.current.fillStyle = timelapse.colors[colorIndex];
-						canvasCTX.current.fillRect(x, y, 1, 1);
+						drawTimelapsePixel(timelapse, expand, pixel, canvasCTX.current);
 	
 						countRef.current = countRef.current + 1;
 					}
@@ -291,8 +321,8 @@ export const App: React.FC = () => {
 			return null;
 		}
 
-		const { width } = timelapseRef.current.getBoundingClientRect();
-		const pixel = width / timelapse.total;
+		const { width } = (timelapseRef.current as any).getBoundingClientRect();
+		const pixel = width / (timelapse.total || 1);
 
 		return (
 			<>
@@ -328,12 +358,11 @@ export const App: React.FC = () => {
 		const pixelsCount = playCursor.current - (expand.index.from + partIndex * timelapse.partSize);
 		resetRef.current();
 
+		const part = (parts.current as number[][][])[globalPartIndex];
+
 		for (let i = 0; i < pixelsCount; i++) {
 			try {
-				const [colorIndex, x, y] = parts.current[globalPartIndex][i];
-
-				canvasCTX.current.fillStyle = timelapse.colors[colorIndex];
-				canvasCTX.current.fillRect(x, y, 1, 1);
+				drawTimelapsePixel(timelapse, expand, part[i], canvasCTX.current);
 			} catch (e) {
 				console.log('Error:', e);
 
@@ -355,16 +384,18 @@ export const App: React.FC = () => {
 			return;
 		}
 
-		const { width, left } = timelapseRef.current ? timelapseRef.current.getBoundingClientRect() : {};
-		const cursor = Math.floor((event.clientX - left) / width * timelapse.total);
+		const { width, left } = timelapseRef.current ? (timelapseRef.current as any).getBoundingClientRect() : {};
+		const cursor = Math.floor((event.clientX - (left || 0)) / (width || 1) * (timelapse.total || 0));
 		const { globalPartIndex } = getTimelapseIndexes(timelapse, cursor);
+
+		const expand = getExpandByGlobalPart(timelapse, globalPartIndex);
 
 		stop();
 		playCursor.current = cursor;
 		setClickedCursor(cursor);
 		moveTimelapseCursor();
 		setStartPart(globalPartIndex);
-		void preloadPart(globalPartIndex, false); // TODO isTruecolor
+		void preloadPart(globalPartIndex, getExpandIsTruecolor(timelapse, expand));
 	};
 
 	const handleFasterClick = () => {
@@ -385,8 +416,8 @@ export const App: React.FC = () => {
 		if (
 			timelapse &&
 			timelapse.episode === selectedEpisode &&
-			parts.current[startPart] &&
-			parts.current[startPart].length
+			(parts.current as number[][][])[startPart] &&
+			(parts.current as number[][][])[startPart].length
 		) {
 			drawPixelsFromPartStart();
 		}
@@ -394,11 +425,13 @@ export const App: React.FC = () => {
 
 	useEffect(() => {
 		if (selectedEpisode) {
+			const firstExpand = timelapse.expands && timelapse.expands[0];
+
 			stop();
 			playCursor.current = 0;
 			parts.current = [];
 			setStartPart(0);
-			void preloadPart(0, false); // TODO isTruecolor
+			void preloadPart(0, getExpandIsTruecolor(timelapse, firstExpand));
 			void fetchSelectedEpisodeTimelapse();
 			moveTimelapseCursor();
 		}

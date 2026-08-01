@@ -1,11 +1,15 @@
+/**
+ * Подготавливает bin файлы для timelapse
+ */
+
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-// TODO use color schemes from constants/colorSchemes.ts
-const { colorSchemes } = require('../config.json');
+const { colorSchemes } = require('../constants/colorSchemes.ts');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png
+// npm run tools prepareTimelapse s4e1 NOIMAGE
 // rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
 // http://localhost:8080/timelapse/#staticHost=http://localhost:8080
 
@@ -30,12 +34,24 @@ const u32toU16 = (num) => [
 
 const u16tou32 = (high, low) => (high << 16) | (low & 0xFFFF);
 
+const getSchemeColors = (colorScheme) => {
+	const scheme = colorSchemes[colorScheme] || colorSchemes.COLORS_1;
+	return Object.values(scheme);
+};
+
+const buildColorsCache = (colorScheme) => {
+	const scheme = colorSchemes[colorScheme] || colorSchemes.COLORS_1;
+	return Object.values(scheme)
+		.reduce((list, color, index) => ({
+			...list,
+			[color]: index,
+		}), {});
+};
+
 const prepareTimelapse = (
 	season = 's1e1',
 	backgroundImage = `${__dirname}/../../assets/426x240.png`,
-	colors = 'COLORS',
 ) => {
-	const COLORS = colorSchemes[colors];
 	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
 	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
 	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;
@@ -46,19 +62,22 @@ const prepareTimelapse = (
 	}
 
 	const expandsRaw = fs.readFileSync(expandsFile).toString();
-	const expands = expandsRaw.split('\n').filter(Boolean).map((item) => {
-		const [time, index, width, height, shiftX, shiftY, colorScheme] = item.split(';');
+	const expands = expandsRaw
+		.split('\n')
+		.filter(Boolean)
+		.map((item) => {
+			const [time, index, width, height, shiftX, shiftY, colorScheme] = item.split(';');
 
-		return {
-			time: Number(time),
-			index: Number(index),
-			width: Number(width),
-			height: Number(height),
-			shiftX: Number(shiftX),
-			shiftY: Number(shiftY),
-			colorScheme,
-		};
-	});
+			return {
+				time: Number(time),
+				index: Number(index),
+				width: Number(width),
+				height: Number(height),
+				shiftX: Number(shiftX),
+				shiftY: Number(shiftY),
+				colorScheme: colorScheme === 'COLORS1' ? 'COLORS_1' : (colorScheme || 'COLORS_1'),
+			};
+		});
 
 	let canvas = createCanvas(expands[0].width, expands[0].height);
 	let ctx = canvas.getContext('2d');
@@ -74,24 +93,11 @@ const prepareTimelapse = (
 		ctx.drawImage(image, 0, 0);
 	}
 
-	const colorsCache = Object.values(COLORS).reduce((list, color, index) => ({
-		...list,
-		[color]: index,
-	}), {});
-
-	const colorSchemes = {
-		// COLOR: 0,
-	};
+	let colorsCache = buildColorsCache(expands[0].colorScheme);
 
 	const timelapse = {
 		version: '2.0',
-		// colors: Object.values(COLORS),
-		colorSchemes: [
-			// {
-			// 	name: 'COLORS',
-			// 	colors: []
-			// }
-		],
+		colorSchemes,
 		expands: [
 			// {
 			// 	canvas: { width, height },
@@ -99,22 +105,13 @@ const prepareTimelapse = (
 			// 	part: { from, to },
 			// 	shift: { x, y },
 			// 	colorScheme: 0,
+			// 	isTruecolor: false,
+			// 	colors: [],
 			// }
 		],
-		// days: {
-		// 	// "01.01.2023": {
-		// 	// 	from: 0,
-		// 	// 	to: 9999
-		// 	// },
-		// 	// "01.02.2023": {
-		// 	// 	from: 10000,
-		// 	// 	to: 25000
-		// 	// }
-		// }
 		episode: season,
 	};
 
-	// const _breakCount = 100_000;
 	let index = 0;
 
 	const rl = readline.createInterface({
@@ -123,22 +120,23 @@ const prepareTimelapse = (
 	});
 
 	let expandIndex = -1;
-	let partIndex = -1;
+	let partIndex = 0;
 
 	let partPixels = [];
 
 	let savePreview = false;
 
-	let isTruecolor = false;
+	let isTruecolor = expands[0].colorScheme === 'truecolor';
 
 	rl.on('line', (line) => {
 		// if (index >= _breakCount) {
 		// 	return;
 		// }
 
-		const newExpandIndex = expands.filter((item) => index >= item.index).length - 1;
+		while (expandIndex + 1 < expands.length && index >= expands[expandIndex + 1].index) {
+			const newExpandIndex = expandIndex + 1;
+			const prevIsTruecolor = isTruecolor;
 
-		if (newExpandIndex > expandIndex) {
 			if (expandIndex >= 0) {
 				// backup image
 				const backupCanvas = createCanvas(canvas.width, canvas.height);
@@ -149,13 +147,30 @@ const prepareTimelapse = (
 				ctx = canvas.getContext('2d');
 				ctx.fillStyle = '#fff';
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
-				// restore image
-				ctx.drawImage(backupCanvas, 0, 0); // shiftx, shiftY
+				// restore image с учётом сдвига старого канваса в новом
+				ctx.drawImage(
+					backupCanvas,
+					expands[newExpandIndex].shiftX,
+					expands[newExpandIndex].shiftY,
+				);
+
+				// закрыть текущую неполную часть предыдущего расширения
+				if (partPixels.length) {
+					packTimelapsePart(
+						partPixels,
+						`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+						prevIsTruecolor,
+					);
+					partPixels = [];
+					partIndex++;
+					savePreview = true;
+				}
 			}
 
 			expandIndex = newExpandIndex;
 
 			isTruecolor = expands[expandIndex].colorScheme === 'truecolor';
+			colorsCache = buildColorsCache(expands[expandIndex].colorScheme);
 
 			timelapse.expands[expandIndex] = {
 				canvas: {
@@ -167,28 +182,22 @@ const prepareTimelapse = (
 					to: index,
 				},
 				part: {
-					from: partIndex + 1,
-					to: partIndex + 1
+					from: partIndex,
+					to: partIndex
 				},
 				shift: {
 					x: expands[expandIndex].shiftX,
 					y: expands[expandIndex].shiftY,
 				},
 				colorScheme: expands[expandIndex].colorScheme,
+				isTruecolor,
+				colors: getSchemeColors(expands[expandIndex].colorScheme),
 			};
 
-			if (index) {
-				packTimelapsePart(
-					partPixels,
-					`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
-				);
-				partPixels = [];
-			}
-
 			savePreview = true;
-
-			partIndex++;
 		}
+
+		const expand = expands[expandIndex];
 
 		timelapse.expands[expandIndex].index.to = index;
 		timelapse.expands[expandIndex].part.to = partIndex;
@@ -201,11 +210,18 @@ const prepareTimelapse = (
 		// month = MONTHS[month + 1];
 		// const date = `${year.padStart(2, 0)}/${month.padStart(2, 0)}/${day.padStart(2, 0)}`;
 
+		// канвасные координаты (мировые + сдвиг текущего расширения)
+		const px = Number(x) + expand.shiftX;
+		const py = Number(y) + expand.shiftY;
+
 		if (isTruecolor) {
 			const [high, low] = u32toU16(rgb2num(hexToRgb(color)));
-			partPixels.push([high, low, Number(x), Number(y)]);
+			partPixels.push([high, low, px, py]);
 		} else {
-			partPixels.push([colorsCache[color], Number(x), Number(y)]);
+			if (colorsCache[color] === undefined) {
+				console.warn(`Color ${color} not found in scheme ${expand.colorScheme} at index ${index}`);
+			}
+			partPixels.push([colorsCache[color] ?? 0, px, py]);
 		}
 
 		index++;
@@ -228,9 +244,9 @@ const prepareTimelapse = (
 			savePreview = false;
 		}
 
-		// drawPixel
+		// drawPixel (координаты уже канвасные)
 		ctx.fillStyle = color;
-		ctx.fillRect(x, y, 1, 1);
+		ctx.fillRect(px, py, 1, 1);
 	});
 
 	rl.on('close', () => {
@@ -284,6 +300,7 @@ const packTimelapsePart = async (list, output, isTruecolor) => {
 		binary_16[index * length] = item[0];
 		binary_16[index * length + 1] = item[1];
 		binary_16[index * length + 2] = item[2];
+
 		if (isTruecolor) {
 			binary_16[index * length + 3] = item[3];
 		}

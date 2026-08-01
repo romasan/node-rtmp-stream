@@ -164,6 +164,8 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 			crlfDelay: Infinity
 		});
 
+		const expandsFile = __dirname + '/../../db/expands.log';
+
 		if (!stats.history) {
 			stats.history = {
 				days: {},
@@ -198,22 +200,36 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 			? stats.uuids.reduce((list, item, index) => ({ ...list, [item]: index }), {})
 			: {};
 
-		let index = 0;
+		let index = -1;
+
+		let expand: any = null;
+
+		const expands = fs.readFileSync(expandsFile)
+			.toString()
+			.split('\n')
+			.filter(Boolean)
+			.map((line) => line.split(';'));
 	
 		rl.on('line', (line) => {
 			index++;
 
-			if (stats.totalCount >= index) {
-				return;
+			if (!expand || expand[1] === index) {
+				expand = expands.shift();
 			}
+
+			const [,,,, shiftX, shiftY] = expand;
+
+			// if (stats.totalCount >= index) {
+			// 	return;
+			// }
 
 			const [time, area, x, y, color, uuid, ip, nickname] = line.split(';');
 
 			updateStats({
 				time: Number(time),
 				area,
-				x: Number(x),
-				y: Number(y),
+				x: Number(x) + Number(shiftX),
+				y: Number(y) + Number(shiftY),
 				color,
 				uuid,
 				ip,

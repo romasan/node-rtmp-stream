@@ -113,8 +113,10 @@ export const Chat: FC = () => {
 			<div>
 				<div>
 					<input value={count} onChange={({ target: { value }}) => setCount(value)} size={7} placeholder="COUNT" />
-					<button onClick={reload}>load</button>
-					loaded: {messages.length}
+					<button onClick={reload}>Загрузить</button>
+					&nbsp;
+					Отображается: {messages.length};&nbsp;
+					Всего: TODO
 				</div>
 				<div>
 					<input placeholder="NICKNAME" onChange={onChangeNick} />
