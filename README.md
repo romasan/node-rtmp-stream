@@ -1,184 +1,288 @@
-# basic
+# PIXEL BATTLE (node-rtmp-stream)
 
-(!) - high priority
+Многопользовательский pixel-art проект («место»), в котором игроки совместно рисуют на общем полотне. Вдохновлён r/place. Игроки авторизуются через Twitch, Discord, Steam, Telegram или VK, ставят по одному пикселю с перезарядкой (кулдауном), общаются в чате, а админы управляют банами, статистикой, картами активности, паузой и расширением полотна.
 
-- [x] auth by twitch
-- [x] auth by discord
-- [x] auth by telegram
-- [ ] auth by vkplay
-- [ ] auth by vk
-- [x] auth by steam
-- [x] countdown
-- [x] githib actions deploy (front only?)
-- [x] ssl support
-- [x] bot protection
-- [x] session caching
-- [x] replace res/ -> assets/
-- [x] online users list
-- [x] reset countdown on login
-- [x] buy pixel-battle.ru | pixelbattles.ru
-- [x] use one countdown for every session with one authorization
-- [x] fix zoom on click on non canvas and "pixel" elements
-- [x] chat mute user
-- [x] add datetime for logs
-- [x] chat moderation (delete all by user)
-- [ ] read chat from stream(s)?
-- [ ] support for multiple colors
-- [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
-- [ ] rename all qq to admin or super
-- [ ] use one countdown for active unauthorized users with one ip address
-- [x] do not allow more than one (or percentage of the number online) user with one IP address
-- [ ] integration tests
-- [ ] webassembly + canvas =) rust?
-- [x] add to telegram web app
-- [ ] add qr to stream) (like https://github.com/hip-hyena/PaintBot)
-- [x] chat rate limit
-- [ ] check has new banned users/IP in pixels.log
-- [ ] rating for groups/squads/tags
-- [ ] achievements!
-	- used all colors;
-	- joined the squad;
-	- put 100, 1k, 10k, 100k pixels;
-	- put dots without leaving for 1, 8, 24 hours;
-	- participated every day for a week;
-- [ ] chat slow mode
-- [ ] chat messages from user
-- [ ] chat delete all for banned
-- [ ] fix typescript warnings and remove all "any" plug
-- [ ] use account uuid for stats
-- [ ] moderators tools
-	- users on selected region, with count of pixel (ban status, count of pixel inside / outside region, registration date, chat messages count)
-	- ban / mute controls in "whose pixel" panel, ant banned status
-	- checbox, translate to chat message "<username> is banner by <moderator>"
-	- control for fast show activity map for session / username in "whose pixel" panel
-	- chat moderation in separate wide window
-	- update moderation panel layout
-	- add popup messages on ban user (banned <username> / <username> already banned)
-	- tool for restore canvas without pixels of banned users (with pause mode)
-	- preview canvas without pixels of banned users
-	- activity map banned and unbanned (banned colors for sessions)
-	- mute / ban with timeout
-	- ban with chat access
-	- admin add / remove moderators
-	- log of moderation actions
-	- newest map by index for session / nick / ip
+Проект состоит из двух частей:
 
-# admin panel
+- **Клиент** (`src/`) — React-приложение (Parcel + TypeScript).
+- **Сервер** (`server/`) — Node.js + TypeScript (ts-node, pm2), WebSocket-сервер, REST API, отрисовка полотна через `node-canvas`.
 
-- [x] add admin route
-- [x] update stream frame
-- [x] cover up area
-- [x] change countdown in runtime
-- [x] preview last changes, heatmap, changes by user
-- [ ] change countdown for uuid/nick/ip
-- [ ] freeze area
-- [ ] statistic (online, total pixels, online/pixels by hour/day)
-- [ ] get pixel author (uuid, IP, nickname, auth service)
-- [ ] get users on IP address
-- [ ] ban by uuid (shadow)
-- [ ] ban by IP address (shadow)
+---
 
-# server
+## Стек технологий
 
-- [x] backup frames / pixels for timelapse
-- [x] auto restart on fail (fix ffmpeg problems)
-- [x] auto restart: write process.pid to file
-- [x] auto restart (use PM2)
-- [x] freeze frame to stream from admin panel
-- [x] move ssl handle to nginx? (https://www.sitepoint.com/configuring-nginx-ssl-node-js/)
-- [x] const.js -> config.json
-- [x] if not use database, replace: pixels.log, inout.png, pid, expands.log, messages.log, sessions/x/x/x/, sessions/auth.json, sessions/list, sessions/logout.log to DB/
-- [x] sessios file structure like git objects a/b/c/abcdefg000000 -> ab/abcdefg000000
-- [x] replace server/tools/getPixelInfo -> server/
-- [x] remove event emitter
-- [ ] auto restart: add servise with chatbot for notification
-- [ ] fit the canvas into the frame
-- [ ] rotated access log
-- [ ] use database instead files
-- [ ] binary ws messages? (protobufjs)
-- [ ] merge token|uuid vars name?
-- [ ] use nestjs?
-- [ ] stress testing (apache benchmark?)
-- [ ] DDoS protection
+| Слой | Технологии |
+|---|---|
+| Клиент | React 18, TypeScript, SCSS Modules, Parcel 2, Chart.js / react-chartkick |
+| Сервер | Node.js, TypeScript, ts-node, WebSocket (`ws`), `node-canvas`, sqlite3 |
+| Авторизация | OAuth2: Twitch, Discord, Steam, Telegram, VK |
+| БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
+| Стриминг | ffmpeg + скрипт `scripts/stream.sh` |
+| CI/CD | GitHub Actions → сборка → react-snap → деплой на GitHub Pages (`gh-pages`) |
+| Процессы | pm2 (`pixelbattle`) |
 
-# web
+---
 
-- [x] drawing
-- [x] zooming
-- [x] select color
-- [x] zooming at cursor
-- [x] zooming at mobile
-- [x] fix pixel cursor position
-- [x] mobile layout
-- [x] link to stream
-- [x] contrast border for pixel placeholder
-- [x] timelapse page
-- [x] build svg inside page (https://github.com/albinotonnina/parcel-plugin-inlinesvg)
-- [x] replace Bar panel to App
-- [ ] check is offline
-- [ ] FAQ page
-- [ ] fix layout after resize
-- [ ] dont rerender canvas conponent in update countdown timer (and on move pixel)
-- [ ] scale with canvas instead of css (for safari?)
-- [ ] decomposite canvas component by hooks (useDrag, useWheel, useTouch)
-- [ ] offline indicator
-- [ ] add react router and make SPA
-- [ ] play button in center of timelapse canvas
-- [ ] hash link to coordinate, like https://pixelbattles.ru/#100,200 go to position, scale, higlight pixel
-- [ ] fix countdown progress position on reload page
-- [ ] fix coundown on login to ended game
+## Структура проекта
 
-# page with infinity map
+```
+.
+├── .github/workflows/deploy.yml   # CI/CD: сборка и деплой на GitHub Pages
+├── assets/                        # Иконки, шрифты, картинки (svg, webp, ttf)
+├── db/                            # Данные: db.sqlite3, bans.json, values.json, сессии
+├── hoops/                         # Служебные конфиги/скрипты (Discord auth и пр.)
+├── pages/                         # HTML-страницы (входные точки Parcel)
+│   ├── index.html                 # Главная страница игры
+│   ├── login/                     # OAuth-редиректы авторизации
+│   ├── logout/                    # Выход из аккаунта
+│   ├── qq/                        # Панель инструментов модератора (admin)
+│   ├── tg/                        # Telegram Mini App версия
+│   ├── timelapse/                 # Таймлапс полотна
+│   └── twitch/                    # Twitch Extension (видео-оверлей)
+├── scripts/                       # Скрипты сборки и стриминга
+│   ├── addramdisk.sh              # RAM-диск для ускорения (Linux)
+│   ├── postbuild.js               # Пост-обработка сборки
+│   ├── postrender.js              # Пост-обработка react-snap/SSR
+│   ├── saveep.sh                  # Сохранение пикселей (эпизод)
+│   └── stream.sh                  # Запуск ffmpeg стрима полотна
+├── server/                        # Серверная часть
+│   ├── index.ts                   # Точка входа сервера
+│   ├── config.json                # Конфигурация (хосты, ключи, время, картинки)
+│   ├── api/                       # REST API + админка
+│   ├── constants/                 # Цветовые схемы
+│   ├── helpers/                   # Утилиты-хелперы
+│   ├── tools/                     # Консольные инструменты анализа БД
+│   ├── types/                     # TypeScript-типы
+│   └── utils/                     # Ядро: canvas, ws, auth, bans, stats и т.д.
+├── src/                           # Клиент (React)
+│   ├── index.tsx                  # Входная точка приложения
+│   ├── App.tsx                    # Корневой компонент
+│   ├── components/                # UI-компоненты (Canvas, Chat, Palette...)
+│   ├── containers/                # Контейнеры (Admin, TgMiniApp, Timelapse)
+│   ├── hooks/                     # Хуки (useApp, useWsStore, useDraggable...)
+│   ├── helpers/                   # Клиентские утилиты
+│   └── styles/                    # Глобальные стили (SCSS)
+├── static/                        # Статика: robots.txt, sitemap.xml, favicon
+└── package.json                   # Скрипты и зависимости
+```
 
-- [ ] parts of map like geo
+---
 
-# configurate
+## Как это работает
 
-# how to update ssl certificate
+### 1. Подключение клиента
+
+1. Пользователь открывает главную страницу (`pages/index.html` → `src/index.tsx`).
+2. Клиент вызывает `start()` (`server/api/start.ts`):
+   - проверяет rate-limit по IP;
+   - проверяет бан по IP/token;
+   - создаёт новую сессию (UUID-token) и выдаёт **HttpOnly cookie** `token` на год, либо продлевает существующую сессию.
+3. Устанавливается **WebSocket-соединение** (`src/lib/ws.ts`):
+   - адрес: `api.<host>` во внешнем окружении, `localhost:8080` в dev;
+   - протокол `wss` для HTTPS или хеша `#secured`;
+   - при обрыве — переподключение каждые 10 секунд;
+   - пинг каждые 10 секунд (`ws.send('2')`), сообщение `'3'` игнорируется.
+4. События с сервера приходят вида `{ event, payload }` и эмитятся через `event-emitter` (`ws:<event>`).
+
+### 2. Полотно (canvas)
+
+- Сервер держит полотно в памяти (`server/utils/canvas.ts`) — `node-canvas`.
+- Клиент загружает текущее состояние как PNG: `//<WSHost>/canvas.png` и рисует его на `<canvas>`.
+- При каждом новом пикселе сервер шлёт событие `drawPix` по WebSocket, клиент мгновенно закрашивает пиксель (без перезагрузки страницы).
+- Полотно периодически сохраняется на диск: `setInterval(saveCanvas, 60 * 1000)` (`server/index.ts`).
+- Поддерживается **расширение полотна** (`server/utils/expands.ts`): сервер увеличивает размер и смещает/масштабирует старое содержимое; клиент синхронизирует канвас через событие `expand`.
+
+### 3. Постановка пикселя
+
+1. Игрок выбирает цвет в палитре (`Palette`), кликает по полотну.
+2. `PUT /api/pix` (`server/api/pix.ts`) проверяет:
+   - не завершилось ли время раунда (`finishTimeStamp`);
+   - не на паузе ли сервер (`paused`);
+   - авторизацию пользователя;
+   - наличие WebSocket-соединения;
+   - rate-limit по IP;
+   - бан по нику;
+   - корректность координат/цвета;
+   - **кулдаун пикселя** (`getExpiration()` / `updateClientCountdown()`).
+3. Если всё ок — `drawPix()` обновляет полотно, пишет в статистику и шлёт `drawPix` всем подключённым.
+4. Ответы API: `ok`, `fail`, `skip`, `await`, `paused`, `timeout`.
+5. Клиент показывает таймер до следующего пикселя прямо на канвасе.
+
+### 4. Авторизация
+
+- Доступные провайдеры: **Twitch, Discord, Steam, Telegram, VK** (`server/api/auth/`).
+- Каждый провайдер — свой OAuth2-флоу: редирект на провайдера, callback, получение профиля.
+- После успешного входа пользователь привязывается к `token` (сессии), получает ник и «area» (площадку/провайдера).
+- Выход — `server/api/logout.ts` (удаляет куку и пользователя).
+- Telegram Mini App (`src/containers/TgMiniApp`) использует встроенный `Telegram.WebApp` и отдельную авторизацию.
+
+### 5. Чат
+
+- `GET /api/messages` — история сообщений из SQLite (`server/utils/chat.ts`, таблица `chat`).
+- `PUT /api/chat` — отправка сообщения с защитой:
+  - бан/мут по нику → отклонение;
+  - глобальный кулдаун (значение `cooldown` в `values.json`, по умолчанию 5 сек);
+  - анти-спам (повтор одинакового текста) → «сообщение удалено из-за спама» от бота;
+  - длина сообщения — до 100 символов.
+- Новые сообщения рассылаются всем через WebSocket (`chatMessage`).
+
+### 6. Статистика и карты активности
+
+`server/utils/stats.ts` собирает по каждому пикселю: время, UUID, цвет, ник/area, IP, счётчик.
+
+Эндпоинты админки (`server/api/admin/`):
+
+| Маршрут | Описание |
+|---|---|
+| `stats` | Общая статистика |
+| `history` | История изменений во времени |
+| `pixel` | Данные по конкретному пикселю |
+| `heatmap.png` | Тепловая карта частоты пикселей |
+| `newestmap.png` | Карта новизны пикселей |
+| `newestmapByIndex.png` | Новизна по индексу |
+| `usersmap.png` | Карта по UUID (один пользователь — одним цветом) |
+| `lastPixels.png` | Последние N пикселей |
+| `byIP.png` | Карта по IP-адресам |
+| `byTime.png` | Карта пикселей за последний интервал времени |
+| `user` | Информация о пользователе |
+| `onlineList` | Список онлайн-пользователей |
+| `ban` / `unban` / `getBans` | Управление банами |
+| `chat` | Управление чатом |
+| `countdown` | Управление кулдауном |
+| `pause` | Пауза игры |
+| `expand` | Расширение полотна |
+| `fillSquare` | Заливка области |
+| `streamSettings` | Настройки стрима |
+| `updateFreezedFrame` | Обновление «застывшего» кадра |
+
+### 7. Баны (`server/utils/bans.ts`)
+
+Хранятся в `db/bans.json`, четыре типа:
+
+- `token` — по UUID-токену;
+- `ip` — по IP-адресу (поддержка нескольких IP через запятую/перенос строки);
+- `nick` — по нику;
+- `mute` — только мут чата (по нику).
+
+Бан может быть **вечным** (`true`) или **временным** (timestamp). По истечении срока бан автоматически снимается.
+
+### 8. Сессии и онлайн (`server/utils/sessions.ts`, `online.ts`)
+
+- Сессии хранятся по токенам, привязываются к IP.
+- Активность обновляется при действиях (`uptateActiveTime`).
+- Онлайн-список (топ 100) кэшируется на 5 секунд, показывает ник и площадку (area).
+
+### 9. Панель модератора (`/qq`)
+
+Доступна только администраторам/модераторам (`checkIsAdmin`). Включает: баны, статистику, карты активности, чат, паузу, расширение полотна, заливку области, управление кулдауном и настройками стрима. UI — `src/containers/Admin`.
+
+### 10. Таймлапс (`/timelapse`)
+
+- Отдельная страница (`pages/timelapse/`, `src/containers/Timelapse`).
+- Проигрывает историю изменений полотна («эпизоды»).
+- Серверные утилиты генерации: `server/tools/prepareTimelapse.js`, `server/tools/drawEpisode.js`.
+- Скрипт сохранения эпизода: `scripts/saveep.sh`.
+
+### 11. Стриминг (`scripts/stream.sh`)
+
+1. `server/api/stream.ts` рендерит PNG-кадр полотна (`/stream.png`) поверх фоновой картинки (`bgImage`), ререндер каждую секунду.
+2. `scripts/stream.sh` через `ffmpeg`:
+   - берёт PNG-кадр как видео (`image2`, 30 fps);
+   - накладывает аудиодорожку (`inputAudio`);
+   - кодирует H.264/AAC;
+   - публикует во RTMP (`rtmpHostKey`).
+3. Скрипт автоматически перезапускает ffmpeg при обрыве.
+
+### 12. Инструменты анализа (`server/tools/`)
+
+Консольные утилиты для работы с данными:
+
+- `prepareDatabase.js` — подготовка БД;
+- `prepareSessions.js` — подготовка сессий;
+- `recover.js` — восстановление;
+- `restorePixels.js` — восстановление пикселей;
+- `drawDiffMask.js` — маска различий;
+- `drawEpisode.js` — отрисовка эпизода таймлапса;
+- `prepareTimelapse.js` — подготовка таймлапса;
+- `upscale.js` — апскейл полотна;
+- `expand.js` — расширение полотна;
+- `geoip.js` — геолокация по IP (maxmind);
+- `checkLog.js`, `debugServer.js`, `debugStream.js`, `debugTwitch.js` — отладка;
+- `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий.
+
+---
+
+## Конфигурация (`server/config.json`)
+
+Основные секции:
+
+| Ключ | Назначение |
+|---|---|
+| `server.host` | Хост сайта |
+| `server.proxyIp` | Использовать `X-Forwarded-For` (за прокси) |
+| `server.secure` | Secure-куки (HTTPS) |
+| `finishTimeStamp` | Момент завершения раунда (после него ставка пикселей запрещена) |
+| `stream.bgImage` | Фоновая картинка для стрима |
+| `stream.streamFile` | Файл-кадр, отдаваемый ffmpeg |
+| `stream.inputAudio` | Аудиодорожка для стрима |
+| `stream.rtmpHostKey` | RTMP-адрес трансляции |
+| OAuth-ключи | Клиентские ID/секреты Twitch, Discord, Steam, Telegram, VK |
+
+---
+
+## Основные скрипты (`package.json`)
+
+| Команда | Описание |
+|---|---|
+| `npm run dev:server` | Запуск сервера в dev-режиме (nodemon + ts-node) |
+| `npm run dev:web` | Запуск Parcel для клиента (dev-сервер) |
+| `npm run build` | Production-сборка клиента (Parcel) |
+| `npm run build:server` | Компиляция сервера в `lib/` |
+| `npm start` | Сборка сервера + запуск через pm2 (`pixelbattle`) |
+| `npm stop` | Остановка pm2-процесса |
+| `npm run render` | react-snap (SSR пререндер) + постобработка |
+| `npm run build:twitch` | Сборка Twitch Extension (zip) |
+| `npm run tools` | Запуск консольных инструментов (`server/tools`) |
+| `npm run eslint` | Линтинг клиента |
+
+---
+
+## CI/CD
+
+`.github/workflows/deploy.yml`:
+
+1. Пуш в ветку `main`.
+2. Установка Node 18 + системных библиотек для `node-canvas`.
+3. `npm install`, `npm run build`.
+4. `npm run render` (react-snap) — пререндер страниц для SEO.
+5. Деплой `dist/` в ветку `gh-pages` (GitHub Pages).
+
+---
+
+## Запуск локально
 
 ```bash
-sudo systemctl stop nginx
-sudo certbot certonly --standalone -d api.pixelbattles.ru
-sudo systemctl start nginx
+# 1. Установка зависимостей
+npm install
+
+# 2. Сервер (WebSocket + API) на :8080
+npm run dev:server
+
+# 3. Клиентский dev-сервер Parcel (в другом терминале)
+npm run dev:web
 ```
 
-# nginx
+Клиент в dev подключается к WebSocket на `localhost:8080`.
 
-```bash
-sudo apt-get install nginx
-sudo nginx
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example
-sudo ln -s /etc/nginx/sites-available/example /etc/nginx/sites-enabled/example
-sudo vim /etc/nginx/sites-available/example
-sudo /etc/init.d/nginx restart
-sudo nginx -s reload
-```
+---
 
-/etc/nginx/sites-available/example
+## БД и хранение
 
-```
-server {
-	listen 80;
-	listen 443 ssl;
-	server_name api.pixelbattles.ru;
+| Файл | Назначение |
+|---|---|
+| `db/db.sqlite3` | SQLite: таблица `chat` (id, time, name, area, token, text) |
+| `db/bans.json` | Баны: `{ token, ip, nick, mute }` |
+| `db/values.json` | Серверные значения: `paused`, `cooldown` и др. |
+| `db/` (прочие) | Сессии, статистика, пиксельные снапшоты |
 
-	# allow 93.100.95.191;
-	# deny all;
-	# deny 192.3.228.238;
-
-	location / {
-		proxy_pass http://localhost:7000;
-		proxy_http_version 1.1;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection 'upgrade';
-		proxy_set_header Host $host;
-		# proxy_set_header Forwarded $proxy_add_forwarded;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		# proxy_set_header X-Forwarded-For "$realip_remote_addr";
-		proxy_cache_bypass $http_upgrade;
-	}
-
-	ssl_certificate /etc/letsencrypt/live/api.pixelbattles.ru/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/api.pixelbattles.ru/privkey.pem;
-}
-```
+Полотно в памяти (canvas) периодически сбрасывается на диск; загрузка при старте происходит из снапшота.
