@@ -52,9 +52,9 @@
 │   ├── api/                       # REST API + админка
 │   ├── constants/                 # Цветовые схемы
 │   ├── helpers/                   # Утилиты-хелперы
-│   ├── tools/                     # Консольные инструменты анализа БД
 │   ├── types/                     # TypeScript-типы
 │   └── utils/                     # Ядро: canvas, ws, auth, bans, stats и т.д.
+├── tools/                         # Консольные инструменты анализа БД
 ├── src/                           # Клиент (React)
 │   ├── index.tsx                  # Входная точка приложения
 │   ├── App.tsx                    # Корневой компонент
@@ -183,7 +183,7 @@
 
 - Отдельная страница (`pages/timelapse/`, `src/containers/Timelapse`).
 - Проигрывает историю изменений полотна («эпизоды»).
-- Серверные утилиты генерации: `server/tools/prepareTimelapse.js`, `server/tools/drawEpisode.js`.
+- Серверные утилиты генерации: `tools/prepareTimelapse.js`, `tools/drawEpisode.js`.
 - Скрипт сохранения эпизода: `scripts/saveep.sh`.
 
 ### 11. Стриминг (`scripts/stream.sh`)
@@ -196,7 +196,7 @@
    - публикует во RTMP (`rtmpHostKey`).
 3. Скрипт автоматически перезапускает ffmpeg при обрыве.
 
-### 12. Инструменты анализа (`server/tools/`)
+### 12. Инструменты анализа (`tools/`)
 
 Консольные утилиты для работы с данными:
 
@@ -246,7 +246,7 @@
 | `npm stop` | Остановка pm2-процесса |
 | `npm run render` | react-snap (SSR пререндер) + постобработка |
 | `npm run build:twitch` | Сборка Twitch Extension (zip) |
-| `npm run tools` | Запуск консольных инструментов (`server/tools`) |
+| `npm run tools` | Запуск консольных инструментов (`tools`) |
 | `npm run eslint` | Линтинг клиента |
 
 ### Pre-commit проверка (husky)

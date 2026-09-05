@@ -1,8 +1,8 @@
 const fs = require('fs');
-const { _parseUserData } = require('../utils/auth');
+const { _parseUserData } = require('../server/utils/auth');
 
 const _fixSessionByNickName = () => {
-	const sessions = require('../../db/auth.json');
+	const sessions = require('../db/auth.json');
 
 	const tokens = Object.keys(session);
 
@@ -17,14 +17,14 @@ const _fixSessionByNickName = () => {
 		}
 	});
 
-	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify({
+	fs.writeFileSync(__dirname + '/../db/auth.json', JSON.stringify({
 		sessions,
 		users,
 	}));
 };
 
 const checkSessions = () => {
-	const sessions = require('../../db/auth.json');
+	const sessions = require('../db/auth.json');
 
 	const users = {};
 	let uniq = 0;
@@ -57,7 +57,7 @@ const checkSessions = () => {
 };
 
 const clearEmpty = () => {
-	const sessions = require('../../db/auth.json');
+	const sessions = require('../db/auth.json');
 	const output = Object.entries(sessions)
 		.filter(([key, value]) => {
 			const username = Boolean(value?.data?.[0]?.display_name);
@@ -66,11 +66,11 @@ const clearEmpty = () => {
 		})
 		.reduce((list, [key, value]) => ({ ...list, [key]: value }), {});
 
-	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
+	fs.writeFileSync(__dirname + '/../db/auth.json', JSON.stringify(output));
 };
 
 const mergeSessions = () => {
-	const sessions = require('../../db/auth.json');
+	const sessions = require('../db/auth.json');
 
 	const _authorized = {};
 	const _sessions = {};
@@ -93,7 +93,7 @@ const mergeSessions = () => {
 		sessions: _sessions,
 	};
 
-	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(output));
+	fs.writeFileSync(__dirname + '/../db/auth.json', JSON.stringify(output));
 };
 
 // const fixSessionByNickName = () => {

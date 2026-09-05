@@ -1,6 +1,6 @@
 const readline = require('readline');
 const fs = require('fs');
-const bansJSON = require('../../db/bans.json');
+const bansJSON = require('../db/bans.json');
 
 const filterByBlocked = (input, output) => {
 	const rl = readline.createInterface({

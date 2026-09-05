@@ -20,7 +20,7 @@ const tables = {
 };
 
 const prepareDatabase = () => {
-	const dbFile = __dirname + '/../../db/db.sqlite3';
+	const dbFile = __dirname + '/../db/db.sqlite3';
 
 	if (fs.existsSync(dbFile)) {
 		fs.unlinkSync(dbFile);
@@ -39,7 +39,7 @@ const prepareDatabase = () => {
 	const stmt = db.prepare('INSERT INTO chat (id, time, name, area, token, text) VALUES (?, ?, ?, ?, ?, ?)');
 
 	const rl = readline.createInterface({
-		input: fs.createReadStream(__dirname + '/../../db/messages.log'),
+		input: fs.createReadStream(__dirname + '/../db/messages.log'),
 		crlfDelay: Infinity
 	});
 
@@ -77,7 +77,7 @@ const prepareDatabase = () => {
 };
 
 const debugDB = () => {
-	// const db = new loki(__dirname + '/../../db/db.loki');
+	// const db = new loki(__dirname + '/../db/db.loki');
 
 	// db.loadDatabase();
 

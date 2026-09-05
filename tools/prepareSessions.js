@@ -4,14 +4,14 @@ const readline = require('readline');
 const prepareSessions = () => {
 	const whiteList = {};
 
-	const auth = require(__dirname + '/../../db/auth.json');
+	const auth = require(__dirname + '/../db/auth.json');
 
 	Object.keys(auth.sessions).forEach((uuid) => {
 		whiteList[uuid] = (whiteList[uuid] || 0) + 1;
 	});
 
 	const rl = readline.createInterface({
-		input: fs.createReadStream(__dirname + '/../../db/logout.log'),
+		input: fs.createReadStream(__dirname + '/../db/logout.log'),
 		crlfDelay: Infinity
 	});
 
@@ -31,7 +31,7 @@ const unlinkOldEmptySessions = () => {
 };
 
 const addNicknameList = () => {
-	const auth = require(__dirname + '/../../db/auth.json');
+	const auth = require(__dirname + '/../db/auth.json');
 
 	auth.nicknames = {
 		discord: {},
@@ -60,7 +60,7 @@ const addNicknameList = () => {
 		}
 	})
 
-	fs.writeFileSync(__dirname + '/../../db/auth.json', JSON.stringify(auth, true, 2))
+	fs.writeFileSync(__dirname + '/../db/auth.json', JSON.stringify(auth, true, 2))
 };
 
 module.exports = {

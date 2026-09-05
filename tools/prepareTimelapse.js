@@ -5,7 +5,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const { colorSchemes } = require('../constants/colorSchemes.ts');
+const { colorSchemes } = require('../server/constants/colorSchemes.ts');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png
@@ -50,12 +50,12 @@ const buildColorsCache = (colorScheme) => {
 
 const prepareTimelapse = (
 	season = 's1e1',
-	backgroundImage = `${__dirname}/../../assets/426x240.png`,
+	backgroundImage = `${__dirname}/../assets/426x240.png`,
 ) => {
-	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
-	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
-	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;
-	const dirName = `${__dirname}/../../db/archive/${season}/timelapse/`;
+	const expandsFile = `${__dirname}/../db/archive/${season}/expands.log`;
+	const pixelsFile = `${__dirname}/../db/archive/${season}/pixels.log`;
+	const timelapseFile = `${__dirname}/../db/archive/${season}/timelapse/index.json`;
+	const dirName = `${__dirname}/../db/archive/${season}/timelapse/`;
 
 	if (!fs.existsSync(dirName)) {
 		fs.mkdirSync(dirName, { recursive: true });
@@ -158,7 +158,7 @@ const prepareTimelapse = (
 				if (partPixels.length) {
 					packTimelapsePart(
 						partPixels,
-						`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+						`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 						prevIsTruecolor,
 					);
 					partPixels = [];
@@ -229,7 +229,7 @@ const prepareTimelapse = (
 		if (partPixels.length >= PART_PIXELS_COUNT) {
 			packTimelapsePart(
 				partPixels,
-				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 				isTruecolor,
 			);
 			partPixels = [];
@@ -239,7 +239,7 @@ const prepareTimelapse = (
 		}
 
 		if (savePreview) {
-			const output = `${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.png`;
+			const output = `${__dirname}/../db/archive/${season}/timelapse/${partIndex}.png`;
 			fs.writeFileSync(output, canvas.toBuffer());
 			savePreview = false;
 		}
@@ -253,7 +253,7 @@ const prepareTimelapse = (
 		if (partPixels.length) {
 			packTimelapsePart(
 				partPixels,
-				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 				isTruecolor,
 			);
 		}

@@ -15,7 +15,7 @@ const restorePixels = (input, output) => {
 	bar.start(BACKUP_FILES_COUNT, 0);
 
 	for (let i = 1; i <= BACKUP_FILES_COUNT; i++) {
-		const json = JSON.parse(fs.readFileSync(`${__dirname}/../../db/stats/backup-${i}.json`));
+		const json = JSON.parse(fs.readFileSync(`${__dirname}/../db/stats/backup-${i}.json`));
 
 		Object.values(json).forEach((item) => {
 			const line = [

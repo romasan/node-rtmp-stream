@@ -5,7 +5,7 @@ const fs = require('fs');
 const https = require('https');
 const maxmind = require('maxmind').default;
 
-const dbFilePath = __dirname + '/../../db/GeoLite2-City.mmdb';
+const dbFilePath = __dirname + '/../db/GeoLite2-City.mmdb';
 
 const fetchGeoDB = (url = 'https://git.io/GeoLite2-City.mmdb') => new Promise((resolve) => {
 	const file = fs.createWriteStream(dbFilePath);

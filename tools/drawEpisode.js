@@ -6,9 +6,9 @@ const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
 const { createCanvas, Image, registerFont } = require('canvas');
-const { colorSchemes } = require('../constants/colorSchemes.ts');
-// const { drawBGCanvas } = require('../utils/canvas');
-// const { getFileLinesCount } = require('../helpers');
+const { colorSchemes } = require('../server/constants/colorSchemes.ts');
+// const { drawBGCanvas } = require('../server/utils/canvas');
+// const { getFileLinesCount } = require('../server/helpers');
 
 const getFileLinesCount = (file) => new Promise((resolve) => {
 	const rl = readline.createInterface({
@@ -27,9 +27,9 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 	});
 });
 
-// registerFont(__dirname + '/../../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
+// registerFont(__dirname + '/../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
-const PPF = 157; // 300;
+const PPF = 108; // 300;
 const FPS = 60; // 25;
 const PPS = PPF * FPS;
 
@@ -51,7 +51,7 @@ const breakLine = Infinity;
 // npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
 // npm run tools drawEpisode CURRENT ./tmp NOIMAGE
 // ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
-// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E1" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E2" -metadata artist="pixelbattles.ru" output.mp4
 // ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -af apad -shortest output.mp4
 
 // const scale = 2;
@@ -125,8 +125,8 @@ const circle = (w, h, minR, maxR) => {
 const drawEpisode = async (ep, bg, firstFrame) => {
 	console.log('Start draw episode', ep);
 
-	const pixelsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}pixels.log`;
-	const expandsFile = `${__dirname}/../../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}expands.log`;
+	const pixelsFile = `${__dirname}/../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}pixels.log`;
+	const expandsFile = `${__dirname}/../db/${ep !== 'CURRENT' ? `archive/${ep}/` : ''}expands.log`;
 	const expands = fs.readFileSync(expandsFile)
 		.toString()
 		.split('\n')
@@ -260,7 +260,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			ctx.globalCompositeOperation = 'source-over';
 			ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
+			const output = __dirname + '/../server/frames/' + String(++frame).padStart(8, '0') + '.png';
 
 			fs.writeFileSync(output, canvas.toBuffer());
 		}
@@ -276,7 +276,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		ctx.globalCompositeOperation = 'source-over';
 		ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-		const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
+		const output = __dirname + '/../server/frames/' + String(++frame).padStart(8, '0') + '.png';
 
 		fs.writeFileSync(output, canvas.toBuffer());
 

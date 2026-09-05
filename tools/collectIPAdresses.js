@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Progress = require('cli-progress');
-const { addSessionForIP } = require('../helpers');
+const { addSessionForIP } = require('../server/helpers');
 const path = require('path');
 const readline = require('readline');
 
@@ -137,7 +137,7 @@ const updateSessionFilesDepth = () => {
 	for (const filePath of list) {
 		const token = filePath.split('/').pop();
 		const prefix = token.slice(0, 2);
-		const to = `${__dirname}/../../db/sessions/depth1/${prefix}/${token}`;
+		const to = `${__dirname}/../db/sessions/depth1/${prefix}/${token}`;
 		const dirname = path.dirname(to);
 
 		fs.mkdirSync(dirname, { recursive: true });
