@@ -28,6 +28,7 @@
 ```
 .
 ├── .github/workflows/deploy.yml   # CI/CD: сборка и деплой на GitHub Pages
+├── .husky/pre-commit              # Git pre-commit hook (husky): проверка сборки и пререндера
 ├── assets/                        # Иконки, шрифты, картинки (svg, webp, ttf)
 ├── db/                            # Данные: db.sqlite3, bans.json, values.json, сессии
 ├── hoops/                         # Служебные конфиги/скрипты (Discord auth и пр.)
@@ -247,6 +248,10 @@
 | `npm run build:twitch` | Сборка Twitch Extension (zip) |
 | `npm run tools` | Запуск консольных инструментов (`server/tools`) |
 | `npm run eslint` | Линтинг клиента |
+
+### Pre-commit проверка (husky)
+
+При `npm install` срабатывает скрипт `prepare` (`husky`), который включает Git-хуки из `.husky/`. Хук `pre-commit` перед каждым коммитом запускает `npm run build && npm run render` — если production-сборка клиента или react-snap пререндер завершаются ошибкой, коммит отклоняется. При необходимости пропустить проверку: `git commit --no-verify`.
 
 ---
 

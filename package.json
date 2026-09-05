@@ -17,7 +17,8 @@
     "build:twitch": "cd pages/twitch/ && zip -r twitch-extension.zip ./*",
     "tools": "node ./server/tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
-    "logs": "pm2 log"
+    "logs": "pm2 log",
+    "prepare": "husky"
   },
   "reactSnap": {
     "source": "dist",
@@ -66,6 +67,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react": "^7.33.2",
     "form-data": "^4.0.0",
+    "husky": "^9.1.7",
     "maxmind": "^4.3.20",
     "nodemon": "^3.1.9",
     "parcel-plugin-static-files-copy": "^2.6.0",

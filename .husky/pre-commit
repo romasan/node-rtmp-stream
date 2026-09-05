@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Проверка production-сборки и react-snap пререндера перед коммитом.
+# Прерывает коммит (exit != 0), если `npm run build` или `npm run render` завершились ошибкой.
+npm run build && npm run render
