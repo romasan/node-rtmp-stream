@@ -51,7 +51,7 @@ const breakLine = Infinity;
 // npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
 // npm run tools drawEpisode CURRENT ./tmp NOIMAGE
 // ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
-// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i server/frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E2" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E2" -metadata artist="pixelbattles.ru" output.mp4
 // ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -af apad -shortest output.mp4
 
 // const scale = 2;
@@ -130,6 +130,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	const expands = fs.readFileSync(expandsFile)
 		.toString()
 		.split('\n')
+		.filter((line) => line.trim() !== '')
 		.map((line) => line.split(';'));
 	const length = breakLine < Infinity ? breakLine : await getFileLinesCount(pixelsFile);
 
@@ -228,8 +229,12 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			nextPartStartTime = expands[part + 1] ? Number(expands[part + 1][0]) : Infinity;
 			width = Number(expands[part][2] || width);
 			height = Number(expands[part][3] || height);
-			shiftX = Number(expands[part][4] || 0);
-			shiftY = Number(expands[part][5] || 0);
+			const newShiftX = Number(expands[part][4] || 0);
+			const newShiftY = Number(expands[part][5] || 0);
+			const deltaShiftX = newShiftX - shiftX;
+			const deltaShiftY = newShiftY - shiftY;
+			shiftX = newShiftX;
+			shiftY = newShiftY;
 			colorScheme = expands[part][6];
 			currentColors = colorSchemes[colorScheme] || colorSchemes.COLORS_1;
 			isTruecolor = colorScheme === 'truecolor' || colorScheme === 'COLORS_32';
@@ -248,8 +253,8 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			mctx.fillStyle = '#fff';
 			mctx.fillRect(0, 0, width, height);
 
-			// restore с учётом сдвига старого канваса в новом
-			mctx.drawImage(backupImage, shiftX, shiftY);
+			// restore на дельту сдвига (как в live expandCanvas: drawImage(img, shiftX - expand.shiftX, ...))
+			mctx.drawImage(backupImage, deltaShiftX, deltaShiftY);
 		}
 
 		mctx.fillStyle = color;
@@ -260,7 +265,7 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			ctx.globalCompositeOperation = 'source-over';
 			ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-			const output = __dirname + '/../server/frames/' + String(++frame).padStart(8, '0') + '.png';
+			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
 
 			fs.writeFileSync(output, canvas.toBuffer());
 		}
@@ -276,15 +281,15 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		ctx.globalCompositeOperation = 'source-over';
 		ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-		const output = __dirname + '/../server/frames/' + String(++frame).padStart(8, '0') + '.png';
+		const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
 
 		fs.writeFileSync(output, canvas.toBuffer());
 
 		const sec = Math.floor(frame / FPS);
 		const finalInTime = Math.floor((Date.now() - startTime) / 1000);
 
-		console.log(`Done in ${Math.floor(finalInTime / 60).toFixed(1)}:${(finalInTime % 60).toFixed(1)}`)
-		console.log(`Total duration: ${Math.floor(sec / 60).toFixed(1)}:${(sec % 60).toFixed(1)}, ${frame} frames, ${i} pixels`);
+		console.log(`Done in ${Math.floor(finalInTime / 60)}:${(finalInTime % 60)}`)
+		console.log(`Total duration: ${Math.floor(sec / 60)}:${(sec % 60)}, ${frame} frames, ${i} pixels`);
 	});
 };
 
