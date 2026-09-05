@@ -234,6 +234,7 @@
 
 | Команда | Описание |
 |---|---|
+| `npm run dev` | Параллельный запуск dev-сервера и клиента (`dev:server` + `dev:web` через `concurrently`) |
 | `npm run dev:server` | Запуск сервера в dev-режиме (nodemon + ts-node) |
 | `npm run dev:web` | Запуск Parcel для клиента (dev-сервер) |
 | `npm run build` | Production-сборка клиента (Parcel) |
