@@ -6,7 +6,7 @@
 - [x] auth by discord
 - [x] auth by telegram
 - [ ] auth by vkplay
-- [ ] auth by vk
+- [x] auth by vk
 - [x] auth by steam
 - [x] countdown
 - [x] githib actions deploy (front only?)
@@ -23,7 +23,7 @@
 - [x] add datetime for logs
 - [x] chat moderation (delete all by user)
 - [ ] read chat from stream(s)?
-- [ ] support for multiple colors
+- [x] support for multiple colors
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
 - [ ] use one countdown for active unauthorized users with one ip address
@@ -73,7 +73,7 @@
 - [ ] change countdown for uuid/nick/ip
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
-- [ ] get pixel author (uuid, IP, nickname, auth service)
+- [x] get pixel author (uuid, IP, nickname, auth service)
 - [ ] get users on IP address
 - [ ] ban by uuid (shadow)
 - [ ] ban by IP address (shadow)
@@ -92,7 +92,7 @@
 - [x] replace server/tools/getPixelInfo -> server/
 - [x] remove event emitter
 - [ ] auto restart: add servise with chatbot for notification
-- [ ] fit the canvas into the frame
+- [x] fit the canvas into the frame
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages? (protobufjs)
