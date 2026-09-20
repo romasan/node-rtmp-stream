@@ -1,6 +1,7 @@
 # Changelog
 
 ## 20.09.2026
+- Fixed `tools/prepareTimelapse.js` expanding the canvas: the previously rendered image (and the emitted `expand.shift`) now uses the shift delta between consecutive expansions instead of the cumulative shift, so the image is no longer offset twice on multi-axis expansions.
 - Added `scripts/packTimelapse.sh`, which copies archived episode timelapses into `tmp/timelapse/<season>/` and generates `tmp/timelapse/index.json` with the season list.
 - Added `tools/loadColorSchemes.js`, which loads the color schemes from `server/constants/colorSchemes.ts` via `ts-node`, so `tools/prepareTimelapse.js` and `tools/drawEpisode.js` work on Node 18 as well as Node 24+ instead of relying on the experimental `require('.ts')`.
 - Pinned `nan` to `^2.29.0` for `canvas` via npm `overrides` so the native module compiles on Node 24 (canvas 2.11.2 requires a newer `nan`).

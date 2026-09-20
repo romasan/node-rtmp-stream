@@ -137,6 +137,14 @@ const prepareTimelapse = (
 			const newExpandIndex = expandIndex + 1;
 			const prevIsTruecolor = isTruecolor;
 
+			// В expands.log сдвиги хранятся накопительно (абсолютно от начала координат),
+			// а для сдвига уже нарисованного изображения (и для клиента) нужна разница
+			// между текущим и предыдущим расширением — относительный сдвиг.
+			const prevShiftX = expandIndex >= 0 ? expands[expandIndex].shiftX : 0;
+			const prevShiftY = expandIndex >= 0 ? expands[expandIndex].shiftY : 0;
+			const shiftX = expands[newExpandIndex].shiftX - prevShiftX;
+			const shiftY = expands[newExpandIndex].shiftY - prevShiftY;
+
 			if (expandIndex >= 0) {
 				// backup image
 				const backupCanvas = createCanvas(canvas.width, canvas.height);
@@ -150,8 +158,8 @@ const prepareTimelapse = (
 				// restore image с учётом сдвига старого канваса в новом
 				ctx.drawImage(
 					backupCanvas,
-					expands[newExpandIndex].shiftX,
-					expands[newExpandIndex].shiftY,
+					shiftX,
+					shiftY,
 				);
 
 				// закрыть текущую неполную часть предыдущего расширения
@@ -186,8 +194,8 @@ const prepareTimelapse = (
 					to: partIndex
 				},
 				shift: {
-					x: expands[expandIndex].shiftX,
-					y: expands[expandIndex].shiftY,
+					x: shiftX,
+					y: shiftY,
 				},
 				colorScheme: expands[expandIndex].colorScheme,
 				isTruecolor,
