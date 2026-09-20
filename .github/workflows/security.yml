@@ -1,0 +1,36 @@
+name: Security audit
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Каждый понедельник в 06:00 UTC — регулярный контроль уязвимостей.
+    - cron: '0 6 * * 1'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies (lockfile only)
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Run npm audit
+        # Информационный аудит: оставшиеся advisories приходят только из транзитивных
+        # цепочек dev/prod-инструментов (react-snap → express/puppeteer/cheerio,
+        # canvas/sqlite3 → node-gyp/@mapbox/node-pre-gyp → tar, @typescript-eslint)
+        # и требуют breaking-обновлений, поэтому сборку не блокируем.
+        # Обновления выполняются через Dependabot.
+        continue-on-error: true
+        run: npm audit --audit-level=high

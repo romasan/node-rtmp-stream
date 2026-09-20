@@ -19,6 +19,7 @@
 | БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
 | Стриминг | ffmpeg + скрипт `scripts/stream.sh` |
 | CI/CD | GitHub Actions → сборка → react-snap → деплой на GitHub Pages (`gh-pages`) |
+| Безопасность | Dependabot (npm) + аудит уязвимостей `npm audit` в CI |
 | Процессы | pm2 (`pixelbattle`) |
 
 ---
@@ -27,7 +28,9 @@
 
 ```
 .
+├── .github/dependabot.yml         # Автообновления зависимостей (npm, weekly)
 ├── .github/workflows/deploy.yml   # CI/CD: сборка и деплой на GitHub Pages
+├── .github/workflows/security.yml # CI: аудит уязвимостей зависимостей (npm audit)
 ├── .husky/pre-commit              # Git pre-commit hook (husky): проверка сборки и пререндера
 ├── assets/                        # Иконки, шрифты, картинки (svg, webp, ttf)
 ├── db/                            # Данные: db.sqlite3, bans.json, values.json, сессии
@@ -264,6 +267,18 @@
 3. `npm install`, `npm run build`.
 4. `npm run render` (react-snap) — пререндер страниц для SEO.
 5. Деплой `dist/` в ветку `gh-pages` (GitHub Pages).
+
+### Контроль уязвимостей
+
+- `.github/workflows/security.yml` — job `audit`: при push/PR в `main` и по расписанию (каждый понедельник) выполняет `npm install --package-lock-only --ignore-scripts` и `npm audit --audit-level=high`. Аудит информационный (`continue-on-error`): оставшиеся advisories приходят только из транзитивных цепочек инструментов (`react-snap` → `express`/`puppeteer`/`cheerio`, `canvas`/`sqlite3` → `node-gyp`/`@mapbox/node-pre-gyp` → `tar`, `@typescript-eslint`) и требуют breaking-обновлений, поэтому сборку не блокируют.
+- `.github/dependabot.yml` — еженедельные обновления npm-зависимостей (production- и development-зависимости группируются в отдельные PR), чтобы бэклог уязвимостей не накапливался.
+
+Прямые зависимости с известными уязвимостями обновлены вручную: `ws@8.21.3`, `form-data@4.0.6`; мёртвые зависимости (`parcel-bundler`, `res`, `src`) удалены — они тянули уязвимые `underscore`, `uuid@1`, `uuid@3` и `ws@5`. Уязвимые версии, которые нельзя обновить без breaking-изменений, отслеживаются через Dependabot.
+
+### Особенности зависимостей
+
+- `svgo` (devDependency, версия зафиксирована) — нужен трансформеру `@parcel/transformer-svg-react`, заданному в `.parcelrc` для `*.svg`. Если пакета нет в дереве, Parcel во время сборки доустанавливает его сам (`Installing svgo...` → `npm install --json --save-dev svgo@^3`) и переписывает `package.json` и lock-файлы: сборка перестаёт быть воспроизводимой и требует доступа в сеть. Поэтому зависимость объявлена явно, а не полагается на autoinstall.
+- `sass` ограничен диапазоном `^1.70.0 <1.100.0` (резолвится в `1.99.0`): начиная с `sass@1.100.0` в `engines` указано `node >=20.19.0`, а проект работает на Node 18 (`node-canvas`/`sqlite3`), из-за чего `yarn install` на поддерживаемой версии Node падал на проверке engines.
 
 ---
 
