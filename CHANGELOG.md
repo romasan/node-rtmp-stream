@@ -1,6 +1,9 @@
 # Changelog
 
 ## 20.09.2026
+- Pinned the supported Node version to 18 via `.nvmrc` (`18`) — the `engines` field is intentionally not used, because Parcel treats it as a Node target and emits client bundles with external `import "react"`.
+- Added `scripts/check-node.js` as a `predev:server` guard that fails with a clear message and the `nvm use` hint when the Node major version from `.nvmrc` does not match the running one.
+- Documented in README that `yarn install` drops native artifacts missing from `yarn.lock` and how to restore them (`npm rebuild sqlite3 canvas`, `node node_modules/puppeteer/install.js`).
 - Updated vulnerable direct dependencies: `ws` `^8.13.0` → `^8.21.3` and `form-data` `^4.0.0` → `^4.0.6`.
 - Removed dead unused dependencies: `parcel-bundler`, `res` and `src` (they pulled hundreds of packages and vulnerable `underscore`/`uuid`). `package-lock.json` shrank from 1767 to 1016 packages, `yarn.lock` was regenerated accordingly.
 - Aligned Parcel packages to a single version (`parcel`, `@parcel/transformer-sass`, `@parcel/transformer-svg-react`: `^2.10.3` → `^2.16.4`) — Parcel requires plugin versions to match exactly.

@@ -14,7 +14,7 @@
 | Слой | Технологии |
 |---|---|
 | Клиент | React 18, TypeScript, SCSS Modules, Parcel 2, Chart.js / react-chartkick |
-| Сервер | Node.js, TypeScript, ts-node, WebSocket (`ws`), `node-canvas`, sqlite3 |
+| Сервер | Node.js 18, TypeScript, ts-node, WebSocket (`ws`), `node-canvas`, sqlite3 |
 | Авторизация | OAuth2: Twitch, Discord, Steam, Telegram, VK |
 | БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
 | Стриминг | ffmpeg + скрипт `scripts/stream.sh` |
@@ -28,6 +28,7 @@
 
 ```
 .
+├── .nvmrc                         # Версия Node для nvm (18)
 ├── .github/dependabot.yml         # Автообновления зависимостей (npm, weekly)
 ├── .github/workflows/deploy.yml   # CI/CD: сборка и деплой на GitHub Pages
 ├── .github/workflows/security.yml # CI: аудит уязвимостей зависимостей (npm audit)
@@ -45,6 +46,7 @@
 │   └── twitch/                    # Twitch Extension (видео-оверлей)
 ├── scripts/                       # Скрипты сборки и стриминга
 │   ├── addramdisk.sh              # RAM-диск для ускорения (Linux)
+│   ├── check-node.js              # Проверка версии Node перед запуском сервера
 │   ├── postbuild.js               # Пост-обработка сборки
 │   ├── postrender.js              # Пост-обработка react-snap/SSR
 │   ├── saveep.sh                  # Сохранение пикселей (эпизод)
@@ -280,12 +282,16 @@
 - `svgo` (devDependency, версия зафиксирована) — нужен трансформеру `@parcel/transformer-svg-react`, заданному в `.parcelrc` для `*.svg`. Если пакета нет в дереве, Parcel во время сборки доустанавливает его сам (`Installing svgo...` → `npm install --json --save-dev svgo@^3`) и переписывает `package.json` и lock-файлы: сборка перестаёт быть воспроизводимой и требует доступа в сеть. Поэтому зависимость объявлена явно, а не полагается на autoinstall.
 - `sass` ограничен диапазоном `^1.70.0 <1.100.0` (резолвится в `1.99.0`): начиная с `sass@1.100.0` в `engines` указано `node >=20.19.0`, а проект работает на Node 18 (`node-canvas`/`sqlite3`), из-за чего `yarn install` на поддерживаемой версии Node падал на проверке engines.
 - Основной пакетный менеджер — npm (CI тоже использует npm). `yarn` (v1) при установке перелинковывает `node_modules` и теряет артефакты, которые не описаны в `yarn.lock`: после `yarn install` команда `npm run dev:server` падает с `Could not locate the bindings file` (`sqlite3`), а `npm run render` — с `Chromium revision is not downloaded` (`puppeteer`). Восстановление: `npm rebuild sqlite3 canvas` и `node node_modules/puppeteer/install.js`.
+- Поддерживается **Node 18**: версия зафиксирована в `.nvmrc` (`18`), перед `npm run dev:server` её проверяет `scripts/check-node.js` (`predev:server`). Поле `engines` в `package.json` намеренно не задано: Parcel учитывает `engines` при выборе окружения и собирает клиент как Node/ESM-таргет — вместо бандла в `dist/*.js` остаются внешние импорты (`import ... from "react"`), страница падает с `Failed to resolve module specifier "react"`, а `npm run render` (react-snap) завершается ошибкой. `canvas@2.11` не публикует prebuilt-бинарники для `darwin-arm64` (в релизе есть только `darwin-x64`), поэтому на Apple Silicon модуль компилируется из исходников под ABI текущего Node (нужны `cairo`, `pango`, `libjpeg`, `giflib`, `pixman`, `librsvg`; в CI ставится `libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev`), а на Node 24 исходники `canvas@2.11` вообще не собираются (ломающие изменения V8 API). Симптом неправильной версии Node: `NODE_MODULE_VERSION 108 ... this version of Node.js requires NODE_MODULE_VERSION 137` при импорте `canvas`; после смены версии Node выполните `npm rebuild canvas`. `sqlite3@5`, в отличие от `canvas`, ставится prebuilt-сборкой (`napi`) и переносим между версиями Node.
 
 ---
 
 ## Запуск локально
 
 ```bash
+# 0. Node 18 (версия из .nvmrc) и системные библиотеки для node-canvas
+nvm use            # или: nvm install 18 && nvm use 18
+
 # 1. Установка зависимостей
 npm install
 

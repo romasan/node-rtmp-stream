@@ -6,6 +6,7 @@
     "start": "npm run build:server && pm2 start node ./lib/index.js --name pixelbattle",
     "stop": "pm2 stop pixelbattle && pm2 delete pixelbattle",
     "dev": "concurrently -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
+    "predev:server": "node ./scripts/check-node.js",
     "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
     "dev:web": "parcel pages/index.html pages/*/index.html",
     "dev:timelapse": "npx http-server --cors",
