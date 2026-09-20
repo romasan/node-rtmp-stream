@@ -1,5 +1,9 @@
 # Changelog
 
+## 21.09.2026
+- Refactored `tools/drawEpisode.js` to render episode frames in parallel via `child_process.fork` (`DRAW_EPISODE_WORKERS` sets the worker count), byte-identical to serial output.
+- Fixed `tools/drawEpisode.js` keeping residue of the previous frame: the frame canvas is now cleared (`ctx.clearRect`) before each draw, so smaller or transparent backgrounds no longer show stale pixels.
+
 ## 20.09.2026
 - Fixed `tools/drawEpisode.js` failing with `ENOENT` when the output `frames/` directory does not exist: the directory is now created automatically before rendering.
 - Fixed `tools/drawEpisode.js` crashing with `EISDIR` when the background directory (e.g. `./tmp`) contains subdirectories: only image files (`.jpg`/`.jpeg`/`.png`/`.webp`) are now used as background frames.
