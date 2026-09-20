@@ -9,10 +9,10 @@ const { colorSchemes } = require('./loadColorSchemes');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png
-// npm run tools prepareTimelapse s4e1 NOIMAGE
+// npm run tools prepareTimelapse s4e2 NOIMAGE
 // rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
-// http://localhost:8080/timelapse/#staticHost=http://localhost:8080
-
+// npm run tools prepareTimelapse s4e2 NOIMAGE && scripts/packTimelapse.sh && npx http-server tmp -p 8081 --cors
+// http://localhost:1234/timelapse#staticHost=http://localhost:8081
 const hexToRgb = (hex) => [
 	parseInt(hex.substring(1, 3), 16),
 	parseInt(hex.substring(3, 5), 16),

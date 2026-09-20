@@ -43,6 +43,7 @@
 ├── scripts/                       # Скрипты сборки и стриминга
 │   ├── addramdisk.sh              # RAM-диск для ускорения (Linux)
 │   ├── postbuild.js               # Пост-обработка сборки
+│   ├── packTimelapse.sh           # Упаковка таймлапса в tmp/timelapse
 │   ├── postrender.js              # Пост-обработка react-snap/SSR
 │   ├── saveep.sh                  # Сохранение пикселей (эпизод)
 │   └── stream.sh                  # Запуск ffmpeg стрима полотна
@@ -185,6 +186,13 @@
 - Проигрывает историю изменений полотна («эпизоды»).
 - Серверные утилиты генерации: `tools/prepareTimelapse.js`, `tools/drawEpisode.js`.
 - Скрипт сохранения эпизода: `scripts/saveep.sh`.
+- Скрипт упаковки: `scripts/packTimelapse.sh` — копирует данные сезонов из `db/archive/<сезон>/timelapse/*` в `tmp/timelapse/<сезон>/` (структура как на статике) и генерирует `tmp/timelapse/index.json` со списком сезонов (`{ key, label }`). Сезоны без подготовленных `.bin` пропускаются. Результат можно скопировать в `dist/` и проверить локально:
+
+```
+./scripts/packTimelapse.sh
+rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
+# http://localhost:8080/timelapse/#staticHost=http://localhost:8080
+```
 
 ### 11. Стриминг (`scripts/stream.sh`)
 
