@@ -279,6 +279,7 @@
 
 - `svgo` (devDependency, версия зафиксирована) — нужен трансформеру `@parcel/transformer-svg-react`, заданному в `.parcelrc` для `*.svg`. Если пакета нет в дереве, Parcel во время сборки доустанавливает его сам (`Installing svgo...` → `npm install --json --save-dev svgo@^3`) и переписывает `package.json` и lock-файлы: сборка перестаёт быть воспроизводимой и требует доступа в сеть. Поэтому зависимость объявлена явно, а не полагается на autoinstall.
 - `sass` ограничен диапазоном `^1.70.0 <1.100.0` (резолвится в `1.99.0`): начиная с `sass@1.100.0` в `engines` указано `node >=20.19.0`, а проект работает на Node 18 (`node-canvas`/`sqlite3`), из-за чего `yarn install` на поддерживаемой версии Node падал на проверке engines.
+- Основной пакетный менеджер — npm (CI тоже использует npm). `yarn` (v1) при установке перелинковывает `node_modules` и теряет артефакты, которые не описаны в `yarn.lock`: после `yarn install` команда `npm run dev:server` падает с `Could not locate the bindings file` (`sqlite3`), а `npm run render` — с `Chromium revision is not downloaded` (`puppeteer`). Восстановление: `npm rebuild sqlite3 canvas` и `node node_modules/puppeteer/install.js`.
 
 ---
 
