@@ -5,6 +5,7 @@
 - [x] auth by twitch
 - [x] auth by discord
 - [x] auth by telegram
+- [ ] auth by vkplay
 - [x] auth by vk
 - [x] auth by steam
 - [x] countdown
@@ -72,7 +73,7 @@
 - [ ] change countdown for uuid/nick/ip
 - [ ] freeze area
 - [ ] statistic (online, total pixels, online/pixels by hour/day)
-- [ ] get pixel author (uuid, IP, nickname, auth service)
+- [x] get pixel author (uuid, IP, nickname, auth service)
 - [ ] get users on IP address
 - [ ] ban by uuid (shadow)
 - [ ] ban by IP address (shadow)
@@ -91,7 +92,7 @@
 - [x] replace server/tools/getPixelInfo -> server/
 - [x] remove event emitter
 - [ ] auto restart: add servise with chatbot for notification
-- [ ] fit the canvas into the frame
+- [x] fit the canvas into the frame
 - [ ] rotated access log
 - [ ] use database instead files
 - [ ] binary ws messages? (protobufjs)
