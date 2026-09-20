@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Проверяет версию Node перед запуском сервера: `canvas`/`sqlite3` собираются
- * под ABI текущего Node, поэтому на неподдерживаемой версии сервер падает
- * с `NODE_MODULE_VERSION` или `Could not locate the bindings file`.
+ * Проверяет версию Node перед запуском сервера: проект зафиксирован на версии
+ * из `.nvmrc` (та же версия используется в CI), чтобы окружение разработки
+ * совпадало со сборкой и деплоем.
  * Версия берётся из `.nvmrc`: поле `engines` в `package.json` не используется,
  * потому что Parcel учитывает его при выборе окружения и собирает клиент
  * как Node/ESM-таргет (внешние `import "react"` вместо бандла).
@@ -17,9 +17,9 @@ const current = process.versions.node;
 
 if (supportedMajor && Number(current.split('.')[0]) !== supportedMajor) {
 	console.error(`[node] Неподдерживаемая версия Node.js: v${current}, требуется ${required} (см. .nvmrc).`);
-	console.error('[node] node-canvas собирается под ABI конкретной версии Node, поэтому сервер падает с');
-	console.error('[node] "NODE_MODULE_VERSION ... was compiled against a different Node.js version".');
-	console.error('[node] Запустите: nvm use && npm rebuild canvas');
+	console.error('[node] Проект зафиксирован на версии из .nvmrc — она же используется в CI (deploy.yml, security.yml),');
+	console.error('[node] чтобы локальный запуск, сборка и деплой шли на одинаковом окружении.');
+	console.error('[node] Запустите: nvm use');
 
 	process.exit(1);
 }

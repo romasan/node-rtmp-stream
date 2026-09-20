@@ -10,6 +10,7 @@
 - Applied `npm audit fix` where no breaking changes were required.
 - Declared `svgo` (`3.3.5`) as an explicit pinned devDependency: `@parcel/transformer-svg-react` (see `.parcelrc`) needs it, and without it Parcel runs `npm install --json --save-dev svgo@^3` during every build, rewriting `package.json` and both lock files and requiring network access.
 - Constrained `sass` to `^1.70.0 <1.100.0` (resolves to `1.99.0`): `sass@1.100.0` and newer declare `engines.node >=20.19.0`, which broke `yarn install` on the supported Node 18.
+- Upgraded `canvas` `^2.11.0` → `3.2.3` (N-API prebuilds for `darwin-arm64`/`linux-x64` instead of `nan`/ABI-bound builds): the native module no longer pins the project to a single Node major version, and rendering output stays byte-identical.
 - Added `npm audit` CI job (`.github/workflows/security.yml`) and Dependabot config (`.github/dependabot.yml`) to prevent the vulnerability backlog from growing again.
 
 ## 05.09.2026
