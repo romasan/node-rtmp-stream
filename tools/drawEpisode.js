@@ -47,11 +47,13 @@ const videoHeight = 1080; // 720 | 1080;
 
 const breakLine = Infinity;
 
+const debugInfo = false;
+
 // ffmpeg -i bg.mp4 -vf "fps=60" tmp/%08d.jpg
 // npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
 // npm run tools drawEpisode CURRENT ./tmp NOIMAGE
 // ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
-// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2025 S4E2" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2026 S4E2" -metadata artist="pixelbattles.ru" output.mp4
 // ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -af apad -shortest output.mp4
 
 // const scale = 2;
@@ -122,6 +124,36 @@ const circle = (w, h, minR, maxR) => {
 // const skipFrom = 0;
 // const skipTo = 1000;
 
+const drawDebugInfo = (ctx, frameNumber, pixels, part, width, height, shiftX, shiftY) => {
+	ctx.save();
+	ctx.globalCompositeOperation = 'source-over';
+	ctx.font = '36px sans-serif';
+	ctx.textAlign = 'left';
+	ctx.textBaseline = 'top';
+
+	const lines = [
+		`Frame: ${frameNumber}`,
+		`Pixels: ${pixels}`,
+		`Expansion: ${part}`,
+		`Canvas: ${width}x${height}`,
+		`Shift: ${shiftX},${shiftY}`,
+	];
+
+	const padding = 12;
+	const lineHeight = 44;
+	const textWidth = lines.reduce((max, line) => Math.max(max, ctx.measureText(line).width), 0);
+
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+	ctx.fillRect(0, 0, textWidth + padding * 2, lines.length * lineHeight + padding * 2);
+
+	ctx.fillStyle = '#00ff00';
+	lines.forEach((line, index) => {
+		ctx.fillText(line, padding, padding + index * lineHeight);
+	});
+
+	ctx.restore();
+};
+
 const drawEpisode = async (ep, bg, firstFrame) => {
 	console.log('Start draw episode', ep);
 
@@ -137,6 +169,9 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	const _sec = Math.floor(length / PPS);
 	console.log(`Start renderind for: ${String(Math.floor(_sec / 60)).padStart(2, '0')}:${String(_sec % 60).padStart(2, '0')} duration, ${length / PPF} frames, ${length} pixels`);
 
+	const framesDir = `${__dirname}/../frames`;
+	fs.mkdirSync(framesDir, { recursive: true });
+
 	const bar = new Progress.Bar();
 	const canvas = createCanvas(videoWidth, videoHeight);
 	const ctx = canvas.getContext('2d');
@@ -144,11 +179,14 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 	let bgFiles;
 	let bgIndex = 0;
 	if (fs.existsSync(bg)) {
-		bgFiles = fs.readdirSync(bg);
+		bgFiles = fs.readdirSync(bg)
+			.filter((file) => /\.(jpe?g|png|webp)$/i.test(file))
+			.filter((file) => fs.statSync(`${bg}/${file}`).isFile())
+			.sort();
 	}
 
 	const drawFrameBg = () => {
-		if (bgFiles) {
+		if (bgFiles && bgFiles.length > 0) {
 			const frame = `${bg}/${bgFiles[bgIndex]}`;
 			const imgBuf = fs.readFileSync(frame);
 			const image = new Image;
@@ -265,7 +303,13 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 			ctx.globalCompositeOperation = 'source-over';
 			ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-			const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
+			frame++;
+
+			if (debugInfo) {
+				drawDebugInfo(ctx, frame, i, part, width, height, shiftX, shiftY);
+			}
+
+			const output = framesDir + '/' + String(frame).padStart(8, '0') + '.png';
 
 			fs.writeFileSync(output, canvas.toBuffer());
 		}
@@ -281,7 +325,13 @@ const drawEpisode = async (ep, bg, firstFrame) => {
 		ctx.globalCompositeOperation = 'source-over';
 		ctx.drawImage(mcanvas, 0, 0, width, height, pixelsFrameX, pixelsFrameY, width * scale, height * scale);
 
-		const output = __dirname + '/../frames/' + String(++frame).padStart(8, '0') + '.png';
+		frame++;
+
+		if (debugInfo) {
+			drawDebugInfo(ctx, frame, i, part, width, height, shiftX, shiftY);
+		}
+
+		const output = framesDir + '/' + String(frame).padStart(8, '0') + '.png';
 
 		fs.writeFileSync(output, canvas.toBuffer());
 

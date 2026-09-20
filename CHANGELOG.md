@@ -1,6 +1,9 @@
 # Changelog
 
 ## 20.09.2026
+- Fixed `tools/drawEpisode.js` failing with `ENOENT` when the output `frames/` directory does not exist: the directory is now created automatically before rendering.
+- Fixed `tools/drawEpisode.js` crashing with `EISDIR` when the background directory (e.g. `./tmp`) contains subdirectories: only image files (`.jpg`/`.jpeg`/`.png`/`.webp`) are now used as background frames.
+- Added a debug overlay to `tools/drawEpisode.js` (enabled via the `debugInfo` flag) that draws frame number, last rendered pixel, expansion number, canvas size and expansion shift in the top-left corner of every frame.
 - Fixed `tools/prepareTimelapse.js` expanding the canvas: the previously rendered image (and the emitted `expand.shift`) now uses the shift delta between consecutive expansions instead of the cumulative shift, so the image is no longer offset twice on multi-axis expansions.
 - Added `scripts/packTimelapse.sh`, which copies archived episode timelapses into `tmp/timelapse/<season>/` and generates `tmp/timelapse/index.json` with the season list.
 - Added `tools/loadColorSchemes.js`, which loads the color schemes from `server/constants/colorSchemes.ts` via `ts-node`, so `tools/prepareTimelapse.js` and `tools/drawEpisode.js` work on Node 18 as well as Node 24+ instead of relying on the experimental `require('.ts')`.
