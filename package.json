@@ -51,6 +51,11 @@
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },
+  "overrides": {
+    "canvas": {
+      "nan": "^2.29.0"
+    }
+  },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.3",
     "@parcel/transformer-svg-react": "^2.10.3",

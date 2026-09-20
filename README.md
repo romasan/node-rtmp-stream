@@ -213,6 +213,10 @@
 - `checkLog.js`, `debugServer.js`, `debugStream.js`, `debugTwitch.js` — отладка;
 - `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий.
 
+Инструменты запускаются обычным `node` (`npm run tools <команда>`). Цветовые схемы подгружаются из исходника `server/constants/colorSchemes.ts` через общий хелпер `tools/loadColorSchemes.js`, который регистрирует `ts-node` (`transpileOnly`) — поэтому инструменты работают и на Node 18, и на Node 24+.
+
+> `canvas` — нативный модуль: он собирается под ту версию Node, которой выполняется установка зависимостей. После смены версии Node (например, через `nvm`) нужно переустановить зависимости (`npm install`) или пересобрать модуль (`npm rebuild canvas`), иначе `require('canvas')` упадёт с ошибкой `NODE_MODULE_VERSION`.
+
 ---
 
 ## Конфигурация (`server/config.json`)

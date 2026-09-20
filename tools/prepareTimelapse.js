@@ -5,7 +5,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const { colorSchemes } = require('../server/constants/colorSchemes.ts');
+const { colorSchemes } = require('./loadColorSchemes');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png

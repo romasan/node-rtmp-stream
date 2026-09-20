@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.09.2026
+- Added `tools/loadColorSchemes.js`, which loads the color schemes from `server/constants/colorSchemes.ts` via `ts-node`, so `tools/prepareTimelapse.js` and `tools/drawEpisode.js` work on Node 18 as well as Node 24+ instead of relying on the experimental `require('.ts')`.
+- Pinned `nan` to `^2.29.0` for `canvas` via npm `overrides` so the native module compiles on Node 24 (canvas 2.11.2 requires a newer `nan`).
+
 ## 05.09.2026
 - Moved `server/tools` one level up to the repo root `tools/` and fixed all relative import paths.
 - Added a husky pre-commit hook that runs `npm run build && npm run render` and aborts the commit on any build/render error.
