@@ -20,9 +20,9 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 });
 
 const expand = async (input, output, width, height, shiftX = 0, shiftY = 0, colorScheme = 'COLORS_1') => {
-	const countOfPixels = await getFileLinesCount(__dirname + '/../../db/pixels.log');
+	const countOfPixels = await getFileLinesCount(__dirname + '/../db/pixels.log');
 
-	const file = fs.createWriteStream(__dirname + '/../../db/expands.log', { flags : 'a' });
+	const file = fs.createWriteStream(__dirname + '/../db/expands.log', { flags : 'a' });
 
 	const imgBuf = fs.readFileSync(input);
 	const image = new Image;

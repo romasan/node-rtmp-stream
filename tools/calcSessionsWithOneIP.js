@@ -1,11 +1,11 @@
 const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
-const { getPathByToken } = require('../helpers');
-const { getFileLinesCount } = require('../helpers');
+const { getPathByToken } = require('../server/helpers');
+const { getFileLinesCount } = require('../server/helpers');
 
 const calcSessionsWithOneIP = async () => {
-	const path = __dirname + '/../../db/list';
+	const path = __dirname + '/../db/list';
 	const cache = {};
 	// const errors = [];
 

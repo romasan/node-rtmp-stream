@@ -6,8 +6,8 @@ const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
 
-const recover = (file = __dirname + '/../../db/pixels.log', backgroundImage = 'NOIMAGE', output = __dirname + '/../../db/inout.png', width, height) => {
-	const list = fs.readFileSync(__dirname + '/../../db/expands.log')
+const recover = (file = __dirname + '/../db/pixels.log', backgroundImage = 'NOIMAGE', output = __dirname + '/../db/inout.png', width, height) => {
+	const list = fs.readFileSync(__dirname + '/../db/expands.log')
 		.toString()
 		.split('\n')
 		.filter(Boolean);

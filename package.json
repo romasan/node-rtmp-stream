@@ -15,7 +15,7 @@
     "postbuild": "cp static/* dist/ && cp dist/*.js dist/tg/ && cp dist/*.css dist/tg/ && cp dist/*.webp dist/tg/ && cp dist/*.png dist/tg/ && cp dist/*.ttf dist/tg/ && node ./scripts/postbuild.js",
     "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
     "build:twitch": "cd pages/twitch/ && zip -r twitch-extension.zip ./*",
-    "tools": "node ./server/tools/index.js",
+    "tools": "node ./tools/index.js",
     "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
     "logs": "pm2 log",
     "prepare": "husky"
@@ -50,6 +50,11 @@
     "typescript": "^5.0.2",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
+  },
+  "overrides": {
+    "canvas": {
+      "nan": "^2.29.0"
+    }
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.3",

@@ -43,6 +43,7 @@
 ├── scripts/                       # Скрипты сборки и стриминга
 │   ├── addramdisk.sh              # RAM-диск для ускорения (Linux)
 │   ├── postbuild.js               # Пост-обработка сборки
+│   ├── packTimelapse.sh           # Упаковка таймлапса в tmp/timelapse
 │   ├── postrender.js              # Пост-обработка react-snap/SSR
 │   ├── saveep.sh                  # Сохранение пикселей (эпизод)
 │   └── stream.sh                  # Запуск ffmpeg стрима полотна
@@ -52,9 +53,9 @@
 │   ├── api/                       # REST API + админка
 │   ├── constants/                 # Цветовые схемы
 │   ├── helpers/                   # Утилиты-хелперы
-│   ├── tools/                     # Консольные инструменты анализа БД
 │   ├── types/                     # TypeScript-типы
 │   └── utils/                     # Ядро: canvas, ws, auth, bans, stats и т.д.
+├── tools/                         # Консольные инструменты анализа БД
 ├── src/                           # Клиент (React)
 │   ├── index.tsx                  # Входная точка приложения
 │   ├── App.tsx                    # Корневой компонент
@@ -183,8 +184,15 @@
 
 - Отдельная страница (`pages/timelapse/`, `src/containers/Timelapse`).
 - Проигрывает историю изменений полотна («эпизоды»).
-- Серверные утилиты генерации: `server/tools/prepareTimelapse.js`, `server/tools/drawEpisode.js`.
+- Серверные утилиты генерации: `tools/prepareTimelapse.js`, `tools/drawEpisode.js`.
 - Скрипт сохранения эпизода: `scripts/saveep.sh`.
+- Скрипт упаковки: `scripts/packTimelapse.sh` — копирует данные сезонов из `db/archive/<сезон>/timelapse/*` в `tmp/timelapse/<сезон>/` (структура как на статике) и генерирует `tmp/timelapse/index.json` со списком сезонов (`{ key, label }`). Сезоны без подготовленных `.bin` пропускаются. Результат можно скопировать в `dist/` и проверить локально:
+
+```
+./scripts/packTimelapse.sh
+rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
+# http://localhost:8080/timelapse/#staticHost=http://localhost:8080
+```
 
 ### 11. Стриминг (`scripts/stream.sh`)
 
@@ -196,7 +204,7 @@
    - публикует во RTMP (`rtmpHostKey`).
 3. Скрипт автоматически перезапускает ffmpeg при обрыве.
 
-### 12. Инструменты анализа (`server/tools/`)
+### 12. Инструменты анализа (`tools/`)
 
 Консольные утилиты для работы с данными:
 
@@ -205,13 +213,17 @@
 - `recover.js` — восстановление;
 - `restorePixels.js` — восстановление пикселей;
 - `drawDiffMask.js` — маска различий;
-- `drawEpisode.js` — отрисовка эпизода таймлапса;
+- `drawEpisode.js` — отрисовка эпизода таймлапса; в качестве фона берутся только файлы-изображения (`.jpg`/`.jpeg`/`.png`/`.webp`) из указанной директории (подпапки игнорируются); выходная директория `frames/` создаётся автоматически; при включённом флаге `debugInfo` поверх каждого кадра в левом верхнем углу выводится отладочная информация (номер кадра, номер последнего отрендеренного пикселя, номер расширения, размер полотна, сдвиг расширения); рендер распараллелен по ядрам CPU: кадры делятся на равные чанки, каждый чанк рисует отдельный процесс (`child_process.fork`), их число задаётся 4-м аргументом команды или переменной окружения `DRAW_EPISODE_WORKERS` (по умолчанию — по числу ядер); результат побайтово совпадает с последовательным рендером;
 - `prepareTimelapse.js` — подготовка таймлапса;
 - `upscale.js` — апскейл полотна;
 - `expand.js` — расширение полотна;
 - `geoip.js` — геолокация по IP (maxmind);
 - `checkLog.js`, `debugServer.js`, `debugStream.js`, `debugTwitch.js` — отладка;
 - `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий.
+
+Инструменты запускаются обычным `node` (`npm run tools <команда>`). Цветовые схемы подгружаются из исходника `server/constants/colorSchemes.ts` через общий хелпер `tools/loadColorSchemes.js`, который регистрирует `ts-node` (`transpileOnly`) — поэтому инструменты работают и на Node 18, и на Node 24+.
+
+> `canvas` — нативный модуль: он собирается под ту версию Node, которой выполняется установка зависимостей. После смены версии Node (например, через `nvm`) нужно переустановить зависимости (`npm install`) или пересобрать модуль (`npm rebuild canvas`), иначе `require('canvas')` упадёт с ошибкой `NODE_MODULE_VERSION`.
 
 ---
 
@@ -246,7 +258,7 @@
 | `npm stop` | Остановка pm2-процесса |
 | `npm run render` | react-snap (SSR пререндер) + постобработка |
 | `npm run build:twitch` | Сборка Twitch Extension (zip) |
-| `npm run tools` | Запуск консольных инструментов (`server/tools`) |
+| `npm run tools` | Запуск консольных инструментов (`tools`) |
 | `npm run eslint` | Линтинг клиента |
 
 ### Pre-commit проверка (husky)

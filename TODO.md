@@ -5,7 +5,6 @@
 - [x] auth by twitch
 - [x] auth by discord
 - [x] auth by telegram
-- [ ] auth by vkplay
 - [x] auth by vk
 - [x] auth by steam
 - [x] countdown
@@ -22,7 +21,7 @@
 - [x] chat mute user
 - [x] add datetime for logs
 - [x] chat moderation (delete all by user)
-- [ ] read chat from stream(s)?
+- [ ] read chat from stream(s)? twitch, vk live
 - [x] support for multiple colors
 - [ ] twitch extension (https://dev.twitch.tv/docs/extensions/)
 - [ ] rename all qq to admin or super
@@ -30,8 +29,8 @@
 - [x] do not allow more than one (or percentage of the number online) user with one IP address
 - [ ] integration tests
 - [ ] webassembly + canvas =) rust?
-- [x] add to telegram web app
-- [ ] add qr to stream) (like https://github.com/hip-hyena/PaintBot)
+- [x] add to telegram mini app (like https://github.com/hip-hyena/PaintBot)
+- [ ] add qr to stream
 - [x] chat rate limit
 - [ ] check has new banned users/IP in pixels.log
 - [ ] rating for groups/squads/tags

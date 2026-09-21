@@ -5,14 +5,14 @@
 const fs = require('fs');
 const readline = require('readline');
 const { createCanvas, Image } = require('canvas');
-const { colorSchemes } = require('../constants/colorSchemes.ts');
+const { colorSchemes } = require('./loadColorSchemes');
 const PART_PIXELS_COUNT = 100_000;
 
 // npm run tools prepareTimelapse s3e1 assets/s3e1.png
-// npm run tools prepareTimelapse s4e1 NOIMAGE
+// npm run tools prepareTimelapse s4e2 NOIMAGE
 // rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
-// http://localhost:8080/timelapse/#staticHost=http://localhost:8080
-
+// npm run tools prepareTimelapse s4e2 NOIMAGE && scripts/packTimelapse.sh && npx http-server tmp -p 8081 --cors
+// http://localhost:1234/timelapse#staticHost=http://localhost:8081
 const hexToRgb = (hex) => [
 	parseInt(hex.substring(1, 3), 16),
 	parseInt(hex.substring(3, 5), 16),
@@ -50,12 +50,12 @@ const buildColorsCache = (colorScheme) => {
 
 const prepareTimelapse = (
 	season = 's1e1',
-	backgroundImage = `${__dirname}/../../assets/426x240.png`,
+	backgroundImage = `${__dirname}/../assets/426x240.png`,
 ) => {
-	const expandsFile = `${__dirname}/../../db/archive/${season}/expands.log`;
-	const pixelsFile = `${__dirname}/../../db/archive/${season}/pixels.log`;
-	const timelapseFile = `${__dirname}/../../db/archive/${season}/timelapse/index.json`;
-	const dirName = `${__dirname}/../../db/archive/${season}/timelapse/`;
+	const expandsFile = `${__dirname}/../db/archive/${season}/expands.log`;
+	const pixelsFile = `${__dirname}/../db/archive/${season}/pixels.log`;
+	const timelapseFile = `${__dirname}/../db/archive/${season}/timelapse/index.json`;
+	const dirName = `${__dirname}/../db/archive/${season}/timelapse/`;
 
 	if (!fs.existsSync(dirName)) {
 		fs.mkdirSync(dirName, { recursive: true });
@@ -137,6 +137,14 @@ const prepareTimelapse = (
 			const newExpandIndex = expandIndex + 1;
 			const prevIsTruecolor = isTruecolor;
 
+			// В expands.log сдвиги хранятся накопительно (абсолютно от начала координат),
+			// а для сдвига уже нарисованного изображения (и для клиента) нужна разница
+			// между текущим и предыдущим расширением — относительный сдвиг.
+			const prevShiftX = expandIndex >= 0 ? expands[expandIndex].shiftX : 0;
+			const prevShiftY = expandIndex >= 0 ? expands[expandIndex].shiftY : 0;
+			const shiftX = expands[newExpandIndex].shiftX - prevShiftX;
+			const shiftY = expands[newExpandIndex].shiftY - prevShiftY;
+
 			if (expandIndex >= 0) {
 				// backup image
 				const backupCanvas = createCanvas(canvas.width, canvas.height);
@@ -150,15 +158,15 @@ const prepareTimelapse = (
 				// restore image с учётом сдвига старого канваса в новом
 				ctx.drawImage(
 					backupCanvas,
-					expands[newExpandIndex].shiftX,
-					expands[newExpandIndex].shiftY,
+					shiftX,
+					shiftY,
 				);
 
 				// закрыть текущую неполную часть предыдущего расширения
 				if (partPixels.length) {
 					packTimelapsePart(
 						partPixels,
-						`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+						`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 						prevIsTruecolor,
 					);
 					partPixels = [];
@@ -186,8 +194,8 @@ const prepareTimelapse = (
 					to: partIndex
 				},
 				shift: {
-					x: expands[expandIndex].shiftX,
-					y: expands[expandIndex].shiftY,
+					x: shiftX,
+					y: shiftY,
 				},
 				colorScheme: expands[expandIndex].colorScheme,
 				isTruecolor,
@@ -229,7 +237,7 @@ const prepareTimelapse = (
 		if (partPixels.length >= PART_PIXELS_COUNT) {
 			packTimelapsePart(
 				partPixels,
-				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 				isTruecolor,
 			);
 			partPixels = [];
@@ -239,7 +247,7 @@ const prepareTimelapse = (
 		}
 
 		if (savePreview) {
-			const output = `${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.png`;
+			const output = `${__dirname}/../db/archive/${season}/timelapse/${partIndex}.png`;
 			fs.writeFileSync(output, canvas.toBuffer());
 			savePreview = false;
 		}
@@ -253,7 +261,7 @@ const prepareTimelapse = (
 		if (partPixels.length) {
 			packTimelapsePart(
 				partPixels,
-				`${__dirname}/../../db/archive/${season}/timelapse/${partIndex}.bin`,
+				`${__dirname}/../db/archive/${season}/timelapse/${partIndex}.bin`,
 				isTruecolor,
 			);
 		}
