@@ -50,18 +50,10 @@ const getFileLinesCount = (file) => new Promise((resolve) => {
 
 // registerFont(__dirname + '/../assets/fonts/CustomFont.ttf', { family: 'Custom Font' });
 
-const PPF = 108; // 300;
+// PPF = TOTAL_PIXELS / (TARGET_SEC * FPS)
+const PPF = 132; // 300;
 const FPS = 60; // 25;
 const PPS = PPF * FPS;
-
-const sec = 1000;
-const min = sec * 60;
-const hour = min * 60;
-const day = hour * 24;
-
-const textX = 1500;
-const textY = 1000;
-const textLineHeight = 70;
 
 const videoWidth = 1920; // 1080 | 1920;
 const videoHeight = 1080; // 720 | 1080;
@@ -77,24 +69,8 @@ const REPORT_EVERY_PIXELS = PPF * 10;
 // npm run tools drawEpisode CURRENT ./tmp ./assets/s3e1.png
 // npm run tools drawEpisode CURRENT ./tmp NOIMAGE
 // ffmpeg -i "concat:bg1.mp3|bg2.mp3|bg3.mp3" -c copy bg.mp3
-// ffmpeg -stream_loop -1 -i bg1.mp3 -r 60 -i frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2026 S4E2" -metadata artist="pixelbattles.ru" output.mp4
+// ffmpeg -stream_loop -1 -i s4e2.mp3 -r 60 -i frames/%08d.png -vf "scale=1920:1080" -c:v libx264 -c:a aac -shortest -map_metadata -1 -metadata title="Pixel Battle 2026 S4E2" -metadata artist="pixelbattles.ru" output.mp4
 // ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -af apad -shortest output.mp4
-
-// const scale = 2;
-
-// const drawDayBG = (ctx, day) => {
-// 	const bg = drawBGCanvas(videoWidth, videoHeight);
-// 	ctx.drawImage(bg, 0, 0);
-
-// 	const text = `Day #${day}`;
-// 	ctx.fillStyle = '#000';
-// 	ctx.fillText(text, textX - 1, textY + textLineHeight - 1);
-// 	ctx.fillText(text, textX + 1, textY + textLineHeight + 1);
-// 	ctx.fillText(text, textX - 1, textY + textLineHeight + 1);
-// 	ctx.fillText(text, textX + 1, textY + textLineHeight - 1);
-// 	ctx.fillStyle = '#fff';
-// 	ctx.fillText(text, textX, textY + textLineHeight);
-// };
 
 const backupCanvas = (canvas) => {
 	const backupCanvas = createCanvas(canvas.width, canvas.height);
