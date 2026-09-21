@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -26,6 +29,15 @@ jobs:
         run: |
           npm install
 
+      # Порог для production-дерева — high: единственная moderate-находка (`uuid <11.1.1`,
+      # GHSA-w5hq-g745-h8pq) неприменима — проект использует только v4, уязвимость в v3/v5/v6 с `buf`.
+      # Обновиться до patched `uuid` нельзя: `uuid@11+` содержит синтаксис ES2021 (`??`, `?.`),
+      # который не парсит Chromium 78 внутри react-snap (см. README, раздел про зависимости).
+      - name: Audit dependencies
+        run: |
+          npm audit --omit=dev --audit-level=high
+          npm audit --audit-level=critical
+
       - name: Build
         run: |
           npm run build
@@ -35,6 +47,7 @@ jobs:
           npm run render
 
       - name: Deploy
+        if: github.event_name == 'push'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
