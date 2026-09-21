@@ -1,6 +1,13 @@
 # Changelog
 
 ## 21.09.2026
+- Updated dependencies to close the Dependabot alerts: `ws ^8.21.3`, `form-data ^4.0.6`, `canvas ^3.2.3`, `parcel ^2.16.4`, `node-fetch ^2.7.0`, `pm2 ^7.0.4` (#72).
+- Pinned patched versions of transitive dependencies via npm `overrides`, cutting `npm audit` from 140 findings (13 critical, 58 high) to 5 high and 0 critical (#72).
+- Removed unused dependencies (`parcel-bundler`, `res`, `src`, `parcel-plugin-static-files-copy`, PostCSS plugins), which dropped the legacy Parcel 1 tree with its vulnerable transitive packages.
+- Kept `uuid` on 9.x and documented why: `uuid@10+` ships ES2021 syntax (`??`, `?.`) that react-snap's Chromium 78 cannot parse, so the client bundle never boots and the prerender fails silently.
+- Added an `npm audit` gate to the deploy workflow (`--omit=dev --audit-level=high` plus `--audit-level=critical`) with a weekly schedule and manual trigger (#72).
+- Documented the inapplicable moderate `uuid` advisory (GHSA-w5hq-g745-h8pq affects v3/v5/v6 with an external `buf`; the project uses v4 only) that keeps the production audit gate at `high`.
+- Added a `smoke:server` script that checks a running server end to end: guest session, WebSocket `init`, ping/pong and chat history (#72).
 - Refactored `tools/drawEpisode.js` to render episode frames in parallel via `child_process.fork` (`DRAW_EPISODE_WORKERS` sets the worker count), byte-identical to serial output.
 - Fixed `tools/drawEpisode.js` keeping residue of the previous frame: the frame canvas is now cleared (`ctx.clearRect`) before each draw, so smaller or transparent backgrounds no longer show stale pixels.
 

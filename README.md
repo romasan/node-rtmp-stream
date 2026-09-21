@@ -18,7 +18,7 @@
 | Авторизация | OAuth2: Twitch, Discord, Steam, Telegram, VK |
 | БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
 | Стриминг | ffmpeg + скрипт `scripts/stream.sh` |
-| CI/CD | GitHub Actions → сборка → react-snap → деплой на GitHub Pages (`gh-pages`) |
+| CI/CD | GitHub Actions → `npm audit` → сборка → react-snap → деплой на GitHub Pages (`gh-pages`) |
 | Процессы | pm2 (`pixelbattle`) |
 
 ---
@@ -252,6 +252,7 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 | `npm run dev` | Параллельный запуск dev-сервера и клиента (`dev:server` + `dev:web` через `concurrently`) |
 | `npm run dev:server` | Запуск сервера в dev-режиме (nodemon + ts-node) |
 | `npm run dev:web` | Запуск Parcel для клиента (dev-сервер) |
+| `npm run smoke:server` | Смоук-проверка запущенного сервера: гостевая сессия (`/start`), WebSocket (`init`, ping/pong) и история чата (`/messages`) |
 | `npm run build` | Production-сборка клиента (Parcel) |
 | `npm run build:server` | Компиляция сервера в `lib/` |
 | `npm start` | Сборка сервера + запуск через pm2 (`pixelbattle`) |
@@ -267,15 +268,32 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 
 ---
 
+## Зависимости и безопасность
+
+Состояние аудита: `npm audit --omit=dev` — единственная находка moderate-уровня (`uuid <11.1.1`, GHSA-w5hq-g745-h8pq), `high`/`critical` в production-дереве нет; `npm audit` — только dev-only цепочка `react-snap` → `puppeteer@1.20` (в том числе `extract-zip`/`yauzl`), которая используется лишь при `npm run render`.
+
+Находка по `uuid` неприменима: уязвимость затрагивает генераторы v3/v5/v6 при передаче внешнего буфера `buf`, а проект использует только `v4` (`server/api/start.ts`, `server/api/chat.ts`, `server/utils/chat.ts`, `src/hooks/useWindow/useWindow.tsx`, `src/components/Tools/components/Block/Block.tsx`, `tools/*`). Обновиться до исправленной версии (`uuid ≥ 11.1.1`) нельзя, пока пререндер работает на Chromium 78 — поэтому CI-проверка production-дерева использует порог `--audit-level=high`.
+
+- Прямые зависимости обновлены до патченных версий: `ws ≥ 8.21.3` (DoS через сжатые фреймы), `form-data 4.0.6`.
+- Транзитивные зависимости зафиксированы через `overrides` в `package.json`: `minimist ^1.2.8`, `cheerio ^1.0.0`, `nth-check ^2.1.1`, а также патченные `brace-expansion`, `minimatch`, `js-yaml`, `qs`, `tar`, `node-gyp`, `express`, `serve-static`.
+- Удалены неиспользуемые зависимости: `parcel-bundler` (Parcel 1 тянул устаревшее уязвимое дерево), `res`, `src`, `parcel-plugin-static-files-copy` и PostCSS-плагины (`postcss`, `postcss-assets`, `postcss-modules`, `autoprefixer`) — Parcel 2 обрабатывает CSS-модули (`*.module.scss`) сам, а копирование статики делает `scripts/postbuild.js`.
+- После обновления зависимостей работа серверной части проверяется смоуком `npm run smoke:server` (нужен запущенный сервер): он создаёт гостевую сессию, поднимает WebSocket-соединение, ждёт сообщение `init`, проверяет ping/pong и читает историю чата.
+- `uuid` зафиксирован на `9.x`: начиная с `uuid@10` публикуемый код содержит синтаксис ES2021 (`??`, `?.`), который не парсит Chromium 78 внутри `react-snap` (puppeteer 1.20). Из-за этого приложение не загружается в браузере пререндера, а `npm run render` молча падает с кодом 1. При обновлении клиентских зависимостей это ограничение нужно проверять через `npm run render`.
+
+---
+
 ## CI/CD
 
 `.github/workflows/deploy.yml`:
 
-1. Пуш в ветку `main`.
+1. Пуш в ветку `main`, а также запуск по расписанию (каждый понедельник 06:00 UTC) и вручную (`workflow_dispatch`).
 2. Установка Node 18 + системных библиотек для `node-canvas`.
-3. `npm install`, `npm run build`.
-4. `npm run render` (react-snap) — пререндер страниц для SEO.
-5. Деплой `dist/` в ветку `gh-pages` (GitHub Pages).
+3. `npm install`, затем проверка уязвимостей: `npm audit --omit=dev --audit-level=high` (падение при high/critical в production-дереве) и `npm audit --audit-level=critical` (падение при critical-уязвимости, включая dev).
+4. `npm run build`.
+5. `npm run render` (react-snap) — пререндер страниц для SEO.
+6. Деплой `dist/` в ветку `gh-pages` (GitHub Pages) — только для пушей в `main`.
+
+Регулярный запуск по расписанию нужен, чтобы новые advisories не накапливались: если в зависимостях появляется critical-уязвимость, workflow становится красным ещё до следующего пуша.
 
 ---
 
