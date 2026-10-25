@@ -17,6 +17,7 @@ import steamAuth from './auth/steam';
 import discordAuth from './auth/discord';
 import telegramAuth from './auth/telegram';
 import vkAuth from './auth/vk';
+import localAuth from './auth/local';
 import admin from './admin';
 import { start } from './start';
 import { pix } from './pix';
@@ -157,7 +158,8 @@ export const webServerHandler = async (req: IncomingMessage, res: ServerResponse
 		const _discordAuth = !_steamAuth && await discordAuth(req, res);
 		const _telegramAuth = !_discordAuth && await telegramAuth(req, res);
 		const _vkAuth = !_telegramAuth && await vkAuth(req, res);
-		const _isSomeAuth = _twitchAuth || _steamAuth || _discordAuth || _telegramAuth || _vkAuth;
+		const _localAuth = !_vkAuth && await localAuth(req, res);
+		const _isSomeAuth = _twitchAuth || _steamAuth || _discordAuth || _telegramAuth || _vkAuth || _localAuth;
 
 		if (_isSomeAuth) {
 			const token = getToken(req);

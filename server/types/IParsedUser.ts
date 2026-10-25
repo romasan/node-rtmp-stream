@@ -2,5 +2,5 @@ export interface IParsedUser {
     id: string;
     name: string;
     avatar: string;
-    area: 'discord' | 'twitch' | 'steam' | 'telegram' | 'vk';
+    area: 'discord' | 'twitch' | 'steam' | 'telegram' | 'vk' | 'local';
 }

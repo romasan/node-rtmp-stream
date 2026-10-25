@@ -5,8 +5,12 @@ import DiscordIcon from '/assets/discord.svg';
 import SteamIcon from '/assets/steam.svg';
 import TelegramIcon from '/assets/telegram.svg';
 import VkIcon from '/assets/vk.svg';
+import LoginIcon from '/assets/login.svg';
 
 import * as s from './Login.module.scss';
+
+const { hostname } = document.location;
+const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
 
 export const Login = () => {
 	return (
@@ -33,6 +37,12 @@ export const Login = () => {
 					<VkIcon />
 					VK ID
 				</a>
+				{isLocalhost && (
+					<a href="/login/?local">
+						<LoginIcon />
+						Локальный вход
+					</a>
+				)}
 			</div>
 		</>
 	);

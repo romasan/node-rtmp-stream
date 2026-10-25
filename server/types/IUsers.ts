@@ -8,5 +8,6 @@ export interface IUsers {
 		steam: Record<string, string>;
 		telegram: Record<string, string>;
 		vk: Record<string, string>;
+		local: Record<string, string>;
 	};
 }

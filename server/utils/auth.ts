@@ -25,6 +25,7 @@ let users: IUsers = {
 		steam: {},
 		telegram: {},
 		vk: {},
+		local: {},
 	},
 };
 
@@ -53,6 +54,7 @@ const getAllUsers = () => {
 			steam: {},
 			telegram: {},
 			vk: {},
+			local: {},
 		};
 	}
 
@@ -74,6 +76,10 @@ const getAllUsers = () => {
 
 	if (!users.nicknames.vk) {
 		users.nicknames.vk = {};
+	}
+
+	if (!users.nicknames.local) {
+		users.nicknames.local = {};
 	}
 };
 
@@ -131,6 +137,11 @@ export const checkIsAdmin = (token: string) => {
 		return true;
 	}
 
+	// local (dev) admin
+	if (Boolean(user) && user?._authType === 'local' && user?.role === 'admin') {
+		return true;
+	}
+
 	return false;
 };
 
@@ -183,6 +194,15 @@ export const _parseUserData = (raw: any): IParsedUser | null => {
 			name: `${raw?.first_name}${raw.last_name ? ' ' : ''}${raw?.last_name || ''}`,
 			avatar: raw?.avatar,
 			area: 'vk',
+		};
+	}
+
+	if (raw?._authType === 'local') {
+		return {
+			id: raw?.id,
+			name: raw?.name,
+			avatar: raw?.avatar || '',
+			area: 'local',
 		};
 	}
 
