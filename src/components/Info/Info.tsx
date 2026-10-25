@@ -4,6 +4,7 @@ import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { useDraggable } from '../../hooks/useDraggable';
 
 import { getStats } from '../../lib/api';
+import ee from '../../lib/ee';
 
 import { formatNumber } from '../../helpers/formatNumber';
 import { nickSanitize } from '../../helpers/nickSanitize';
@@ -49,6 +50,18 @@ export const Info: FC<Props> = ({
 		getStats()
 			.then(setStats)
 			.catch(() => {/* */});
+	}, []);
+
+	useEffect(() => {
+		const updateOnlineCount = (onlineCount: number) => {
+			setStats((current) => ({ ...current, onlineCount }));
+		};
+
+		ee.on('ws:online', updateOnlineCount);
+
+		return () => {
+			ee.off('ws:online', updateOnlineCount);
+		};
 	}, []);
 
 	return (

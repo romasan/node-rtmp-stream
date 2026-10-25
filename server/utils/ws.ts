@@ -16,6 +16,7 @@ import {
 } from './auth';
 import { getExpand } from './expands';
 import { getValue } from './values';
+import { encodeWsMessage } from './wsProtocol';
 
 const {
 	server: {
@@ -33,22 +34,31 @@ let webServer = null;
 let wss: WebSocket.Server | null = null;
 
 export const send = (token: string, event: string, payload: any) => {
+	const binaryMessage = encodeWsMessage(event, payload);
+	const message = binaryMessage || JSON.stringify({ event, payload });
+
 	wss?.clients.forEach((ws: WebSocket) => {
 		if (ws.readyState === WebSocket.OPEN && (ws as any)._token === token) {
-			ws.send(JSON.stringify({ event, payload }));
+			ws.send(message);
 		}
 	});
 };
 
 export const spam = (data: any) => {
 	// if online > N use waveSpam
-	const message = JSON.stringify(data);
+	const binaryMessage = encodeWsMessage(data.event, data.payload);
+	const message = binaryMessage || JSON.stringify(data);
 
 	wss?.clients.forEach((ws) => {
 		if (ws.readyState === WebSocket.OPEN) {
 			ws.send(message);
 		}
 	});
+};
+
+const broadcastOnline = () => {
+	updatedCacheTime = 0;
+	spam({ event: 'online', payload: getOnlineCountUniqUUID() });
 };
 
 // const delay = (t = 100) => new Promise((resolve) => setTimeout(resolve, t));
@@ -297,7 +307,11 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 			if (ip) {
 				removeIPConnection(ip, token);
 			}
+
+			broadcastOnline();
 		});
+
+		broadcastOnline();
 
 		ws.on('message', (buf: Buffer) => {
 			const raw = buf.toString();

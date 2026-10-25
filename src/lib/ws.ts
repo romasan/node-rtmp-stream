@@ -1,4 +1,5 @@
 import ee from './ee';
+import { decodeWsMessage } from './wsProtocol';
 
 let ws: WebSocket | null = null;
 
@@ -7,14 +8,18 @@ const reduceMessage = ({ data }: MessageEvent) => {
 		return;
 	}
 
-	let json = null;
-	try {
-		json = JSON.parse(
-			data.toString()
-		);
-	} catch (e) {/* */}
+	let json: any = null;
+	if (typeof data === 'string') {
+		try {
+			json = JSON.parse(data);
+		} catch (e) {/* */}
+	} else if (data instanceof ArrayBuffer) {
+		try {
+			json = decodeWsMessage(new Uint8Array(data));
+		} catch (e) {/* */}
+	}
 
-	const { event, payload } = json;
+	const { event, payload } = json || {};
 
 	if (event && typeof payload !== 'undefined') {
 		ee.emit(`ws:${event}`, payload);
@@ -36,6 +41,7 @@ const WSProtocol = (protocol === 'https:' || hash === '#secured') ? 'wss' : 'ws'
 
 export const connect = (status?: string) => {
 	ws = new WebSocket(`${WSProtocol}://${WSHost}`);
+	ws.binaryType = 'arraybuffer';
 
 	ws.onerror = console.error;
 

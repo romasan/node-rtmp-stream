@@ -1,0 +1,217 @@
+{
+	"nested": {
+		"rtmpstream": {
+			"nested": {
+				"DrawPix": {
+					"fields": {
+						"x": {
+							"type": "sint32",
+							"id": 1
+						},
+						"y": {
+							"type": "sint32",
+							"id": 2
+						},
+						"color": {
+							"type": "uint32",
+							"id": 3
+						}
+					}
+				},
+				"Cooldown": {
+					"fields": {
+						"milliseconds": {
+							"type": "uint32",
+							"id": 1
+						}
+					}
+				},
+				"Online": {
+					"fields": {
+						"count": {
+							"type": "uint32",
+							"id": 1
+						}
+					}
+				},
+				"Canvas": {
+					"fields": {
+						"width": {
+							"type": "uint32",
+							"id": 1
+						},
+						"height": {
+							"type": "uint32",
+							"id": 2
+						},
+						"shiftX": {
+							"type": "sint32",
+							"id": 3
+						},
+						"shiftY": {
+							"type": "sint32",
+							"id": 4
+						},
+						"colorScheme": {
+							"type": "string",
+							"id": 5
+						}
+					}
+				},
+				"Init": {
+					"fields": {
+						"id": {
+							"type": "string",
+							"id": 1
+						},
+						"name": {
+							"type": "string",
+							"id": 2
+						},
+						"avatar": {
+							"type": "string",
+							"id": 3
+						},
+						"area": {
+							"type": "string",
+							"id": 4
+						},
+						"countdown": {
+							"type": "uint32",
+							"id": 5
+						},
+						"isAuthorized": {
+							"type": "bool",
+							"id": 6
+						},
+						"canvas": {
+							"type": "Canvas",
+							"id": 7
+						},
+						"hasFinish": {
+							"type": "bool",
+							"id": 8
+						},
+						"finishMs": {
+							"type": "sint64",
+							"id": 9
+						},
+						"finishText": {
+							"type": "string",
+							"id": 10
+						},
+						"needAuthorize": {
+							"type": "bool",
+							"id": 11
+						},
+						"paused": {
+							"type": "bool",
+							"id": 12
+						}
+					}
+				},
+				"ChatMessage": {
+					"fields": {
+						"id": {
+							"type": "string",
+							"id": 1
+						},
+						"time": {
+							"type": "uint64",
+							"id": 2
+						},
+						"text": {
+							"type": "string",
+							"id": 3
+						},
+						"name": {
+							"type": "string",
+							"id": 4
+						},
+						"area": {
+							"type": "string",
+							"id": 5
+						}
+					}
+				},
+				"Pause": {
+					"fields": {
+						"paused": {
+							"type": "bool",
+							"id": 1
+						}
+					}
+				},
+				"Expand": {
+					"fields": {
+						"width": {
+							"type": "uint32",
+							"id": 1
+						},
+						"height": {
+							"type": "uint32",
+							"id": 2
+						},
+						"shiftX": {
+							"type": "sint32",
+							"id": 3
+						},
+						"shiftY": {
+							"type": "sint32",
+							"id": 4
+						},
+						"colorScheme": {
+							"type": "string",
+							"id": 5
+						}
+					}
+				},
+				"WsMessage": {
+					"oneofs": {
+						"body": {
+							"oneof": [
+								"drawPix",
+								"cooldown",
+								"online",
+								"init",
+								"chatMessage",
+								"pause",
+								"expand"
+							]
+						}
+					},
+					"fields": {
+						"drawPix": {
+							"type": "DrawPix",
+							"id": 1
+						},
+						"cooldown": {
+							"type": "Cooldown",
+							"id": 2
+						},
+						"online": {
+							"type": "Online",
+							"id": 3
+						},
+						"init": {
+							"type": "Init",
+							"id": 4
+						},
+						"chatMessage": {
+							"type": "ChatMessage",
+							"id": 5
+						},
+						"pause": {
+							"type": "Pause",
+							"id": 6
+						},
+						"expand": {
+							"type": "Expand",
+							"id": 7
+						}
+					}
+				}
+			}
+		}
+	}
+}
