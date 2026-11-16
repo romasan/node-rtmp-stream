@@ -23,6 +23,8 @@ const local = async (req: IncomingMessage, res: ServerResponse) => {
 		return false;
 	}
 
+	const loginPage = new URL('/login/?local', host).href;
+
 	if (req.method === 'POST') {
 		const token = getToken(req);
 		const body = (await getPostPayload(req)) as string;
@@ -57,13 +59,13 @@ const local = async (req: IncomingMessage, res: ServerResponse) => {
 			Log('Local auth error: wrong credentials', login);
 
 			res.writeHead(200, { 'Content-Type': 'text/html' });
-			res.end('Ошибка: неверный логин или пароль. <a href="/login/?local">Попробовать ещё раз</a>');
+			res.end(`Ошибка: неверный логин или пароль. <a href="${loginPage}">Попробовать ещё раз</a>`);
 		}
 
 		return true;
 	}
 
-	res.writeHead(302, { Location: '/login/?local' });
+	res.writeHead(302, { Location: loginPage });
 	res.end();
 
 	return true;
