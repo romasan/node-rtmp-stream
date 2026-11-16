@@ -1,0 +1,16 @@
+<html>
+	<head>
+		<title>Выход</title>
+		<script>
+			const { hostname, protocol } = document.location;
+			const isLocalhost = (hostname === 'localhost' || hostname === '127.0.0.1');
+			const useProxy = isLocalhost && (location.port === '1234' || location.port === '1420');
+			const APIhost = useProxy ? `${location.origin}/__api` : `${protocol}//${isLocalhost ? '' : 'api.'}${hostname.replace('www.', '')}${isLocalhost ? ':8080' : ''}`;
+
+			document.location.href = `${APIhost}/auth/logout`;
+		</script>
+	</head>
+	<body>
+		Выход
+	</body>
+</html>

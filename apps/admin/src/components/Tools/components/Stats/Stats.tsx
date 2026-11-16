@@ -1,0 +1,196 @@
+import React, { FC, useState } from 'react';
+import cn from 'classnames';
+
+import { Block } from '../Block';
+
+import { get } from '../../helpers';
+import { useModal } from '../../../../hooks';
+import { formatNumber, formatTime } from '../../../../helpers';
+
+import * as s from './Stats.module.scss';
+
+interface Props {
+	canvas: any;
+	userInfo: (userId: string, filter?: string, event?: any) => void;
+}
+
+export const Stats: FC<Props> = ({ canvas, userInfo }) => {
+	const [stats, setStats] = useState<any>({});
+	const [list, setList] = useState<{ name: string; active: boolean; lastActivity: number; uuid: string }[]>([]);
+	const [uuid, setUuid] = useState('');
+	const [nick, setNick] = useState('');
+	const [user, setUser] = useState<any>(null);
+
+	const modalUser = useModal({
+		content: (
+			<div>
+				<div>User</div>
+				<div>Nick: {nick || 'EMPTY'}</div>
+				<div>UUID: {uuid || 'EMPTY'}</div>
+				<div>UUIDs:</div>
+				<div className={s.uuids}>
+					{user && user.uuids && user.uuids.map((uuid: string) => (
+						<div key={uuid}>{uuid}</div>
+					))}
+				</div>
+			</div>
+		),
+		portal: true,
+	});
+
+	const onOpen = () => {
+		get('stats')
+			.then(setStats)
+			.catch(() => {/* */});
+	};
+
+	const getUserSessions = () => {
+		get(`user?nick=${nick}`)
+			.then(setUser)
+			.catch(() => {/* */});
+	};
+
+	const onClose = () => {
+		canvas.width = canvas.width;
+	};
+
+	const getList = () => {
+		get('onlineList')
+			.then(setList)
+			.catch(() => {/* */});
+	};
+
+	const toggleList = (event: React.MouseEvent) => {
+		event.preventDefault();
+
+		if (list.length) {
+			setList([]);
+		} else {
+			getList();
+		}
+	};
+
+	const drawPixel = (event: React.MouseEvent) => {
+		event.preventDefault();
+
+		const ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = '#f658b8';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+		ctx.fillStyle = '#000';
+		ctx.fillRect(stats.coord.x - 1, stats.coord.y - 1, 1, 1);
+		ctx.fillRect(stats.coord.x - 2, stats.coord.y - 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x - 1, stats.coord.y + 1, 1, 1);
+		ctx.fillRect(stats.coord.x - 2, stats.coord.y + 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x + 1, stats.coord.y - 1, 1, 1);
+		ctx.fillRect(stats.coord.x + 2, stats.coord.y - 2, 1, 1);
+
+		ctx.fillRect(stats.coord.x + 1, stats.coord.y + 1, 1, 1);
+		ctx.fillRect(stats.coord.x + 2, stats.coord.y + 2, 1, 1);
+
+		ctx.fillStyle = stats.color;
+		ctx.fillRect(stats.coord.x, stats.coord.y, 1, 1);
+	};
+
+	const onChangeUuid = (event: any) => {
+		setUuid(event.target.value);
+	};
+
+	const onChangeNick = (event: any) => {
+		setNick(event.target.value);
+	};
+
+	const onShowUserByNick = () => {
+		getUserSessions();
+		modalUser.open();
+	};
+
+	// console.log('==== list:', list); // TODO open user controls popup==== ranges
+
+	return (
+		<Block title="👤 Общее" onOpen={onOpen} onClose={onClose} id="stats">
+			{Boolean(stats.online) && (
+				<div>
+					<div>
+						Сессии:
+						A {stats.online.countByActivity} /
+						U {stats.online.uniq} /
+						O {stats.online.open} /
+						&nbsp;
+						{stats.online.all}
+					</div>
+					<div>
+						Пикселей за
+						минуту {stats.perMin},
+						час {stats.perHour}
+					</div>
+					<div className={s.users}>
+						<a href="#" onClick={toggleList}>
+							Список онлайн 
+							[{list.length ? '-' : '+'}] 
+							{list.length > 0 && `(${list.length})`}
+						</a>
+						<div className={s.list}>
+							{list.map((item) => (
+								<div 
+									key={String(item.name)}
+									title={formatTime(Date.now() - item.lastActivity)}
+									className={cn(s.session, { [s.active]: item.active })}
+								>
+									<button onClick={(event) => userInfo(item.name, 'nick', event)}>🔑</button>
+									"{item.name}"
+									(
+										<button onClick={(event) => userInfo(item.uuid, 'token', event)}>🔑</button>
+										{item.uuid}
+									)
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			)}
+			<hr />
+			<div>
+				Активность: {formatTime(stats.lastActivity)} назад
+			</div>
+			{Boolean(stats.coord) && (
+				<div>
+					<button onClick={(event) => userInfo(stats.lastUserName, 'nick', event)}>🔑</button>
+					"{stats.lastUserName}"
+					(
+						<button onClick={(event) => userInfo(stats.lastUserUUID, 'token', event)}>🔑</button>
+						{stats.lastUserUUID}
+						&nbsp;/&nbsp;
+						{stats.lastUserIP || 'IP'}
+					)
+					<div>
+						<a href="#" onClick={drawPixel}>{stats.coord.x},{stats.coord.y} {stats.color}</a>
+					</div>
+				</div>
+			)}
+			<hr />
+			<div>
+				<input placeholder="UUID" onChange={onChangeUuid} disabled/>
+				<button onClick={modalUser.open} disabled>Open by UUID</button>
+			</div>
+			<div>
+				<input placeholder="NICKNAME" onChange={onChangeNick} />
+				<button onClick={onShowUserByNick}>Open by Nick</button>
+			</div>
+			<hr />
+			<div>
+				Всего посталено пикселей: {formatNumber(stats.total)}
+			</div>
+			<div>
+				Свободных пикселей: {formatNumber(stats.empty)}
+			</div>
+			<div>
+				Uptime: {formatTime(stats.uptime)}
+			</div>
+			{modalUser.render()}
+		</Block>
+	);
+};
