@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru" data-client="game">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Пиксель Батл · Slint</title>
+    <link rel="preload" href="./pkg/pixelbattle_slint_bg.wasm" as="fetch" type="application/wasm" crossorigin="anonymous">
+    <link rel="modulepreload" href="./pkg/pixelbattle_slint.js">
+    <link rel="modulepreload" href="./pkg/bridge.js">
+    <style>
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #d9d7ff; }
+        canvas { width: 100%; height: 100%; outline: none; touch-action: none; }
+        canvas[data-field-cursor="pointer"] { cursor: pointer !important; }
+        canvas[data-field-cursor="crosshair"] { cursor: crosshair !important; }
+        canvas[data-field-cursor="pick"] { cursor: url("./pkg/eye-dropper.png") 9 22, crosshair !important; }
+        [hidden] { display: none !important; }
+        #fallback { padding: 1rem; font: 1rem system-ui; }
+    </style>
+    <script>
+        const telegramStartup = (() => {
+            const route = document.documentElement.dataset.client;
+            const existing = window.Telegram?.WebApp;
+            const hash = new URLSearchParams(location.hash.slice(1));
+            const enabled = route !== 'timelapse' && (route === 'telegram' || location.hostname.startsWith('tg.')
+                || hash.has('tgWebAppData') || Boolean(existing?.initData));
+            if (!enabled || existing) return { enabled, sdk: Promise.resolve(existing) };
+
+            const sdk = new Promise(resolve => {
+                const script = document.createElement('script');
+                script.src = 'https://telegram.org/js/telegram-web-app.js';
+                script.onload = () => resolve(window.Telegram?.WebApp);
+                script.onerror = () => resolve(undefined);
+                document.head.append(script);
+            });
+            return { enabled, sdk };
+        })();
+    </script>
+</head>
+<body>
+    <canvas id="canvas" tabindex="0" aria-label="Пиксель Батл"></canvas>
+    <div id="fallback" hidden>Не удалось запустить Slint. <a href="/">Открыть React-версию</a></div>
+    <script type="module">
+        const fallback = document.querySelector('#fallback a');
+        if (fallback) fallback.href += location.search + location.hash;
+        try {
+            const url = new URL('./pkg/pixelbattle_slint.js', import.meta.url);
+            const palette = fetch('./pkg/palette.json').catch(() => null);
+            const [{ default: init, Client }, { boot }] = await Promise.all([
+                import(url),
+                import("./pkg/bridge.js"),
+            ]);
+            await boot(init, Client, palette, telegramStartup);
+        } catch (error) {
+            console.error(error);
+            document.querySelector('#canvas').hidden = true;
+            document.querySelector('#fallback').hidden = false;
+        }
+    </script>
+</body>
+</html>

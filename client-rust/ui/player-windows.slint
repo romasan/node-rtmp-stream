@@ -1,0 +1,325 @@
+import { ScrollView } from "std-widgets.slint";
+
+export struct MessageRow {
+    time: string,
+    name: string,
+    label: string,
+    area: string,
+    text: styled-text,
+}
+
+export struct ChatDay {
+    label: string,
+    messages: [MessageRow],
+}
+
+export struct PlayerRow {
+    name: string,
+    area: string,
+    count: string,
+    place: string,
+}
+
+export component PlatformIcon inherits Image {
+    in property <string> area;
+    width: 16px;
+    height: 16px;
+    image-fit: contain;
+    source: area == "twitch" ? @image-url("../../assets/twitch_bw.svg")
+        : area == "discord" ? @image-url("../../assets/discord_bw.svg")
+        : area == "steam" ? @image-url("../../assets/steam_bw.svg")
+        : area == "telegram" ? @image-url("../../assets/telegram_bw.svg")
+        : area == "vk" ? @image-url("../../assets/vk_bw.svg")
+        : area == "system" ? @image-url("../../assets/star.svg")
+        : @image-url("");
+}
+
+component PanelButton inherits Rectangle {
+    in property <string> label;
+    in property <bool> enabled: true;
+    callback clicked();
+    background: hit.pressed ? #8080a6 : hit.has-hover ? #b5b4ea : #9e9ecc;
+    border-radius: 3px;
+    border-color: #2d2d3a;
+    border-width: 1px;
+    opacity: enabled ? 1 : 0.5;
+    Text { text: root.label; color: black; horizontal-alignment: center; vertical-alignment: center; }
+    hit := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+export component PlayerWindow inherits Rectangle {
+    in property <length> content-top: 27px;
+    callback close();
+    callback drag(length, length);
+    background: #aaa8d9;
+    border-radius: 3px;
+    border-width: 3px;
+    border-color: #2d2d3a;
+    TouchArea {}
+    Rectangle { x: 1px; y: 1px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
+    Rectangle { x: 1px; y: 1px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
+    body := Rectangle {
+        x: 7px;
+        y: root.content-top;
+        width: parent.width - 14px;
+        height: parent.height - root.content-top - 7px;
+        @children
+    }
+    Rectangle {
+        x: 7px;
+        y: 6px;
+        width: parent.width - 33px;
+        height: 16px;
+        for stripe in 4: Rectangle {
+            y: stripe * 4px + 1px;
+            height: 1px;
+            background: #2d2d3a;
+            Rectangle { y: 1px; height: 1px; background: #edeefc; }
+        }
+        TouchArea {
+            property <length> start-x;
+            property <length> start-y;
+            mouse-cursor: grab;
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down && event.button == PointerEventButton.left {
+                    self.start-x = self.mouse-x;
+                    self.start-y = self.mouse-y;
+                }
+            }
+            moved => {
+                if self.pressed { root.drag(self.mouse-x - self.start-x, self.mouse-y - self.start-y); }
+            }
+        }
+    }
+    PanelButton { x: parent.width - 26px; y: 4px; width: 19px; height: 19px; label: "×"; clicked => { root.close(); } }
+}
+
+export component ChatContent inherits Rectangle {
+    in property <bool> mobile;
+    in-out property <length> scroll-position <=> scroll.viewport-y;
+    in property <[ChatDay]> days;
+    in property <string> nickname;
+    in property <bool> authorized;
+    in property <bool> sending;
+    in-out property <string> draft;
+    callback send(string);
+    callback open-link(string);
+    property <string> chat-font: "Custom Font ttf 12h 1.0";
+
+    function submit() {
+        if root.authorized && !root.sending && root.draft != "" { root.send(root.draft); }
+    }
+
+    changed days => { scroll.viewport-y = Math.min(0px, scroll.height - scroll.viewport-height); }
+
+    Rectangle {
+        y: 0;
+        width: parent.width;
+        height: parent.height - 33px;
+        background: #dbdbef;
+        border-radius: 5px;
+        border-width: 2px;
+        border-color: #2d2d3a;
+        scroll := ScrollView {
+            mouse-drag-pan-enabled: root.mobile;
+            x: 5px; y: 5px;
+            width: parent.width - 10px;
+            height: parent.height - 10px;
+            viewport-height: rows.preferred-height;
+            rows := VerticalLayout {
+                width: scroll.visible-width;
+                spacing: 3px;
+                if root.days.length == 0: Text {
+                    color: black;
+                    text: "пока никто не писал";
+                    font-family: root.chat-font;
+                    font-size: 16px;
+                }
+                for day in root.days: Rectangle {
+                    height: entries.preferred-height;
+                    entries := VerticalLayout {
+                        spacing: 3px;
+                        if day.label != "": Rectangle { height: heading.preferred-height; }
+                        for message in day.messages: VerticalLayout {
+                            spacing: 2px;
+                            HorizontalLayout {
+                                spacing: 4px;
+                                PlatformIcon { area: message.area; }
+                                Rectangle {
+                                    horizontal-stretch: 1;
+                                    min-height: 17px;
+                                    Text {
+                                        x: 0;
+                                        width: parent.width;
+                                        text: message.label;
+                                        color: black;
+                                        overflow: elide;
+                                        horizontal-alignment: left;
+                                        font-family: root.chat-font;
+                                        font-size: 16px;
+                                        letter-spacing: 1px;
+                                    }
+                                    if root.authorized && message.name != root.nickname && message.name != "": TouchArea {
+                                        mouse-cursor: pointer;
+                                        clicked => {
+                                            root.draft = root.draft + (root.draft == "" ? "" : " ") + "@" + message.name + " ";
+                                            editor.focus();
+                                            editor.select-all();
+                                            editor.clear-selection();
+                                        }
+                                    }
+                                }
+                                Text {
+                                    text: message.time;
+                                    color: black;
+                                    font-family: root.chat-font;
+                                    font-size: 16px;
+                                    letter-spacing: 1px;
+                                }
+                            }
+                            StyledText {
+                                text: message.text;
+                                default-color: black;
+                                default-font-family: root.chat-font;
+                                default-font-size: 16px;
+                                link-clicked(url) => { root.open-link(url); }
+                            }
+                        }
+                    }
+                    Rectangle {
+                        visible: day.label != "";
+                        y: Math.max(0px, Math.min(parent.height - self.height, -scroll.viewport-y - parent.y));
+                        height: heading.preferred-height;
+                        background: #dbdbef;
+                        heading := Text {
+                            text: day.label;
+                            color: black;
+                            horizontal-alignment: center;
+                            font-family: root.chat-font;
+                            font-size: 16px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Rectangle {
+        y: parent.height - 30px; height: 30px;
+        background: #bbbaf1;
+        border-radius: 5px;
+        border-width: 2px;
+        border-color: #2d2d3a;
+        Text {
+            x: 6px; width: parent.width - 40px;
+            text: root.authorized ? "НАПИСАТЬ СООБЩЕНИЕ" : "АВТОРИЗУЙТЕСЬ, ЧТОБЫ НАПИСАТЬ";
+            color: #757575;
+            vertical-alignment: center;
+            overflow: elide;
+            visible: root.draft == "" && !editor.has-focus;
+            font-family: root.chat-font;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        editor := TextInput {
+            x: 6px; y: 5px;
+            width: parent.width - 40px; height: parent.height - 10px;
+            text <=> root.draft;
+            enabled: root.authorized;
+            color: black;
+            font-family: root.chat-font;
+            font-size: 16px;
+            font-weight: 700;
+            single-line: true;
+            accepted => { root.submit(); }
+        }
+        PanelButton {
+            x: parent.width - 28px; y: 2px;
+            width: 26px; height: 26px;
+            label: "↵";
+            enabled: root.authorized && !root.sending;
+            clicked => { root.submit(); }
+        }
+    }
+}
+
+component StatisticsText inherits Text {
+    color: black;
+    font-family: "Custom Font ttf 12h 1.0";
+    font-size: 16px;
+    vertical-alignment: center;
+}
+
+component PlayerLine inherits HorizontalLayout {
+    in property <PlayerRow> entry;
+    height: 21.5px;
+    spacing: 4px;
+    StatisticsText {
+        text: entry.place == "" ? "" : entry.place + ".";
+        width: 20px;
+        horizontal-alignment: right;
+    }
+    PlatformIcon { area: entry.area; }
+    StatisticsText {
+        text: entry.name; overflow: elide; horizontal-stretch: 1;
+    }
+    StatisticsText { text: entry.count; }
+}
+
+export component StatisticsContent inherits Rectangle {
+    in property <bool> mobile;
+    out property <length> content-height: rows.preferred-height + 24px;
+    in-out property <length> scroll-position <=> scroll.viewport-y;
+    in property <string> status;
+    in property <string> total;
+    in property <int> online;
+    in property <[PlayerRow]> leaders;
+    in property <[PlayerRow]> players;
+
+    background: #dbdbef;
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: #2d2d3a;
+    scroll := ScrollView {
+        mouse-drag-pan-enabled: root.mobile;
+        x: 12px; y: 12px;
+        width: parent.width - 24px;
+        height: parent.height - 24px;
+        viewport-height: rows.preferred-height;
+        changed viewport-height => {
+            self.viewport-y = Math.max(Math.min(0px, self.height - self.viewport-height), self.viewport-y);
+        }
+        changed height => {
+            self.viewport-y = Math.max(Math.min(0px, self.height - self.viewport-height), self.viewport-y);
+        }
+        rows := VerticalLayout {
+            width: scroll.visible-width;
+            if root.status != "": StatisticsText { height: 16px; text: root.status; }
+            if root.status == "": VerticalLayout {
+                StatisticsText {
+                    text: "Всего поставлено пикселей: " + root.total;
+                    wrap: word-wrap;
+                    height: Math.max(16px, self.preferred-height);
+                }
+                Rectangle { height: 10px; }
+                StatisticsText { height: 16px; text: "ТОП участников:"; }
+                Rectangle { height: 5px; }
+                for entry in root.leaders: PlayerLine { entry: entry; }
+                if root.online > 0: VerticalLayout {
+                    Rectangle { height: 10px; }
+                    StatisticsText { height: 16px; text: "Онлайн (" + root.online + "):"; }
+                    Rectangle { height: 5px; }
+                    for entry in root.players: PlayerLine { entry: entry; }
+                    if root.players.length > root.online: StatisticsText {
+                        x: 24px;
+                        height: 16px;
+                        text: "и ещё " + (root.players.length - root.online) + " игрока";
+                    }
+                }
+            }
+        }
+    }
+}

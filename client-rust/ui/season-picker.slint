@@ -1,0 +1,184 @@
+import { ScrollView } from "std-widgets.slint";
+
+export struct SeasonOption {
+    label: string,
+    group: int,
+}
+
+export component SeasonPicker inherits Rectangle {
+    in property <[SeasonOption]> seasons;
+    in property <int> selected-index;
+    out property <bool> has-keyboard-focus: field-focus.has-focus || root.popup-focused;
+    callback selected(int);
+
+    property <bool> available: root.seasons.length > 0;
+    property <bool> popup-focused;
+    property <int> highlighted;
+    property <length> row-height: 24px;
+    property <length> group-gap: 7px;
+    property <length> content-height: root.available ? root.row-top(root.seasons.length - 1) + root.row-height : 0px;
+
+    preferred-width: labels.preferred-width + 20px;
+    min-width: 40px;
+    height: 19px;
+    background: white;
+    border-width: 1px;
+    border-color: field-focus.has-focus ? #244e9a : #767676;
+    border-radius: 2px;
+    forward-focus: field-focus;
+    accessible-role: combobox;
+    accessible-label: "Сезон";
+    accessible-value: selection.text;
+    accessible-enabled: root.available;
+    accessible-expandable: true;
+    accessible-expanded: root.popup-focused;
+    accessible-action-expand => { root.open(); }
+
+    function open() {
+        if root.available {
+            root.highlighted = Math.max(0, root.selected-index);
+            popup.show();
+        }
+    }
+
+    function select(index: int) {
+        if index >= 0 && index < root.seasons.length && index != root.selected-index {
+            root.selected(index);
+        }
+    }
+
+    function close() {
+        popup.close();
+        field-focus.focus();
+    }
+
+    pure function row-top(index: int) -> length {
+        return index * root.row-height + root.seasons[index].group * root.group-gap;
+    }
+
+    labels := VerticalLayout {
+        visible: false;
+        Text { text: root.available ? "" : "Загрузка…"; font-size: 13px; }
+        for season in root.seasons: Text { text: season.label; font-size: 13px; }
+    }
+
+    selection := Text {
+        x: 4px;
+        width: root.width - 18px;
+        text: root.available ? root.seasons[root.selected-index].label : "Загрузка…";
+        color: black;
+        font-size: 13px;
+        overflow: elide;
+        vertical-alignment: center;
+    }
+
+    Path {
+        x: root.width - 13px;
+        y: (root.height - 5px) / 2;
+        width: 9px;
+        height: 5px;
+        stroke: black;
+        stroke-width: 1.2px;
+        commands: "M 0 0 L 4.5 5 L 9 0";
+    }
+
+    field-focus := FocusScope {
+        enabled: root.available;
+        key-pressed(event) => {
+            if event.text == Key.Return || event.text == Key.Space {
+                root.open();
+            } else if event.text == Key.UpArrow {
+                root.select(Math.max(0, root.selected-index - 1));
+            } else if event.text == Key.DownArrow {
+                root.select(Math.min(root.seasons.length - 1, root.selected-index + 1));
+            } else {
+                return reject;
+            }
+            return accept;
+        }
+        TouchArea {
+            enabled: root.available;
+            mouse-cursor: pointer;
+            clicked => { field-focus.focus(); root.open(); }
+        }
+    }
+
+    popup := PopupWindow {
+        y: -self.height - 2px;
+        width: root.width;
+        height: Math.min(6 * root.row-height, root.content-height) + 2px;
+        close-policy: close-on-click-outside;
+        forward-focus: menu-focus;
+
+        menu-focus := FocusScope {
+            focus-changed-event => { root.popup-focused = self.has-focus; }
+            key-pressed(event) => {
+                if event.text == Key.Escape {
+                    root.close();
+                } else if event.text == Key.Return || event.text == Key.Space {
+                    root.select(root.highlighted);
+                    root.close();
+                } else if event.text == Key.Home {
+                    root.highlighted = 0;
+                } else if event.text == Key.End {
+                    root.highlighted = root.seasons.length - 1;
+                } else if event.text == Key.UpArrow {
+                    root.highlighted = Math.max(0, root.highlighted - 1);
+                } else if event.text == Key.DownArrow {
+                    root.highlighted = Math.min(root.seasons.length - 1, root.highlighted + 1);
+                } else {
+                    return reject;
+                }
+                return accept;
+            }
+
+            Rectangle {
+                background: white;
+                border-color: #767676;
+                border-width: 1px;
+                ScrollView {
+                    x: 1px; y: 1px;
+                    width: parent.width - 2px; height: parent.height - 2px;
+                    viewport-width: self.visible-width;
+                    viewport-height: root.content-height;
+                    property <int> active-row: root.highlighted;
+                    init => { self.viewport-y = -Math.max(0px, root.row-top(self.active-row) + root.row-height - self.visible-height); }
+                    changed active-row => {
+                        let top = root.row-top(self.active-row);
+                        self.viewport-y = Math.min(-top, Math.max(self.viewport-y, self.visible-height - top - root.row-height));
+                    }
+
+                    for season[index] in root.seasons: Rectangle {
+                        y: root.row-top(index);
+                        width: parent.width;
+                        height: root.row-height;
+                        background: index == root.highlighted || option.has-hover ? #cfe1fa : white;
+                        accessible-role: list-item;
+                        accessible-label: season.label;
+                        accessible-action-default => { root.select(index); root.close(); }
+                        if index > 0 && season.group != root.seasons[index - 1].group: Rectangle {
+                            x: 3px;
+                            y: -4px;
+                            width: parent.width - 6px;
+                            height: 1px;
+                            background: #767676;
+                        }
+                        Text {
+                            x: 4px;
+                            width: parent.width - 8px;
+                            text: season.label;
+                            color: black;
+                            font-size: 13px;
+                            overflow: elide;
+                            vertical-alignment: center;
+                        }
+                        option := TouchArea {
+                            mouse-cursor: pointer;
+                            clicked => { root.select(index); root.close(); }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

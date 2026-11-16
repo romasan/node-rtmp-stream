@@ -1,0 +1,1067 @@
+import { LoginDialog } from "login.slint";
+import { PaletteEditor } from "color-picker.slint";
+import { TimelapseControls } from "timelapse-controls.slint";
+import { SeasonOption } from "season-picker.slint";
+
+import "../../assets/fonts/CustomFont.ttf";
+import { ChatContent, ChatDay, PlatformIcon, PlayerRow, PlayerWindow, StatisticsContent } from "player-windows.slint";
+
+component OutlinedText inherits Text {
+    color: black;
+    stroke: white;
+    stroke-width: 2px;
+    stroke-style: outside;
+}
+
+component IconButton inherits TouchArea {
+    in property <image> icon;
+    in property <string> label;
+    in property <length> icon-size;
+    in property <float> hover-scale: 1;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { root.clicked(); }
+    width: 32px;
+    height: 32px;
+    mouse-cursor: pointer;
+    Image {
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        width: Math.min(root.width, root.icon-size > 0px ? root.icon-size : self.preferred-width);
+        height: Math.min(root.height, root.icon-size > 0px ? root.icon-size : self.preferred-height);
+        transform-origin: { x: self.width / 2, y: self.height / 2 };
+        transform-scale: root.has-hover ? root.hover-scale : 1;
+        animate transform-scale { duration: 200ms; }
+        source: root.icon;
+        image-fit: contain;
+        opacity: root.enabled ? 1 : 0.5;
+    }
+}
+
+component PaletteSwatch inherits Rectangle {
+    in property <color> fill;
+    in property <bool> mobile;
+    in property <bool> selected;
+    callback clicked();
+    callback double-clicked();
+    z: !root.mobile && hit.has-hover ? 1 : 0;
+
+    Rectangle {
+        background: root.fill;
+        border-radius: root.mobile ? 12px : 3px;
+        border-width: 2px;
+        border-color: #2d2d3a;
+        transform-origin: { x: self.width / 2, y: self.height / 2 };
+        transform-scale: !root.mobile && hit.has-hover ? 1.2 : 1;
+        animate transform-scale { duration: 200ms; }
+
+        if root.mobile && root.selected: Rectangle {
+            x: 1px; y: 1px;
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            border-radius: 11px;
+            border-width: 1px;
+            border-color: white;
+        }
+        if !root.mobile: Rectangle {
+            x: 2px; y: parent.height - 2px;
+            width: parent.width - 4px; height: 2px;
+            background: #b6b5eb;
+        }
+        if !root.mobile: Rectangle {
+            x: parent.width - 2px; y: 2px;
+            width: 2px; height: parent.height - 4px;
+            background: #b6b5eb;
+        }
+    }
+    hit := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+        double-clicked => { root.double-clicked(); }
+    }
+}
+
+export struct FieldTile {
+    column: float,
+    row: float,
+    columns: float,
+    rows: float,
+    image: image,
+}
+
+export struct Swatch {
+    key: string,
+    slot: string,
+    rgb: color,
+}
+
+export struct PixelDetails {
+    label: string,
+    area: string,
+    time: string,
+    color-label: string,
+    swatch: color,
+}
+
+component PixelTooltipText inherits Text {
+    height: 16px;
+    color: black;
+    font-family: "Custom Font ttf 12h 1.0";
+    font-size: 16px;
+    vertical-alignment: center;
+    overflow: elide;
+}
+
+component PixelTooltip inherits Rectangle {
+    in property <PixelDetails> pixel;
+    in property <length> arrow-target;
+    in property <bool> below;
+    property <length> arrow-center: Math.max(5px, Math.min(root.width - 5px, root.arrow-target));
+
+    preferred-width: details.preferred-width + 2px;
+    height: details.preferred-height + 2px;
+    background: white;
+    border-width: 1px;
+    border-color: black;
+    details := VerticalLayout {
+        x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px;
+        padding-left: 4px; padding-right: 4px;
+        padding-top: 2px; padding-bottom: 2px;
+        HorizontalLayout {
+            height: 16px; spacing: 3px;
+            if root.pixel.area != "": PlatformIcon { width: 12px; height: 12px; y: 2px; area: root.pixel.area; }
+            PixelTooltipText { text: root.pixel.label; }
+        }
+        if root.pixel.time != "": PixelTooltipText { text: root.pixel.time; }
+        if root.pixel.color-label != "": HorizontalLayout {
+            height: 16px; spacing: 5px;
+            Rectangle { width: 12px; height: 12px; y: 2px; background: root.pixel.swatch; }
+            PixelTooltipText { text: root.pixel.color-label; }
+        }
+    }
+    Path {
+        x: root.arrow-center - 5px;
+        y: root.below ? -5px : root.height - 1px;
+        width: 10px; height: 6px;
+        stroke: black; stroke-width: 1px;
+        fill: white;
+        commands: root.below ? "M 0 6 L 5 0 L 10 6" : "M 0 0 L 5 6 L 10 0";
+    }
+}
+
+struct ReplayPickerBounds {
+    left: length,
+    top: length,
+    width: length,
+    height: length,
+    visible: bool,
+}
+
+export component App inherits Window {
+    background: #d9d7ff;
+    out property <float> viewport-width: self.width / 1px;
+    out property <float> viewport-height: self.height / 1px;
+    in property <[FieldTile]> field-tiles;
+    in property <bool> mobile;
+    in property <string> season-label;
+    in property <bool> connected;
+    in property <bool> snapshot-error;
+    in property <bool> finished;
+    in property <length> field-width;
+    in property <length> field-height;
+    in property <bool> ready;
+    in property <bool> replay;
+    in property <[SeasonOption]> seasons;
+    in property <int> replay-season: -1;
+    in property <bool> replay-loaded;
+    in property <bool> replay-retryable;
+    in property <[float]> replay-markers;
+    in property <float> replay-progress;
+    in property <string> replay-speed;
+    in property <string> replay-position;
+    in property <string> replay-status;
+    in property <bool> playing;
+    in property <bool> authorized;
+    in property <bool> truecolor;
+    in property <bool> local;
+    in property <string> stats;
+    in property <string> total-pixels;
+    in-out property <int> online-count;
+    in property <[PlayerRow]> leaders;
+    in property <[PlayerRow]> online-players;
+    in property <bool> moderator;
+    in property <bool> telegram;
+    in property <bool> paused;
+    in property <string> user-name;
+    in property <string> status: "Подключение…";
+    in property <bool> has-deadline;
+    in property <string> cooldown-clock;
+    in property <float> cooldown-progress;
+    in property <string> season-clock;
+    in property <styled-text> finish-message;
+    property <string> field-label: (root.cell-active && root.cell-coordinates != "" ? root.cell-coordinates + " " : "")
+        + "X" + Math.round(root.zoom * 10) / 10;
+    in property <[ChatDay]> chat-days;
+    in-out property <bool> chat-open;
+    property <bool> stats-open;
+    in-out property <bool> new-mention;
+    in-out property <string> chat-draft;
+    in-out property <bool> chat-sending;
+    property <[int]> window-order: [0, 1, 2];
+    in-out property <length> chat-scroll;
+    in-out property <length> stats-scroll;
+    callback raise-editor();
+
+    function close-chat() {
+        root.chat-open = false;
+        root.chat-draft = "";
+        root.chat-scroll = 0px;
+        root.chat-sending = false;
+        root.hide-chat();
+    }
+
+    function close-stats() {
+        root.stats-open = false;
+        root.stats-scroll = 0px;
+        root.hide-stats();
+    }
+
+    function raise-window(id: int) {
+        if root.window-order[2] != id {
+            if root.window-order[0] == id {
+                root.window-order = [root.window-order[1], root.window-order[2], id];
+            } else {
+                root.window-order = [root.window-order[0], root.window-order[2], id];
+            }
+        }
+    }
+
+    raise-editor() => { root.raise-window(2); }
+
+    function window-at(id: int, x: length, y: length) -> bool {
+        if id == 0 {
+            return root.stats-open && x >= root.stats-x && x < root.stats-x + root.stats-width
+                && y >= root.stats-y && y < root.stats-y + root.stats-height;
+        }
+        if id == 1 {
+            return root.chat-open && x >= root.chat-x && x < root.chat-x + root.chat-width
+                && y >= root.chat-y && y < root.chat-y + root.chat-height;
+        }
+        return root.panel == 5
+            && x >= root.editor-left + root.editor-width * (1 - root.editor-scale)
+            && x < root.editor-left + root.editor-width
+            && y >= root.editor-top + root.editor-height * (1 - root.editor-scale)
+            && y < root.editor-top + root.editor-height;
+    }
+
+    public function activate-window-at(x: float, y: float) {
+        if root.panel != 0 && root.panel != 5 { return; }
+        let px = x * 1px;
+        let py = y * 1px;
+        if root.window-at(root.window-order[2], px, py) { return; }
+        if root.window-at(root.window-order[1], px, py) {
+            root.raise-window(root.window-order[1]);
+        } else if root.window-at(root.window-order[0], px, py) {
+            root.raise-window(root.window-order[0]);
+        }
+    }
+
+    property <length> stats-width: root.mobile ? root.width - 3px : Math.min(root.width - 4px, 338px);
+    property <length> chat-width: root.mobile ? root.width - 3px : Math.min(root.width - 4px, 324px);
+    property <length> chat-height: Math.min(root.height - 42px, Math.max(160px, root.height - (root.mobile ? 99px : 139px)));
+    property <length> stats-content-height: 40px;
+    property <length> stats-height: Math.min(root.height - 42px, Math.max(60px,
+        Math.min(root.stats-content-height + 38px, root.height - (root.mobile ? 118px : 238px))));
+    property <length> chat-left: root.mobile ? 1px : root.width - 330px;
+    property <length> chat-top: root.mobile ? 40px : 60px;
+    property <length> stats-left: root.mobile ? 1px : root.width - 350px;
+    property <length> stats-top: root.mobile ? 40px : 55px;
+    property <length> chat-x: root.window-x(root.chat-left, root.chat-width);
+    property <length> chat-y: root.window-y(root.chat-top, root.chat-height);
+    property <length> stats-x: root.window-x(root.stats-left, root.stats-width);
+    property <length> stats-y: root.window-y(root.stats-top, root.stats-height);
+
+    function window-x(x: length, width: length) -> length {
+        return Math.max(0px, Math.min(root.width - width, x));
+    }
+
+    function window-y(y: length, height: length) -> length {
+        return Math.max(40px, Math.min(root.height - height, y));
+    }
+    in property <[Swatch]> palette;
+    in-out property <string> selected;
+    in-out property <color> selected-rgb: black;
+    in-out property <bool> picking;
+    in-out property <int> panel;
+    in property <float> min-zoom: 1;
+    in property <float> max-zoom: 50;
+    in property <float> initial-zoom: 2;
+    in property <float> click-zoom: 6;
+    in property <float> touch-zoom: 12;
+    out property <float> zoom: root.initial-zoom;
+    property <length> offset-x;
+    property <length> offset-y;
+    public function center-replay-field() {
+        root.offset-x = 0px;
+        root.offset-y = 0px;
+    }
+    public function preserve-field-origin(width: float, height: float) {
+        root.offset-x = root.origin-x - root.width / 2 + width * 1px * root.zoom / 2;
+        root.offset-y = root.origin-y - root.height / 2 + height * 1px * root.zoom / 2;
+    }
+    property <length> half-field-width: root.field-width * root.zoom / 2;
+    property <length> half-field-height: root.field-height * root.zoom / 2;
+    out property <length> origin-x: root.width / 2 - root.half-field-width
+        + Math.max(-root.half-field-width, Math.min(root.half-field-width, root.offset-x));
+    out property <length> origin-y: root.height / 2 - root.half-field-height
+        + Math.max(-root.half-field-height, Math.min(root.half-field-height, root.offset-y));
+    callback navigate(string);
+    callback finish-link(string);
+    callback select-pixel(int, int, bool, string);
+    callback send-message(string);
+    callback show-chat();
+    callback hide-chat();
+    callback chat-link(string);
+    callback show-stats();
+    callback hide-stats();
+    in-out property <string> editor-slot;
+    in-out property <string> editor-hex;
+    in property <float> editor-hue;
+    in property <float> editor-saturation;
+    in property <float> editor-value;
+    in property <color> editor-hue-color;
+    in property <color> editor-color;
+    callback open-color(string);
+    callback palette-hold(float, float) -> bool;
+    callback scroll-palette(float, float, float) -> bool;
+    property <length> swatch-scroll;
+    callback edit-hex(string);
+    callback adjust-color(float, float, float);
+    callback commit-hex();
+    callback custom-color();
+    callback delete-color();
+    callback season(int);
+    callback seek(float);
+    callback play();
+    callback speed(float);
+    callback toggle-replay-position();
+    callback replay-key() -> bool;
+    callback reposition(float, float, float, float, float);
+    property <length> palette-x: 6px;
+    property <length> palette-y: root.footer-visible && root.palette-left + root.palette-width + 8px > root.footer-left
+        ? root.footer-top - root.palette-height - 8px : root.height - 68px;
+    property <length> palette-drag-x;
+    property <length> palette-drag-y;
+    property <length> swatch-size: root.mobile ? Math.min(root.width, root.height) * 0.08 : 20px;
+    property <length> swatch-left: root.mobile ? 6px : 81px;
+    property <length> swatch-top: root.mobile ? 4px : 9px;
+    property <length> pipette-size: 28px;
+    property <length> palette-padding-right: root.mobile ? 6px : 9px;
+    property <length> palette-tools-width: 6px + root.pipette-size + root.palette-padding-right;
+    property <length> swatch-visible-width: Math.max(0px, root.palette-width - root.swatch-left - root.palette-tools-width);
+    property <int> palette-items: root.palette.length + (root.truecolor ? 1 : 0);
+    property <int> swatch-columns: root.mobile ? root.palette-items : Math.ceil(root.palette-items / 2);
+    property <length> swatch-track-width: Math.max(0px, root.swatch-columns * (root.swatch-size + 1px) - 1px);
+    property <length> palette-width: root.mobile ? root.width - 4px : Math.min(root.width - 4px,
+        root.swatch-left + root.swatch-track-width + root.palette-tools-width);
+    property <length> palette-height: root.mobile ? Math.max(34px, root.swatch-size + 8px) : 60px;
+    property <length> palette-left: root.mobile ? 2px : Math.max(0px, Math.min(root.width - root.palette-width, root.palette-x));
+    property <length> palette-top: root.mobile ? root.height - root.palette-height - 2px
+        : Math.max(40px, Math.min(root.height - root.palette-height, root.palette-y));
+    property <bool> footer-visible: !root.replay && !root.mobile && !root.telegram;
+    property <length> footer-left: root.width - 202px;
+    property <length> footer-top: root.height - 44.5px;
+    in-out property <bool> hover-active;
+    in-out property <float> pointer-x;
+    in-out property <float> pointer-y;
+    out property <int> cell-x: Math.floor(((root.mobile ? root.width / 2 : root.pointer-x * 1px) - root.origin-x) / (root.zoom * 1px));
+    out property <int> cell-y: Math.floor(((root.mobile ? root.height / 2 : root.pointer-y * 1px) - root.origin-y) / (root.zoom * 1px));
+    out property <bool> cell-active: root.ready && !root.replay && (root.panel == 0 || (root.panel == 5 && root.picking))
+        && (root.mobile || (root.hover-active && root.field-area(root.pointer-x, root.pointer-y)))
+        && root.cell-x >= 0 && root.cell-y >= 0
+        && root.cell-x * 1px < root.field-width && root.cell-y * 1px < root.field-height;
+    out property <bool> cell-inspectable: root.cell-active && root.zoom >= root.click-zoom;
+    in property <float> placement-progress: 1;
+    in property <float> placement-x;
+    in property <float> placement-y;
+    in property <color> placement-color;
+    in property <string> cell-coordinates;
+    in property <PixelDetails> cell-details;
+    in property <color> cell-color;
+    property <color> preview-color: root.picking || root.finished ? root.cell-color : root.selected-rgb;
+    property <length> preview-outset: root.mobile ? 3px : 0px;
+    pure function contrast-color(fill: color) -> color {
+        return rgb(255 - fill.red, 255 - fill.green, 255 - fill.blue);
+    }
+    property <length> cell-left: root.origin-x + root.cell-x * 1px * root.zoom;
+    property <length> cell-top: root.origin-y + root.cell-y * 1px * root.zoom;
+    property <length> editor-x: root.mobile ? root.width - 250px : 200px;
+    property <length> editor-y: root.height - (root.mobile ? 350px : 400px);
+    property <length> editor-left: root.window-x(root.editor-x, root.editor-width);
+    property <length> editor-top: root.window-y(root.editor-y, root.editor-height);
+    property <length> editor-width: Math.min(root.width - 10px, 244px);
+    property <length> editor-height: Math.min(root.height - 42px, 306px);
+    property <float> editor-scale: root.picking ? 0.5 : 1;
+    pure callback field-area(float, float) -> bool;
+    callback wheel-zoom(float, float, float);
+    callback choose(float, float, bool);
+    callback field-cursor-changed(string);
+    property <string> field-cursor: !root.mobile && root.hover-active && root.ready
+        && root.cell-x >= 0 && root.cell-y >= 0
+        && root.cell-x * 1px < root.field-width && root.cell-y * 1px < root.field-height
+        && root.field-area(root.pointer-x, root.pointer-y)
+        ? (root.picking ? "pick" : root.replay || root.zoom >= root.click-zoom ? "crosshair" : "pointer") : "";
+    changed field-cursor => { root.field-cursor-changed(root.field-cursor); }
+
+    palette-hold(x, y) => {
+        let local-x = x * 1px - root.palette-left - root.swatch-left;
+        let local-y = y * 1px - root.palette-top - root.swatch-top;
+        let content-x = local-x - root.swatch-scroll;
+        let stride = root.swatch-size + 1px;
+        let index = Math.floor(content-x / stride);
+        if root.mobile && root.connected && root.truecolor && !root.finished && root.panel == 0
+            && !root.window-at(0, x * 1px, y * 1px) && !root.window-at(1, x * 1px, y * 1px)
+            && local-x >= 0px && local-x < root.swatch-visible-width
+            && local-y >= 0px && local-y < root.swatch-size
+            && index >= 0 && index < root.palette.length
+            && content-x - index * stride < root.swatch-size {
+            root.open-color(root.palette[index].slot);
+            return true;
+        }
+        return false;
+    }
+
+    scroll-palette(x, y, delta) => {
+        let px = x * 1px;
+        let py = y * 1px;
+        let left = root.palette-left + root.swatch-left;
+        let top = root.palette-top + root.swatch-top;
+        let limit = root.swatch-visible-width - root.swatch-track-width;
+        if root.replay || !root.connected || root.finished || root.panel != 0 || limit >= 0px
+            || root.window-at(0, px, py) || root.window-at(1, px, py)
+            || px < left || px >= left + root.swatch-visible-width
+            || py < top || py >= root.palette-top + root.palette-height {
+            return false;
+        }
+        root.swatch-scroll = Math.max(limit, Math.min(0px, root.swatch-scroll - delta * 1px));
+        return true;
+    }
+
+    field-area(x, y) => {
+        return (root.panel == 0 || (root.panel == 5 && root.picking)) && y > 40
+            && !root.window-at(0, x * 1px, y * 1px)
+            && !root.window-at(1, x * 1px, y * 1px)
+            && !root.window-at(2, x * 1px, y * 1px)
+            && !(root.footer-visible && x * 1px >= root.footer-left - 10px && y * 1px >= root.footer-top - 10px)
+            && (!root.replay || y * 1px < replay-controls.y)
+            && !(root.connected && !root.finished && !root.replay
+                && x * 1px >= root.palette-left && x * 1px < root.palette-left + root.palette-width
+                && y * 1px >= root.palette-top && y * 1px < root.palette-top + root.palette-height);
+    }
+
+    reposition(x, y, dx, dy, factor) => {
+        let next = Math.max(root.min-zoom, Math.min(root.max-zoom, root.zoom * factor));
+        let ratio = next / root.zoom;
+        let anchor-x = x * 1px;
+        let anchor-y = y * 1px;
+        let next-left = anchor-x + dx * 1px - (anchor-x - root.origin-x) * ratio;
+        let next-top = anchor-y + dy * 1px - (anchor-y - root.origin-y) * ratio;
+        let half-width = root.field-width * next / 2;
+        let half-height = root.field-height * next / 2;
+        let next-x = next-left - root.width / 2 + half-width;
+        let next-y = next-top - root.height / 2 + half-height;
+        root.offset-x = Math.max(-half-width, Math.min(half-width, next-x));
+        root.offset-y = Math.max(-half-height, Math.min(half-height, next-y));
+        root.zoom = next;
+    }
+
+    public pure function board-contains(x: float, y: float) -> bool {
+        return x * 1px >= root.origin-x && x * 1px < root.origin-x + 2 * root.half-field-width
+            && y * 1px >= root.origin-y && y * 1px < root.origin-y + 2 * root.half-field-height;
+    }
+
+    wheel-zoom(x, y, factor) => {
+        if root.board-contains(x, y) {
+            root.reposition(x, y, 0, 0, factor);
+        } else {
+            root.reposition(root.viewport-width / 2, root.viewport-height / 2, 0, 0, factor);
+        }
+    }
+
+    choose(x, y, touch) => {
+        if root.ready && !root.replay {
+            let px = touch ? root.viewport-width / 2 : x;
+            let py = touch ? root.viewport-height / 2 : y;
+            let cell-x = Math.floor((px * 1px - root.origin-x) / (root.zoom * 1px));
+            let cell-y = Math.floor((py * 1px - root.origin-y) / (root.zoom * 1px));
+            if cell-x >= 0 && cell-y >= 0 && cell-x * 1px < root.field-width && cell-y * 1px < root.field-height {
+                if root.zoom < root.click-zoom && (touch || !root.picking) {
+                    let target = touch ? root.touch-zoom : root.click-zoom;
+                    root.reposition(px, py, 0, 0, target / root.zoom);
+                } else {
+                    root.select-pixel(cell-x, cell-y, root.picking, root.selected);
+                    root.picking = false;
+                }
+            }
+        }
+    }
+
+    Image {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        source: @image-url("checkerboard.png");
+        image-fit: preserve;
+        horizontal-alignment: left;
+        vertical-alignment: top;
+        horizontal-tiling: repeat;
+        vertical-tiling: repeat;
+        image-rendering: pixelated;
+    }
+
+    for tile in root.field-tiles: Image {
+        x: root.origin-x + tile.column * root.zoom * 1px;
+        y: root.origin-y + tile.row * root.zoom * 1px;
+        width: tile.columns * root.zoom * 1px;
+        height: tile.rows * root.zoom * 1px;
+        source: tile.image;
+        image-fit: fill;
+        image-rendering: pixelated;
+        visible: !root.snapshot-error;
+    }
+
+    if root.snapshot-error: Image {
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        width: Math.min(root.width, 426px);
+        height: self.width * 240 / 426;
+        source: @image-url("field-unavailable.png");
+        image-rendering: pixelated;
+    }
+
+    if root.placement-progress < 1: Rectangle {
+        property <length> base-size: root.zoom * 1px;
+        property <float> expansion: 1 + 9 * root.placement-progress;
+        width: (base-size + 2 * root.preview-outset) * expansion;
+        height: self.width;
+        x: root.origin-x + (root.placement-x + 0.5) * base-size - self.width / 2;
+        y: root.origin-y + (root.placement-y + 0.5) * base-size - self.height / 2;
+        background: root.placement-color;
+        border-width: root.preview-outset * expansion;
+        border-color: root.contrast-color(root.placement-color);
+        border-radius: self.width * root.placement-progress / 2;
+        transform-rotation: 45deg * root.placement-progress;
+        opacity: 1 - root.placement-progress;
+    }
+
+    if root.cell-inspectable && root.placement-progress >= 1: Rectangle {
+        x: root.cell-left - root.preview-outset;
+        y: root.cell-top - root.preview-outset;
+        width: root.zoom * 1px + 2 * root.preview-outset;
+        height: self.width;
+        background: root.preview-color;
+        border-width: root.mobile ? root.preview-outset : 1px;
+        border-color: root.contrast-color(root.preview-color);
+        if root.cell-details.label != "" || root.cell-details.time != "": PixelTooltip {
+            width: Math.min(root.width, self.preferred-width);
+            x: Math.max(-parent.x, Math.min(root.width - parent.x - self.width, (parent.width - self.width) / 2));
+            y: self.below ? parent.height + 6px : -self.height - 6px;
+            below: parent.y < self.height + 6px;
+            arrow-target: parent.width / 2 - self.x;
+            pixel: root.cell-details;
+        }
+    }
+
+    Rectangle {
+        x: 4px;
+        y: 4px;
+        width: root.mobile ? 32px : 174px;
+        height: 32px;
+        Image { x: 0; y: 0; source: @image-url("../../assets/logo.svg"); width: 32px; height: 32px; }
+        if !root.mobile: OutlinedText {
+            x: 38px; y: 0; height: 20px;
+            text: "PIXEL BATTLE";
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 20px;
+            font-weight: 700;
+            vertical-alignment: center;
+        }
+        if !root.mobile: OutlinedText {
+            x: 38px; y: 20px; height: 12px;
+            text: root.season-label;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 12px;
+            font-weight: 700;
+            vertical-alignment: center;
+        }
+        TouchArea { mouse-cursor: pointer; clicked => { root.navigate(root.telegram ? "./" : "game"); } }
+    }
+
+    HorizontalLayout {
+        x: Math.max(42px, root.width - self.preferred-width - 8px);
+        y: 4px;
+        width: Math.min(self.preferred-width, root.width - 50px);
+        height: 32px;
+        spacing: 10px;
+
+        if root.authorized: OutlinedText {
+            text: root.user-name;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 20px;
+            overflow: elide;
+            vertical-alignment: center;
+            max-width: Math.max(0px, root.width - 260px);
+        }
+        if !root.telegram: IconButton {
+            icon: root.authorized ? @image-url("../../assets/logout.svg") : @image-url("../../assets/login.svg");
+            label: root.authorized ? "Выйти" : "Войти";
+            enabled: root.connected;
+            clicked => {
+                if root.authorized { root.navigate("/logout/"); }
+                else { root.panel = 1; }
+            }
+        }
+        IconButton {
+            icon: @image-url("../../assets/chat.svg");
+            label: "Чат";
+            clicked => {
+                root.new-mention = false;
+                if root.chat-open {
+                    root.close-chat();
+                } else {
+                    root.chat-open = true;
+                    root.raise-window(1);
+                    root.show-chat();
+                }
+            }
+            if root.new-mention: Rectangle {
+                x: parent.width - 8px; y: 0; width: 8px; height: 8px;
+                background: red; border-radius: 4px;
+            }
+        }
+        IconButton {
+            icon: @image-url("../../assets/info.svg");
+            label: "Статистика";
+            clicked => {
+                if root.stats-open {
+                    root.close-stats();
+                } else {
+                    root.stats-open = true;
+                    root.raise-window(0);
+                    root.show-stats();
+                }
+            }
+        }
+        if !root.telegram: IconButton {
+            icon: @image-url("../../assets/clock.svg");
+            label: root.replay ? "Игра" : "Таймлапс";
+            clicked => { root.navigate(root.replay ? "game" : "timelapse/"); }
+        }
+        if root.moderator && !root.replay: IconButton {
+            icon: @image-url("../../assets/gear.svg");
+            label: "Инструменты";
+            clicked => { root.navigate("/qq/"); }
+        }
+    }
+
+    if !root.replay && !root.connected: OutlinedText {
+        text: root.status;
+        x: (root.width - self.preferred-width) / 2;
+        y: root.height - 42px;
+        font-family: "Custom Font ttf 12h 1.0";
+        font-size: 18px;
+    }
+
+    if !root.replay && root.connected: HorizontalLayout {
+        z: 0.5;
+        width: self.preferred-width;
+        x: (root.width - self.width) / 2;
+        property <length> baseline-y: root.mobile ? root.height - 88px
+            : root.footer-visible && self.x + self.width + 8px > root.footer-left
+                ? root.footer-top - 24px : root.height - 38px;
+        y: !root.finished && self.x - 10px < root.palette-left + root.palette-width
+            && self.x + self.width > root.palette-left
+            && root.palette-top + root.palette-height > self.baseline-y - 5px
+            && root.palette-top < self.baseline-y + 23px
+            ? Math.min(self.baseline-y, root.palette-top - 24px) : self.baseline-y;
+        height: 18px;
+        if root.cooldown-clock != "" && !root.finished: Rectangle {
+            width: cooldown-label.preferred-width + 18px;
+            height: parent.height;
+            Rectangle {
+                x: -10px; y: -5px;
+                width: cooldown-label.preferred-width + 20px;
+                height: parent.height + 10px;
+                background: black;
+                Rectangle {
+                    x: 0; y: 0;
+                    height: parent.height;
+                    width: parent.width * root.cooldown-progress;
+                    background: #00ff00;
+                }
+            }
+            cooldown-label := OutlinedText {
+                x: 0; y: 0;
+                width: self.preferred-width;
+                height: parent.height;
+                text: root.cooldown-clock;
+                vertical-alignment: center;
+                font-family: "Custom Font ttf 12h 1.0";
+                font-size: 18px;
+                font-weight: 700;
+            }
+        }
+        OutlinedText {
+            text: root.field-label;
+            vertical-alignment: center;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 18px;
+            font-weight: 700;
+        }
+    }
+
+    if !root.replay && root.paused: Rectangle {
+        x: 50px;
+        y: 50px;
+        width: pause-label.preferred-width + 20px;
+        height: pause-label.preferred-height + 20px;
+        background: black;
+        pause-label := Text {
+            x: 10px; y: 10px;
+            text: "PAUSE ||";
+            color: white;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 48px;
+        }
+    }
+
+    if !root.replay && root.has-deadline && !root.finished: Text {
+        x: (root.width - self.preferred-width) / 2;
+        y: root.mobile ? 39px : 15px;
+        text: root.season-clock;
+        font-family: "Custom Font ttf 12h 1.0";
+        font-size: root.mobile ? 32px : 48px;
+        color: white;
+        stroke: black;
+        stroke-width: 2px;
+        stroke-style: outside;
+    }
+
+    if !root.replay && root.finished: Rectangle {
+        x: (root.width - self.width) / 2;
+        y: 50px;
+        width: root.mobile ? Math.min(root.width, root.width * 0.9 + 20px)
+            : Math.min(root.width / 2, finish-content.preferred-width + 20px);
+        height: finish-content.preferred-height + 20px;
+        background: black;
+        finish-content := StyledText {
+            x: 10px; y: 10px;
+            width: parent.width - 20px;
+            text: root.finish-message;
+            default-font-family: "Custom Font ttf 12h 1.0";
+            default-font-size: root.mobile ? 21.333px : 48px;
+            default-color: white;
+            link-color: white;
+            horizontal-alignment: root.mobile ? center : left;
+            link-clicked(link) => { root.finish-link(link); }
+        }
+    }
+
+    if root.footer-visible: HorizontalLayout {
+        x: root.footer-left;
+        y: root.footer-top;
+        width: 192px;
+        height: 32px;
+        spacing: 8px;
+        for link in [
+            { icon: @image-url("../../assets/vkplay.svg"), label: "VK Play Live", url: "https://vkplay.live/place_tv" },
+            { icon: @image-url("../../assets/twitch.svg"), label: "Twitch", url: "https://www.twitch.tv/place_ru" },
+            { icon: @image-url("../../assets/youtube.svg"), label: "YouTube", url: "https://www.youtube.com/@Place-ru" },
+            { icon: @image-url("../../assets/discord.svg"), label: "Discord", url: "https://discord.gg/FfVjurYrus" },
+            { icon: @image-url("../../assets/telegram.svg"), label: "Telegram", url: "https://t.me/pixel_battle_online" },
+        ]: IconButton {
+            icon: link.icon;
+            label: link.label;
+            icon-size: 32px;
+            hover-scale: 1.2;
+            clicked => { root.navigate(link.url); }
+        }
+    }
+
+    if !root.replay && root.connected && !root.finished: Rectangle {
+        property <length> swatch-inset: root.mobile ? 0px : 3px;
+        property <length> corner-inset: root.mobile ? 10px : 3px;
+        x: root.palette-left;
+        y: root.palette-top;
+        width: root.palette-width;
+        height: root.palette-height;
+        background: #aaa8d9;
+        border-radius: root.mobile ? 10px : 3px;
+        border-width: root.mobile ? 2px : 3px;
+        border-color: #2d2d3a;
+        clip: true;
+
+        Rectangle {
+            x: parent.corner-inset; y: 0;
+            width: parent.width - 2 * parent.corner-inset; height: parent.border-width;
+            background: #b6b5eb;
+        }
+        Rectangle {
+            x: 0; y: parent.corner-inset;
+            width: parent.border-width; height: parent.height - 2 * parent.corner-inset;
+            background: #b6b5eb;
+        }
+        if !root.mobile: Rectangle {
+            x: 9px; y: 9px; width: 16px; height: 42px;
+            for stripe in 10: Rectangle {
+                y: stripe * 4px + 2px;
+                height: 1px; background: #2d2d3a;
+                Rectangle { y: 1px; height: 1px; background: #edeefc; }
+            }
+            TouchArea {
+                mouse-cursor: grab;
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down && event.button == PointerEventButton.left {
+                        root.palette-drag-x = self.mouse-x;
+                        root.palette-drag-y = self.mouse-y;
+                    }
+                }
+                moved => {
+                    if self.pressed {
+                        root.palette-y = root.palette-top + self.mouse-y - root.palette-drag-y;
+                        root.palette-x = root.palette-left + self.mouse-x - root.palette-drag-x;
+                    }
+                }
+            }
+        }
+        if !root.mobile: Rectangle {
+            x: 33px; y: 9px; width: 42px; height: 42px;
+            background: #c2c1fa;
+            border-width: 2px;
+            border-color: #2d2d3a;
+            border-radius: 3px;
+            Image {
+                x: 2px; y: 2px;
+                width: parent.width - 4px; height: parent.height - 4px;
+                source: @image-url("palette-checkerboard.png");
+                image-fit: preserve;
+                horizontal-alignment: left;
+                vertical-alignment: top;
+                horizontal-tiling: repeat;
+                vertical-tiling: repeat;
+                image-rendering: pixelated;
+            }
+            Rectangle { x: 2px; y: parent.height - 2px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
+            Rectangle { x: parent.width - 2px; y: 2px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
+            Rectangle {
+                x: 8px; y: 8px; width: 26px; height: 26px;
+                background: root.selected-rgb;
+                border-color: #2d2d3a; border-width: 2px; border-radius: 3px;
+                Rectangle { x: 2px; y: 0; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
+                Rectangle { x: 0; y: 2px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
+            }
+        }
+        Flickable {
+            property <length> inset: parent.swatch-inset;
+            x: root.swatch-left - self.inset;
+            y: root.swatch-top - self.inset;
+            width: root.swatch-visible-width + 2 * self.inset;
+            height: (root.mobile ? root.swatch-size : 41px) + 2 * self.inset;
+            viewport-width: Math.max(self.width, root.swatch-track-width + 2 * self.inset);
+            viewport-height: self.height;
+            viewport-x <=> root.swatch-scroll;
+            changed viewport-width => {
+                self.viewport-x = Math.max(self.width - self.viewport-width, Math.min(0px, self.viewport-x));
+            }
+            changed width => {
+                self.viewport-x = Math.max(self.width - self.viewport-width, Math.min(0px, self.viewport-x));
+            }
+            for swatch[index] in root.palette: PaletteSwatch {
+                x: parent.inset + (root.mobile ? index : Math.floor(index / 2)) * (root.swatch-size + 1px);
+                y: parent.inset + (!root.mobile && Math.mod(index, 2) == 1 ? root.swatch-size + 1px : 0px);
+                width: root.swatch-size;
+                height: root.swatch-size;
+                fill: swatch.rgb;
+                mobile: root.mobile;
+                selected: root.selected == swatch.key;
+                clicked => {
+                    root.selected = swatch.key;
+                    root.selected-rgb = swatch.rgb;
+                }
+                double-clicked => { if root.truecolor && !root.mobile { root.open-color(swatch.slot); } }
+            }
+            if root.truecolor: IconButton {
+                x: parent.inset + (root.mobile ? root.palette.length : Math.floor(root.palette.length / 2))
+                    * (root.swatch-size + 1px);
+                y: parent.inset + (!root.mobile && Math.mod(root.palette.length, 2) == 1 ? root.swatch-size + 1px : 0px);
+                width: root.swatch-size;
+                height: root.swatch-size;
+                icon-size: root.mobile ? root.swatch-size * 0.625 : 14px;
+                icon: @image-url("../../assets/add.svg");
+                label: "Добавить цвет";
+                clicked => { root.open-color(""); }
+            }
+        }
+        IconButton {
+            x: parent.width - root.palette-padding-right - self.width;
+            y: (parent.height - self.height) / 2;
+            width: root.pipette-size;
+            height: root.pipette-size;
+            icon: @image-url("../../assets/eye-dropper.png");
+            label: "Пипетка";
+            opacity: root.picking ? 0.55 : 1;
+            clicked => { root.picking = !root.picking; }
+        }
+    }
+
+    replay-key() => {
+        if root.replay && root.panel == 0 && !root.chat-open && !root.stats-open && !replay-controls.season-has-focus {
+            root.play();
+            return true;
+        }
+        return false;
+    }
+
+    callback position-native-season-picker(float, float, float, float, bool);
+    property <length> picker-left: replay-controls.x + replay-controls.season-picker-left;
+    property <length> picker-top: replay-controls.y + replay-controls.season-picker-top;
+    property <ReplayPickerBounds> native-picker: {
+        left: root.picker-left,
+        top: root.picker-top,
+        width: replay-controls.season-picker-width,
+        height: replay-controls.season-picker-height,
+        visible: root.replay && root.mobile && root.panel == 0 && root.seasons.length > 0
+            && !(root.chat-open && root.window-covers-picker(root.chat-x, root.chat-y, root.chat-width, root.chat-height))
+            && !(root.stats-open && root.window-covers-picker(root.stats-x, root.stats-y, root.stats-width, root.stats-height)),
+    };
+
+    pure function window-covers-picker(left: length, top: length, width: length, height: length) -> bool {
+        return left < root.picker-left + replay-controls.season-picker-width
+            && left + width > root.picker-left
+            && top < root.picker-top + replay-controls.season-picker-height
+            && top + height > root.picker-top;
+    }
+
+    changed native-picker => {
+        let bounds = root.native-picker;
+        root.position-native-season-picker(bounds.left / 1px, bounds.top / 1px,
+            bounds.width / 1px, bounds.height / 1px, bounds.visible);
+    }
+
+    replay-controls := TimelapseControls {
+        visible: root.replay;
+        x: 5px;
+        y: root.height - self.height - 5px;
+        width: root.width - 10px;
+        seasons: root.seasons;
+        season-index: root.replay-season;
+        markers: root.replay-markers;
+        progress: root.replay-progress;
+        loaded: root.replay-loaded;
+        retryable: root.replay-retryable;
+        playing: root.playing;
+        speed-label: root.replay-speed;
+        position-label: root.replay-position;
+        status: root.replay-status;
+        seek(value) => { root.seek(value); }
+        play => { root.play(); }
+        speed(factor) => { root.speed(factor); }
+        toggle-position => { root.toggle-replay-position(); }
+        season(index) => { root.season(index); }
+    }
+
+    for slot in root.window-order: Rectangle {
+        z: 1;
+        if slot == 0 && root.stats-open: PlayerWindow {
+            x: root.stats-x; y: root.stats-y;
+            width: root.stats-width; height: root.stats-height;
+            content-top: 31px;
+            close => { root.close-stats(); }
+            drag(dx, dy) => {
+                root.stats-left = root.window-x(root.stats-x + dx, self.width);
+                root.stats-top = root.window-y(root.stats-y + dy, self.height);
+            }
+            StatisticsContent {
+                mobile: root.mobile;
+                init => { root.stats-content-height = self.content-height; }
+                changed content-height => { root.stats-content-height = self.content-height; }
+                scroll-position <=> root.stats-scroll;
+                status: root.stats;
+                total: root.total-pixels;
+                online: root.online-count;
+                leaders: root.leaders;
+                players: root.online-players;
+            }
+        }
+        if slot == 1 && root.chat-open: PlayerWindow {
+            x: root.chat-x; y: root.chat-y;
+            width: root.chat-width; height: root.chat-height;
+            content-top: 31px;
+            close => { root.close-chat(); }
+            drag(dx, dy) => {
+                root.chat-left = root.window-x(root.chat-x + dx, self.width);
+                root.chat-top = root.window-y(root.chat-y + dy, self.height);
+            }
+            ChatContent {
+                mobile: root.mobile;
+                scroll-position <=> root.chat-scroll;
+                days: root.chat-days;
+                nickname: root.user-name;
+                authorized: root.authorized;
+                sending: root.chat-sending;
+                draft <=> root.chat-draft;
+                send(text) => { root.send-message(text); }
+                open-link(url) => { root.chat-link(url); }
+            }
+        }
+
+        if slot == 2 && root.panel == 5: PlayerWindow {
+            width: root.editor-width;
+            height: root.editor-height;
+            x: root.editor-left;
+            y: root.editor-top;
+            opacity: root.picking ? 0.5 : 1;
+            transform-scale: root.editor-scale;
+            transform-origin: { x: self.width, y: self.height };
+            close => { root.panel = 0; root.picking = false; }
+            drag(dx, dy) => {
+                root.editor-x = root.window-x(root.editor-left + dx * root.editor-scale, self.width);
+                root.editor-y = root.window-y(root.editor-top + dy * root.editor-scale, self.height);
+            }
+            PaletteEditor {
+                hue: root.editor-hue;
+                saturation: root.editor-saturation;
+                value: root.editor-value;
+                hue-color: root.editor-hue-color;
+                sample: root.editor-color;
+                hex <=> root.editor-hex;
+                editing: root.editor-slot != "";
+                hex-edited(text) => { root.edit-hex(text); }
+                adjust(h, s, v) => { root.adjust-color(h, s, v); }
+                hex-committed => { root.commit-hex(); }
+                save => { root.custom-color(); }
+                remove => { root.delete-color(); }
+                pick => { root.picking = !root.picking; }
+                cancel => { root.panel = 0; root.picking = false; }
+            }
+        }
+
+    }
+
+    if root.panel == 1: Rectangle {
+        z: 3;
+        background: #0008;
+        TouchArea {}
+        LoginDialog {
+            x: (root.width - self.width) / 2;
+            y: (root.height - self.height) / 2;
+            width: Math.min(root.width - 8px, 336px);
+            height: Math.min(root.height - 8px, root.local ? 383px : 333px);
+            local: root.local;
+            login(provider) => { root.navigate("/login/?" + provider); }
+            close => { root.panel = 0; }
+        }
+    }
+
+}

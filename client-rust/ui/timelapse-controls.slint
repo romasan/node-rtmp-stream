@@ -1,0 +1,176 @@
+import { SeasonOption, SeasonPicker } from "season-picker.slint";
+
+component ReplayButton inherits Rectangle {
+    in property <image> icon;
+    in property <string> label;
+    in property <bool> enabled: true;
+    callback clicked();
+    width: 30px;
+    height: 30px;
+    background: hit.pressed ? #8080a6 : hit.has-hover ? #b5b4ea : #9e9ecc;
+    border-radius: 3px;
+    opacity: enabled ? 1 : 0.5;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { if root.enabled { root.clicked(); } }
+    Image {
+        x: (root.width - self.width) / 2; y: 7.5px;
+        width: 15px; height: 15px;
+        source: root.icon;
+        image-fit: contain;
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => { root.clicked(); }
+    }
+}
+
+component Divider inherits Rectangle {
+    width: 1px;
+    height: 30px;
+    background: #8e8eab;
+}
+
+export component TimelapseControls inherits Rectangle {
+    in property <[SeasonOption]> seasons;
+    in property <int> season-index: -1;
+    in property <[float]> markers;
+    in property <float> progress;
+    in property <bool> loaded;
+    in property <bool> retryable;
+    in property <bool> playing;
+    in property <string> speed-label;
+    in property <string> position-label;
+    in property <string> status;
+    callback seek(float);
+    callback play();
+    callback speed(float);
+    callback toggle-position();
+    callback season(int);
+
+    out property <bool> season-has-focus: season-picker.has-keyboard-focus;
+    out property <length> season-picker-left: seasons.x + season-picker.x;
+    out property <length> season-picker-top: seasons.y + season-picker.y;
+    out property <length> season-picker-width: season-picker.width;
+    out property <length> season-picker-height: season-picker.height;
+
+    property <length> content-width: root.width - 26px;
+    property <length> narrow-gap: root.width < 490px ? 5px : 10px;
+    property <length> season-inline-width: season-caption.preferred-width + 4px + season-picker.preferred-width;
+    property <length> playback-text-width: speed-text.preferred-width + 2px;
+    property <length> counter-min-width: Math.min(counter-measure.preferred-width, 70px);
+    property <bool> season-label-above: 90px + root.playback-text-width + 6 * root.narrow-gap
+        + counter-measure.preferred-width + root.season-inline-width + 10px > root.content-width;
+    property <bool> stacked: root.season-label-above && 60px + root.playback-text-width + 60px
+        + root.counter-min-width + season-picker.preferred-width + 10px > root.content-width;
+    property <bool> compact-row: root.season-label-above && !root.stacked;
+    property <length> button-width: root.compact-row
+        ? Math.max(20px, Math.min(30px, (playback.width - root.playback-text-width - 60px - root.counter-min-width) / 3))
+        : 30px;
+    height: root.stacked ? 100px : 80px;
+    background: #aaa8d9;
+    border-color: #2d2d3a;
+    border-width: 3px;
+    border-radius: 3px;
+
+    Rectangle { x: 1px; y: 0; width: parent.width - 4px; height: 3px; background: #b6b5eb; }
+    Rectangle { x: 0; y: 1px; width: 3px; height: parent.height - 4px; background: #b6b5eb; }
+
+    track := Rectangle {
+        x: 13px; y: 13px; width: root.width - 26px; height: 14px;
+        background: #6c6c80b3;
+        border-width: 2px;
+        border-color: #6c6c81;
+        Rectangle {
+            x: 2px; y: parent.height - 2px; width: parent.width - 2px;
+            height: 2px; background: #c1c0e6;
+        }
+        Rectangle {
+            x: parent.width - 2px; y: 2px; width: 2px;
+            height: parent.height - 2px; background: #c1c0e6;
+        }
+        if root.loaded: Rectangle {
+            x: 2px; y: 2px;
+            width: (parent.width - 4px) * root.progress;
+            height: parent.height - 4px;
+            background: #0090f6;
+        }
+        for position in root.markers: Rectangle {
+            x: 2px + (parent.width - 5px) * position;
+            y: 2px; width: 1px; height: parent.height - 4px;
+            background: white;
+        }
+        TouchArea {
+            enabled: root.loaded;
+            mouse-cursor: pointer;
+            clicked => {
+                root.seek(Math.max(0, Math.min(1, (self.mouse-x - 2px) / (self.width - 4px))));
+            }
+        }
+    }
+
+    playback := HorizontalLayout {
+        x: 13px; y: 37px;
+        width: root.content-width - (root.stacked ? 0px : seasons.width + 10px); height: 30px;
+        spacing: root.compact-row ? 10px : root.narrow-gap;
+        ReplayButton {
+            width: root.button-width;
+            icon: root.retryable ? @image-url("../../assets/reload.svg")
+                : root.playing ? @image-url("../../assets/pause.svg") : @image-url("../../assets/play.svg");
+            label: root.retryable ? "Повторить загрузку" : root.playing ? "Пауза" : "Воспроизвести";
+            enabled: root.loaded || root.retryable;
+            clicked => { root.play(); }
+        }
+        Divider {}
+        ReplayButton { width: root.button-width; icon: @image-url("../../assets/slower.svg"); label: "Медленнее"; clicked => { root.speed(1 / 1.1); } }
+        ReplayButton { width: root.button-width; icon: @image-url("../../assets/faster.svg"); label: "Быстрее"; clicked => { root.speed(1.1); } }
+        speed-text := Text {
+            text: root.speed-label; color: black; vertical-alignment: center;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 16px;
+        }
+        Divider {}
+        Rectangle {
+            preferred-width: counter-measure.preferred-width;
+            horizontal-stretch: 1;
+            position-text := Text {
+                x: 0; y: -2px; width: parent.width; height: parent.height + 4px;
+                text: counter-measure.text;
+                color: black; vertical-alignment: center; overflow: elide;
+                wrap: root.compact-row ? word-wrap : no-wrap;
+                font-family: "Custom Font ttf 12h 1.0";
+                font-size: 16px;
+            }
+            TouchArea { mouse-cursor: pointer; clicked => { root.toggle-position(); } }
+        }
+    }
+
+    counter-measure := Text {
+        visible: false;
+        text: root.status == "" ? root.position-label : root.status;
+        font-family: "Custom Font ttf 12h 1.0";
+        font-size: 16px;
+    }
+
+    seasons := Rectangle {
+        x: root.width - self.width - 13px;
+        y: root.stacked ? 68px : root.compact-row ? 34.5px : 37px;
+        width: Math.min(root.compact-row ? season-picker.preferred-width : root.season-inline-width, root.content-width);
+        height: root.compact-row ? 35px : 30px;
+        season-caption := Text {
+            x: 0; y: 0; height: root.compact-row ? 16px : parent.height;
+            text: "Сезон:"; color: black; vertical-alignment: center;
+            font-family: "Custom Font ttf 12h 1.0";
+            font-size: 16px;
+        }
+        season-picker := SeasonPicker {
+            x: root.compact-row ? 0px : season-caption.preferred-width + 4px;
+            y: root.compact-row ? 16px : (parent.height - self.height) / 2;
+            width: parent.width - self.x;
+            seasons: root.seasons;
+            selected-index: root.season-index;
+            selected(index) => { root.season(index); }
+        }
+    }
+}

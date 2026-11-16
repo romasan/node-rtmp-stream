@@ -1,0 +1,102 @@
+component LoginProvider inherits Rectangle {
+    in property <string> key;
+    in property <string> label;
+    in property <image> icon;
+    callback clicked(string);
+    background: hit.has-hover ? #333 : transparent;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-action-default => { root.clicked(root.key); }
+    Image { x: 5px; y: 5px; width: 40px; height: 40px; source: root.icon; image-fit: contain; }
+    Text {
+        x: 65px;
+        width: parent.width - 67px; height: parent.height;
+        text: root.label;
+        color: hit.has-hover ? white : #5757ff;
+        font-size: parent.width < 260px ? 19px : 24px;
+        font-family: "Custom Font ttf 12h 1.0";
+        vertical-alignment: center;
+        overflow: elide;
+    }
+    hit := TouchArea { mouse-cursor: pointer; clicked => { root.clicked(root.key); } }
+}
+
+export component LoginDialog inherits Rectangle {
+    in property <bool> local;
+    callback login(string);
+    callback close();
+
+    background: #aaa8d9;
+    border-color: #2d2d3a;
+    border-width: 3px;
+    border-radius: 3px;
+    TouchArea {}
+    Rectangle { x: 1px; y: 1px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
+    Rectangle { x: 1px; y: 1px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
+
+    Text {
+        x: 19px; y: 16px;
+        width: parent.width - 38px; height: 27px;
+        text: "Войти с помощью";
+        color: black;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        font-family: "Custom Font ttf 12h 1.0";
+        font-size: 21px;
+    }
+    close-button := TouchArea {
+        x: parent.width - 40px; y: 10px;
+        width: 30px; height: 30px;
+        mouse-cursor: pointer;
+        accessible-role: button;
+        accessible-label: "Закрыть";
+        accessible-action-default => { root.close(); }
+        clicked => { root.close(); }
+        Rectangle {
+            border-radius: 5px;
+            border-width: close-button.has-hover ? 2px : 0px;
+            border-color: #2d2d3a;
+            background: close-button.pressed ? #8080a6 : transparent;
+            Text {
+                width: parent.width; height: parent.height;
+                text: "×"; color: close-button.has-hover ? red : black;
+                font-size: 23px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+            }
+        }
+    }
+
+    Flickable {
+        x: 18px; y: 61px;
+        width: parent.width - 36px;
+        height: parent.height - 79px;
+        viewport-height: providers.preferred-height + 4px;
+        viewport-width: self.width;
+        Rectangle {
+            height: providers.preferred-height + 4px;
+            border-width: 2px; border-color: #2d2d3a; border-radius: 5px;
+            background: #dbdbef;
+            clip: true;
+            providers := VerticalLayout {
+                x: 2px; y: 2px;
+                width: parent.width - 4px;
+                for provider in [
+                    { key: "twitch", name: "Twitch", icon: @image-url("../../assets/twitch.svg") },
+                    { key: "discord", name: "Discord", icon: @image-url("../../assets/discord.svg") },
+                    { key: "steam", name: "Steam", icon: @image-url("../../assets/steam.svg") },
+                    { key: "telegram", name: "Telegram", icon: @image-url("../../assets/telegram.svg") },
+                    { key: "vk", name: "VK ID", icon: @image-url("../../assets/vk.svg") },
+                    { key: "local", name: "Локальный вход", icon: @image-url("../../assets/login.svg") },
+                ]: LoginProvider {
+                    key: provider.key;
+                    label: provider.name;
+                    icon: provider.icon;
+                    visible: provider.key != "local" || root.local;
+                    height: self.visible ? 50px : 0px;
+                    clicked(key) => { root.login(key); }
+                }
+            }
+        }
+    }
+}
