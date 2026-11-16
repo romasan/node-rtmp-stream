@@ -1,6 +1,7 @@
 # Changelog
 
 ## 16.11.2026
+- Vendored `i-slint-core` in `vendor/slint-core` via `[patch.crates-io]` to fix clicks on chat links wrapped across several lines, plus a `wrapped_chat_link` test.
 - Restructured the repo into npm and Cargo workspaces: `apps/admin` (React/Parcel), `apps/app` (Slint + Trunk) and `apps/server`.
 - Added a Slint + Rust WebAssembly client with build/activation scripts and a `PIXELBATTLE_SLINT_DEFAULT` deploy toggle.
 - `tools/prepareTimelapse.js` now writes a complete snapshot for every part and marks archives with `completeSnapshots`.

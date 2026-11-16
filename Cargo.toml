@@ -5,3 +5,7 @@ resolver = "3"
 [profile.release]
 lto = true
 opt-level = "z"
+
+# Slint 1.16 loses hits on earlier lines of a wrapped StyledText link.
+[patch.crates-io]
+i-slint-core = { path = "vendor/slint-core" }

@@ -23,3 +23,7 @@ i-slint-backend-winit = { version = "=1.16.0", default-features = false, feature
 
 [build-dependencies]
 slint-build = "=1.16.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+slint = { version = "=1.16.0", default-features = false, features = ["std", "renderer-software", "compat-1-2"] }
+i-slint-core = { version = "=1.16.0", features = ["shared-parley"] }

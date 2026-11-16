@@ -38,6 +38,7 @@ assets/               Общие изображения и шрифт
 shared/ws-schema.json Общая protobuf-схема для React и сервера
 tools/                Существующие Node.js-утилиты
 scripts/              Сборка сайта, dev-прокси и эксплуатационные скрипты
+vendor/slint-core/    Локальная копия `i-slint-core` с исправлением кликов по ссылке
 db/                   Локальные данные сервера (не входят в Git)
 Cargo.toml            Cargo workspace
 package.json          npm workspaces и общие команды
@@ -234,6 +235,18 @@ npm test              # JS- и Rust-тесты
 `npm run tools <команда>` запускает существующие утилиты; `npm run build:twitch` упаковывает Twitch extension. `npm start` собирает сервер и запускает его через pm2. Хук pre-commit выполняет `npm run check` и `npm test`.
 
 GitHub Actions устанавливает зависимости через `npm ci`, проверяет проект, собирает приложения и публикует `dist-release/` в `gh-pages`. Каталог `dist-release/tg/` можно раздавать как корень отдельного Telegram-хоста.
+
+### Локальная копия Slint (`vendor/slint-core`)
+
+Slint 1.16 не распознаёт клик по ссылке в чате, если ссылка перенесена на несколько строк. Поэтому `i-slint-core` подключён через `[patch.crates-io]` в корневом `Cargo.toml` из локальной копии `vendor/slint-core` (исправление — в `textlayout/sharedparley.rs`).
+
+При обновлении Slint:
+
+1. Обновите закреплённые версии Slint в `apps/app/Cargo.toml`.
+2. Удалите секцию `[patch.crates-io]` и выполните `cargo test --test wrapped_chat_link` — тест проверяет клики по разным строкам одной ссылки.
+3. Если тест проходит, ошибка в новой версии уже устранена — удалите `vendor/slint-core`.
+4. Если нет — обновите локальную копию под новую версию, перенесите исправление, восстановите подмену и повторите тест.
+5. После обновления проверьте `npm run test:app` и `npm run build:app`, обновите `Cargo.lock` и убедитесь, что подмена указывает на нужную версию.
 
 ---
 

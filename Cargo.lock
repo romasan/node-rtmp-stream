@@ -1651,6 +1651,7 @@ version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "580bb55cd14cb12bd9169920661235797f4c8220318d0071e971fce345e28488"
 dependencies = [
+ "bytemuck",
  "calloop 0.14.5",
  "drm",
  "gbm",
@@ -1658,7 +1659,9 @@ dependencies = [
  "i-slint-common",
  "i-slint-core",
  "i-slint-renderer-femtovg",
+ "i-slint-renderer-software",
  "input",
+ "memmap2",
  "nix",
  "raw-window-handle",
  "xkbcommon",
@@ -1686,6 +1689,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90f7fddf48d12b366f352f8fb78d59665c490cf279786772f1d1592e143edd0d"
 dependencies = [
  "block2 0.6.2",
+ "bytemuck",
  "cfg-if",
  "cfg_aliases",
  "copypasta",
@@ -1698,6 +1702,8 @@ dependencies = [
  "i-slint-core-macros",
  "i-slint-renderer-femtovg",
  "i-slint-renderer-skia",
+ "i-slint-renderer-software",
+ "imgref",
  "lyon_path",
  "muda",
  "objc2 0.6.5",
@@ -1707,6 +1713,7 @@ dependencies = [
  "objc2-ui-kit 0.3.2",
  "pin-weak",
  "raw-window-handle",
+ "rgb",
  "scoped-tls-hkt",
  "scopeguard",
  "softbuffer",
@@ -1769,8 +1776,6 @@ dependencies = [
 [[package]]
 name = "i-slint-core"
 version = "1.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bac8ed92f61140aa03e426b28cd135e252c82891bc1ed88f2f799ba367f21c8"
 dependencies = [
  "auto_enums",
  "bitflags 2.13.2",
@@ -3295,6 +3300,7 @@ name = "pixelbattle-slint"
 version = "0.1.0"
 dependencies = [
  "i-slint-backend-winit",
+ "i-slint-core",
  "js-sys",
  "png 0.18.1",
  "prost",
