@@ -6,6 +6,7 @@ pid
 ssl-cert/
 node_modules/
 dist/
+dist-release/
 db/*
 frames/
 .cache/

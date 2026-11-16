@@ -4,8 +4,10 @@
 
 Проект состоит из двух частей:
 
-- **Клиент** (`src/`) — React-приложение (Parcel + TypeScript).
+- **Клиент** (`client-rust/`) — Slint и WebAssembly. Админка (`src/containers/Admin/`) использует React и TypeScript.
 - **Сервер** (`server/`) — Node.js + TypeScript (ts-node, pm2), WebSocket-сервер, REST API, отрисовка полотна через `node-canvas`.
+
+[![Made with Slint](https://raw.githubusercontent.com/slint-ui/slint/v1.16.0/logo/MadeWithSlint-logo-whitebg.png)](https://slint.dev/)
 
 ---
 
@@ -18,7 +20,7 @@
 | Авторизация | OAuth2: Twitch, Discord, Steam, Telegram, VK |
 | БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
 | Стриминг | ffmpeg + скрипт `scripts/stream.sh` |
-| CI/CD | GitHub Actions → сборка → react-snap → деплой на GitHub Pages (`gh-pages`) |
+| CI/CD | GitHub Actions → сборка и публикация на GitHub Pages (`gh-pages`) |
 | Процессы | pm2 (`pixelbattle`) |
 
 ---
@@ -249,10 +251,13 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 
 | Команда | Описание |
 |---|---|
-| `npm run dev` | Параллельный запуск dev-сервера и клиента (`dev:server` + `dev:web` через `concurrently`) |
+| `npm run dev` | Сборка Slint-релиза и запуск сайта с API |
+| `npm run dev0` | Запуск React-сборки через Parcel с локальным API |
 | `npm run dev:server` | Запуск сервера в dev-режиме (nodemon + ts-node) |
 | `npm run dev:web` | Запуск Parcel для клиента (dev-сервер) |
+| `npm run dev:web-server` | Раздача готовой сборки `dist-release/` на порту 1234 |
 | `npm run build` | Production-сборка клиента (Parcel) |
+| `npm run build:release` | Сборка Slint для сайта и React для админки в `dist-release/` |
 | `npm run build:server` | Компиляция сервера в `lib/` |
 | `npm start` | Сборка сервера + запуск через pm2 (`pixelbattle`) |
 | `npm stop` | Остановка pm2-процесса |
@@ -271,11 +276,12 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 
 `.github/workflows/deploy.yml`:
 
-1. Пуш в ветку `main`.
+1. Пуш в ветку `main` или ручной запуск **Build and Deploy** для `main`.
 2. Установка Node 18 + системных библиотек для `node-canvas`.
-3. `npm install`, `npm run build`.
-4. `npm run render` (react-snap) — пререндер страниц для SEO.
-5. Деплой `dist/` в ветку `gh-pages` (GitHub Pages).
+3. Установка зависимостей и сборка сайта. При `PIXELBATTLE_SLINT_DEFAULT=true` запускается `npm run build:release`. Иначе выполняются `npm run build`, `npm run render` и `npm run build:slint`.
+4. Публикация собранного каталога (`dist-release/` или `dist/`) в ветку `gh-pages` (GitHub Pages).
+
+Для возврата к сборке с публичным React-клиентом установите `PIXELBATTLE_SLINT_DEFAULT=false` в переменных репозитория и запустите **Build and Deploy** для `main`. Для повторного переключения на Slint установите `true` и повторите запуск. Изменение переменной само по себе публикацию не запускает.
 
 ---
 
@@ -285,14 +291,11 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 # 1. Установка зависимостей
 npm install
 
-# 2. Сервер (WebSocket + API) на :8080
-npm run dev:server
-
-# 3. Клиентский dev-сервер Parcel (в другом терминале)
-npm run dev:web
+# 2. Сборка сайта и запуск API
+npm run dev
 ```
 
-Клиент в dev подключается к WebSocket на `localhost:8080`.
+Игра открывается на `http://localhost:1234/`, таймлапс на `/timelapse/`, Telegram-вариант на `/tg/`, админка на `/qq/`. Клиент подключается к API и WebSocket на `localhost:8080`. В локальном `server/config.json` укажите `http://localhost:1234` в `server.origin`.
 
 ---
 

@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 jobs:
   build-and-deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,18 +28,36 @@ jobs:
         run: |
           npm install
 
-      - name: Build
-        run: |
-          npm run build
+      - name: Test Slint timelapse
+        run: node --test client-rust/tests/timelapse.test.mjs
 
-      - name: Rect Snap
-        run: |
-          npm run render
+      - name: Build current site
+        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
+        run: npm run build
+
+      - name: Render current site
+        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
+        run: npm run render
+
+      - name: Set up Rust for Slint
+        working-directory: client-rust
+        run: rustup show
+
+      - name: Install wasm-bindgen
+        run: cargo +1.93.0 install wasm-bindgen-cli --version 0.2.130 --locked
+
+      - name: Build Slint preview
+        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
+        run: npm run build:slint
+
+      - name: Build Slint release
+        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT == 'true' }}
+        run: npm run build:release
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: dist
+          FOLDER: ${{ vars.PIXELBATTLE_SLINT_DEFAULT == 'true' && 'dist-release' || 'dist' }}
           CLEAN: true
