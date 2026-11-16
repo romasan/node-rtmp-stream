@@ -20,6 +20,7 @@ _*
 *.m4a
 *.aac
 *.json
+*.html
 !src/constants.json
 !shared/ws-schema.json
 .eslintcache
