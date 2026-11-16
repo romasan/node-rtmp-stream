@@ -1,7 +1,8 @@
+import { repoRoot } from '../repoRoot';
 import fs from 'fs';
 import path from 'path';
 
-const file = __dirname + '/../../db/values.json';
+const file = repoRoot + '/db/values.json';
 
 let values: any = {
 	paused: false,

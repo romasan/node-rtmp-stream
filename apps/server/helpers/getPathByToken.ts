@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 import { validateToken } from './validateToken';
 
 export const getPathByToken = (token = '', prevalidate = true) => {
@@ -7,5 +8,5 @@ export const getPathByToken = (token = '', prevalidate = true) => {
 
 	const prefix = token.slice(0, 2);
 
-	return `${__dirname}/../../db/sessions/${prefix}/${token}`;
+	return `${repoRoot}/db/sessions/${prefix}/${token}`;
 };

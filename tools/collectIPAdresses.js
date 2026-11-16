@@ -1,6 +1,7 @@
+require('./register-typescript');
 const fs = require('fs');
 const Progress = require('cli-progress');
-const { addSessionForIP } = require('../server/helpers');
+const { addSessionForIP } = require('../apps/server/helpers');
 const path = require('path');
 const readline = require('readline');
 

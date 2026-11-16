@@ -1,5 +1,6 @@
+require('./register-typescript');
 const fs = require('fs');
-const { _parseUserData } = require('../server/utils/auth');
+const { _parseUserData } = require('../apps/server/utils/auth');
 
 const _fixSessionByNickName = () => {
 	const sessions = require('../db/auth.json');

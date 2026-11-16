@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * управление авторизированными пользователми
  */
@@ -11,9 +12,9 @@ const {
 	moderatorNicks,
 } = require('../config.json');
 
-const DBFileName = __dirname + '/../../db/auth.json';
+const DBFileName = repoRoot + '/db/auth.json';
 
-const logoutLog = fs.createWriteStream(__dirname + '/../../db/logout.log', { flags : 'a' });
+const logoutLog = fs.createWriteStream(repoRoot + '/db/logout.log', { flags : 'a' });
 
 let users: IUsers = {
 	sessions: {},

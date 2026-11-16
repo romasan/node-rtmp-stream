@@ -28,8 +28,8 @@ const { fork } = require('child_process');
 const Progress = require('cli-progress');
 const { createCanvas, Image, registerFont } = require('canvas');
 const { colorSchemes } = require('./loadColorSchemes');
-// const { drawBGCanvas } = require('../server/utils/canvas');
-// const { getFileLinesCount } = require('../server/helpers');
+// const { drawBGCanvas } = require('../apps/server/utils/canvas');
+// const { getFileLinesCount } = require('../apps/server/helpers');
 
 const getFileLinesCount = (file) => new Promise((resolve) => {
 	const rl = readline.createInterface({

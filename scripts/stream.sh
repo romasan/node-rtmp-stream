@@ -1,8 +1,8 @@
 #!/bin/bash
 
-AUDIO_PATH=$(perl -nle 'print $1 if /"inputAudio":\s*"(.*?)"/' ./server/config.json)
-FRAME_FILE=$(perl -nle 'print $1 if /"streamFile":\s*"(.*?)"/' ./server/config.json)
-OUTPUT_RTMP=$(perl -nle 'print $1 if /"rtmpHostKey":\s*"(.*?)"/' ./server/config.json)
+AUDIO_PATH=$(perl -nle 'print $1 if /"inputAudio":\s*"(.*?)"/' ./apps/server/config.json)
+FRAME_FILE=$(perl -nle 'print $1 if /"streamFile":\s*"(.*?)"/' ./apps/server/config.json)
+OUTPUT_RTMP=$(perl -nle 'print $1 if /"rtmpHostKey":\s*"(.*?)"/' ./apps/server/config.json)
 
 cleanup() {
     echo "\n"

@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 import path from 'path';
 import fs from 'fs';
 import { Log } from '../utils/log';
@@ -16,7 +17,7 @@ export const addSessionForIP = (ip: string, token: string, time = Date.now()) =>
 		return;
 	}
 
-	const filePath = `${__dirname}/../../db/sessions/network/${a}/${_ip}`;
+	const filePath = `${repoRoot}/db/sessions/network/${a}/${_ip}`;
 	const dirname = path.dirname(filePath);
 	const content = [time, token].join(';') + '\n';
 

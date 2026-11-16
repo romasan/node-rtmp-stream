@@ -12,7 +12,7 @@ const {
 			}
 		},
 	},
-} = require('../server/config.json');
+} = require('../apps/server/config.json');
 
 const getPostPayload = (req, type = 'text') => {
 	return new Promise((resolve, reject) => {

@@ -261,6 +261,7 @@ export const initServer = (callback: (req: IncomingMessage, res: ServerResponse)
 
 	webServer.on('error', error => {
 		console.error('Server error:', error);
+		throw error;
 	});
 
 	webServer.listen(port, 'localhost');

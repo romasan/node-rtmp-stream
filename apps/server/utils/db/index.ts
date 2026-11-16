@@ -1,3 +1,4 @@
+import { repoRoot } from '../../repoRoot';
 /**
  * работа с базой данных
  */
@@ -7,7 +8,7 @@ import path from 'path';
 import sqlite3 from 'sqlite3';
 import { Log } from '../log';
 
-const dbFile = __dirname + '/../../../db/db.sqlite3';
+const dbFile = repoRoot + '/db/db.sqlite3';
 const sqlite3db = sqlite3.verbose();
 
 if (!fs.existsSync(dbFile)) {

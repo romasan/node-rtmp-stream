@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * canvas полотно
  */
@@ -39,7 +40,7 @@ export const updateCanvasConf = (value: {
 	conf.freezed = value.freezed ?? conf.freezed;
 };
 
-const file = __dirname + '/../../db/inout.png';
+const file = repoRoot + '/db/inout.png';
 
 export const initStreamCanvas = () => {
 	if (!fs.existsSync(file)) {

@@ -1,5 +1,5 @@
 /**
- * Загружает наборы цветов из `server/constants/colorSchemes.ts`.
+ * Загружает наборы цветов из `apps/server/constants/colorSchemes.ts`.
  *
  * Инструменты в `tools/` — обычные CommonJS-скрипты (запускаются через
  * `node ./tools/index.js`), поэтому для чтения `.ts`-файла регистрируем
@@ -8,9 +8,6 @@
  * type-stripping).
  */
 
-require('ts-node').register({
-	transpileOnly: true,
-	compilerOptions: { module: 'commonjs' },
-});
+require('./register-typescript');
 
-module.exports = require('../server/constants/colorSchemes.ts');
+module.exports = require('../apps/server/constants/colorSchemes.ts');

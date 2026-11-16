@@ -49,9 +49,9 @@ export const start = (req: IncomingMessage, res: ServerResponse) => {
 		const newToken = uuid();
 
 		if (secure) {
-			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly; Secure`);
+			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; Path=/; HttpOnly; Secure`);
 		} else {
-			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; HttpOnly`);
+			res.setHeader('Set-Cookie', `token=${newToken}; Max-Age=31536000; Path=/; HttpOnly`);
 		}
 
 		addSession(newToken, ip);

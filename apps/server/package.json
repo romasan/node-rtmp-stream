@@ -1,0 +1,21 @@
+{
+  "name": "@pixelbattle/server",
+  "private": true,
+  "version": "1.1.0",
+  "scripts": {
+    "dev": "cd ../.. && nodemon --exitcrash --watch 'apps/server/**/*.ts' --exec 'ts-node --project apps/server/tsconfig.json' apps/server/index.ts",
+    "build": "node ../../scripts/build-server.js",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test tests/*.test.cjs"
+  },
+  "dependencies": {
+    "bad-words-next": "^2.3.1",
+    "canvas": "3.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "node-fetch": "^2.6.9",
+    "protobufjs": "8.8.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
+  }
+}

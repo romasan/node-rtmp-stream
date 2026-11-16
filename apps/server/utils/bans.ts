@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * управление банами
  */
@@ -5,7 +6,7 @@
 import fs from 'fs';
 import { dirname } from 'path';
 
-const DBFileName = __dirname + '/../../db/bans.json';
+const DBFileName = repoRoot + '/db/bans.json';
 
 let bans: any = {
 	token: {},

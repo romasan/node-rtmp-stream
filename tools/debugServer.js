@@ -8,7 +8,7 @@ const {
 			telegram: { token }
 		},
 	},
-} = require('../server/config.json');
+} = require('../apps/server/config.json');
 
 const parseCookies = (cookies = '') => {
 	return cookies

@@ -1,3 +1,4 @@
+import { repoRoot } from '../../repoRoot';
 import fetch from 'node-fetch';
 import url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -13,7 +14,7 @@ const {
 		host: hoopHost,
 		port: hoopPort,
 	}
-} = require('../../../hoops/config.json');
+} = require(repoRoot + '/hoops/config.json');
 
 const {
 	server: {

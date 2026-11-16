@@ -1,8 +1,9 @@
+import { repoRoot } from '../repoRoot';
 import fs, { WriteStream } from 'fs';
 import path from 'path';
 import { getTotalPixels } from './stats';
 
-const expandsFile = __dirname + '/../../db/expands.log';
+const expandsFile = repoRoot + '/db/expands.log';
 let file: WriteStream;
 let data = {
 	colorScheme: 'COLORS_1',

@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * управление задержкой для выставления пикселя
  */
@@ -27,7 +28,7 @@ const expirationsList: any = {
 
 let countdownRanges: any = {};
 
-const DBFileName = __dirname + '/../../db/countdown.json';
+const DBFileName = repoRoot + '/db/countdown.json';
 
 const preloadCountdownRanges = () => {
 	// TODO use database

@@ -3,6 +3,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 
 const getDirectoriesRecursive = (directory) => {
 	fs.readdirSync(directory)

@@ -1,5 +1,6 @@
+import { repoRoot } from '../repoRoot';
 import * as protobuf from 'protobufjs';
-import schema from '../../shared/ws-schema.json';
+const schema = require(repoRoot + '/shared/ws-schema.json');
 
 const messageType = protobuf.Root.fromJSON(schema as any).lookupType('rtmpstream.WsMessage');
 

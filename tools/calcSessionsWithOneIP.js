@@ -1,8 +1,9 @@
+require('./register-typescript');
 const fs = require('fs');
 const readline = require('readline');
 const Progress = require('cli-progress');
-const { getPathByToken } = require('../server/helpers');
-const { getFileLinesCount } = require('../server/helpers');
+const { getPathByToken } = require('../apps/server/helpers');
+const { getFileLinesCount } = require('../apps/server/helpers');
 
 const calcSessionsWithOneIP = async () => {
 	const path = __dirname + '/../db/list';

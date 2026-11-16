@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * генерирует статистику поставленных пикселей
  */
@@ -160,7 +161,7 @@ export const getPixelsInfo = (output?: fs.PathOrFileDescriptor) => {
 	return new Promise<IStats>((resolve) => {
 
 		const rl = readline.createInterface({
-			input: fs.createReadStream(__dirname + '/../../db/pixels.log'),
+			input: fs.createReadStream(repoRoot + '/db/pixels.log'),
 			crlfDelay: Infinity
 		});
 

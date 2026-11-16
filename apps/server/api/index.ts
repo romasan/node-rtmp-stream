@@ -1,6 +1,7 @@
+import { repoRoot } from '../repoRoot';
 import fs from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import packageFile from '../../package.json';
+const packageFile = require(repoRoot + '/package.json');
 import { getIPAddress } from '../helpers';
 import {
 	getCanvas,

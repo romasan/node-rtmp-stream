@@ -1,3 +1,4 @@
+import { repoRoot } from '../repoRoot';
 /**
  * управление сессиями
  */
@@ -21,7 +22,7 @@ const gap = 100;
 
 let index = 0;
 
-const file = __dirname + '/../../db/list';
+const file = repoRoot + '/db/list';
 
 if (!fs.existsSync(file)) {
 	const dirname = path.dirname(file);
@@ -40,7 +41,7 @@ rl.on('line', (uuid) => {
 });
 
 const tokensFile = fs.createWriteStream(file, { flags : 'a' });
-// const ipFile = fs.createWriteStream(__dirname + '/../../db/iplist', { flags : 'a' });
+// const ipFile = fs.createWriteStream(repoRoot + '/db/iplist', { flags : 'a' });
 
 const trim = (obj: any) => {
 	return Object.entries(obj)
