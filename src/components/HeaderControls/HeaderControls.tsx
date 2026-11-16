@@ -6,6 +6,7 @@ import { Chat } from '../Chat';
 import { Info } from '../Info';
 
 import { ERole } from '../../hooks';
+import { clientRoute } from '../../lib/clientRoutes';
 
 import ChatIcon from '/assets/chat.svg';
 import LoginIcon from '/assets/login.svg';
@@ -79,7 +80,7 @@ export const HeaderControls: React.FC<Props> = ({
 							<InfoIcon className={s.iconButton} onClick={toggleInfo} />
 						</span>
 						{withTimelapse && (
-							<a href="/timelapse" title="Таймлапс">
+							<a href={clientRoute('/timelapse/')} title="Таймлапс">
 								<TimelapseIcon className={s.iconButton} />
 							</a>
 						)}
