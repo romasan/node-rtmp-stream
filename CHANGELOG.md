@@ -1,5 +1,11 @@
 # Changelog
 
+## 16.11.2026
+- Added a Slint + Rust WebAssembly client with build/activation scripts and a `PIXELBATTLE_SLINT_DEFAULT` deploy toggle.
+- `tools/prepareTimelapse.js` now writes a complete snapshot for every part and marks archives with `completeSnapshots`.
+- Updated `canvas` to 3.2.3 and removed the `nan` override.
+- Local auth now builds the login redirect URL from the request host.
+
 ## 21.09.2026
 - Refactored `tools/drawEpisode.js` to render episode frames in parallel via `child_process.fork` (`DRAW_EPISODE_WORKERS` sets the worker count), byte-identical to serial output.
 - Fixed `tools/drawEpisode.js` keeping residue of the previous frame: the frame canvas is now cleared (`ctx.clearRect`) before each draw, so smaller or transparent backgrounds no longer show stale pixels.
