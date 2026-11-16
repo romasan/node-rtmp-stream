@@ -79,7 +79,7 @@ extern "C" {
     fn cancel_pixel_inspection();
     fn save_color(slot: &str, color: &str);
     fn delete_color(slot: &str);
-    fn history();
+    fn open_chat();
     fn stats();
     fn cancel_stats();
     fn post_message(text: &str);
@@ -149,7 +149,7 @@ impl Client {
         ui.on_field_cursor_changed(|cursor| set_field_cursor(cursor.as_str()));
         ui.on_navigate(|path| navigate(path.as_str()));
         ui.on_finish_link(|url| open_finish_link(url.as_str()));
-        ui.on_show_chat(history);
+        ui.on_show_chat(open_chat);
         ui.on_hide_chat(forget_message_submission);
         ui.on_chat_link(|url| open_chat_link(url.as_str()));
         ui.on_show_stats(stats);
@@ -778,6 +778,38 @@ impl Client {
 
     pub fn playing(&self, value: bool) {
         self.ui.set_playing(value);
+    }
+
+    pub fn register_chat_font(&self, bytes: &[u8]) {
+        use slint::fontique_08::fontique;
+
+        let mut collection = slint::fontique_08::shared_collection();
+        let fonts = collection.register_fonts(
+            fontique::Blob::new(std::sync::Arc::new(bytes.to_vec())),
+            None,
+        );
+        for script in [*b"Hira", *b"Kana", *b"Hani"] {
+            collection.append_fallbacks(
+                fontique::FallbackKey::new(fontique::Script::from_bytes(script), None),
+                fonts.iter().map(|font| font.0),
+            );
+        }
+        self.update_chat(&mut self.state.borrow_mut());
+    }
+
+    pub fn register_emoji_font(&self, bytes: &[u8]) {
+        use slint::fontique_08::fontique;
+
+        let mut collection = slint::fontique_08::shared_collection();
+        let fonts = collection.register_fonts(
+            fontique::Blob::new(std::sync::Arc::new(bytes.to_vec())),
+            None,
+        );
+        collection.append_generic_families(
+            fontique::GenericFamily::Emoji,
+            fonts.iter().map(|font| font.0),
+        );
+        self.update_chat(&mut self.state.borrow_mut());
     }
 
     pub fn merge_history(&self, json: &str) {

@@ -134,7 +134,7 @@ export component PaletteEditor inherits Rectangle {
                 accepted => { root.save(); }
             }
         }
-        ColorButton { width: 30px; icon: @image-url("../../assets/eye-dropper.png"); clicked => { root.pick(); } }
+        ColorButton { width: 30px; icon: @image-url("../../../assets/eye-dropper.png"); clicked => { root.pick(); } }
     }
     HorizontalLayout {
         x: 0; y: root.gradient-height + 42px; width: Math.min(root.width, root.editing ? 202px : 128px);

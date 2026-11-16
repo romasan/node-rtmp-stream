@@ -82,12 +82,12 @@ export component LoginDialog inherits Rectangle {
                 x: 2px; y: 2px;
                 width: parent.width - 4px;
                 for provider in [
-                    { key: "twitch", name: "Twitch", icon: @image-url("../../assets/twitch.svg") },
-                    { key: "discord", name: "Discord", icon: @image-url("../../assets/discord.svg") },
-                    { key: "steam", name: "Steam", icon: @image-url("../../assets/steam.svg") },
-                    { key: "telegram", name: "Telegram", icon: @image-url("../../assets/telegram.svg") },
-                    { key: "vk", name: "VK ID", icon: @image-url("../../assets/vk.svg") },
-                    { key: "local", name: "Локальный вход", icon: @image-url("../../assets/login.svg") },
+                    { key: "twitch", name: "Twitch", icon: @image-url("../../../assets/twitch.svg") },
+                    { key: "discord", name: "Discord", icon: @image-url("../../../assets/discord.svg") },
+                    { key: "steam", name: "Steam", icon: @image-url("../../../assets/steam.svg") },
+                    { key: "telegram", name: "Telegram", icon: @image-url("../../../assets/telegram.svg") },
+                    { key: "vk", name: "VK ID", icon: @image-url("../../../assets/vk.svg") },
+                    { key: "local", name: "Локальный вход", icon: @image-url("../../../assets/login.svg") },
                 ]: LoginProvider {
                     key: provider.key;
                     label: provider.name;

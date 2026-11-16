@@ -1,0 +1,7 @@
+[workspace]
+members = ["apps/app"]
+resolver = "3"
+
+[profile.release]
+lto = true
+opt-level = "z"

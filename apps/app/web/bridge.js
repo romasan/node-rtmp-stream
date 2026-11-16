@@ -1,8 +1,11 @@
+import { createChatFontLoader } from './chat-font.mjs';
+
 const canvas = document.querySelector('#canvas');
 const hostname = location.hostname;
 const local = hostname === 'localhost' || hostname === '127.0.0.1';
-const api = local ? `${location.protocol}//${hostname}:8080` : `${location.protocol}//api.${hostname.replace(/^(www|tg)\./, '')}`;
-const wsUrl = api.replace(/^https?:/, location.hash === '#secured' || location.protocol === 'https:' ? 'wss:' : 'ws:');
+const trunkDev = local && (location.port === '1234' || location.port === '1420');
+const api = trunkDev ? `${location.origin}/__api` : local ? `${location.protocol}//${hostname}:8080` : `${location.protocol}//api.${hostname.replace(/^(www|tg)\./, '')}`;
+const wsUrl = (trunkDev ? `${location.origin}/__ws` : api).replace(/^https?:/, location.hash === '#secured' || location.protocol === 'https:' ? 'wss:' : 'ws:');
 const heartbeatTimeout = 30000;
 let client;
 let socket;
@@ -23,15 +26,15 @@ let initialized = false;
 let replay;
 
 const route = document.documentElement.dataset.client;
-const preview = /(?:^|\/)slint(?:\/|$)/.test(location.pathname);
-const timelapsePath = preview ? '/slint/timelapse/' : '/timelapse/';
+const siteBase = document.documentElement.dataset.siteBase || '/';
+const timelapsePath = `${siteBase}timelapse/`;
 
 export function navigate(path) {
     if (path === 'timelapse/') {
         path = timelapsePath + location.hash;
     }
     if (path === 'game') {
-        path = preview ? '/slint/' : '/';
+        path = siteBase;
     }
     if (path.startsWith("https://")) window.open(path, "_blank", "noopener,noreferrer");
     else location.assign(path);
@@ -244,6 +247,22 @@ export async function place_pixel(x, y, color) {
     } finally {
         placing = false;
     }
+}
+
+const loadChatFont = createChatFontLoader(
+    () => fetch(new URL('./NotoSansJP.ttf', import.meta.url)),
+    bytes => client.register_chat_font(bytes),
+);
+
+const loadEmojiFont = createChatFontLoader(
+    () => fetch(new URL('./NotoColorEmoji.ttf', import.meta.url)),
+    bytes => client.register_emoji_font(bytes),
+);
+
+export function open_chat() {
+    void history();
+    void loadEmojiFont().catch(error => console.error('Не удалось загрузить эмодзи', error));
+    void loadChatFont().catch(error => console.error('Не удалось загрузить шрифт чата', error));
 }
 
 export async function history() {

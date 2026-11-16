@@ -3,7 +3,7 @@ import { PaletteEditor } from "color-picker.slint";
 import { TimelapseControls } from "timelapse-controls.slint";
 import { SeasonOption } from "season-picker.slint";
 
-import "../../assets/fonts/CustomFont.ttf";
+import "../../../assets/fonts/CustomFont.ttf";
 import { ChatContent, ChatDay, PlatformIcon, PlayerRow, PlayerWindow, StatisticsContent } from "player-windows.slint";
 
 component OutlinedText inherits Text {
@@ -578,7 +578,7 @@ export component App inherits Window {
         y: 4px;
         width: root.mobile ? 32px : 174px;
         height: 32px;
-        Image { x: 0; y: 0; source: @image-url("../../assets/logo.svg"); width: 32px; height: 32px; }
+        Image { x: 0; y: 0; source: @image-url("../../../assets/logo.svg"); width: 32px; height: 32px; }
         if !root.mobile: OutlinedText {
             x: 38px; y: 0; height: 20px;
             text: "PIXEL BATTLE";
@@ -614,7 +614,7 @@ export component App inherits Window {
             max-width: Math.max(0px, root.width - 260px);
         }
         if !root.telegram: IconButton {
-            icon: root.authorized ? @image-url("../../assets/logout.svg") : @image-url("../../assets/login.svg");
+            icon: root.authorized ? @image-url("../../../assets/logout.svg") : @image-url("../../../assets/login.svg");
             label: root.authorized ? "Выйти" : "Войти";
             enabled: root.connected;
             clicked => {
@@ -623,7 +623,7 @@ export component App inherits Window {
             }
         }
         IconButton {
-            icon: @image-url("../../assets/chat.svg");
+            icon: @image-url("../../../assets/chat.svg");
             label: "Чат";
             clicked => {
                 root.new-mention = false;
@@ -641,7 +641,7 @@ export component App inherits Window {
             }
         }
         IconButton {
-            icon: @image-url("../../assets/info.svg");
+            icon: @image-url("../../../assets/info.svg");
             label: "Статистика";
             clicked => {
                 if root.stats-open {
@@ -654,12 +654,12 @@ export component App inherits Window {
             }
         }
         if !root.telegram: IconButton {
-            icon: @image-url("../../assets/clock.svg");
+            icon: @image-url("../../../assets/clock.svg");
             label: root.replay ? "Игра" : "Таймлапс";
             clicked => { root.navigate(root.replay ? "game" : "timelapse/"); }
         }
         if root.moderator && !root.replay: IconButton {
-            icon: @image-url("../../assets/gear.svg");
+            icon: @image-url("../../../assets/gear.svg");
             label: "Инструменты";
             clicked => { root.navigate("/qq/"); }
         }
@@ -775,11 +775,11 @@ export component App inherits Window {
         height: 32px;
         spacing: 8px;
         for link in [
-            { icon: @image-url("../../assets/vkplay.svg"), label: "VK Play Live", url: "https://vkplay.live/place_tv" },
-            { icon: @image-url("../../assets/twitch.svg"), label: "Twitch", url: "https://www.twitch.tv/place_ru" },
-            { icon: @image-url("../../assets/youtube.svg"), label: "YouTube", url: "https://www.youtube.com/@Place-ru" },
-            { icon: @image-url("../../assets/discord.svg"), label: "Discord", url: "https://discord.gg/FfVjurYrus" },
-            { icon: @image-url("../../assets/telegram.svg"), label: "Telegram", url: "https://t.me/pixel_battle_online" },
+            { icon: @image-url("../../../assets/vkplay.svg"), label: "VK Play Live", url: "https://vkplay.live/place_tv" },
+            { icon: @image-url("../../../assets/twitch.svg"), label: "Twitch", url: "https://www.twitch.tv/place_ru" },
+            { icon: @image-url("../../../assets/youtube.svg"), label: "YouTube", url: "https://www.youtube.com/@Place-ru" },
+            { icon: @image-url("../../../assets/discord.svg"), label: "Discord", url: "https://discord.gg/FfVjurYrus" },
+            { icon: @image-url("../../../assets/telegram.svg"), label: "Telegram", url: "https://t.me/pixel_battle_online" },
         ]: IconButton {
             icon: link.icon;
             label: link.label;
@@ -898,7 +898,7 @@ export component App inherits Window {
                 width: root.swatch-size;
                 height: root.swatch-size;
                 icon-size: root.mobile ? root.swatch-size * 0.625 : 14px;
-                icon: @image-url("../../assets/add.svg");
+                icon: @image-url("../../../assets/add.svg");
                 label: "Добавить цвет";
                 clicked => { root.open-color(""); }
             }
@@ -908,7 +908,7 @@ export component App inherits Window {
             y: (parent.height - self.height) / 2;
             width: root.pipette-size;
             height: root.pipette-size;
-            icon: @image-url("../../assets/eye-dropper.png");
+            icon: @image-url("../../../assets/eye-dropper.png");
             label: "Пипетка";
             opacity: root.picking ? 0.55 : 1;
             clicked => { root.picking = !root.picking; }

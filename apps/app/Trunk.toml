@@ -1,0 +1,42 @@
+[build]
+target = "index.html"
+
+[watch]
+watch = ["src", "ui", "web", "../../assets", "../admin/src/constants.json", "../server/constants/colorSchemes.ts"]
+ignore = ["generated", "dist", "target"]
+
+[[hooks]]
+stage = "pre_build"
+command = "node"
+command_arguments = ["../../scripts/prepare-app-assets.js"]
+
+[[hooks]]
+stage = "post_build"
+command = "node"
+command_arguments = ["../../scripts/prepare-app-routes.js"]
+
+[serve]
+port = 1420
+
+[[proxy]]
+backend = "http://127.0.0.1:8080/"
+rewrite = "/__api/"
+request_headers = { "x-forwarded-for" = "127.0.0.1" }
+
+[[proxy]]
+backend = "ws://127.0.0.1:8080/"
+rewrite = "/__ws"
+ws = true
+request_headers = { "x-forwarded-for" = "127.0.0.1" }
+
+[[proxy]]
+backend = "http://127.0.0.1:1234/qq/"
+
+[[proxy]]
+backend = "http://127.0.0.1:1234/login/"
+
+[[proxy]]
+backend = "http://127.0.0.1:1234/logout/"
+
+[[proxy]]
+backend = "http://127.0.0.1:1234/__admin/"

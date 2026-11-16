@@ -116,15 +116,15 @@ export component TimelapseControls inherits Rectangle {
         spacing: root.compact-row ? 10px : root.narrow-gap;
         ReplayButton {
             width: root.button-width;
-            icon: root.retryable ? @image-url("../../assets/reload.svg")
-                : root.playing ? @image-url("../../assets/pause.svg") : @image-url("../../assets/play.svg");
+            icon: root.retryable ? @image-url("../../../assets/reload.svg")
+                : root.playing ? @image-url("../../../assets/pause.svg") : @image-url("../../../assets/play.svg");
             label: root.retryable ? "Повторить загрузку" : root.playing ? "Пауза" : "Воспроизвести";
             enabled: root.loaded || root.retryable;
             clicked => { root.play(); }
         }
         Divider {}
-        ReplayButton { width: root.button-width; icon: @image-url("../../assets/slower.svg"); label: "Медленнее"; clicked => { root.speed(1 / 1.1); } }
-        ReplayButton { width: root.button-width; icon: @image-url("../../assets/faster.svg"); label: "Быстрее"; clicked => { root.speed(1.1); } }
+        ReplayButton { width: root.button-width; icon: @image-url("../../../assets/slower.svg"); label: "Медленнее"; clicked => { root.speed(1 / 1.1); } }
+        ReplayButton { width: root.button-width; icon: @image-url("../../../assets/faster.svg"); label: "Быстрее"; clicked => { root.speed(1.1); } }
         speed-text := Text {
             text: root.speed-label; color: black; vertical-alignment: center;
             font-family: "Custom Font ttf 12h 1.0";
