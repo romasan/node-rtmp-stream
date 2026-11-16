@@ -97,6 +97,7 @@ const prepareTimelapse = (
 
 	const timelapse = {
 		version: '2.0',
+		completeSnapshots: true,
 		colorSchemes,
 		expands: [
 			// {
@@ -123,8 +124,6 @@ const prepareTimelapse = (
 	let partIndex = 0;
 
 	let partPixels = [];
-
-	let savePreview = false;
 
 	let isTruecolor = expands[0].colorScheme === 'truecolor';
 
@@ -171,7 +170,6 @@ const prepareTimelapse = (
 					);
 					partPixels = [];
 					partIndex++;
-					savePreview = true;
 				}
 			}
 
@@ -201,14 +199,16 @@ const prepareTimelapse = (
 				isTruecolor,
 				colors: getSchemeColors(expands[expandIndex].colorScheme),
 			};
-
-			savePreview = true;
 		}
 
 		const expand = expands[expandIndex];
 
 		timelapse.expands[expandIndex].index.to = index;
 		timelapse.expands[expandIndex].part.to = partIndex;
+		// The PNG contains all prior edits and precedes this part's first edit.
+		if (!partPixels.length) {
+			fs.writeFileSync(`${dirName}${partIndex}.png`, canvas.toBuffer());
+		}
 
 		const [time, area, x, y, color, uuid] = line.split(';');
 
@@ -242,14 +242,6 @@ const prepareTimelapse = (
 			);
 			partPixels = [];
 			partIndex++;
-			// create preview image
-			savePreview = true;
-		}
-
-		if (savePreview) {
-			const output = `${__dirname}/../db/archive/${season}/timelapse/${partIndex}.png`;
-			fs.writeFileSync(output, canvas.toBuffer());
-			savePreview = false;
 		}
 
 		// drawPixel (координаты уже канвасные)
@@ -267,7 +259,7 @@ const prepareTimelapse = (
 		}
 
 		timelapse.total = index - 1;
-		timelapse.totalParts = partIndex;
+		timelapse.totalParts = timelapse.expands.at(-1)?.part.to ?? 0;
 		timelapse.partSize = PART_PIXELS_COUNT;
 
 		fs.writeFileSync(timelapseFile, JSON.stringify(timelapse, true, 2));
