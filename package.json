@@ -32,7 +32,7 @@
   "license": "ISC",
   "dependencies": {
     "bad-words-next": "^2.3.1",
-    "canvas": "^2.11.0",
+    "canvas": "3.2.3",
     "chart.js": "^4.4.7",
     "classnames": "^2.3.2",
     "crypto": "^1.0.1",
@@ -52,11 +52,6 @@
     "typescript": "^5.0.2",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
-  },
-  "overrides": {
-    "canvas": {
-      "nan": "^2.29.0"
-    }
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.3",
