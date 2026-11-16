@@ -224,17 +224,31 @@ export component ChatContent inherits Rectangle {
             font-size: 16px;
             font-weight: 700;
         }
-        editor := TextInput {
+        Rectangle {
             x: 6px; y: 5px;
             width: parent.width - 40px; height: parent.height - 10px;
-            text <=> root.draft;
-            enabled: root.authorized;
-            color: black;
-            font-family: root.chat-font;
-            font-size: 16px;
-            font-weight: 700;
-            single-line: true;
-            accepted => { root.submit(); }
+            clip: true;
+            editor := TextInput {
+                property <length> scroll-x;
+                x: min(0px, max(parent.width - self.width - self.text-cursor-width, self.scroll-x));
+                width: max(parent.width - self.text-cursor-width, self.preferred-width);
+                height: 100%;
+                text <=> root.draft;
+                enabled: root.authorized;
+                color: black;
+                font-family: root.chat-font;
+                font-size: 16px;
+                font-weight: 700;
+                single-line: true;
+                cursor-position-changed(position) => {
+                    if position.x + self.scroll-x < 0px {
+                        self.scroll-x = -position.x;
+                    } else if position.x + self.scroll-x > parent.width - self.text-cursor-width {
+                        self.scroll-x = parent.width - position.x - self.text-cursor-width;
+                    }
+                }
+                accepted => { root.submit(); }
+            }
         }
         PanelButton {
             x: parent.width - 28px; y: 2px;
