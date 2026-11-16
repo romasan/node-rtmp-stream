@@ -7,7 +7,7 @@ use regex::Regex;
 #[cfg(any(test, target_arch = "wasm32"))]
 static CHAT_LINK: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(concat!(
-        r"(?i)https://(?:www\.youtube\.com/(?:watch\?v=[a-z0-9_]+|@[a-z0-9_-]+)",
+        r"(?i)https://(?:www\.youtube\.com/(?:watch\?v=[a-z0-9_-]+|@[a-z0-9_/-]+)",
         r"|youtu\.be/[a-z0-9_-]+|(?:pixelbattles\.ru|discord\.gg|www\.twitch\.tv)/[a-z0-9_/-]*)"
     ))
     .expect("chat URL pattern")
@@ -73,6 +73,18 @@ mod tests {
                 None
             ),
             r"https\:\/\/pixelbattles\.ru\.evil\.test\/ <https://www.youtube.com/watch?v=abc_42>"
+        );
+    }
+
+    #[test]
+    fn youtube_video_ids_may_contain_hyphens_and_underscores() {
+        assert_eq!(
+            chat_markdown("https://www.youtube.com/watch?v=oQT-SYyppYI", None),
+            "<https://www.youtube.com/watch?v=oQT-SYyppYI>"
+        );
+        assert_eq!(
+            chat_markdown("https://www.youtube.com/watch?v=a-b_c!", None),
+            r"<https://www.youtube.com/watch?v=a-b_c>\!"
         );
     }
 
