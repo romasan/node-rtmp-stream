@@ -187,7 +187,12 @@ python3 -m http.server 9000 --directory dist-release
 - `expand.js` — расширение полотна;
 - `geoip.js` — геолокация по IP (maxmind);
 - `checkLog.js`, `debugServer.js`, `debugStream.js`, `debugTwitch.js` — отладка;
-- `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий.
+- `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий;
+- `analyzePixels.js` — анализ журнала `db/pixels.log`: JSON-отчёт с признаками автоматизации по аккаунтам (`rapid`, `regular`, `straight_run`, `raster_scan`), общими IP, совместными линиями и графом синхронности; описание признаков и порогов — в `tools/analyzePixels.md`;
+- `pixelSynchronization.js` — модуль графа синхронности, который использует `analyzePixels.js`;
+- `renderPixelReport.js` — преобразует JSON-отчёт `analyzePixels.js` в автономный HTML-файл для просмотра в браузере.
+
+Тесты утилит анализа журнала лежат в `scripts/tests/analyze-pixels.test.cjs` и запускаются вместе с `npm test`.
 
 Инструменты запускаются обычным `node` (`npm run tools <команда>`). Цветовые схемы подгружаются из исходника `apps/server/constants/colorSchemes.ts` через общий хелпер `tools/loadColorSchemes.js`, который регистрирует `ts-node` (`transpileOnly`) — поэтому инструменты работают и на Node 18, и на Node 24+.
 

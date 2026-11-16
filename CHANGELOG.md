@@ -1,5 +1,8 @@
 # Changelog
 
+## 17.11.2026
+- Added `tools/analyzePixels.js` with `tools/pixelSynchronization.js` and `tools/renderPixelReport.js` to flag automation and coordinated accounts in `pixels.log`, plus tests and docs.
+
 ## 16.11.2026
 - Chat input now scrolls horizontally, so a long draft keeps the caret in view instead of running past the field.
 - Fixed chat links to YouTube videos whose id contains `-` or `_`, such as `watch?v=oQT-SYyppYI`.
