@@ -1,63 +1,38 @@
 name: Build and Deploy
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 jobs:
   build-and-deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.1
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
-
-      - name: Install system dependencies for canvas
+          node-version: 24.20.0
+          cache: npm
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+      - run: npm install --global npm@11.19.0
+      - run: npm ci
+      - name: Set up Rust and Trunk
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-
-      - name: Install
-        run: |
-          npm install
-
-      - name: Test Slint timelapse
-        run: node --test client-rust/tests/timelapse.test.mjs
-
-      - name: Build current site
-        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
-        run: npm run build
-
-      - name: Render current site
-        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
-        run: npm run render
-
-      - name: Set up Rust for Slint
-        working-directory: client-rust
-        run: rustup show
-
-      - name: Install wasm-bindgen
-        run: cargo +1.93.0 install wasm-bindgen-cli --version 0.2.130 --locked
-
-      - name: Build Slint preview
-        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT != 'true' }}
-        run: npm run build:slint
-
-      - name: Build Slint release
-        if: ${{ vars.PIXELBATTLE_SLINT_DEFAULT == 'true' }}
-        run: npm run build:release
-
+          rustup show
+          curl -fsSL https://github.com/trunk-rs/trunk/releases/download/v0.22.1/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Cache Cargo build
+        uses: Swatinem/rust-cache@v2
+      - run: npm test
+      - run: npm run check
+      - run: npm run build
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: ${{ vars.PIXELBATTLE_SLINT_DEFAULT == 'true' && 'dist-release' || 'dist' }}
+          FOLDER: dist-release
           CLEAN: true

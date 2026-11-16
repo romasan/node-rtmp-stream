@@ -26,4 +26,11 @@ _*
 *.zip
 .idea/
 /lib/
+/target/
 tmp/
+!apps/admin/package.json
+!apps/server/package.json
+!apps/admin/tsconfig.json
+!apps/server/tsconfig.json
+!apps/admin/src/constants.json
+!apps/server/config.example.json

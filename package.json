@@ -3,36 +3,25 @@
   "version": "1.1.0",
   "description": "",
   "scripts": {
+    "dev": "concurrently --kill-others -n admin,app,server -c blue,magenta,green \"npm:dev:admin\" \"npm:dev:app\" \"npm:dev:server\"",
+    "dev:admin": "npm run dev --workspace @pixelbattle/admin",
+    "dev:app": "cd apps/app && trunk serve",
+    "dev:server": "npm run dev --workspace @pixelbattle/server",
+    "build": "npm run build:admin && npm run build:app && npm run build:server && node scripts/assemble-site.js",
+    "build:admin": "npm run build --workspace @pixelbattle/admin",
+    "build:app": "cd apps/app && trunk build --release",
+    "build:server": "npm run build --workspace @pixelbattle/server",
+    "check": "npm run check --workspace @pixelbattle/admin && npm run check --workspace @pixelbattle/server && cargo check --locked --workspace && cargo check --locked --workspace --target wasm32-unknown-unknown",
+    "test": "npm run test:server && npm run test:app && node --test scripts/tests/*.test.cjs",
     "start": "npm run build:server && pm2 start node ./lib/index.js --name pixelbattle",
     "stop": "pm2 stop pixelbattle && pm2 delete pixelbattle",
-    "dev0": "concurrently -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
-    "dev": "npm run build:release && concurrently -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web-server\"",
-    "dev:server": "nodemon --watch 'server/**/*.ts' --exec 'ts-node -r ./server/tsconfig.json' server/index.ts",
-    "dev:web": "parcel pages/index.html pages/*/index.html",
-    "dev:web-server": "python3 -m http.server 1234 --bind 127.0.0.1 --directory dist-release",
-    "dev:timelapse": "npx http-server --cors",
-    "activate:slint": "node scripts/activate-slint.js",
-    "build:slint": "sh scripts/build-slint.sh",
-    "prebuild:release": "rm -rf dist-release",
-    "build:release": "parcel build pages/404.html pages/login/index.html pages/logout/index.html pages/qq/index.html --dist-dir dist-release --no-source-maps --no-cache && npm run build:slint -- dist-release/slint && node scripts/activate-slint.js dist-release --release",
-    "build:server": "rm -rf ./lib && tsc --build ./server/tsconfig.json && cp ./server/config.json ./lib/ && cp ./server/favicon.ico ./lib/",
-    "benchmark:ws": "npm run build:server && node ./scripts/benchmark-ws-protobuf.js",
-    "prebuild": "rm -rf dist/*.* .parcel-cache",
-    "build": "parcel build pages/*.html pages/*/index.html --no-source-maps",
-    "postbuild": "cp static/* dist/ && cp dist/*.js dist/tg/ && cp dist/*.css dist/tg/ && cp dist/*.webp dist/tg/ && cp dist/*.png dist/tg/ && cp dist/*.ttf dist/tg/ && node ./scripts/postbuild.js",
-    "render": "mkdir -p tmp && cp pages/login/index.html tmp/ && react-snap && node ./scripts/postrender.js && mv -f tmp/index.html dist/login/",
-    "build:twitch": "cd pages/twitch/ && zip -r twitch-extension.zip ./*",
     "tools": "node ./tools/index.js",
-    "eslint": "./node_modules/.bin/eslint 'src/**/*.{ts,tsx}' --cache",
+    "benchmark:ws": "npm run build:server && node scripts/benchmark-ws-protobuf.js",
+    "build:twitch": "cd apps/admin/pages/twitch && zip -r twitch-extension.zip ./*",
     "logs": "pm2 log",
-    "prepare": "husky"
-  },
-  "reactSnap": {
-    "source": "dist",
-    "puppeteerArgs": [
-      "--no-sandbox",
-      "--disable-setuid-sandbox"
-    ]
+    "prepare": "husky",
+    "test:server": "npm run test --workspace @pixelbattle/server",
+    "test:app": "node --test apps/app/tests/*.test.mjs && cargo test --locked --workspace"
   },
   "author": "Roman Bauer",
   "license": "ISC",
@@ -47,7 +36,6 @@
     "jsonwebtoken": "^9.0.3",
     "node-fetch": "^2.6.9",
     "parcel": "^2.10.3",
-    "parcel-bundler": "^1.12.5",
     "protobufjs": "8.8.1",
     "react": "^18.2.0",
     "react-chartkick": "^0.5.4",
@@ -78,15 +66,23 @@
     "husky": "^9.1.7",
     "maxmind": "^4.3.20",
     "nodemon": "^3.1.9",
-    "parcel-plugin-static-files-copy": "^2.6.0",
     "pm2": "^5.3.1",
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",
     "postcss-modules": "^4.3.1",
-    "react-snap": "^1.23.0",
     "sass": "^1.70.0",
     "ts-node": "^10.9.2",
     "typescript-plugin-css-modules": "^5.0.0",
     "yargs": "^17.7.2"
+  },
+  "private": true,
+  "workspaces": [
+    "apps/admin",
+    "apps/server"
+  ],
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": ">=24.20.0 <25",
+    "npm": ">=11.19.0 <12"
   }
 }

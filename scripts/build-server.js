@@ -1,0 +1,14 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+const root = path.resolve(__dirname, '..');
+const source = path.join(root, 'apps/server');
+const output = path.join(root, 'lib');
+fs.rmSync(output, { recursive: true, force: true });
+const tsc = require.resolve('typescript/bin/tsc');
+const result = spawnSync(process.execPath, [tsc, '--project', path.join(source, 'tsconfig.json')], { stdio: 'inherit' });
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status || 1);
+fs.copyFileSync(path.join(source, 'favicon.ico'), path.join(output, 'favicon.ico'));
+const config = path.join(source, 'config.json');
+if (fs.existsSync(config)) fs.copyFileSync(config, path.join(output, 'config.json'));

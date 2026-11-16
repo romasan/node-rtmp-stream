@@ -1,4 +1,4 @@
-const { year, episode } = require('../src/constants.json');
+const { year, episode } = require('../apps/admin/src/constants.json');
 
 function siteMetadata(source) {
     return source.replace('<noscript>WEBSITE SHEMA</noscript>', `<script type="application/ld+json">
