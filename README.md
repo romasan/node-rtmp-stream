@@ -2,10 +2,11 @@
 
 Многопользовательский pixel-art проект («место»), в котором игроки совместно рисуют на общем полотне. Вдохновлён r/place. Игроки авторизуются через Twitch, Discord, Steam, Telegram или VK, ставят по одному пикселю с перезарядкой (кулдауном), общаются в чате, а админы управляют банами, статистикой, картами активности, паузой и расширением полотна.
 
-Проект состоит из двух частей:
+Проект состоит из трёх приложений:
 
-- **Клиент** (`client-rust/`) — Slint и WebAssembly. Админка (`src/containers/Admin/`) использует React и TypeScript.
-- **Сервер** (`server/`) — Node.js + TypeScript (ts-node, pm2), WebSocket-сервер, REST API, отрисовка полотна через `node-canvas`.
+- `apps/app/` — пользовательский клиент Slint + Rust/WASM; сборка через Trunk.
+- `apps/admin/` — панель модератора на React и TypeScript; сборка через Parcel.
+- `apps/server/` — сервер Node.js и TypeScript: HTTP API, WebSocket и полотно.
 
 [![Made with Slint](https://raw.githubusercontent.com/slint-ui/slint/v1.16.0/logo/MadeWithSlint-logo-whitebg.png)](https://slint.dev/)
 
@@ -15,7 +16,8 @@
 
 | Слой | Технологии |
 |---|---|
-| Клиент | React 18, TypeScript, SCSS Modules, Parcel 2, Chart.js / react-chartkick |
+| Клиент | Rust, Slint, FemtoVG, WebAssembly, Trunk |
+| Админка | React 18, TypeScript, SCSS Modules, Parcel 2 |
 | Сервер | Node.js, TypeScript, ts-node, WebSocket (`ws`), `node-canvas`, sqlite3 |
 | Авторизация | OAuth2: Twitch, Discord, Steam, Telegram, VK |
 | БД | SQLite (`db/db.sqlite3`) — чат; JSON-файлы (`db/bans.json`, `db/values.json`) |
@@ -27,47 +29,18 @@
 
 ## Структура проекта
 
-```
-.
-├── .github/workflows/deploy.yml   # CI/CD: сборка и деплой на GitHub Pages
-├── .husky/pre-commit              # Git pre-commit hook (husky): проверка сборки и пререндера
-├── assets/                        # Иконки, шрифты, картинки (svg, webp, ttf)
-├── db/                            # Данные: db.sqlite3, bans.json, values.json, сессии
-├── hoops/                         # Служебные конфиги/скрипты (Discord auth и пр.)
-├── pages/                         # HTML-страницы (входные точки Parcel)
-│   ├── index.html                 # Главная страница игры
-│   ├── login/                     # OAuth-редиректы авторизации
-│   ├── logout/                    # Выход из аккаунта
-│   ├── qq/                        # Панель инструментов модератора (admin)
-│   ├── tg/                        # Telegram Mini App версия
-│   ├── timelapse/                 # Таймлапс полотна
-│   └── twitch/                    # Twitch Extension (видео-оверлей)
-├── scripts/                       # Скрипты сборки и стриминга
-│   ├── addramdisk.sh              # RAM-диск для ускорения (Linux)
-│   ├── postbuild.js               # Пост-обработка сборки
-│   ├── packTimelapse.sh           # Упаковка таймлапса в tmp/timelapse
-│   ├── postrender.js              # Пост-обработка react-snap/SSR
-│   ├── saveep.sh                  # Сохранение пикселей (эпизод)
-│   └── stream.sh                  # Запуск ffmpeg стрима полотна
-├── server/                        # Серверная часть
-│   ├── index.ts                   # Точка входа сервера
-│   ├── config.json                # Конфигурация (хосты, ключи, время, картинки)
-│   ├── api/                       # REST API + админка
-│   ├── constants/                 # Цветовые схемы
-│   ├── helpers/                   # Утилиты-хелперы
-│   ├── types/                     # TypeScript-типы
-│   └── utils/                     # Ядро: canvas, ws, auth, bans, stats и т.д.
-├── tools/                         # Консольные инструменты анализа БД
-├── src/                           # Клиент (React)
-│   ├── index.tsx                  # Входная точка приложения
-│   ├── App.tsx                    # Корневой компонент
-│   ├── components/                # UI-компоненты (Canvas, Chat, Palette...)
-│   ├── containers/                # Контейнеры (Admin, TgMiniApp, Timelapse)
-│   ├── hooks/                     # Хуки (useApp, useWsStore, useDraggable...)
-│   ├── helpers/                   # Клиентские утилиты
-│   └── styles/                    # Глобальные стили (SCSS)
-├── static/                        # Статика: robots.txt, sitemap.xml, favicon
-└── package.json                   # Скрипты и зависимости
+```text
+apps/
+  admin/              React-админка, HTML авторизации и 404
+  app/                Rust/Slint, Trunk, UI и браузерный мост
+  server/             TypeScript-сервер и пример конфигурации
+assets/               Общие изображения и шрифт
+shared/ws-schema.json Общая protobuf-схема для React и сервера
+tools/                Существующие Node.js-утилиты
+scripts/              Сборка сайта, dev-прокси и эксплуатационные скрипты
+db/                   Локальные данные сервера (не входят в Git)
+Cargo.toml            Cargo workspace
+package.json          npm workspaces и общие команды
 ```
 
 ---
@@ -76,30 +49,20 @@
 
 ### 1. Подключение клиента
 
-1. Пользователь открывает главную страницу (`pages/index.html` → `src/index.tsx`).
-2. Клиент вызывает `start()` (`server/api/start.ts`):
-   - проверяет rate-limit по IP;
-   - проверяет бан по IP/token;
-   - создаёт новую сессию (UUID-token) и выдаёт **HttpOnly cookie** `token` на год, либо продлевает существующую сессию.
-3. Устанавливается **WebSocket-соединение** (`src/lib/ws.ts`):
-   - адрес: `api.<host>` во внешнем окружении, `localhost:8080` в dev;
-   - протокол `wss` для HTTPS или хеша `#secured`;
-   - при обрыве — переподключение каждые 10 секунд;
-   - пинг каждые 10 секунд (`ws.send('2')`), сообщение `'3'` игнорируется.
-4. События с сервера приходят вида `{ event, payload }` и эмитятся через `event-emitter` (`ws:<event>`).
+Slint запускается из `apps/app/index.html`, а браузерный мост `apps/app/web/bridge.js` загружает палитру, запрашивает сессию через `/start` и подключает WebSocket. В production API находится на `api.<host>`; в разработке Trunk и админка проксируют HTTP и WebSocket на порт 8080. Схема protobuf используется сервером и React-админкой, соответствующие Rust-типы описаны в `apps/app/src/protocol.rs`.
 
 ### 2. Полотно (canvas)
 
-- Сервер держит полотно в памяти (`server/utils/canvas.ts`) — `node-canvas`.
+- Сервер держит полотно в памяти (`apps/server/utils/canvas.ts`) — `node-canvas`.
 - Клиент загружает текущее состояние как PNG: `//<WSHost>/canvas.png` и рисует его на `<canvas>`.
 - При каждом новом пикселе сервер шлёт событие `drawPix` по WebSocket, клиент мгновенно закрашивает пиксель (без перезагрузки страницы).
-- Полотно периодически сохраняется на диск: `setInterval(saveCanvas, 60 * 1000)` (`server/index.ts`).
-- Поддерживается **расширение полотна** (`server/utils/expands.ts`): сервер увеличивает размер и смещает/масштабирует старое содержимое; клиент синхронизирует канвас через событие `expand`.
+- Полотно периодически сохраняется на диск: `setInterval(saveCanvas, 60 * 1000)` (`apps/server/index.ts`).
+- Поддерживается **расширение полотна** (`apps/server/utils/expands.ts`): сервер увеличивает размер и смещает/масштабирует старое содержимое; клиент синхронизирует канвас через событие `expand`.
 
 ### 3. Постановка пикселя
 
 1. Игрок выбирает цвет в палитре (`Palette`), кликает по полотну.
-2. `PUT /api/pix` (`server/api/pix.ts`) проверяет:
+2. `PUT /pix` (`apps/server/api/pix.ts`) проверяет:
    - не завершилось ли время раунда (`finishTimeStamp`);
    - не на паузе ли сервер (`paused`);
    - авторизацию пользователя;
@@ -114,16 +77,16 @@
 
 ### 4. Авторизация
 
-- Доступные провайдеры: **Twitch, Discord, Steam, Telegram, VK** (`server/api/auth/`).
+- Доступные провайдеры: **Twitch, Discord, Steam, Telegram, VK** (`apps/server/api/auth/`).
 - Каждый провайдер — свой OAuth2-флоу: редирект на провайдера, callback, получение профиля.
 - После успешного входа пользователь привязывается к `token` (сессии), получает ник и «area» (площадку/провайдера).
-- Выход — `server/api/logout.ts` (удаляет куку и пользователя).
-- Telegram Mini App (`src/containers/TgMiniApp`) использует встроенный `Telegram.WebApp` и отдельную авторизацию.
+- Выход — `apps/server/api/logout.ts` (удаляет куку и пользователя).
+- Telegram Mini App (`apps/app/web/bridge.js`) использует встроенный `Telegram.WebApp` и отдельную авторизацию.
 
 ### 5. Чат
 
-- `GET /api/messages` — история сообщений из SQLite (`server/utils/chat.ts`, таблица `chat`).
-- `PUT /api/chat` — отправка сообщения с защитой:
+- `GET /messages` — история сообщений из SQLite (`apps/server/utils/chat.ts`, таблица `chat`).
+- `PUT /chat` — отправка сообщения с защитой:
   - бан/мут по нику → отклонение;
   - глобальный кулдаун (значение `cooldown` в `values.json`, по умолчанию 5 сек);
   - анти-спам (повтор одинакового текста) → «сообщение удалено из-за спама» от бота;
@@ -132,11 +95,11 @@
 
 ### 6. Статистика и карты активности
 
-`server/utils/stats.ts` собирает по каждому пикселю: время, UUID, цвет, ник/area, IP, счётчик.
+`apps/server/utils/stats.ts` собирает по каждому пикселю: время, UUID, цвет, ник/area, IP, счётчик.
 
-Карты активности (`server/utils/maps.ts`) рендерятся по текущему размеру полотна (`getExpand()`) с учётом сдвигов от расширения (`shiftX`/`shiftY`) и поэтому совпадают с видимым холстом.
+Карты активности (`apps/server/utils/maps.ts`) рендерятся по текущему размеру полотна (`getExpand()`) с учётом сдвигов от расширения (`shiftX`/`shiftY`) и поэтому совпадают с видимым холстом.
 
-Эндпоинты админки (`server/api/admin/`):
+Эндпоинты админки (`apps/server/api/admin/`):
 
 | Маршрут | Описание |
 |---|---|
@@ -161,7 +124,7 @@
 | `streamSettings` | Настройки стрима |
 | `updateFreezedFrame` | Обновление «застывшего» кадра |
 
-### 7. Баны (`server/utils/bans.ts`)
+### 7. Баны (`apps/server/utils/bans.ts`)
 
 Хранятся в `db/bans.json`, четыре типа:
 
@@ -172,7 +135,7 @@
 
 Бан может быть **вечным** (`true`) или **временным** (timestamp). По истечении срока бан автоматически снимается.
 
-### 8. Сессии и онлайн (`server/utils/sessions.ts`, `online.ts`)
+### 8. Сессии и онлайн (`apps/server/utils/sessions.ts`, `online.ts`)
 
 - Сессии хранятся по токенам, привязываются к IP.
 - Активность обновляется при действиях (`uptateActiveTime`).
@@ -180,11 +143,11 @@
 
 ### 9. Панель модератора (`/qq`)
 
-Доступна только администраторам/модераторам (`checkIsAdmin`). Включает: баны, статистику, карты активности, чат, паузу, расширение полотна, заливку области, управление кулдауном и настройками стрима. UI — `src/containers/Admin`.
+Доступна только администраторам/модераторам (`checkIsAdmin`). Включает: баны, статистику, карты активности, чат, паузу, расширение полотна, заливку области, управление кулдауном и настройками стрима. UI — `apps/admin/src/containers/Admin`.
 
 ### 10. Таймлапс (`/timelapse`)
 
-- Отдельная страница (`pages/timelapse/`, `src/containers/Timelapse`).
+- Режим Slint-приложения на маршруте `/timelapse/`.
 - Проигрывает историю изменений полотна («эпизоды»).
 - Серверные утилиты генерации: `tools/prepareTimelapse.js`, `tools/drawEpisode.js`.
 - Скрипт сохранения эпизода: `scripts/saveep.sh`.
@@ -192,13 +155,15 @@
 
 ```
 ./scripts/packTimelapse.sh
-rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx http-server dist
-# http://localhost:8080/timelapse/#staticHost=http://localhost:8080
+npm run build
+cp -r tmp/timelapse dist-release/
+python3 -m http.server 9000 --directory dist-release
+# http://localhost:9000/timelapse/#staticHost=http://localhost:9000
 ```
 
 ### 11. Стриминг (`scripts/stream.sh`)
 
-1. `server/api/stream.ts` рендерит PNG-кадр полотна (`/stream.png`) поверх фоновой картинки (`bgImage`), ререндер каждую секунду.
+1. `apps/server/api/stream.ts` рендерит PNG-кадр полотна (`/stream.png`) поверх фоновой картинки (`bgImage`), ререндер каждую секунду.
 2. `scripts/stream.sh` через `ffmpeg`:
    - берёт PNG-кадр как видео (`image2`, 30 fps);
    - накладывает аудиодорожку (`inputAudio`);
@@ -223,13 +188,13 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 - `checkLog.js`, `debugServer.js`, `debugStream.js`, `debugTwitch.js` — отладка;
 - `calcSessionsWithOneIP.js`, `collectIPAdresses.js`, `filterByBlocked.js`, `filterByIP.js`, `filterByUUID.js`, `fixSessionByNickName.js` — фильтрация/анализ сессий.
 
-Инструменты запускаются обычным `node` (`npm run tools <команда>`). Цветовые схемы подгружаются из исходника `server/constants/colorSchemes.ts` через общий хелпер `tools/loadColorSchemes.js`, который регистрирует `ts-node` (`transpileOnly`) — поэтому инструменты работают и на Node 18, и на Node 24+.
+Инструменты запускаются обычным `node` (`npm run tools <команда>`). Цветовые схемы подгружаются из исходника `apps/server/constants/colorSchemes.ts` через общий хелпер `tools/loadColorSchemes.js`, который регистрирует `ts-node` (`transpileOnly`) — поэтому инструменты работают и на Node 18, и на Node 24+.
 
 > `canvas` — нативный модуль: он собирается под ту версию Node, которой выполняется установка зависимостей. После смены версии Node (например, через `nvm`) нужно переустановить зависимости (`npm install`) или пересобрать модуль (`npm rebuild canvas`), иначе `require('canvas')` упадёт с ошибкой `NODE_MODULE_VERSION`.
 
 ---
 
-## Конфигурация (`server/config.json`)
+## Конфигурация (`apps/server/config.json`)
 
 Основные секции:
 
@@ -247,55 +212,28 @@ rm -rf dist .parcel-cache && npm run build && cp -r tmp/timelapse ./dist/ && npx
 
 ---
 
-## Основные скрипты (`package.json`)
+## Разработка и сборка
 
-| Команда | Описание |
-|---|---|
-| `npm run dev` | Сборка Slint-релиза и запуск сайта с API |
-| `npm run dev0` | Запуск React-сборки через Parcel с локальным API |
-| `npm run dev:server` | Запуск сервера в dev-режиме (nodemon + ts-node) |
-| `npm run dev:web` | Запуск Parcel для клиента (dev-сервер) |
-| `npm run dev:web-server` | Раздача готовой сборки `dist-release/` на порту 1234 |
-| `npm run build` | Production-сборка клиента (Parcel) |
-| `npm run build:release` | Сборка Slint для сайта и React для админки в `dist-release/` |
-| `npm run build:server` | Компиляция сервера в `lib/` |
-| `npm start` | Сборка сервера + запуск через pm2 (`pixelbattle`) |
-| `npm stop` | Остановка pm2-процесса |
-| `npm run render` | react-snap (SSR пререндер) + постобработка |
-| `npm run build:twitch` | Сборка Twitch Extension (zip) |
-| `npm run tools` | Запуск консольных инструментов (`tools`) |
-| `npm run eslint` | Линтинг клиента |
+Для проекта нужны Node.js 24.20.0, npm 11.19.0, Rust из `rust-toolchain.toml` и Trunk 0.22.1. На Linux для `canvas` также нужны Cairo, Pango, JPEG, GIF и librsvg; список пакетов приведён в CI. Trunk устанавливается отдельно, например `cargo install trunk --version 0.22.1 --locked`. Создайте локальный `apps/server/config.json` по `apps/server/config.example.json`, укажите существующее изображение в `stream.bgImage`, подготовьте рабочий каталог `db/` и локальный `hoops/config.json` для Discord-интеграции.
 
-### Pre-commit проверка (husky)
-
-При `npm install` срабатывает скрипт `prepare` (`husky`), который включает Git-хуки из `.husky/`. Хук `pre-commit` перед каждым коммитом запускает `npm run build && npm run render` — если production-сборка клиента или react-snap пререндер завершаются ошибкой, коммит отклоняется. При необходимости пропустить проверку: `git commit --no-verify`.
-
----
-
-## CI/CD
-
-`.github/workflows/deploy.yml`:
-
-1. Пуш в ветку `main` или ручной запуск **Build and Deploy** для `main`.
-2. Установка Node 18 + системных библиотек для `node-canvas`.
-3. Установка зависимостей и сборка сайта. При `PIXELBATTLE_SLINT_DEFAULT=true` запускается `npm run build:release`. Иначе выполняются `npm run build`, `npm run render` и `npm run build:slint`.
-4. Публикация собранного каталога (`dist-release/` или `dist/`) в ветку `gh-pages` (GitHub Pages).
-
-Для возврата к сборке с публичным React-клиентом установите `PIXELBATTLE_SLINT_DEFAULT=false` в переменных репозитория и запустите **Build and Deploy** для `main`. Для повторного переключения на Slint установите `true` и повторите запуск. Изменение переменной само по себе публикацию не запускает.
-
----
-
-## Запуск локально
+`hoops/config.json` должен содержать адрес вспомогательного Discord-сервиса, например `{"discord":{"protocol":"http","host":"localhost","port":3000}}`; для OAuth укажите фактический адрес.
 
 ```bash
-# 1. Установка зависимостей
-npm install
-
-# 2. Сборка сайта и запуск API
-npm run dev
+npm ci
+npm run dev           # сайт: http://localhost:1234/; Ctrl+C останавливает все
+npm run dev:app       # Slint напрямую: http://localhost:1420/
+npm run dev:admin     # админка: http://localhost:1234/qq/
+npm run dev:server    # API и WebSocket на порту из конфигурации
+npm run build         # приложения и собранный сайт в dist-release/
+npm run check         # TypeScript, native Rust и wasm32
+npm test              # JS- и Rust-тесты
 ```
 
-Игра открывается на `http://localhost:1234/`, таймлапс на `/timelapse/`, Telegram-вариант на `/tg/`, админка на `/qq/`. Клиент подключается к API и WebSocket на `localhost:8080`. В локальном `server/config.json` укажите `http://localhost:1234` в `server.origin`.
+Отдельные production-сборки: `npm run build:app`, `npm run build:admin`, `npm run build:server`. Тесты сервера и Slint можно запускать отдельно: `npm run test:server` и `npm run test:app`. Для админки существующего набора тестов нет; её TypeScript проверяется через `npm run check`. Для Slint также доступны `trunk serve` и `trunk build --release` из `apps/app/`. Единый адрес для игры, админки и страниц входа/выхода — `http://localhost:1234/`. Прокси направляет игру в Trunk на порту 1420, админку и страницы авторизации в Parcel на порту 1235, API и WebSocket — на `127.0.0.1:8080`. Для переходов после авторизации установите в локальном `apps/server/config.json` значения `server.host` и `server.origin` в `http://localhost:1234`. Для тестового локального входа включите `localAuth: true`; учётные записи для разработки указаны в `apps/server/api/auth/local.ts`.
+
+`npm run tools <команда>` запускает существующие утилиты; `npm run build:twitch` упаковывает Twitch extension. `npm start` собирает сервер и запускает его через pm2. Хук pre-commit выполняет `npm run check` и `npm test`.
+
+GitHub Actions устанавливает зависимости через `npm ci`, проверяет проект, собирает приложения и публикует `dist-release/` в `gh-pages`. Каталог `dist-release/tg/` можно раздавать как корень отдельного Telegram-хоста.
 
 ---
 
