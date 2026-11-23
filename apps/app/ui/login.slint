@@ -1,3 +1,5 @@
+import { PaletteFrame } from "palette-frame.slint";
+
 component LoginProvider inherits Rectangle {
     in property <string> key;
     in property <string> label;
@@ -21,18 +23,15 @@ component LoginProvider inherits Rectangle {
     hit := TouchArea { mouse-cursor: pointer; clicked => { root.clicked(root.key); } }
 }
 
-export component LoginDialog inherits Rectangle {
+export component LoginDialog inherits PaletteFrame {
     in property <bool> local;
     callback login(string);
     callback close();
 
-    background: #aaa8d9;
-    border-color: #2d2d3a;
-    border-width: 3px;
-    border-radius: 3px;
+    fill: #aaa8d9;
+    raised: true;
+    thickness: 3px;
     TouchArea {}
-    Rectangle { x: 1px; y: 1px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
-    Rectangle { x: 1px; y: 1px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
 
     Text {
         x: 19px; y: 16px;
@@ -53,10 +52,11 @@ export component LoginDialog inherits Rectangle {
         accessible-action-default => { root.close(); }
         clicked => { root.close(); }
         Rectangle {
-            border-radius: 5px;
-            border-width: close-button.has-hover ? 2px : 0px;
-            border-color: #2d2d3a;
-            background: close-button.pressed ? #8080a6 : transparent;
+            if close-button.has-hover || close-button.pressed: PaletteFrame {
+                radius: 5px;
+                raised: !close-button.pressed;
+                fill: close-button.pressed ? #8080a6 : #aaa8d9;
+            }
             Text {
                 width: parent.width; height: parent.height;
                 text: "×"; color: close-button.has-hover ? red : black;
@@ -73,11 +73,10 @@ export component LoginDialog inherits Rectangle {
         height: parent.height - 79px;
         viewport-height: providers.preferred-height + 4px;
         viewport-width: self.width;
-        Rectangle {
+        PaletteFrame {
             height: providers.preferred-height + 4px;
-            border-width: 2px; border-color: #2d2d3a; border-radius: 5px;
-            background: #dbdbef;
-            clip: true;
+            radius: 5px;
+            fill: #dbdbef;
             providers := VerticalLayout {
                 x: 2px; y: 2px;
                 width: parent.width - 4px;

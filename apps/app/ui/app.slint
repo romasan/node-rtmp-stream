@@ -1,5 +1,6 @@
 import { LoginDialog } from "login.slint";
-import { PaletteEditor } from "color-picker.slint";
+import { PaletteFrame } from "palette-frame.slint";
+import { PaletteEditor, PaletteEditorWindow } from "color-picker.slint";
 import { TimelapseControls } from "timelapse-controls.slint";
 import { SeasonOption } from "season-picker.slint";
 
@@ -46,11 +47,9 @@ component PaletteSwatch inherits Rectangle {
     callback double-clicked();
     z: !root.mobile && hit.has-hover ? 1 : 0;
 
-    Rectangle {
-        background: root.fill;
-        border-radius: root.mobile ? 12px : 3px;
-        border-width: 2px;
-        border-color: #2d2d3a;
+    PaletteFrame {
+        fill: root.fill;
+        radius: root.mobile ? 12px : 3px;
         transform-origin: { x: self.width / 2, y: self.height / 2 };
         transform-scale: !root.mobile && hit.has-hover ? 1.2 : 1;
         animate transform-scale { duration: 200ms; }
@@ -62,16 +61,6 @@ component PaletteSwatch inherits Rectangle {
             border-radius: 11px;
             border-width: 1px;
             border-color: white;
-        }
-        if !root.mobile: Rectangle {
-            x: 2px; y: parent.height - 2px;
-            width: parent.width - 4px; height: 2px;
-            background: #b6b5eb;
-        }
-        if !root.mobile: Rectangle {
-            x: parent.width - 2px; y: 2px;
-            width: 2px; height: parent.height - 4px;
-            background: #b6b5eb;
         }
     }
     hit := TouchArea {
@@ -355,15 +344,13 @@ export component App inherits Window {
     property <length> swatch-size: root.mobile ? Math.min(root.width, root.height) * 0.08 : 20px;
     property <length> swatch-left: root.mobile ? 6px : 81px;
     property <length> swatch-top: root.mobile ? 4px : 9px;
-    property <length> pipette-size: 28px;
     property <length> palette-padding-right: root.mobile ? 6px : 9px;
-    property <length> palette-tools-width: 6px + root.pipette-size + root.palette-padding-right;
-    property <length> swatch-visible-width: Math.max(0px, root.palette-width - root.swatch-left - root.palette-tools-width);
+    property <length> swatch-visible-width: Math.max(0px, root.palette-width - root.swatch-left - root.palette-padding-right);
     property <int> palette-items: root.palette.length + (root.truecolor ? 1 : 0);
     property <int> swatch-columns: root.mobile ? root.palette-items : Math.ceil(root.palette-items / 2);
     property <length> swatch-track-width: Math.max(0px, root.swatch-columns * (root.swatch-size + 1px) - 1px);
     property <length> palette-width: root.mobile ? root.width - 4px : Math.min(root.width - 4px,
-        root.swatch-left + root.swatch-track-width + root.palette-tools-width);
+        root.swatch-left + root.swatch-track-width + root.palette-padding-right);
     property <length> palette-height: root.mobile ? Math.max(34px, root.swatch-size + 8px) : 60px;
     property <length> palette-left: root.mobile ? 2px : Math.max(0px, Math.min(root.width - root.palette-width, root.palette-x));
     property <length> palette-top: root.mobile ? root.height - root.palette-height - 2px
@@ -789,29 +776,17 @@ export component App inherits Window {
         }
     }
 
-    if !root.replay && root.connected && !root.finished: Rectangle {
+    if !root.replay && root.connected && !root.finished: PaletteFrame {
         property <length> swatch-inset: root.mobile ? 0px : 3px;
-        property <length> corner-inset: root.mobile ? 10px : 3px;
         x: root.palette-left;
         y: root.palette-top;
         width: root.palette-width;
         height: root.palette-height;
-        background: #aaa8d9;
-        border-radius: root.mobile ? 10px : 3px;
-        border-width: root.mobile ? 2px : 3px;
-        border-color: #2d2d3a;
-        clip: true;
+        fill: #aaa8d9;
+        raised: true;
+        radius: root.mobile ? 10px : 3px;
+        thickness: root.mobile ? 2px : 3px;
 
-        Rectangle {
-            x: parent.corner-inset; y: 0;
-            width: parent.width - 2 * parent.corner-inset; height: parent.border-width;
-            background: #b6b5eb;
-        }
-        Rectangle {
-            x: 0; y: parent.corner-inset;
-            width: parent.border-width; height: parent.height - 2 * parent.corner-inset;
-            background: #b6b5eb;
-        }
         if !root.mobile: Rectangle {
             x: 9px; y: 9px; width: 16px; height: 42px;
             for stripe in 10: Rectangle {
@@ -835,12 +810,9 @@ export component App inherits Window {
                 }
             }
         }
-        if !root.mobile: Rectangle {
+        if !root.mobile: PaletteFrame {
             x: 33px; y: 9px; width: 42px; height: 42px;
-            background: #c2c1fa;
-            border-width: 2px;
-            border-color: #2d2d3a;
-            border-radius: 3px;
+            fill: #c2c1fa;
             Image {
                 x: 2px; y: 2px;
                 width: parent.width - 4px; height: parent.height - 4px;
@@ -852,14 +824,10 @@ export component App inherits Window {
                 vertical-tiling: repeat;
                 image-rendering: pixelated;
             }
-            Rectangle { x: 2px; y: parent.height - 2px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
-            Rectangle { x: parent.width - 2px; y: 2px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
-            Rectangle {
+            PaletteFrame {
                 x: 8px; y: 8px; width: 26px; height: 26px;
-                background: root.selected-rgb;
-                border-color: #2d2d3a; border-width: 2px; border-radius: 3px;
-                Rectangle { x: 2px; y: 0; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
-                Rectangle { x: 0; y: 2px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
+                fill: root.selected-rgb;
+                raised: true;
             }
         }
         Flickable {
@@ -902,16 +870,6 @@ export component App inherits Window {
                 label: "Добавить цвет";
                 clicked => { root.open-color(""); }
             }
-        }
-        IconButton {
-            x: parent.width - root.palette-padding-right - self.width;
-            y: (parent.height - self.height) / 2;
-            width: root.pipette-size;
-            height: root.pipette-size;
-            icon: @image-url("../../../assets/eye-dropper.png");
-            label: "Пипетка";
-            opacity: root.picking ? 0.55 : 1;
-            clicked => { root.picking = !root.picking; }
         }
     }
 
@@ -974,6 +932,8 @@ export component App inherits Window {
     for slot in root.window-order: Rectangle {
         z: 1;
         if slot == 0 && root.stats-open: PlayerWindow {
+            close-top: 9px;
+            close-right: 12px;
             x: root.stats-x; y: root.stats-y;
             width: root.stats-width; height: root.stats-height;
             content-top: 31px;
@@ -1016,7 +976,7 @@ export component App inherits Window {
             }
         }
 
-        if slot == 2 && root.panel == 5: PlayerWindow {
+        if slot == 2 && root.panel == 5: PaletteEditorWindow {
             width: root.editor-width;
             height: root.editor-height;
             x: root.editor-left;

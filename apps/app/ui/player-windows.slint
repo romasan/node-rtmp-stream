@@ -1,4 +1,5 @@
 import { ScrollView } from "std-widgets.slint";
+import { PaletteFrame } from "palette-frame.slint";
 
 export struct MessageRow {
     time: string,
@@ -34,34 +35,34 @@ export component PlatformIcon inherits Image {
         : @image-url("");
 }
 
-component PanelButton inherits Rectangle {
+component PanelButton inherits PaletteFrame {
     in property <string> label;
     in property <bool> enabled: true;
     callback clicked();
-    background: hit.pressed ? #8080a6 : hit.has-hover ? #b5b4ea : #9e9ecc;
-    border-radius: 3px;
-    border-color: #2d2d3a;
-    border-width: 1px;
+    fill: hit.pressed ? #8080a6 : hit.has-hover ? #b5b4ea : #9e9ecc;
+    raised: !hit.pressed;
     opacity: enabled ? 1 : 0.5;
     Text { text: root.label; color: black; horizontal-alignment: center; vertical-alignment: center; }
     hit := TouchArea {
         enabled: root.enabled;
+        accessible-role: button;
+        accessible-label: root.label == "×" ? "Закрыть" : "Отправить сообщение";
+        accessible-action-default => { root.clicked(); }
         mouse-cursor: pointer;
         clicked => { root.clicked(); }
     }
 }
 
-export component PlayerWindow inherits Rectangle {
-    in property <length> content-top: 27px;
+export component PlayerWindow inherits PaletteFrame {
+    in property <length> content-top: 31px;
+    in property <length> close-top: 5px;
+    in property <length> close-right: 8px;
     callback close();
     callback drag(length, length);
-    background: #aaa8d9;
-    border-radius: 3px;
-    border-width: 3px;
-    border-color: #2d2d3a;
+    fill: #aaa8d9;
+    raised: true;
+    thickness: 3px;
     TouchArea {}
-    Rectangle { x: 1px; y: 1px; width: parent.width - 4px; height: 2px; background: #b6b5eb; }
-    Rectangle { x: 1px; y: 1px; width: 2px; height: parent.height - 4px; background: #b6b5eb; }
     body := Rectangle {
         x: 7px;
         y: root.content-top;
@@ -71,11 +72,11 @@ export component PlayerWindow inherits Rectangle {
     }
     Rectangle {
         x: 7px;
-        y: 6px;
-        width: parent.width - 33px;
+        y: 7px;
+        width: parent.width - 37px;
         height: 16px;
         for stripe in 4: Rectangle {
-            y: stripe * 4px + 1px;
+            y: stripe * 4px + 2px;
             height: 1px;
             background: #2d2d3a;
             Rectangle { y: 1px; height: 1px; background: #edeefc; }
@@ -95,7 +96,17 @@ export component PlayerWindow inherits Rectangle {
             }
         }
     }
-    PanelButton { x: parent.width - 26px; y: 4px; width: 19px; height: 19px; label: "×"; clicked => { root.close(); } }
+    Rectangle {
+        x: parent.width - root.close-right - 18px - 4px;
+        y: root.close-top - 4px;
+        width: 26px; height: 27px;
+        background: #aaa8d9;
+        PanelButton {
+            x: 4px; y: 4px; width: 18px; height: 19px;
+            label: "×";
+            clicked => { root.close(); }
+        }
+    }
 }
 
 export component ChatContent inherits Rectangle {
@@ -116,14 +127,12 @@ export component ChatContent inherits Rectangle {
 
     changed days => { scroll.viewport-y = Math.min(0px, scroll.height - scroll.viewport-height); }
 
-    Rectangle {
+    PaletteFrame {
         y: 0;
         width: parent.width;
         height: parent.height - 33px;
-        background: #dbdbef;
-        border-radius: 5px;
-        border-width: 2px;
-        border-color: #2d2d3a;
+        fill: #dbdbef;
+        radius: 5px;
         scroll := ScrollView {
             mouse-drag-pan-enabled: root.mobile;
             x: 5px; y: 5px;
@@ -132,7 +141,7 @@ export component ChatContent inherits Rectangle {
             viewport-height: rows.preferred-height;
             rows := VerticalLayout {
                 width: scroll.visible-width;
-                spacing: 3px;
+                spacing: 0px;
                 if root.days.length == 0: Text {
                     color: black;
                     text: "пока никто не писал";
@@ -142,10 +151,12 @@ export component ChatContent inherits Rectangle {
                 for day in root.days: Rectangle {
                     height: entries.preferred-height;
                     entries := VerticalLayout {
-                        spacing: 3px;
+                        spacing: 0px;
                         if day.label != "": Rectangle { height: heading.preferred-height; }
                         for message in day.messages: VerticalLayout {
-                            spacing: 2px;
+                            padding-top: 5px;
+                            padding-bottom: 5px;
+                            spacing: 0px;
                             HorizontalLayout {
                                 spacing: 4px;
                                 PlatformIcon { area: message.area; }
@@ -207,12 +218,10 @@ export component ChatContent inherits Rectangle {
             }
         }
     }
-    Rectangle {
+    PaletteFrame {
         y: parent.height - 30px; height: 30px;
-        background: #bbbaf1;
-        border-radius: 5px;
-        border-width: 2px;
-        border-color: #2d2d3a;
+        fill: #bbbaf1;
+        radius: 5px;
         Text {
             x: 6px; width: parent.width - 40px;
             text: root.authorized ? "НАПИСАТЬ СООБЩЕНИЕ" : "АВТОРИЗУЙТЕСЬ, ЧТОБЫ НАПИСАТЬ";
@@ -283,7 +292,7 @@ component PlayerLine inherits HorizontalLayout {
     StatisticsText { text: entry.count; }
 }
 
-export component StatisticsContent inherits Rectangle {
+export component StatisticsContent inherits PaletteFrame {
     in property <bool> mobile;
     out property <length> content-height: rows.preferred-height + 24px;
     in-out property <length> scroll-position <=> scroll.viewport-y;
@@ -293,10 +302,8 @@ export component StatisticsContent inherits Rectangle {
     in property <[PlayerRow]> leaders;
     in property <[PlayerRow]> players;
 
-    background: #dbdbef;
-    border-radius: 5px;
-    border-width: 2px;
-    border-color: #2d2d3a;
+    fill: #dbdbef;
+    radius: 5px;
     scroll := ScrollView {
         mouse-drag-pan-enabled: root.mobile;
         x: 12px; y: 12px;

@@ -1,0 +1,45 @@
+// CSS-style bevel with diagonal joins and rounded outer corners.
+export component PaletteFrame inherits Rectangle {
+    in property <color> fill;
+    in property <bool> raised;
+    in property <length> thickness: 2px;
+    in property <length> radius: 3px;
+    background: root.raised ? #b6b5eb : #2d2d3a;
+    border-radius: root.radius;
+    clip: true;
+    Path {
+        width: root.width;
+        height: root.height;
+        fill: root.raised ? #2d2d3a : #b6b5eb;
+        viewbox-width: root.width / 1px;
+        viewbox-height: root.height / 1px;
+        MoveTo { x: (root.width - root.radius * 0.292893) / 1px; y: root.radius * 0.292893 / 1px; }
+        ArcTo {
+            x: root.width / 1px; y: root.radius / 1px;
+            radius-x: root.radius / 1px; radius-y: root.radius / 1px; sweep: true;
+        }
+        LineTo { x: root.width / 1px; y: (root.height - root.radius) / 1px; }
+        ArcTo {
+            x: (root.width - root.radius) / 1px; y: root.height / 1px;
+            radius-x: root.radius / 1px; radius-y: root.radius / 1px; sweep: true;
+        }
+        LineTo { x: root.radius / 1px; y: root.height / 1px; }
+        ArcTo {
+            x: root.radius * 0.292893 / 1px; y: (root.height - root.radius * 0.292893) / 1px;
+            radius-x: root.radius / 1px; radius-y: root.radius / 1px; sweep: true;
+        }
+        LineTo { x: root.thickness / 1px; y: (root.height - root.thickness) / 1px; }
+        LineTo { x: (root.width - root.thickness) / 1px; y: (root.height - root.thickness) / 1px; }
+        LineTo { x: (root.width - root.thickness) / 1px; y: root.thickness / 1px; }
+        Close { }
+    }
+    Rectangle {
+        x: root.thickness;
+        y: root.thickness;
+        width: root.width - 2 * root.thickness;
+        height: root.height - 2 * root.thickness;
+        border-radius: Math.max(0px, root.radius - root.thickness);
+        background: root.fill;
+    }
+}
+
