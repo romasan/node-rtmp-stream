@@ -33,19 +33,19 @@ function assemble({ app, admin, meta, assets, staticDir, output }) {
             fs.copyFileSync(path.join(app, name), target);
         }
     }
-    let appHtml = fs.readFileSync(path.join(app, 'index.html'), 'utf8');
+    let appHtml = siteMetadata(fs.readFileSync(path.join(app, 'index.html'), 'utf8'));
     appHtml = appHtml.replace(/<base\s+href=["'][^"']*["']\s*\/?\s*>/i, `<base href="${assetPath}/">`);
     appHtml = appHtml.replace(/<meta\s+name=["']site-base["']\s+content=["'][^"']*["']\s*\/?\s*>/i, '<meta name="site-base" content="/">');
     for (const name of names) appHtml = appHtml.replaceAll(`/${name}`, `${assetPath}/${name}`);
     for (const route of ['', 'tg', 'timelapse']) {
         const source = siteMetadata(fs.readFileSync(path.join(meta, route, 'index.html'), 'utf8'));
         const tags = source.match(/<meta\b[^>]*>|<link\b[^>]*>|<title>[\s\S]*?<\/title>|<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
-        const retained = tags.filter(tag => !/^<meta\s+(?:charset\b|name="viewport")/i.test(tag) && !/^<link\b[^>]*\srel=["']?stylesheet\b/i.test(tag));
+        const retained = tags.filter(tag => !/^<title>/i.test(tag) && !/^<meta\s+(?:charset\b|name="viewport")/i.test(tag) && !/^<link\b[^>]*\srel=["']?stylesheet\b/i.test(tag));
         const metadata = retained.join('\n    ').replace(/href="(?:\.\.\/)+assets\/([\w.-]+)"/g, (_, filename) => {
             fs.copyFileSync(path.join(assets, filename), path.join(output, filename));
             return `href="/${filename}"`;
         });
-        const html = appHtml.replace('<title>Пиксель Батл · Slint</title>', metadata);
+        const html = appHtml.replace(/<\/title>/i, () => `</title>\n    ${metadata}`);
         const directory = path.join(output, route);
         fs.mkdirSync(directory, { recursive: true });
         fs.writeFileSync(path.join(directory, 'index.html'), html);

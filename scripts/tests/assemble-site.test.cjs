@@ -3,12 +3,13 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { year, episode } = require('../../shared/constants.json');
 const { assemble } = require('../assemble-site');
 test('publishes Slint routes, admin, and assets for a separate Telegram host', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pixel-site-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const put = (name, text) => { const file = path.join(root, name); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, text); };
-  put('app/index.html', '<html><head><title>Пиксель Батл · Slint</title><base href="/"><meta name="site-base" content=""></head><body><script src="/app.js"></script>wasm</body></html>');
+  put('app/index.html', '<html><head><title>PIXEL BATTLE · Пиксель Батл %Y_S_E%</title><base href="/"><meta name="site-base" content=""></head><body><script src="/app.js"></script>wasm</body></html>');
   put('app/app.js', 'js');
   put('app/snippets/example.js', 'snippet');
   put('app/tg/index.html', 'standalone route');
@@ -21,6 +22,8 @@ test('publishes Slint routes, admin, and assets for a separate Telegram host', t
   for (const route of ['', 'tg/', 'timelapse/']) {
     const html = fs.readFileSync(path.join(root, `output/${route}index.html`), 'utf8');
     assert.match(html, /wasm/); assert.match(html, /description/);
+    assert.ok(html.includes(`<title>PIXEL BATTLE · Пиксель Батл ${year} ${episode}</title>`));
+    assert.equal((html.match(/<title>/g) || []).length, 1);
   }
   assert.equal(fs.readFileSync(path.join(root, 'output/qq/index.html'), 'utf8'), 'admin');
   const html = fs.readFileSync(path.join(root, 'output/index.html'), 'utf8');
