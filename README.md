@@ -35,7 +35,7 @@ apps/
   app/                Rust/Slint, Trunk, UI и браузерный мост
   server/             TypeScript-сервер и пример конфигурации
 assets/               Общие изображения и шрифт
-shared/ws-schema.json Общая protobuf-схема для React и сервера
+shared/               Общие данные: constants.json (год и эпизод), ws-schema.json
 tools/                Существующие Node.js-утилиты
 scripts/              Сборка сайта, dev-прокси и эксплуатационные скрипты
 vendor/slint-core/    Локальная копия `i-slint-core` с исправлением кликов по ссылке

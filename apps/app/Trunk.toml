@@ -2,7 +2,7 @@
 target = "index.html"
 
 [watch]
-watch = ["src", "ui", "web", "../../assets", "../admin/src/constants.json", "../server/constants/colorSchemes.ts"]
+watch = ["src", "ui", "web", "../../assets", "../../shared/constants.json", "../server/constants/colorSchemes.ts"]
 ignore = ["generated", "dist", "target"]
 
 [[hooks]]

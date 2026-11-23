@@ -21,7 +21,6 @@ _*
 *.aac
 *.json
 *.html
-!src/constants.json
 !shared/ws-schema.json
 .eslintcache
 *.zip
@@ -33,5 +32,5 @@ tmp/
 !apps/server/package.json
 !apps/admin/tsconfig.json
 !apps/server/tsconfig.json
-!apps/admin/src/constants.json
+!shared/constants.json
 !apps/server/config.example.json
