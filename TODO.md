@@ -94,7 +94,7 @@
 - [x] fit the canvas into the frame
 - [ ] rotated access log
 - [ ] use database instead files
-- [ ] binary ws messages? (protobufjs)
+- [x] binary ws messages? (protobufjs)
 - [ ] merge token|uuid vars name?
 - [ ] use nestjs?
 - [ ] stress testing (apache benchmark?)
