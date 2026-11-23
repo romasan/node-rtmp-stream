@@ -30,6 +30,7 @@ import image404 from '../../../../../assets/404.webp';
 import { EMode, ETouchMode } from './types';
 
 import * as s from './Canvas.module.scss';
+import { CanvasPoint, getMarkerFocus, getMarkerPosition } from './marker';
 
 const DEBUG = document.location.href.includes('localhost');
 
@@ -43,6 +44,7 @@ const icons: Record<string, any> = {
 
 interface Props {
 	color: string;
+	highlight?: CanvasPoint | null;
 	mode?: EMode;
 	className?: string;
 	expiration?: number;
@@ -78,6 +80,7 @@ const defaultPixelData = {
 
 export const Canvas: FC<PropsWithChildren<Props>> = ({
 	color,
+	highlight = null,
 	mode = EMode.CLICK,
 	className,
 	expiration = 0,
@@ -99,6 +102,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 	const cur = useRef<[number, number, boolean]>([-1, -1, false]);
 	const [coord, setCoord] = useState<[number, number]>([Infinity, Infinity]);
 	const [scale, setScale] = useState(2);
+	const [imageVersion, setImageVersion] = useState(0);
 	const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 	const [error, setError] = useState('');
 	const initialDistance = useRef<number | null>(null);
@@ -165,6 +169,7 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		if (canvasRef.current) {
 			canvasRef.current.width = image.width;
 			canvasRef.current.height = image.height;
+			setImageVersion(version => version + 1);
 
 			if (rootRef.current) {
 				const { width, height } = rootRef.current.getBoundingClientRect();
@@ -780,6 +785,21 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 		Log('mode', mode);
 	}, [mode]);
 
+	const marker = highlight && expand ? getMarkerPosition(highlight, expand) : null;
+	useEffect(() => {
+		if (!highlight || !expand || !rootRef.current || !canvasRef.current) return;
+		const point = getMarkerPosition(highlight, expand);
+		if (!point) return;
+		const root = rootRef.current;
+		const { width, height, left, top } = root.getBoundingClientRect();
+		setPos(getMarkerFocus(point, { width, height }, scaleRef.current, target =>
+			[[0, 0], [-14, 0], [14, 0], [0, -14], [0, 14]].every(([dx, dy]) => {
+				const element = document.elementFromPoint(left + target.x + dx, top + target.y + dy);
+				return element !== null && root.contains(element);
+			})
+		));
+	}, [highlight, expand, imageVersion]);
+
 	return (
 		<>
 			<div
@@ -810,6 +830,9 @@ export const Canvas: FC<PropsWithChildren<Props>> = ({
 							)}
 						/>
 						{children}
+						{marker && <div className={s.highlight} role="img" aria-label={`Маркер пикселя ${highlight!.x}, ${highlight!.y}`} style={{ left: marker.x + .5, top: marker.y + .5, transform: `translate(-50%, -50%) scale(${1 / scale})` }}>
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0V6M12 18V24M0 12H6M18 12H24M5 5H19V19H5Z" fill="none" stroke="#111" strokeWidth="4" /><path d="M12 0V6M12 18V24M0 12H6M18 12H24M5 5H19V19H5Z" fill="none" stroke="#75baff" strokeWidth="2" /><circle cx="12" cy="12" r="2" fill="#fff" stroke="#111" /></svg>
+						</div>}
 						{mode === EMode.SELECT && (
 							<div
 								className={s.select}

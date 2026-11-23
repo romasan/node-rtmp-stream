@@ -7,6 +7,7 @@ import { useDraggable } from '../../hooks/useDraggable';
 import { useWindows } from '../../hooks/useWindow';
 
 import { EMode } from '../Canvas';
+import { CanvasPoint } from '../Canvas/marker';
 
 import { ToolsContext } from './context';
 
@@ -35,7 +36,7 @@ export const Content = () => {
 	renderRef.current = setRender;
 
 	return (
-		<div className={cn('wideWindow', s.rightSide)}>{opened ? render : 'Select tab'}</div>
+		<div className={cn('wideWindow', s.rightSide)}>{opened ? render : <span className={s.empty}>Выберите раздел</span>}</div>
 	);
 };
 
@@ -51,6 +52,7 @@ interface Props {
 		shiftY: number;
 		colorScheme: string;
 	}
+	onHighlightPixel?: (point: CanvasPoint | null) => void;
 	setCanvasMode: (value: EMode) => void;
 }
 
@@ -61,6 +63,7 @@ export const Tools: FC<Props> = ({
 	color,
 	expand,
 	setCanvasMode,
+	onHighlightPixel,
 }) => {
 	const isMobile = useMobileLayout();
 	const { anchorRef, draggableRef } = useDraggable({ x: 2, y: 55, hoisting: false });
@@ -102,20 +105,21 @@ export const Tools: FC<Props> = ({
 				setOpened,
 				renderRef,
 			}}>
-				<div className={s.root} ref={draggableRef}>
+				<div className={cn(s.root, { [s.expanded]: expandWindow, [s.widePanel]: wideWindow })} ref={draggableRef}>
 					<div className={s.draggable} ref={anchorRef}>
-						<button className={cn(s.wide, { [s.wided]: !wideWindow })} onClick={onWide}>
-							<div>&gt;</div>
+						<span className={s.heading}>Управление</span>
+						<button type="button" className={cn(s.wide, { [s.wided]: !wideWindow })} onClick={onWide} aria-label="Развернуть раздел сбоку" aria-pressed={wideWindow} title="Раздел сбоку">
+							<span aria-hidden="true">↔</span>
 						</button>
-						<button className={cn(s.close, { [s.toggled]: !expandWindow })} onClick={onToggle}>
-							<div>&gt;</div>
+						<button type="button" className={cn(s.close, { [s.toggled]: !expandWindow })} onClick={onToggle} aria-label={expandWindow ? 'Свернуть панель' : 'Развернуть панель'} aria-expanded={expandWindow}>
+							<span aria-hidden="true">▾</span>
 						</button>
 					</div>
 					<div className={s.content}>
 						{expandWindow && (
 							<div className={s.columns}>
 								<div className={s.leftSide}>
-									<Stats canvas={canvas} userInfo={userInfo} />
+									<Stats userInfo={userInfo} onHighlightPixel={onHighlightPixel} />
 									<Metrics />
 									<Stream />
 									<PixelStats coord={coord} />

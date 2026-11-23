@@ -1,25 +1,31 @@
-.users, .uuids {
-	overflow-x: hidden;
-	overflow-y: auto;
-	max-height: 200px;
-}
-
-.list {
-	background-color: #262627;
-	overflow-y: auto;
-	max-height: 200px;
-}
-
-.session {
-	display: flex;
-	align-items: center;
-	gap: 3px;
-
-	button {
-		padding: 0 2px;
-	}
-}
-
-.active {
-	color: #00ce00;
-}
+.root { min-width: 0; container-type: inline-size; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 5px; label { color: var(--gui-muted); font-size: 10px; } }
+.freshness { color: var(--gui-muted); font-size: 10px; margin: 5px 0 10px; }
+.metrics { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; > div { display: flex; flex-direction: column; gap: 2px; background: var(--gui-surface); border-radius: 3px; padding: 8px; min-width: 0; } span { font-size: 11px; } strong { font-size: 22px; font-weight: 500; color: var(--gui-accent); line-height: 1.3; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; } small { color: var(--gui-muted); font-size: 9px; } }
+.connectionCounts { display: flex; flex-wrap: wrap; gap: 3px 8px; color: var(--gui-muted); font-size: 10px; margin: 8px 0 12px; }
+.section { padding: 9px; border: 1px solid var(--gui-border); border-radius: 3px; margin-bottom: 10px; min-width: 0; h3 { margin: 0 0 7px; font-size: 11px; font-weight: 500; color: var(--gui-muted); } }
+.lastAuthor { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px; button { color: var(--gui-accent); } > span { font-size: 10px; color: var(--gui-muted); } }
+.pixelDetails { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin: 6px 0; font-variant-numeric: tabular-nums; code { font-size: 11px; } > span:last-child { margin-left: auto; font-size: 11px; } }
+.swatch { flex: 0 0 15px; width: 15px; height: 15px; border: 1px solid #ffffff40; border-radius: 2px; }
+.actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.hint { color: var(--gui-muted); font-size: 10px; line-height: 1.5; margin: 6px 0 0; overflow-wrap: anywhere; }
+.details { margin-top: 7px; font-size: 10px; summary { cursor: pointer; color: var(--gui-muted); } }
+.coverageHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; strong { font-size: 18px; font-weight: 500; color: var(--gui-accent); } span { color: var(--gui-muted); font-size: 10px; } }
+.section progress { display: block; width: 100%; height: 6px; margin: 8px 0; border: none; accent-color: var(--gui-accent); border-radius: 3px; overflow: hidden; background: #151515; &::-webkit-progress-bar { background: #151515; } &::-webkit-progress-value { background: var(--gui-accent); } &::-moz-progress-bar { background: var(--gui-accent); } }
+.coverageCounts { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; font-size: 10px; color: var(--gui-muted); font-variant-numeric: tabular-nums; }
+.root .onlineToggle { display: flex; width: 100%; text-align: left; padding: 6px 8px; background: var(--gui-surface); }
+.onlinePanel { padding: 8px 0; }
+.searchLabel { display: flex; flex-direction: column; gap: 5px; font-size: 10px; color: var(--gui-muted); input { width: 100%; } }
+.onlineFilters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 5px; margin: 5px 0; label { font-size: 10px; } button { font-size: 10px; } }
+.list { max-height: 240px; overflow: auto; scrollbar-width: thin; }
+.session { padding: 7px 0; border-bottom: 1px solid var(--gui-border); }
+.sessionHeader { display: flex; justify-content: space-between; align-items: center; gap: 6px; button { color: var(--gui-accent); max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+.activity { color: var(--gui-muted); font-size: 9px; }
+.active { color: #a8ddbc; }
+.tokenLine { display: flex; gap: 5px; align-items: center; min-width: 0; margin-top: 4px; code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; user-select: all; } button { flex-shrink: 0; font-size: 9px; } }
+.sessionMeta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; color: var(--gui-muted); font-size: 9px; margin-top: 3px; }
+.lookup { margin: 10px 0; font-size: 11px; summary { cursor: pointer; color: var(--gui-muted); } form { display: flex; align-items: flex-end; gap: 6px; margin-top: 8px; } label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 10px; } input { width: 100%; } }
+.found { max-height: 150px; overflow: auto; button { display: block; width: 100%; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 10px monospace; } }
+.uptime { color: var(--gui-muted); border-top: 1px solid var(--gui-border); padding-top: 8px; font-size: 10px; }
+.error { padding: 8px; background: #402b2b; color: #ffb5b5; font-size: 11px; border-radius: 3px; margin: 6px 0; }
+.empty { color: var(--gui-muted); text-align: center; padding: 16px 6px; font-size: 11px; }

@@ -6,6 +6,7 @@ import {
 	Palette,
 	Tools,
 } from '../../components';
+import { CanvasPoint } from '../../components/Canvas/marker';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import { APIhost } from '../../lib/api';
 
@@ -18,6 +19,7 @@ import * as s from './App.module.scss';
 export const App: React.FC = () => {
 	const [wsStore, setWsStore] = useState<any>({});
 	const [color, setColor] = useState('');
+	const [highlightedPixel, setHighlightedPixel] = useState<CanvasPoint | null>(null);
 	const [canvasMode, setCanvasMode] = useState<EMode>('CLICK' as EMode);
 	const [coord, setCoord] = useState({});
 	const [range, setRange] = useState({});
@@ -67,6 +69,7 @@ export const App: React.FC = () => {
 		<div className={isMobile ? 'mobile' : ''}>
 			<a href="/" className={s.backButton}>←</a>
 			<Canvas
+				highlight={highlightedPixel}
 				mode={canvasMode}
 				expand={wsStore.canvas}
 				className={s.canvas}
@@ -94,6 +97,7 @@ export const App: React.FC = () => {
 				coord={coord}
 				range={range}
 				color={(wsStore.canvas && wsStore.canvas.colorScheme === 'truecolor') ? color : palette[color]}
+				onHighlightPixel={setHighlightedPixel}
 				setCanvasMode={setCanvasMode}
 			/>
 		</div>

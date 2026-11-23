@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import React, { useRef, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -5,6 +6,8 @@ import * as s from './Modal.module.scss';
 
 interface Props {
 	content: React.ReactElement;
+	title?: string;
+	resizable?: boolean;
 	width?: string;
 	height?: string;
 	portal?: boolean;
@@ -14,6 +17,8 @@ interface Props {
 export const useModal = (props?: Props | React.ReactElement) => {
 	const {
 		content,
+		title,
+		resizable,
 		width,
 		height,
 		portal,
@@ -56,9 +61,10 @@ export const useModal = (props?: Props | React.ReactElement) => {
 
 		const wrapper = (
 			<div className={s.root}>
-				<div className={s.window} style={{ width, height }}> 
-					<div className={s.close} onClick={close}>&times;</div>
-					{content || props}
+				<div className={cn(s.window, { [s.resizable]: resizable, [s.withTitle]: title })} style={{ width, height }} role="dialog" aria-modal="true" aria-label={title || 'Информация'}>
+					{title && <div className={s.header}>{title}</div>}
+					<button type="button" className={s.close} onClick={close} aria-label="Закрыть окно">&times;</button>
+					<div className={s.body}>{content || props}</div>
 				</div>
 			</div>
 		);

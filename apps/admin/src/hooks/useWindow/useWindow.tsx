@@ -33,7 +33,8 @@ const Wrapper = ({
 			style={{ width, height }}
 		>
 			<div className={s.draggable} ref={anchorRef}>
-				<button className={s.close} onClick={onClose}>&times;</button>
+				<span className={s.heading}>Пользователь</span>
+				<button type="button" className={s.close} onClick={onClose} aria-label="Закрыть окно">&times;</button>
 			</div>
 			<div className={s.content}>
 				{content}
@@ -163,7 +164,8 @@ export const useWindow = (props?: IProps | React.ReactElement) => {
 				style={{ width, height }}
 			>
 				<div className={s.draggable} ref={anchorRef}>
-					<button className={s.close} onClick={close}>&times;</button>
+					<span className={s.heading}>Информация</span>
+					<button type="button" className={s.close} onClick={close} aria-label="Закрыть окно">&times;</button>
 				</div>
 				<div className={s.content}>
 					{content || props}

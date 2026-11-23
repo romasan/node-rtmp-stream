@@ -60,6 +60,7 @@ export const Block: FC<PropsWithChildren<Props>> = ({
 
 	const render = () => (
 		<div className={s.content}>
+			{wideWindow && <div className={s.sectionTitle}>{title}</div>}
 			{children}
 		</div>
 	);
@@ -72,9 +73,9 @@ export const Block: FC<PropsWithChildren<Props>> = ({
 
 	return (
 		<div className={s.root}>
-			<div className={cn(s.title, { [s.active]: isOpened })} onClick={toggle}>
+			<button type="button" className={cn(s.title, { [s.active]: isOpened })} onClick={toggle} aria-expanded={isOpened}>
 				{title}
-			</div>
+			</button>
 			{!wideWindow && isOpened && render()}
 		</div>
 	);

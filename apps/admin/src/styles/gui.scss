@@ -1,0 +1,82 @@
+// Shared appearance for the admin's floating controls.
+@mixin panel {
+	--gui-bg: #1f1f1f;
+	--gui-surface: #292929;
+	--gui-control: #383838;
+	--gui-border: #393939;
+	--gui-text: #e5e5e5;
+	--gui-muted: #a3a3a3;
+	--gui-accent: #75baff;
+	box-sizing: border-box;
+	background: var(--gui-bg);
+	color: var(--gui-text);
+	border: 1px solid #111;
+	border-radius: 4px;
+	box-shadow: 0 6px 24px #0006;
+	font: 12px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	color-scheme: dark;
+	accent-color: var(--gui-accent);
+
+	*, *::before, *::after { box-sizing: border-box; }
+	:focus-visible { outline: 2px solid var(--gui-accent); outline-offset: 2px; }
+}
+
+@mixin controls {
+	button, input, select, textarea { font: inherit; }
+	button, select, textarea, input:not([type='checkbox']):not([type='radio']) {
+		max-width: 100%;
+		min-width: 0;
+		border: 1px solid transparent;
+		border-radius: 2px;
+		background: var(--gui-control);
+		color: var(--gui-text);
+		padding: 3px 6px;
+	}
+	button {
+		min-height: 24px;
+		cursor: pointer;
+		margin: 2px 0;
+		transition: background 120ms;
+		&:hover:not(:disabled) { background: #494949; }
+		&:active:not(:disabled) { background: #555; }
+		&:disabled { opacity: .4; cursor: default; }
+	}
+	input:not([type='checkbox']):not([type='radio']), textarea {
+		background: #151515;
+		color: var(--gui-accent);
+		&:focus { border-color: var(--gui-accent); }
+	}
+	input[type='checkbox'], input[type='radio'] { margin: 4px 6px 4px 0; vertical-align: middle; }
+	label { cursor: pointer; }
+	hr { border: 0; border-top: 1px solid var(--gui-border); margin: 8px 0; }
+	a, a:visited { color: var(--gui-accent); }
+	table { border-collapse: collapse; font-size: 11px; }
+	td, th { padding: 3px 5px; border-color: var(--gui-border); overflow-wrap: anywhere; }
+}
+
+@mixin header {
+	display: flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 0 8px 0 10px;
+	background: #111;
+	border-radius: 3px 3px 0 0;
+	font-weight: 600;
+	cursor: grab;
+	user-select: none;
+	&:active { cursor: grabbing; }
+}
+
+@mixin headerButton {
+	flex: 0 0 26px;
+	width: 26px;
+	height: 24px;
+	padding: 0;
+	border: 0;
+	border-radius: 2px;
+	background: transparent;
+	color: var(--gui-muted);
+	font: inherit;
+	cursor: pointer;
+	&:hover { background: #333; color: #fff; }
+}

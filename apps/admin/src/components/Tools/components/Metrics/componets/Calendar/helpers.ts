@@ -1,69 +1,34 @@
-const day = 1000 * 60 * 60 * 24;
+export const padStartWeek = (year: number, month: number) =>
+	(new Date(year, month - 1, 1).getDay() + 6) % 7;
 
-export const padStartWeek = (year: number, month: number) => {
-	const date = new Date(year, month - 1, 1);
-
-	return Math.max(0, date.getDay() - 1);
-};
-
-export const getDaysInMonth = (year: number, month: number) => {
-	const date = new Date(year, month - 1, 1);
-	let time, index;
-
-	for (
-		time = date.getTime() + day;
-		new Date(time).getMonth() === month - 1;
-		time += day
-	) {
-		index = new Date(time).getDate();
-	}
-
-	return index;
-};
+export const getDaysInMonth = (year: number, month: number) =>
+	new Date(year, month, 0).getDate();
 
 export const getMonthsRange = ([fromYear, fromMonth]: number[], [toYear, toMonth]: number[]) => {
-	const list = [];
-	let time = new Date(fromYear, fromMonth, 1).getTime();
-
-	for (
-		let year = fromYear, month = fromMonth;
-		time < new Date(toYear, toMonth, 1).getTime();
-		year = new Date(time).getFullYear(), month = new Date(time).getMonth() + 1, time += (getDaysInMonth(year, month) as number) * day
-	) {
-		list.push([year, month]);
+	const months: string[] = [];
+	for (let index = fromYear * 12 + fromMonth - 1; index <= toYear * 12 + toMonth - 1; index++) {
+		months.push(`${Math.floor(index / 12)}-${String(index % 12 + 1).padStart(2, '0')}`);
 	}
-
-	list.push([toYear, toMonth]);
-
-	return list.map(([year, month]) => `${year}-${String(month).padStart(2, '0')}`);
+	return months;
 };
 
-export const getMonthCalendar = (year: number, month: number) => {
-	const list = Array(padStartWeek(year, month))
-		.fill(null)
-		.concat(Array(getDaysInMonth(year, month)).fill(null).map((_, index) => index + 1));
-	const weeks = Math.ceil(list.length / 7);
-
-	if (weeks * 7 > list.length) {
-		list.push(...Array(weeks * 7 - list.length).fill(null));
-	}
-
-	return list.reduce((matrix, item) => {
-		const lastList = matrix[matrix.length - 1];
-
-		if (lastList.length < 7) {
-			return matrix.slice(0, -1).concat([[...lastList, item]]);
-		}
-
-		return matrix.concat([[item]]);
-	}, [[]]);
+export const getMonthCalendar = (year: number, month: number): (number | null)[][] => {
+	const cells: (number | null)[] = Array(padStartWeek(year, month)).fill(null);
+	for (let date = 1; date <= getDaysInMonth(year, month); date++) cells.push(date);
+	while (cells.length % 7) cells.push(null);
+	return Array.from({ length: cells.length / 7 }, (_, index) => cells.slice(index * 7, index * 7 + 7));
 };
 
-export const prepareHours = (list: number[]): [string, number][] => {
-	const emptyList = Array(24).fill(null)
-		.map((_, index) => (String(index).padStart(2, '0')))
-		.reduce((list, key) => ({ ...list, [key]: 0}), {});
+export const prepareHours = (list?: Record<string, number> | number[]): [string, number][] =>
+	Array.from({ length: 24 }, (_, hour) => {
+		const key = String(hour).padStart(2, '0');
+		const values = list as Record<string, number> | undefined;
+		return [key, Math.max(0, Number(values?.[key] ?? values?.[String(hour)]) || 0)];
+	});
 
-	return Object.entries({ ...emptyList, ...list } as unknown as Record<string, number>)
-		.sort(([a], [b]) => Number(a) > Number(b) ? 1 : -1);
+export const getChartPoints = (data: [string, number][], width: number, height: number) => {
+	const max = Math.max(1, ...data.map(([, value]) => value));
+	return data.map(([, value], index) =>
+		`${index * width / Math.max(1, data.length - 1)},${height - value / max * height}`
+	).join(' ');
 };

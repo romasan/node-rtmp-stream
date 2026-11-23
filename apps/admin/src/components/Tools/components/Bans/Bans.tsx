@@ -1,217 +1,181 @@
-import React, { FC, useState } from 'react';
+import React, { FC, FormEvent, useRef, useState } from 'react';
 import cn from 'classnames';
 
-import { useModal } from '../../../../hooks';
-
 import { Block } from '../Block';
-
-import { get, put, patch } from '../../helpers';
-
+import { addBan, BAN_TYPES, BanList, BanType, loadBans, removeBan } from './api';
 import * as s from './Bans.module.scss';
 
+const categories: Record<BanType, { title: string; label: string; placeholder: string; empty: string }> = {
+	token: { title: 'Сессии', label: 'Токен сессии', placeholder: 'UUID или токен', empty: 'Заблокированных сессий пока нет.' },
+	ip: { title: 'IP', label: 'IP-адрес', placeholder: '192.0.2.1 или 2001:db8::1', empty: 'Заблокированных IP пока нет.' },
+	nick: { title: 'Ники', label: 'Никнейм', placeholder: 'Никнейм пользователя', empty: 'Банов по никнейму пока нет.' },
+	mute: { title: 'Мьюты', label: 'Никнейм', placeholder: 'Никнейм пользователя', empty: 'Мьютов в чате пока нет.' },
+};
+const emptyFields = (): Record<BanType, string> => ({ token: '', ip: '', nick: '', mute: '' });
+const errorMessage = (error: unknown) => error instanceof Error ? error.message : 'Не удалось выполнить запрос. Попробуйте ещё раз.';
+const termLabel = (type: BanType, term: true | number) => {
+	// IP and mute expiration is not enforced by the current backend.
+	if (term === true || type === 'ip' || type === 'mute') return 'Бессрочно';
+	if (term <= Date.now()) return 'Срок истёк';
+	return `До ${new Date(term).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+};
+
 export const Bans: FC = () => {
-	const [stats, setStats] = useState<any>({});
-	const [ip, setIp] = useState('');
-	const [token, setToken] = useState('');
-	const [nick, setNick] = useState('');
-	const [mute, setMute] = useState('');
-	const [ipsText, setIpsText] = useState('');
-	const [opened, setOpened] = useState('');
+	const [stats, setStats] = useState<BanList | null>(null);
+	const [tab, setTab] = useState<BanType>('token');
+	const [queries, setQueries] = useState(emptyFields);
+	const [drafts, setDrafts] = useState(emptyFields);
+	const [adding, setAdding] = useState(false);
+	const [bulkIp, setBulkIp] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [loadError, setLoadError] = useState('');
+	const [pending, setPending] = useState<{ kind: 'add' } | { kind: 'remove'; value: string } | null>(null);
+	const [feedback, setFeedback] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+	const [copied, setCopied] = useState('');
+	const initialTabChosen = useRef(false);
+	const loadVersion = useRef(0);
+	const saving = useRef(false);
 
-	const toggleOpened = (value: string) => {
-		setOpened(value === opened ? '' : value);
+	const refresh = async () => {
+		const version = ++loadVersion.current;
+		setLoading(true);
+		setLoadError('');
+		try {
+			const bans = await loadBans();
+			if (version !== loadVersion.current) return;
+			setStats(bans);
+			if (!initialTabChosen.current) {
+				setTab(BAN_TYPES.find(type => Object.keys(bans[type]).length > 0) || 'token');
+				initialTabChosen.current = true;
+			}
+		} catch (error) {
+			if (version === loadVersion.current) setLoadError(errorMessage(error));
+		} finally {
+			if (version === loadVersion.current) setLoading(false);
+		}
 	};
 
-	const handleOpen = () => {
-		get('getBans')
-			.then(setStats)
-			.catch(() => {/* */});
+	const list = stats?.[tab] || {};
+	const entries = Object.keys(list).sort((a, b) => a.localeCompare(b));
+	const query = queries[tab].trim().toLocaleLowerCase();
+	const filtered = entries.filter(value => value.toLocaleLowerCase().includes(query));
+	const draft = drafts[tab];
+	const values = tab === 'ip'
+		? Array.from(new Set(draft.split(/\r?\n|,\s*/).map(value => value.trim()).filter(Boolean)))
+		: [draft.trim()].filter(Boolean);
+	const newValues = values.filter(value => !Object.prototype.hasOwnProperty.call(list, value));
+	const busy = loading || Boolean(pending);
+	const canAdd = Boolean(stats && !loadError && newValues.length && !busy);
+
+	const submit = async (event: FormEvent) => {
+		event.preventDefault();
+		if (!canAdd || saving.current) return;
+		saving.current = true;
+		setPending({ kind: 'add' });
+		setFeedback(null);
+		try {
+			await addBan(tab, newValues.join('\n'));
+			setDrafts(previous => ({ ...previous, [tab]: '' }));
+			setAdding(false);
+			setFeedback({ kind: 'success', text: tab === 'mute' ? 'Мьют добавлен.' : newValues.length > 1 ? 'IP-адреса заблокированы.' : 'Бан добавлен.' });
+			await refresh();
+		} catch (error) {
+			setFeedback({ kind: 'error', text: errorMessage(error) });
+		} finally {
+			saving.current = false;
+			setPending(null);
+		}
 	};
 
-	const handleClickBanByIp = () => {
-		put('ban', JSON.stringify({ type: 'ip', value: ip }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */})
-			.finally(() => setIp(''));
+	const remove = async (value: string) => {
+		if (busy || saving.current || loadError) return;
+		saving.current = true;
+		setPending({ kind: 'remove', value });
+		setFeedback(null);
+		try {
+			await removeBan(tab, value);
+			setFeedback({ kind: 'success', text: tab === 'mute' ? `Мьют для «${value}» снят.` : `Бан для «${value}» снят.` });
+			await refresh();
+		} catch (error) {
+			setFeedback({ kind: 'error', text: errorMessage(error) });
+		} finally {
+			saving.current = false;
+			setPending(null);
+		}
 	};
 
-	const handleClickBanByToken = () => {
-		put('ban', JSON.stringify({ type: 'token', value: token }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */})
-			.finally(() => setToken(''));
+	const copy = async (value: string) => {
+		try {
+			await navigator.clipboard.writeText(value);
+			setCopied(value);
+		} catch {
+			setFeedback({ kind: 'error', text: 'Не удалось скопировать. Полное значение доступно при наведении на строку.' });
+		}
 	};
-
-	const handleClickBanByNick = () => {
-		put('ban', JSON.stringify({ type: 'nick', value: nick }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */})
-			.finally(() => setNick(''));
-	};
-
-	const handleClickUnbanByIp = (value: string) => {
-		patch('unban', JSON.stringify({ type: 'ip', value }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */});
-	};
-
-	const handleClickUnbanByToken = (value: string) => {
-		patch('unban', JSON.stringify({ type: 'token', value }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */});
-	};
-
-	const handleClickUnbanByNick = (value: string) => {
-		patch('unban', JSON.stringify({ type: 'nick', value }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */});
-	};
-
-	const handleClickUnmuteByNick = (value: string) => {
-		patch('unban', JSON.stringify({ type: 'mute', value }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */});
-	};
-
-	const handleClickMuteByNick = () => {
-		put('ban', JSON.stringify({ type: 'mute', value: mute }), false)
-			.then(() => handleOpen())
-			.catch(() => {/* */})
-			.finally(() => setMute(''));
-	};
-
-	const addIps = () => {
-		put('ban', JSON.stringify({ type: 'ip', value: ipsText }), false)
-			.then(() => {
-				handleOpen();
-				ipsModal.close();
-			})
-			.catch(() => {/* */});
-	};
-
-	const ipsModal = useModal({
-		content: (
-			<div>
-				<div>Add IPs</div>
-				<div>
-					<textarea rows={10} cols={60} onChange={({ target }) => setIpsText(target.value)}></textarea>
-				</div>
-				<div>
-					<button disabled={!ipsText} onClick={addIps}>add</button>
-				</div>
-			</div>
-		),
-		portal: true,
-	});
-
-	const bannedByToken = stats.token ? Object.keys(stats.token).length : 0;
-	const bannedByIp = stats.ip ? Object.keys(stats.ip).length : 0;
-	const bannedByNickname = stats.nick ? Object.keys(stats.nick).length : 0;
-	const mutedByNick = stats.mute ? Object.keys(stats.mute).length : 0;
-
-	const filterList = (value: string) => {
-		const query = { token, ip, nick, mute }[opened] || '';
-
-		return !query || value.includes(query);
-	};
-
-	const bannedByTokenFiltered = stats.token ? Object.keys(stats.token).filter(filterList).length : 0;
-	const bannedByIpFiltered = stats.ip ? Object.keys(stats.ip).filter(filterList).length : 0;
-	const bannedByNicknameFiltered = stats.nick ? Object.keys(stats.nick).filter(filterList).length : 0;
-	const mutedByNickFiltered = stats.mute ? Object.keys(stats.mute).filter(filterList).length : 0;
 
 	return (
-		<Block title="🔨 Управление банами" onOpen={handleOpen}>
-			<div onClick={() => toggleOpened('token')} className={cn(s.toggleButton, { [s.active]: opened === 'token' })}>Бан для сессии ({bannedByToken})</div>
-			<div onClick={() => toggleOpened('ip')} className={cn(s.toggleButton, { [s.active]: opened === 'ip' })}>Бан по IP ({bannedByIp})</div>
-			<div onClick={() => toggleOpened('nick')} className={cn(s.toggleButton, { [s.active]: opened === 'nick' })}>Бан по нику ({bannedByNickname})</div>
-			<div onClick={() => toggleOpened('mute')} className={cn(s.toggleButton, { [s.active]: opened === 'mute' })}>Мьют в чате (по нику) ({mutedByNick})</div>
-
-			<hr />
-
-			{opened === 'token' && (
-				<>
-					<div className={s.blockTitle}>Бан для сессии: {bannedByTokenFiltered}</div>
-					<div className={s.list}>
-						{stats.token && Object.keys(stats.token).filter(filterList).sort().map((v) => (
-							<div key={v} className={s.item}>
-								{v}
-								<span onClick={() => handleClickUnbanByToken(v)}>&times;</span>
-							</div>
-						))}
-					</div>
-					<div>
-						<input value={token} onChange={({target: {value}}) => setToken(value)} placeholder="TOKEN" />
-						<button onClick={handleClickBanByToken} disabled={!token}>добавить</button>
-						<select>
-							<option value="0">навсегда TODO</option>
-							<option value="0">1 час</option>
-							<option value="0">сутки</option>
-							<option value="0">неделя</option>
-							<option value="0">месяц</option>
-						</select>
-					</div>
-				</>
-			)}
-			{opened === 'ip' && (
-				<>
-					<div className={s.blockTitle}>Бан по IP: {bannedByIpFiltered}</div>
-					<div className={s.list}>
-						{stats.ip && Object.keys(stats.ip).filter(filterList).sort().map((v) => (
-							<div key={v} className={s.item}>
-								{v}
-								<span onClick={() => handleClickUnbanByIp(v)}>&times;</span>
-							</div>
-						))}
-					</div>
-					<div>
-						<input value={ip} onChange={({ target: { value }}) => setIp(value)} placeholder="IP ADDRESS" />
-						<button onClick={handleClickBanByIp} disabled={!ip}>добавить</button>
-						<button onClick={ipsModal.open}>списком</button>
-					</div>
-				</>
-			)}
-			{opened === 'nick' && (
-				<>
-					<div className={s.blockTitle}>Бан по нику: {bannedByNicknameFiltered}</div>
-					<div className={s.list}>
-						{stats.nick && Object.keys(stats.nick).filter(filterList).sort().map((v) => (
-							<div key={v} className={s.item}>
-								{v}
-								<span onClick={() => handleClickUnbanByNick(v)}>&times;</span>
-							</div>
-						))}
-					</div>
-					<div>
-						<input value={nick} onChange={({ target: { value }}) => setNick(value)} placeholder="NICKNAME" />
-						<button onClick={handleClickBanByNick} disabled={!nick}>добавить</button>
-					</div>
-				</>
-			)}
-			{opened === 'mute' && (
-				<>
-					<div className={s.blockTitle}>Мьют в чате: {mutedByNickFiltered}</div>
-					<div className={s.list}>
-						{stats.mute && Object.keys(stats.mute).filter(filterList).sort().map((v) => (
-							<div key={v} className={s.item}>
-								{v}
-								<span onClick={() => handleClickUnmuteByNick(v)}>&times;</span>
-							</div>
-						))}
-					</div>
-					<div>
-						<input value={mute} onChange={({ target: { value }}) => setMute(value)} placeholder="MUTE BY NICKNAME" />
-						<button onClick={handleClickMuteByNick} disabled={!mute}>замьютить</button>
-					</div>
-				</>
-			)}
-			<div>
-				<div>
-					IP с несколькими юзерами:&nbsp;
-					<a href="#">TODO</a>
+		<Block id="bans" title="🔨 Управление банами" onOpen={refresh}>
+			<div className={s.root}>
+				<div className={s.tabs} role="group" aria-label="Тип блокировки">
+					{BAN_TYPES.map(type => (
+						<button type="button" key={type} aria-pressed={tab === type} disabled={busy || !stats}
+							className={cn(s.tab, { [s.activeTab]: tab === type })}
+							onClick={() => { setTab(type); setAdding(false); setFeedback(null); setCopied(''); }}>
+							{categories[type].title}<span>{stats ? Object.keys(stats[type]).length : '—'}</span>
+						</button>
+					))}
 				</div>
+
+				<div className={s.toolbar}>
+					<button type="button" className={s.addButton} onClick={() => { setAdding(value => !value); setFeedback(null); }}
+						disabled={busy || !stats || Boolean(loadError)} aria-expanded={adding} aria-controls="ban-add-form">
+						{tab === 'mute' ? '+ Добавить мьют' : '+ Добавить бан'}
+					</button>
+					<button type="button" onClick={() => void refresh()} disabled={busy}>{loading ? 'Загрузка…' : 'Обновить'}</button>
+				</div>
+
+				{feedback && <div className={cn(s.feedback, { [s.error]: feedback.kind === 'error' })} role={feedback.kind === 'error' ? 'alert' : 'status'}>{feedback.text}</div>}
+				{loadError && <div className={cn(s.feedback, s.error)} role="alert">{stats && 'Список не обновлён. '}{loadError}</div>}
+
+				{adding && <form id="ban-add-form" className={s.form} onSubmit={submit}>
+					<div className={s.formTitle}>{tab === 'mute' ? 'Новый мьют в чате' : 'Новый бан'}<span>Бессрочно</span></div>
+					<label htmlFor="ban-value">{tab === 'ip' && bulkIp ? 'IP-адреса, каждый с новой строки' : categories[tab].label}</label>
+					{tab === 'ip' && bulkIp
+						? <textarea id="ban-value" rows={5} value={draft} disabled={busy} onChange={event => setDrafts(previous => ({ ...previous, [tab]: event.target.value }))} />
+						: <input id="ban-value" autoComplete="off" spellCheck={false} placeholder={categories[tab].placeholder} value={draft} disabled={busy}
+							onChange={event => setDrafts(previous => ({ ...previous, [tab]: event.target.value }))} />}
+					{tab === 'ip' && <label className={s.bulkToggle}><input type="checkbox" checked={bulkIp} disabled={busy} onChange={event => {
+						setBulkIp(event.target.checked);
+						// A multi-line draft must stay visible until submitted or edited.
+						if (!event.target.checked) setDrafts(previous => ({ ...previous, ip: previous.ip.replace(/\r?\n/g, ', ') }));
+					}} />Несколько IP-адресов</label>}
+					{values.length > 0 && !newValues.length && <div className={s.hint}>Уже есть в списке блокировок.</div>}
+					<div className={s.formActions}>
+						<button type="submit" className={s.addButton} disabled={!canAdd}>{pending?.kind === 'add' ? 'Сохранение…' : tab === 'mute' ? 'Замьютить' : 'Заблокировать'}</button>
+						<button type="button" disabled={busy} onClick={() => setAdding(false)}>Отмена</button>
+					</div>
+				</form>}
+
+				<label className={s.search}>
+					<span>Поиск в списке</span>
+					<input type="search" placeholder={tab === 'ip' ? 'Найти IP-адрес…' : tab === 'token' ? 'Найти сессию…' : 'Найти никнейм…'} value={queries[tab]}
+						disabled={!stats} onChange={event => setQueries(previous => ({ ...previous, [tab]: event.target.value }))} />
+				</label>
+				<div className={s.listHeading}><span>{categories[tab].title}</span><span>{stats ? `${filtered.length} из ${entries.length}` : '—'}</span></div>
+				<div className={s.list} aria-label={`Список: ${categories[tab].title}`} aria-busy={loading}>
+					{!stats ? <div className={s.empty} role="status">{loading ? 'Загрузка списка…' : 'Список не загружен.'}</div>
+						: !filtered.length ? <div className={s.empty}>{query ? 'Ничего не найдено. Измените поисковый запрос.' : categories[tab].empty}</div>
+							: filtered.map(value => <div key={value} className={s.item}>
+								<div className={s.details}>
+									<span className={cn(s.value, { [s.token]: tab === 'token' || tab === 'ip' })} title={value}>{value}</span>
+									<span className={s.term}>{termLabel(tab, list[value])}</span>
+								</div>
+								<button type="button" className={s.copy} onClick={() => void copy(value)} aria-label={`Копировать ${value}`} title={copied === value ? 'Скопировано' : 'Копировать'}>{copied === value ? '✓' : '⧉'}</button>
+								<button type="button" className={s.remove} onClick={() => void remove(value)} disabled={busy || Boolean(loadError)} aria-label={`Снять ${tab === 'mute' ? 'мьют' : 'бан'}: ${value}`}>{pending?.kind === 'remove' && pending.value === value ? 'Снятие…' : 'Снять'}</button>
+							</div>)}
+				</div>
+				{copied && <span className={s.copyStatus} role="status">Значение скопировано.</span>}
 			</div>
-			{ipsModal.render()}
 		</Block>
 	);
 };

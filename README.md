@@ -146,6 +146,8 @@ Slint запускается из `apps/app/index.html`, а браузерный
 
 Доступна только администраторам/модераторам (`checkIsAdmin`). Включает: баны, статистику, карты активности, чат, паузу, расширение полотна, заливку области, управление кулдауном и настройками стрима. UI — `apps/admin/src/containers/Admin`.
 
+Разделы админки используют общую тёмную тему `apps/admin/src/styles/gui.scss` (миксины `panel`, `controls`, `header`, `headerButton`). Логика каждого раздела разделена на `api.ts` (HTTP-запросы с понятными сообщениями об ошибках) и `model.ts` (чистые функции), которые покрыты тестами `scripts/tests/admin-*.test.cjs`. Из раздела статистики можно навести маркер на конкретный пиксель: `apps/admin/src/components/Canvas/marker.ts` пересчитывает координаты с учётом сдвигов расширения и подбирает свободное место, чтобы не перекрывать панели.
+
 ### 10. Таймлапс (`/timelapse`)
 
 - Режим Slint-приложения на маршруте `/timelapse/`.
@@ -235,7 +237,7 @@ npm run check         # TypeScript, native Rust и wasm32
 npm test              # JS- и Rust-тесты
 ```
 
-Отдельные production-сборки: `npm run build:app`, `npm run build:admin`, `npm run build:server`. Тесты сервера и Slint можно запускать отдельно: `npm run test:server` и `npm run test:app`. Для админки существующего набора тестов нет; её TypeScript проверяется через `npm run check`. Для Slint также доступны `trunk serve` и `trunk build --release` из `apps/app/`. Единый адрес для игры, админки и страниц входа/выхода — `http://localhost:1234/`. Прокси направляет игру в Trunk на порту 1420, админку и страницы авторизации в Parcel на порту 1235, API и WebSocket — на `127.0.0.1:8080`. Для переходов после авторизации установите в локальном `apps/server/config.json` значения `server.host` и `server.origin` в `http://localhost:1234`. Для тестового локального входа включите `localAuth: true`; учётные записи для разработки указаны в `apps/server/api/auth/local.ts`.
+Отдельные production-сборки: `npm run build:app`, `npm run build:admin`, `npm run build:server`. Тесты сервера, Slint и админки можно запускать отдельно: `npm run test:server`, `npm run test:app` и `node --test scripts/tests/*.test.cjs` (входят в `npm test`). TypeScript админки проверяется через `npm run check`. Для Slint также доступны `trunk serve` и `trunk build --release` из `apps/app/`. Единый адрес для игры, админки и страниц входа/выхода — `http://localhost:1234/`. Прокси направляет игру в Trunk на порту 1420, админку и страницы авторизации в Parcel на порту 1235, API и WebSocket — на `127.0.0.1:8080`. Для переходов после авторизации установите в локальном `apps/server/config.json` значения `server.host` и `server.origin` в `http://localhost:1234`. Для тестового локального входа включите `localAuth: true`; учётные записи для разработки указаны в `apps/server/api/auth/local.ts`.
 
 `npm run tools <команда>` запускает существующие утилиты; `npm run build:twitch` упаковывает Twitch extension. `npm start` собирает сервер и запускает его через pm2. Хук pre-commit выполняет `npm run check` и `npm test`.
 

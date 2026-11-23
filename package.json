@@ -1,6 +1,6 @@
 {
   "name": "rtmp-stream",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
   "scripts": {
     "dev": "concurrently --kill-others -n admin,app,server -c blue,magenta,green \"npm:dev:admin\" \"npm:dev:app\" \"npm:dev:server\"",

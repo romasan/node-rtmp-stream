@@ -238,3 +238,4 @@
 	border-radius: 3px;
 	padding: 3px;
 }
+.highlight { position: absolute; width: 24px; height: 24px; pointer-events: none; transform-origin: center; z-index: 2; svg { display: block; width: 100%; height: 100%; } }

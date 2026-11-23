@@ -10,11 +10,15 @@ export const Metrics: FC = () => {
 			<Calendar />
 		),
 		portal: true,
+		title: 'Метрики · Календарь активности',
+		width: '1000px',
+		height: '680px',
+		resizable: true,
 	});
 
 	return (
 		<Block title="📊 Метрики">
-			<button onClick={modalCalendar.toggle}>календарь</button>
+			<button onClick={modalCalendar.toggle}>Календарь активности</button>
 			<button disabled>графики</button>
 			<div>
 				<a href="https://analytics.google.com/analytics/web/#/a347795738p480482307/reports/intelligenthome" target="_blank">

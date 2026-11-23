@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.11.2026
+- Reworked the admin panel with a shared dark GUI theme (`styles/gui.scss`) and accessible, labeled controls.
+- Split admin sections into `api.ts` and `model.ts` modules and added `scripts/tests/admin-*.test.cjs` unit tests.
+- Added a canvas pixel highlight marker that follows the selected pixel and avoids overlapping the floating panels.
+- Bumped the package version to 2.0.0 and gave Parcel dev builds separate `dist`/`cache` directories under `.parcel-cache`.
+
 ## 17.11.2026
 - Added `tools/analyzePixels.js` with `tools/pixelSynchronization.js` and `tools/renderPixelReport.js` to flag automation and coordinated accounts in `pixels.log`, plus tests and docs.
 
